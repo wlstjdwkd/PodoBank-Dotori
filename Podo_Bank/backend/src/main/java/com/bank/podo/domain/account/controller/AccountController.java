@@ -42,6 +42,12 @@ public class AccountController {
         return ResponseEntity.ok(accountHistoryList);
     }
 
+    @PatchMapping("/password")
+    public ResponseEntity<AccountDTO> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+        accountService.changePassword(changePasswordDTO, passwordEncoder);
+        return ResponseEntity.ok().build();
+    }
+
     @PatchMapping("/deposit")
     public ResponseEntity<AccountDTO> deposit(@RequestBody DepositDTO depositDTO) {
         accountService.deposit(depositDTO, passwordEncoder);

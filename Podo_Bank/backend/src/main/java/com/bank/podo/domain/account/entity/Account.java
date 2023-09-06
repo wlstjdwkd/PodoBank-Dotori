@@ -67,6 +67,26 @@ public class Account {
         this.locked = locked;
     }
 
+    public Account update(Account account) {
+        if(account.getAccountType() != null) {
+            this.accountType = account.getAccountType();
+        }
+        if(account.getPassword() != null) {
+            this.password = account.getPassword();
+        }
+        if(account.getPasswordRetryCount() == 0) {
+            this.passwordRetryCount = account.getPasswordRetryCount();
+        }
+        if(account.getLoanInfo() != null) {
+            this.loanInfo = account.getLoanInfo();
+        }
+        if(account.getInterestRate() != null) {
+            this.interestRate = account.getInterestRate();
+        }
+
+        return this;
+    }
+
     public void deposit(BigDecimal amount) {
         this.balance = this.balance.add(amount);
     }

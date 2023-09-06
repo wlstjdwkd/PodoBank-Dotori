@@ -1,10 +1,7 @@
 package com.bank.podo.domain.account.service;
 
 import com.bank.podo.domain.account.dto.*;
-import com.bank.podo.domain.account.exception.AccountNotFoundException;
-import com.bank.podo.domain.account.exception.AccountUserNotMatchException;
-import com.bank.podo.domain.account.exception.InsufficientBalanceException;
-import com.bank.podo.domain.account.exception.PasswordRetryCountExceededException;
+import com.bank.podo.domain.account.exception.*;
 import com.bank.podo.domain.account.repository.AccountRepository;
 import com.bank.podo.domain.account.repository.TransactionHistoryRepository;
 import com.bank.podo.domain.user.entity.User;
@@ -23,6 +20,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +34,9 @@ public class AccountService {
 
     public void createAccount(CreateAccountDTO createAccountDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
+
+        checkAccountPasswordFormat(createAccountDTO.getPassword());
+
         // TODO: 이지율 설정
         Account account = Account.builder()
                 .accountNumber(generateAccountNumber())
@@ -47,18 +48,21 @@ public class AccountService {
         accountRepository.save(account);
     }
 
+    @Transactional(readOnly = true)
     public List<AccountDTO> getAccountList() {
         User user = getLoginUser();
         List<Account> accountList = accountRepository.findAllByUser(user);
         return toAccountDTOList(accountList);
     }
 
+    @Transactional(readOnly = true)
     public AccountDTO getAccount(Long accountNumber) {
         Account account = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
         return toAccountDTO(account);
     }
 
+    @Transactional(readOnly = true)
     public List<TransactionHistoryDTO> getAccountHistory(Long accountNumber) {
         Account account = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
@@ -70,6 +74,34 @@ public class AccountService {
         List<TransactionHistory> transactionHistoryList = transactionHistoryRepository.findAllByAccount(account);
 
         return toTransactionHistoryDTOList(transactionHistoryList);
+    }
+
+    @Transactional
+    public void changePassword(ChangePasswordDTO changePasswordDTO, PasswordEncoder passwordEncoder) {
+        User user = getLoginUser();
+        Account account = accountRepository.findByAccountNumber(changePasswordDTO.getAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
+
+        checkAccountUserAndPassword(account, user, changePasswordDTO.getOldPassword(), passwordEncoder);
+
+        checkAccountPasswordFormat(changePasswordDTO.getNewPassword());
+
+        // Start a transaction
+        TransactionDefinition txDef = new DefaultTransactionDefinition();
+        TransactionStatus txStatus = transactionManager.getTransaction(txDef);
+
+        try {
+            account.unlock();
+            accountRepository.save(account.update(Account.builder()
+                    .password(passwordEncoder.encode(changePasswordDTO.getNewPassword()))
+                    .passwordRetryCount(0)
+                    .build())); // Persist the updated password
+
+            transactionManager.commit(txStatus); // Commit the transaction
+        } catch (Exception e) {
+            transactionManager.rollback(txStatus); // Rollback if an exception occurs
+            throw e; // Rethrow the exception
+        }
     }
 
     @Transactional
@@ -147,7 +179,6 @@ public class AccountService {
         }
     }
 
-
     @Transactional
     public void transfer(TransferDTO transferDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
@@ -200,7 +231,6 @@ public class AccountService {
         }
     }
 
-
     public void deleteAccount() {
     }
 
@@ -243,6 +273,14 @@ public class AccountService {
         }
 
         return generatedNumber;
+    }
+
+    private void checkAccountPasswordFormat(String password) {
+        String pattern = "^[0-9]{4}$";
+
+        if(!Pattern.compile(pattern).matcher(password).matches()) {
+            throw new AccountPasswordFormatException("계좌 비밀번호는 숫자 4자리여야 합니다.");
+        }
     }
 
     private List<AccountDTO> toAccountDTOList(List<Account> accountList) {
