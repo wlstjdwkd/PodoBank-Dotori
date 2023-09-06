@@ -57,14 +57,14 @@ public class AccountService {
 
     @Transactional(readOnly = true)
     public AccountDTO getAccount(Long accountNumber) {
-        Account account = accountRepository.findByAccountNumber(accountNumber)
+        Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
         return toAccountDTO(account);
     }
 
     @Transactional(readOnly = true)
     public List<TransactionHistoryDTO> getAccountHistory(Long accountNumber) {
-        Account account = accountRepository.findByAccountNumber(accountNumber)
+        Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
         if(!account.getUser().getUserId().equals(getLoginUser().getUserId())) {
@@ -79,7 +79,7 @@ public class AccountService {
     @Transactional
     public void changePassword(ChangePasswordDTO changePasswordDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
-        Account account = accountRepository.findByAccountNumber(changePasswordDTO.getAccountNumber())
+        Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(changePasswordDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
         checkAccountUserAndPassword(account, user, changePasswordDTO.getOldPassword(), passwordEncoder);
@@ -107,7 +107,7 @@ public class AccountService {
     @Transactional
     public void deposit(DepositDTO depositDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
-        Account account = accountRepository.findByAccountNumber(depositDTO.getAccountNumber())
+        Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(depositDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
         checkAccountUserAndPassword(account, user, depositDTO.getPassword(), passwordEncoder);
@@ -143,7 +143,7 @@ public class AccountService {
     @Transactional
     public void withdraw(WithdrawDTO withdrawDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
-        Account account = accountRepository.findByAccountNumber(withdrawDTO.getAccountNumber())
+        Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(withdrawDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
         checkAccountUserAndPassword(account, user, withdrawDTO.getPassword(), passwordEncoder);
@@ -182,9 +182,9 @@ public class AccountService {
     @Transactional
     public void transfer(TransferDTO transferDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
-        Account fromAccount = accountRepository.findByAccountNumber(transferDTO.getFromAccountNumber())
+        Account fromAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(transferDTO.getFromAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
-        Account toAccount = accountRepository.findByAccountNumber(transferDTO.getToAccountNumber())
+        Account toAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(transferDTO.getToAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
         checkAccountUserAndPassword(fromAccount, user, transferDTO.getPassword(), passwordEncoder);
