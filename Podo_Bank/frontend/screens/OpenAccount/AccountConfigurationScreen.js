@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
 
-export default function AccountSetupDetailScreen({ navigation }) {
+export default function AccountConfigurationScreen({ navigation }) {
   const [selectedOption, setSelectedOption] = useState(null);
   const [selectedOption2, setSelectedOption2] = useState(null);
   const [password, setPassword] = useState("");
@@ -17,8 +17,7 @@ export default function AccountSetupDetailScreen({ navigation }) {
     <View style={styles.container}>
       <HeaderComponent navigation={navigation} title="계좌개설" />
       <View style={styles.purpleBox}>
-        <Text style={styles.whiteText}>PODO BANK</Text>
-        <Text style={styles.whiteText}>포도은행 입출금통장</Text>
+        <Text style={styles.blackText}>포도은행 입출금통장</Text>
       </View>
       <TouchableOpacity
         style={styles.whiteBox}
@@ -53,7 +52,7 @@ export default function AccountSetupDetailScreen({ navigation }) {
           secureTextEntry={true}
         />
       </TouchableOpacity>
-      <Text style={{ marginBottom: 30 }}>
+      <Text style={{ marginBottom: 30, fontSize: 12 }}>
         고객님의 자산을 안전하게 보호하고 전화 금융사기의 피해를 예방하고자
         금융거래목적에 대해 질문드립니다.
       </Text>
@@ -61,7 +60,7 @@ export default function AccountSetupDetailScreen({ navigation }) {
         어떤 용도로 통장을 사용하실 건가요?
       </Text>
       <View style={styles.whiteBox}>
-        <Text style={styles.blackText}>계좌사용용도</Text>
+        <Text>계좌사용용도</Text>
         <Text style={styles.grayText}>선택해주세요</Text>
       </View>
       <Text style={{ marginBottom: 20 }}>
@@ -72,7 +71,9 @@ export default function AccountSetupDetailScreen({ navigation }) {
           style={styles.radioButton}
           onPress={() => setSelectedOption("yes")}
         >
-          <View style={selectedOption === "yes" ? styles.innerRadio : {}} />
+          <Text style={selectedOption === "yes" ? styles.checkIcon : null}>
+            {selectedOption === "yes" ? "✔" : ""}
+          </Text>
         </TouchableOpacity>
         <Text>예</Text>
         <View style={{ marginRight: 160 }} />
@@ -80,7 +81,9 @@ export default function AccountSetupDetailScreen({ navigation }) {
           style={styles.radioButton}
           onPress={() => setSelectedOption("no")}
         >
-          <View style={selectedOption === "no" ? styles.innerRadio : {}} />
+          <Text style={selectedOption === "no" ? styles.checkIcon : null}>
+            {selectedOption === "no" ? "✔" : ""}
+          </Text>
         </TouchableOpacity>
         <Text>아니요</Text>
       </View>
@@ -94,7 +97,9 @@ export default function AccountSetupDetailScreen({ navigation }) {
           style={styles.radioButton}
           onPress={() => setSelectedOption2("yes")}
         >
-          <View style={selectedOption2 === "yes" ? styles.innerRadio : {}} />
+          <Text style={selectedOption2 === "yes" ? styles.checkIcon : null}>
+            {selectedOption2 === "yes" ? "✔" : ""}
+          </Text>
         </TouchableOpacity>
         <Text>예</Text>
         <View style={{ marginRight: 160 }} />
@@ -102,7 +107,9 @@ export default function AccountSetupDetailScreen({ navigation }) {
           style={styles.radioButton}
           onPress={() => setSelectedOption2("no")}
         >
-          <View style={selectedOption2 === "no" ? styles.innerRadio : {}} />
+          <Text style={selectedOption2 === "no" ? styles.checkIcon : null}>
+            {selectedOption2 === "no" ? "✔" : ""}
+          </Text>
         </TouchableOpacity>
         <Text>아니요</Text>
       </View>
@@ -111,7 +118,7 @@ export default function AccountSetupDetailScreen({ navigation }) {
         style={styles.confirmButton}
         onPress={() => navigation.navigate("AccountRestrictionScreen")}
       >
-        <Text style={styles.confirmText}>신청하기</Text>
+        <Text style={styles.confirmText}>다음</Text>
       </TouchableOpacity>
     </View>
   );
@@ -124,16 +131,23 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   purpleBox: {
-    backgroundColor: "purple",
-    padding: 30,
+    backgroundColor: "#8B0FD750",
+    padding: 20,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 15,
+    borderRadius: 5,
   },
-  whiteText: {
-    color: "white",
-    fontSize: 20,
-    textAlign: "center",
+  // blackText: {
+  //   color: "white",
+  //   fontSize: 20,
+  //   textAlign: "center",
+  // },
+  checkIcon: {
+    fontSize: 18,
+    color: "black",
+    marginTop: -5,
+    marginBottom: -5,
   },
   whiteBox: {
     flexDirection: "row",
@@ -152,6 +166,7 @@ const styles = StyleSheet.create({
   grayText: {
     fontSize: 18,
     color: "gray",
+    // textAlign: "left",
   },
   passwordDot: {
     width: 10,
@@ -166,7 +181,7 @@ const styles = StyleSheet.create({
   passwordInput: {
     borderColor: "black",
     borderWidth: 1,
-    width: 90, // 또는 적절한 크기로 조절
+    width: 90,
     textAlign: "center",
     fontSize: 18,
   },
@@ -196,9 +211,14 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
   },
   confirmButton: {
-    backgroundColor: "purple",
+    backgroundColor: "#842DC480",
     padding: 15,
     alignItems: "center",
-    borderRadius: 5,
+    // borderTopLeftRadius: 5, // 위쪽 왼쪽 모서리만 둥글게
+    // borderTopRightRadius: 5, // 위쪽 오른쪽 모서리만 둥글게
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
 });

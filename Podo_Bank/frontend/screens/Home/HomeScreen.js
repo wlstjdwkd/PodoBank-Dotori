@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons"; // AntDesign과 Entypo 아이콘 라이브러리 추가
-import BottomBarScreen from "../Header/BottomBarScreen";
+import FooterScreen from "../Header/FooterScreen";
 
 export default function HomeScreen({ navigation }) {
   //대표계좌 axios로 가져와야함
@@ -23,28 +23,41 @@ export default function HomeScreen({ navigation }) {
 
       {/* 대표 계좌 */}
       <View style={styles.accountBox}>
-        <View style={styles.bankInfo}>
-          <Image
-            source={require("../../assets/images/normal_podo.png")}
-            style={styles.bankLogo}
-          />
-          <Text style={styles.bankName}>포도은행 통장</Text>
-        </View>
+        <TouchableOpacity
+          style={styles.touchableOpacity}
+          onPress={() => {
+            navigation.navigate("AccountDetailScreen");
+          }}
+        >
+          <View style={styles.bankInfo}>
+            <Image
+              source={require("../../assets/images/normal_podo.png")}
+              style={styles.bankLogo}
+            />
+            <Text style={styles.bankName}>포도은행 통장</Text>
+          </View>
 
-        <Text style={styles.accountNumber}>1235-4568-4532</Text>
-        <Text style={styles.balance}>1,000,000,000원</Text>
+          <Text style={styles.accountNumber}>1235-4568-4532</Text>
+          <Text style={styles.balance}>1,000,000,000원</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.transferButton}
-          onPress={() => alert("이체 화면으로 이동합니다.")}
+          onPress={() => navigation.navigate("TransferScreen")}
         >
           <Text style={styles.buttonText}>이체</Text>
         </TouchableOpacity>
       </View>
 
       {/* 계좌 추가 버튼 */}
-      <View style={styles.addAccountBox}>
+      <TouchableOpacity
+        style={styles.addAccountBox}
+        onPress={() => {
+          navigation.navigate("AccountConfigurationScreen");
+        }}
+      >
         <AntDesign name="pluscircleo" size={25} color="black" />
-      </View>
+      </TouchableOpacity>
 
       {/* 설정 버튼 */}
       <View style={styles.settingsContainer}>
@@ -55,7 +68,7 @@ export default function HomeScreen({ navigation }) {
         />
         <Text style={styles.settingsText}>대표계좌 설정</Text>
       </View>
-      <BottomBarScreen navigation={navigation} />
+      <FooterScreen navigation={navigation} />
     </View>
   );
 }
