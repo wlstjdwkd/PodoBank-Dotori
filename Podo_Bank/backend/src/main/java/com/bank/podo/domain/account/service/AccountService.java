@@ -139,15 +139,10 @@ public class AccountService {
     @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
     public void deposit(DepositDTO depositDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
-        log.info("Account number: {}", depositDTO.getAccountNumber());
         Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(depositDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
         checkAccountUserAndPassword(account, user, depositDTO.getPassword(), passwordEncoder);
-
-        Account account2 = accountRepository.findByAccountNumberAndMaturityAtIsNull(depositDTO.getAccountNumber())
-                .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
-        log.info("Account: {}", account2.toString());
 
         BigDecimal depositAmount = depositDTO.getAmount();
 
@@ -291,20 +286,16 @@ public class AccountService {
 
         if(!passwordEncoder.matches(password, account.getPassword())) {
             increasePasswordRetryCount(account);
-            log.info(accountRepository.findByAccountNumberAndMaturityAtIsNull(account.getAccountNumber()).toString());
             throw new PasswordRetryCountExceededException("비밀번호가 일치하지 않습니다.");
         }
     }
 
     private void increasePasswordRetryCount(Account account) {
         account.increasePasswordRetryCount();
-        log.info("Password retry count: {}", account.getPasswordRetryCount());
         if (account.getPasswordRetryCount() >= 3) {
             account.lock();
         }
-        log.info("Account locked: {}", account.isLocked());
         accountRepository.save(account);
-        log.info("Account saved: {}", accountRepository.findByAccountNumberAndMaturityAtIsNull(account.getAccountNumber()).toString());
     }
 
 
