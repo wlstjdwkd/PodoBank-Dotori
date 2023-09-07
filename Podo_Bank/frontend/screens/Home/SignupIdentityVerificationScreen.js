@@ -1,25 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
-  Image,
   TextInput,
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import HeaderComponent from "../Header/HeaderScreen";
 
 export default function SignupIdentityVerificationScreen({ navigation }) {
+  const [userInfo, setUserInfo] = useState({
+    name: "",
+    birthDate: "",
+    phoneNumber: "",
+  });
+
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.headerContainer}>
-        <Image
-          source={require("../../assets/images/normal_podo.png")}
-          style={styles.podoImage}
-        />
-        <Text style={styles.bankText}>포도은행</Text>
-        <Text style={styles.signupText}>회원가입</Text>
-      </View>
+      <HeaderComponent title="회원가입(1/2)"></HeaderComponent>
 
       {/* 본인 인증 안내 */}
       <Text style={styles.boldText}>본인 인증을 진행해주세요</Text>
@@ -27,19 +26,39 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
       {/* 이름 입력창 */}
       <View style={styles.inputContainer}>
         <Text style={styles.inputText}>이름</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) => setUserInfo({ ...userInfo, name: text })}
+          value={userInfo.name}
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text
+          style={styles.inputText}
+          onChangeText={(text) => setUserInfo({ ...userInfo, birthDate: text })}
+          value={userInfo.birthDate}
+        >
+          생년월일 8자리
+        </Text>
         <TextInput style={styles.input} />
       </View>
       <View style={styles.inputContainer}>
-        <Text style={styles.inputText}>생년월일 8자리</Text>
-        <TextInput style={styles.input} />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text style={styles.inputText}>휴대폰번호</Text>
+        <Text
+          style={styles.inputText}
+          onChangeText={(text) =>
+            setUserInfo({ ...userInfo, phoneNumber: text })
+          }
+          value={userInfo.phoneNumber}
+        >
+          휴대폰번호
+        </Text>
         <TextInput style={styles.input} />
       </View>
       <TouchableOpacity
         style={styles.customButton}
-        onPress={() => navigation.navigate("SignupInformationScreen")}
+        onPress={() =>
+          navigation.navigate("SignupInformationScreen", { userInfo: userInfo })
+        }
       >
         <Text style={styles.linkText}>확인</Text>
       </TouchableOpacity>
@@ -54,26 +73,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     backgroundColor: "white",
   },
-  headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    paddingTop: 30,
-  },
-  podoImage: {
-    width: 25,
-    height: 25,
-    resizeMode: "contain",
-    marginLeft: 30,
-    marginRight: 15,
-  },
-  bankText: {
-    fontSize: 15,
-    marginRight: 15,
-  },
-  signupText: {
-    color: "grey",
-  },
   boldText: {
     fontWeight: "bold",
     fontSize: 20,
@@ -87,14 +86,11 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     marginTop: 10,
-    // flexDirection: "row",
-    // alignItems: "center",
     justifyContent: "flex-start",
   },
   input: {
     borderWidth: 1,
     borderRadius: 10,
-    // flex: 1,
     paddingLeft: 10,
     marginTop: 10,
     marginRight: 30,
@@ -102,6 +98,8 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     height: 50,
     textAlignVertical: "center",
+    elevation: 3,
+    backgroundColor: "white",
   },
   customButton: {
     backgroundColor: "#A175FD",

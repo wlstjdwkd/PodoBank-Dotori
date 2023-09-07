@@ -1,12 +1,12 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { AntDesign, Entypo } from "@expo/vector-icons";
+import { AntDesign, Entypo, FontAwesome } from "@expo/vector-icons";
 
 export default function HeaderComponent({ navigation, title }) {
   return (
     <View style={styles.header}>
       <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Entypo name="chevron-thin-left"></Entypo>
+        <FontAwesome name="angle-left" style={{ fontSize: 30 }}></FontAwesome>
         {/* <Text style={styles.backButton}>&lt;</Text> */}
       </TouchableOpacity>
       <Text style={styles.headerTitle}>{title}</Text>

@@ -4,6 +4,7 @@ import { AntDesign, FontAwesome5 } from "@expo/vector-icons"; // Expo에서 제�
 
 export default function FooterScreen({ navigation }) {
   return (
+    //TODO: 푸터 이미지 바꿔야함
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.iconContainer}
@@ -28,7 +29,7 @@ export default function FooterScreen({ navigation }) {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.iconContainer}
-        onPress={() => navigation.navigate("")}
+        onPress={() => navigation.navigate("MyPageScreen")}
       >
         <FontAwesome5 name="user" size={24} color="black" />
         <Text style={styles.iconText}>마이페이지</Text>

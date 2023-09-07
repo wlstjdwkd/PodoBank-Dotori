@@ -18,6 +18,7 @@ import AccountRestrictionScreen from "../screens/OpenAccount/AccountRestrictionS
 import OpenAccountCompleteScreen from "../screens/OpenAccount/OpenAccountCompleteScreen";
 import AccountManagementScreen from "../screens/Account/AccountManagementScreen";
 import TransactionDetailScreen from "../screens/Account/TransactionDetailScreen";
+import MyPageScreen from "../screens/Home/MyPageScreen";
 
 const Stack = createStackNavigator();
 
@@ -89,6 +90,10 @@ function AppNavigator() {
       <Stack.Screen
         name="TransactionDetailScreen"
         component={TransactionDetailScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="MyPageScreen"
+        component={MyPageScreen}
       ></Stack.Screen>
     </Stack.Navigator>
   );

@@ -36,6 +36,7 @@ export default function LoginScreen({ navigation }) {
       </View>
 
       {/* 로그인 버튼 */}
+      {/* 로그인 back 연동해야함 */}
       <TouchableOpacity
         style={styles.customButton}
         onPress={() => navigation.navigate("HomeScreen")}

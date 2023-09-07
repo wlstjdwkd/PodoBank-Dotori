@@ -1,13 +1,6 @@
 import React from "react";
-import {
-  View,
-  Text,
-  Image,
-  Button,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
-import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons"; // AntDesign과 Entypo 아이콘 라이브러리 추가
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { AntDesign, EvilIcons } from "@expo/vector-icons"; // AntDesign과 Entypo 아이콘 라이브러리 추가
 import FooterScreen from "../Header/FooterScreen";
 
 export default function HomeScreen({ navigation }) {
@@ -30,10 +23,12 @@ export default function HomeScreen({ navigation }) {
           }}
         >
           <View style={styles.bankInfo}>
-            <Image
-              source={require("../../assets/images/normal_podo.png")}
-              style={styles.bankLogo}
-            />
+            <View style={styles.bankLogoContainer}>
+              <Image
+                source={require("../../assets/images/logo_podo.png")}
+                style={styles.bankLogo}
+              />
+            </View>
             <Text style={styles.bankName}>포도은행 통장</Text>
           </View>
 
@@ -61,11 +56,7 @@ export default function HomeScreen({ navigation }) {
 
       {/* 설정 버튼 */}
       <View style={styles.settingsContainer}>
-        <MaterialCommunityIcons
-          name="cog-outline"
-          size={20}
-          style={styles.settingsIcon}
-        />
+        <EvilIcons name="gear" size={25} style={styles.settingsIcon} />
         <Text style={styles.settingsText}>대표계좌 설정</Text>
       </View>
       <FooterScreen navigation={navigation} />
@@ -98,7 +89,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "black",
     fontSize: 16,
-    fontWeight: "bold",
+    // fontWeight: "bold",
   },
   nameContainer: {
     flexDirection: "row",
@@ -122,23 +113,38 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderColor: "#757575",
     borderWidth: 1,
+    // 그림자 스타일 추가
+    elevation: 10,
+    backgroundColor: "white",
   },
   bankInfo: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
   },
+  bankLogoContainer: {
+    width: 30, // 여기서 사이즈는 예시입니다. 원하는 사이즈로 조절해주세요.
+    height: 30, // 여기서 사이즈는 예시입니다. 원하는 사이즈로 조절해주세요.
+    marginRight: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+  },
   bankLogo: {
     width: 25,
     height: 25,
   },
   bankName: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 16,
+    // fontWeight: "bold",
   },
   transferButton: {
     marginTop: 20,
-    backgroundColor: "#8B0FD790",
+    backgroundColor: "#8B0FD750",
     padding: 10,
     borderRadius: 3,
     alignItems: "center",
@@ -155,6 +161,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: "#757575",
     borderWidth: 1,
+    elevation: 10,
+    backgroundColor: "white",
   },
   settingsContainer: {
     flexDirection: "row",
