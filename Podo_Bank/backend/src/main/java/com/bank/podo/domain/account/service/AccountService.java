@@ -9,6 +9,7 @@ import com.bank.podo.domain.account.entity.Account;
 import com.bank.podo.domain.account.entity.TransactionHistory;
 import com.bank.podo.domain.account.entity.TransactionType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AccountService {
@@ -76,7 +78,7 @@ public class AccountService {
         return toTransactionHistoryDTOList(transactionHistoryList);
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
     public void changePassword(ChangePasswordDTO changePasswordDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
         Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(changePasswordDTO.getAccountNumber())
@@ -105,12 +107,47 @@ public class AccountService {
     }
 
     @Transactional
+    public void resetPassword(ResetPasswordDTO resetPasswordDTO, PasswordEncoder passwordEncoder) {
+        User user = getLoginUser();
+        Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(resetPasswordDTO.getAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
+
+        if(!account.getUser().getUserId().equals(user.getUserId())) {
+            throw new AccountUserNotMatchException("계좌의 소유자가 아닙니다.");
+        }
+
+        checkAccountPasswordFormat(resetPasswordDTO.getNewPassword());
+
+        // Start a transaction
+        TransactionDefinition txDef = new DefaultTransactionDefinition();
+        TransactionStatus txStatus = transactionManager.getTransaction(txDef);
+
+        try {
+            account.unlock();
+            accountRepository.save(account.update(Account.builder()
+                    .password(passwordEncoder.encode(resetPasswordDTO.getNewPassword()))
+                    .passwordRetryCount(0)
+                    .build())); // Persist the updated password
+
+            transactionManager.commit(txStatus); // Commit the transaction
+        } catch (Exception e) {
+            transactionManager.rollback(txStatus); // Rollback if an exception occurs
+            throw e; // Rethrow the exception
+        }
+    }
+
+    @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
     public void deposit(DepositDTO depositDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
+        log.info("Account number: {}", depositDTO.getAccountNumber());
         Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(depositDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
         checkAccountUserAndPassword(account, user, depositDTO.getPassword(), passwordEncoder);
+
+        Account account2 = accountRepository.findByAccountNumberAndMaturityAtIsNull(depositDTO.getAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
+        log.info("Account: {}", account2.toString());
 
         BigDecimal depositAmount = depositDTO.getAmount();
 
@@ -140,7 +177,7 @@ public class AccountService {
     }
 
 
-    @Transactional
+    @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
     public void withdraw(WithdrawDTO withdrawDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
         Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(withdrawDTO.getAccountNumber())
@@ -179,7 +216,7 @@ public class AccountService {
         }
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
     public void transfer(TransferDTO transferDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
         Account fromAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(transferDTO.getFromAccountNumber())
@@ -243,23 +280,33 @@ public class AccountService {
             throw new AccountUserNotMatchException("계좌의 소유자가 아닙니다.");
         }
 
+        if(account.isLocked()) {
+            throw new AccountLockedException("계좌가 잠겨있습니다.");
+
+        }
+
         if(account.getPasswordRetryCount() >= 3) {
             throw new PasswordRetryCountExceededException("비밀번호 재시도 횟수를 초과했습니다.");
         }
 
         if(!passwordEncoder.matches(password, account.getPassword())) {
             increasePasswordRetryCount(account);
+            log.info(accountRepository.findByAccountNumberAndMaturityAtIsNull(account.getAccountNumber()).toString());
             throw new PasswordRetryCountExceededException("비밀번호가 일치하지 않습니다.");
         }
     }
 
     private void increasePasswordRetryCount(Account account) {
         account.increasePasswordRetryCount();
-        if(account.getPasswordRetryCount() >= 3) {
+        log.info("Password retry count: {}", account.getPasswordRetryCount());
+        if (account.getPasswordRetryCount() >= 3) {
             account.lock();
         }
+        log.info("Account locked: {}", account.isLocked());
         accountRepository.save(account);
+        log.info("Account saved: {}", accountRepository.findByAccountNumberAndMaturityAtIsNull(account.getAccountNumber()).toString());
     }
+
 
     private Long generateAccountNumber() {
         long prefix = 9775L;

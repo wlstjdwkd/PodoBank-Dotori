@@ -4,6 +4,7 @@ import com.bank.podo.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
@@ -12,10 +13,14 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@ToString
 @NoArgsConstructor
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long accountId;
+
+    @Column(nullable = false)
     private Long accountNumber;
 
     @ManyToOne
@@ -74,8 +79,11 @@ public class Account {
         if(account.getPassword() != null) {
             this.password = account.getPassword();
         }
-        if(account.getPasswordRetryCount() == 0) {
+        if(account.getPasswordRetryCount() != -1) {
             this.passwordRetryCount = account.getPasswordRetryCount();
+        }
+        if(account.locked != this.locked) {
+            this.locked = account.locked;
         }
         if(account.getLoanInfo() != null) {
             this.loanInfo = account.getLoanInfo();
@@ -103,7 +111,12 @@ public class Account {
         this.locked = false;
     }
 
-    public void increasePasswordRetryCount() {
+    public Account increasePasswordRetryCount() {
         this.passwordRetryCount++;
+        if (this.passwordRetryCount >= 3) {
+            this.lock();
+        }
+
+        return this;
     }
 }
