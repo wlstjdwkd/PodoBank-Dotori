@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class DotoriApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(DotoriApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(DotoriApplication.class, args);
+    }
 
 }
