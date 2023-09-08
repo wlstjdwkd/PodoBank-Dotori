@@ -30,7 +30,7 @@ export default function SignupInformationScreen({ navigation, route }) {
       setPasswordMessage("완벽합니당");
       setIsPasswordValid(true);
     } else {
-      setPasswordMessage("양식을 맞춰주세요.!");
+      setPasswordMessage("양식을 맞춰주세요!");
       setIsPasswordValid(false);
     }
   };
@@ -50,27 +50,11 @@ export default function SignupInformationScreen({ navigation, route }) {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <HeaderComponent title="회원가입(2/2)"></HeaderComponent>
+      <HeaderComponent navigation={navigation} title="회원가입(3/3)"></HeaderComponent>
 
       {/* 본인 인증 안내 */}
-      <Text style={styles.boldText}>계정 정보를 입력해주세요</Text>
+      <Text style={styles.boldText}>비밀번호를 입력해주세요</Text>
 
-      {/* 이름 입력창 */}
-      <View style={styles.inputContainer}>
-        <Text style={styles.inputText}>이메일</Text>
-        <View style={styles.inputRowContainer}>
-          <TextInput
-            style={styles.input}
-            onChangeText={(text) =>
-              setUserInfo((prev) => ({ ...prev, email: text }))
-            }
-            placeholder="ID로 사용될 이메일을 선택해주세요."
-          />
-          <TouchableOpacity style={styles.verifyButton}>
-            <Text style={styles.verifyButtonText}>인증하기</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
       <View style={styles.inputContainer}>
         <View style={styles.textRow}>
           <Text style={styles.inputText}>비밀번호</Text>

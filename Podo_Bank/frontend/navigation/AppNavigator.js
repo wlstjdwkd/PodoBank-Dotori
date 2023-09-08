@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import LoginScreen from "../screens/Home/LoginScreen";
 import SignupIdentityVerificationScreen from "../screens/Home/SignupIdentityVerificationScreen";
 import SignupInformationScreen from "../screens/Home/SignupInformationScreen";
+import SignupInformationScreenEmail from "../screens/Home/SignupInformationScreenEmail";
 
 import SignupCompleteScreen from "../screens/Home/SignupCompleteScreen";
 import HomeScreen from "../screens/Home/HomeScreen";
@@ -36,6 +37,10 @@ function AppNavigator() {
       <Stack.Screen
         name="SignupInformationScreen"
         component={SignupInformationScreen}
+      />
+      <Stack.Screen
+        name="SignupInformationScreenEmail"
+        component={SignupInformationScreenEmail}
       />
 
       <Stack.Screen
