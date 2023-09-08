@@ -91,10 +91,7 @@ function AppNavigator() {
         name="TransactionDetailScreen"
         component={TransactionDetailScreen}
       ></Stack.Screen>
-      <Stack.Screen
-        name="MyPageScreen"
-        component={MyPageScreen}
-      ></Stack.Screen>
+      <Stack.Screen name="MyPageScreen" component={MyPageScreen}></Stack.Screen>
     </Stack.Navigator>
   );
 }
