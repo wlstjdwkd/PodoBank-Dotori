@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -78,10 +80,20 @@ public class AccountService {
         }
 
         // 페이지 번호와 정렬 유형에 따라 페이지 요청 생성
-        PageRequest pageRequest = PageRequest.of(historySettingDTO.getPage(), 10,
-                historySettingDTO.getSortType() == 0 ? Sort.Direction.DESC : Sort.Direction.ASC, "createdAt");
+        PageRequest pageRequest = PageRequest.of(historySettingDTO.getPage(), 2,
+                historySettingDTO.getSortType() == 0 ? Sort.by("transactionAt").descending() : Sort.by("transactionAt").ascending());
 
-        List<TransactionHistory> transactionHistoryList = transactionHistoryRepository.findAllByAccount(account, pageRequest);
+        LocalDateTime startDate = LocalDateTime.now().minusDays(historySettingDTO.getSearchMonth());
+
+        List<TransactionHistory> transactionHistoryList = new ArrayList<>();
+        if(historySettingDTO.getTransactionType().equals("DEPOSIT")) {
+            transactionHistoryList = transactionHistoryRepository.findAllByAccountAndTransactionTypeAndTransactionAtGreaterThanEqual(account, TransactionType.DEPOSIT, startDate, pageRequest);
+        } else if(historySettingDTO.getTransactionType().equals("WITHDRAWAL")) {
+            transactionHistoryList = transactionHistoryRepository.findAllByAccountAndTransactionTypeAndTransactionAtGreaterThanEqual(account, TransactionType.WITHDRAWAL, startDate, pageRequest);
+        } else if(historySettingDTO.getTransactionType().equals("ALL")) {
+            transactionHistoryList = transactionHistoryRepository.findAllByAccountAndTransactionAtGreaterThanEqual(account, startDate, pageRequest);
+        }
+
 
         return toTransactionHistoryDTOList(transactionHistoryList);
     }
@@ -320,8 +332,6 @@ public class AccountService {
 
         if (transactionHistory.getCounterAccount() != null) {
             builder.counterAccountName(transactionHistory.getCounterAccount().getUser().getName());
-        } else {
-            builder.counterAccountName("");
         }
 
         return builder.build();
