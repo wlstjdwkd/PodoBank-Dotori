@@ -71,7 +71,7 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
-    public List<TransactionHistoryDTO> getAccountHistory(String accountNumber, HistorySettingDTO historySettingDTO) {
+    public List<TransactionHistoryDTO> getAccountHistory(String accountNumber, int searchMonth, String transactionType, int sortType, int page) {
         Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
@@ -80,17 +80,17 @@ public class AccountService {
         }
 
         // 페이지 번호와 정렬 유형에 따라 페이지 요청 생성
-        PageRequest pageRequest = PageRequest.of(historySettingDTO.getPage(), 2,
-                historySettingDTO.getSortType() == 0 ? Sort.by("transactionAt").descending() : Sort.by("transactionAt").ascending());
+        PageRequest pageRequest = PageRequest.of(page, 2,
+                sortType == 0 ? Sort.by("transactionAt").descending() : Sort.by("transactionAt").ascending());
 
-        LocalDateTime startDate = LocalDateTime.now().minusDays(historySettingDTO.getSearchMonth());
+        LocalDateTime startDate = LocalDateTime.now().minusDays(searchMonth);
 
         List<TransactionHistory> transactionHistoryList = new ArrayList<>();
-        if(historySettingDTO.getTransactionType().equals("DEPOSIT")) {
+        if(transactionType.equals("DEPOSIT")) {
             transactionHistoryList = transactionHistoryRepository.findAllByAccountAndTransactionTypeAndTransactionAtGreaterThanEqual(account, TransactionType.DEPOSIT, startDate, pageRequest);
-        } else if(historySettingDTO.getTransactionType().equals("WITHDRAWAL")) {
+        } else if(transactionType.equals("WITHDRAWAL")) {
             transactionHistoryList = transactionHistoryRepository.findAllByAccountAndTransactionTypeAndTransactionAtGreaterThanEqual(account, TransactionType.WITHDRAWAL, startDate, pageRequest);
-        } else if(historySettingDTO.getTransactionType().equals("ALL")) {
+        } else if(transactionType.equals("ALL")) {
             transactionHistoryList = transactionHistoryRepository.findAllByAccountAndTransactionAtGreaterThanEqual(account, startDate, pageRequest);
         }
 

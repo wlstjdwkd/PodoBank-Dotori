@@ -70,9 +70,12 @@ public class AccountController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
-    @PostMapping("/{accountNumber}/history")
-    public ResponseEntity<List<TransactionHistoryDTO>> getAccountHistory(@PathVariable String accountNumber, @RequestBody HistorySettingDTO historySettingDTO) {
-        List<TransactionHistoryDTO> accountHistoryList = accountService.getAccountHistory(accountNumber, historySettingDTO);
+    @GetMapping("/{accountNumber}/history")
+    public ResponseEntity<List<TransactionHistoryDTO>> getAccountHistory(@PathVariable String accountNumber,
+                                             @RequestParam int searchMonth, @RequestParam String transactionType,
+                                             @RequestParam int sortType, @RequestParam int page) {
+        List<TransactionHistoryDTO> accountHistoryList = accountService.getAccountHistory(accountNumber,
+                searchMonth, transactionType, sortType, page);
         return ResponseEntity.ok(accountHistoryList);
     }
 
