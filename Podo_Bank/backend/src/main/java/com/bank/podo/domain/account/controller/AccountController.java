@@ -49,7 +49,7 @@ public class AccountController {
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     @GetMapping("/{accountNumber}")
-    public ResponseEntity<String> getAccountOwnerName(@PathVariable Long accountNumber) {
+    public ResponseEntity<String> getAccountOwnerName(@PathVariable String accountNumber) {
         String name = accountService.getAccountOwnerName(accountNumber);
         return ResponseEntity.ok(name);
     }
@@ -60,7 +60,7 @@ public class AccountController {
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     @GetMapping("/{accountNumber}/detail")
-    public ResponseEntity<AccountDTO> getAccount(@PathVariable Long accountNumber) {
+    public ResponseEntity<AccountDTO> getAccount(@PathVariable String accountNumber) {
         AccountDTO account = accountService.getAccountDetail(accountNumber);
         return ResponseEntity.ok(account);
     }
@@ -71,8 +71,8 @@ public class AccountController {
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     @GetMapping("/{accountNumber}/history")
-    public ResponseEntity<List<TransactionHistoryDTO>> getAccountHistory(@PathVariable Long accountNumber) {
-        List<TransactionHistoryDTO> accountHistoryList = accountService.getAccountHistory(accountNumber);
+    public ResponseEntity<List<TransactionHistoryDTO>> getAccountHistory(@PathVariable String accountNumber, @RequestBody HistorySettingDTO historySettingDTO) {
+        List<TransactionHistoryDTO> accountHistoryList = accountService.getAccountHistory(accountNumber, historySettingDTO);
         return ResponseEntity.ok(accountHistoryList);
     }
 

@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 public class DepositDTO {
-    private Long accountNumber;
+    private String accountNumber;
     private BigDecimal amount;
     private String password;
     private String content;

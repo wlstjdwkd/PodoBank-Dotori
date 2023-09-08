@@ -8,8 +8,8 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 public class TransferDTO {
-    private Long senderAccountNumber;
-    private Long receiverAccountNumber;
+    private String senderAccountNumber;
+    private String receiverAccountNumber;
     private String password;
     private BigDecimal amount;
     private String senderContent;

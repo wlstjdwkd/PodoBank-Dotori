@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class ResetPasswordDTO {
-    private Long accountNumber;
+    private String accountNumber;
     private String newPassword;
 }
