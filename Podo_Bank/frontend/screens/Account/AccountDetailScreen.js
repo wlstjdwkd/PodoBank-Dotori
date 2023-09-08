@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Modal,
 } from "react-native";
 import { Ionicons, EvilIcons } from "@expo/vector-icons";
 
@@ -57,6 +58,11 @@ export default function AccountDetail({ navigation }) {
     return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
   };
 
+  const [modalVisible, setModalVisible] = useState(false); // 모달 창 표시 상태 관리
+  const [period, setPeriod] = useState("3개월"); // 기간 선택 상태
+  const [range, setRange] = useState("전체"); // 범위 선택 상태
+  const [order, setOrder] = useState("최신순"); // 정렬 순서 상태
+
   return (
     <View style={styles.container}>
       <HeaderScreen navigation={navigation} title="거래 내역 조회" />
@@ -99,11 +105,97 @@ export default function AccountDetail({ navigation }) {
       <View style={styles.horizontalSeparator} />
       {/* 계좌 내역 조회 방식 선택 */}
       <View style={styles.queryModeContainer}>
-        <Text style={styles.queryText}>3개월 · </Text>
-        <Text style={styles.queryText}>전체 · </Text>
-        <Text style={styles.queryText}>최신순</Text>
-        <Ionicons name="chevron-forward" size={24} color="black" />
+        <TouchableOpacity
+          onPress={() => setModalVisible(true)}
+          style={{ flexDirection: "row", alignItems: "center", width: "100%" }}
+        >
+          <Text style={styles.queryText}>{period} · </Text>
+          <Text style={styles.queryText}>{range} · </Text>
+          <Text style={styles.queryText}>{order}</Text>
+          <Ionicons name="chevron-forward" size={24} color="black" />
+        </TouchableOpacity>
       </View>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <View
+          style={{ flex: 1, justifyContent: "flex-end", alignItems: "center" }}
+        >
+          <View
+            style={{
+              width: "100%",
+              backgroundColor: "white",
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              padding: 20,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginBottom: 20,
+              }}
+            >
+              <Text style={styles.modalSelectText}>조회기간 설정</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Text style={{ fontSize: 20 }}>X</Text>
+              </TouchableOpacity>
+            </View>
+            <Text>기간 선택</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-around",
+                marginVertical: 10,
+                borderWidth: 1,
+                borderColor: "#757575",
+              }}
+            >
+              <Text onPress={() => setPeriod("오늘")}>오늘</Text>
+              <Text onPress={() => setPeriod("1개월")}>1개월</Text>
+              <Text onPress={() => setPeriod("3개월")}>3개월</Text>
+              <Text onPress={() => setPeriod("6개월")}>6개월</Text>
+              <Text onPress={() => setPeriod("직접입력")}>직접입력</Text>
+            </View>
+            <Text>거래 유형</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-around",
+                marginVertical: 10,
+                borderWidth: 1,
+                borderColor: "#757575",
+              }}
+            >
+              <Text onPress={() => setRange("전체")}>전체</Text>
+              <Text onPress={() => setRange("입금")}>입금</Text>
+              <Text onPress={() => setRange("출금")}>출금</Text>
+            </View>
+            <Text>정렬 순</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-around",
+                marginVertical: 10,
+                borderWidth: 1,
+                borderColor: "#757575",
+              }}
+            >
+              <Text onPress={() => setOrder("최신순")}>최신순</Text>
+              <Text onPress={() => setOrder("과거순")}>과거순</Text>
+            </View>
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#9D57D0",
+                padding: 10,
+                borderRadius: 5,
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: "white" }}>조회</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.horizontalSeparator} />
 
       {/* 여기부터는 계좌 내역 관련 UI */}
@@ -164,6 +256,18 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: "row",
+  },
+  modalSelectText: {
+    fontSize: 18,
+  },
+  modalOption: {
+    marginVertical: 8,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: "grey",
+    borderRadius: 5,
+    textAlign: "center",
   },
   podoImage: {
     width: 25,
