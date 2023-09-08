@@ -11,9 +11,9 @@ import HeaderComponent from "../Header/HeaderScreen";
 
 export default function SignupInformationScreen({ navigation, route }) {
   const [userInfo, setUserInfo] = useState(route.params.userInfo);
-  const [authenEmail, SetAuthenEmail] = useState(false)
-  const [authenEmailNum, SetAuthenEmailNum] = useState("")  // 6자리의 인증번호라고 가정
-  const [isAuthenEmail, SetIsAuthenEmail] = useState(false) // 임시로 true로 유지중
+  const [authenEmail, SetAuthenEmail] = useState(false);
+  const [authenEmailNum, SetAuthenEmailNum] = useState(""); // 6자리의 인증번호라고 가정
+  const [isAuthenEmail, SetIsAuthenEmail] = useState(false); // 임시로 true로 유지중
   const [confirmAuthenEmailNum, setConfirmAuthenEmailNum] = useState("");
 
   // function compareAuthenNum() {
@@ -21,20 +21,23 @@ export default function SignupInformationScreen({ navigation, route }) {
   //   SetIsAuthenEmail(true)
   // }
   function compareAuthenNum() {
-    const backCompare = 111111
-    if(authenEmailNum != backCompare){  
-      setConfirmAuthenEmailNum("잘못된 인증번호입니다.")
-      SetIsAuthenEmail(false)
-    }else{
-      setConfirmAuthenEmailNum("인증이 완료되었습니다.")
-      SetIsAuthenEmail(true)
+    const backCompare = 111111;
+    if (authenEmailNum != backCompare) {
+      setConfirmAuthenEmailNum("잘못된 인증번호입니다.");
+      SetIsAuthenEmail(false);
+    } else {
+      setConfirmAuthenEmailNum("인증이 완료되었습니다.");
+      SetIsAuthenEmail(true);
     }
   }
 
   return (
     <View style={styles.container}>
       {/* Header */}
-      <HeaderComponent navigation={navigation} title="회원가입(2/3)"></HeaderComponent>
+      <HeaderComponent
+        navigation={navigation}
+        title="회원가입(2/3)"
+      ></HeaderComponent>
 
       {/* 본인 인증 안내 */}
       {/* <Text style={styles.boldText}>계정 정보를 입력해주세요</Text> */}
@@ -45,23 +48,26 @@ export default function SignupInformationScreen({ navigation, route }) {
         <Text style={styles.inputText}>이메일</Text>
         <View style={styles.inputRowContainer}>
           <TextInput
-            style={[styles.input, ]}
+            style={[styles.input]}
             onChangeText={(text) =>
               setUserInfo((prev) => ({ ...prev, email: text }))
             }
             placeholder="ID로 사용될 이메일을 선택해주세요."
             keyboardType="email-address"
           />
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.verifyButton}
-            onPress={()=>{SetAuthenEmail(true)}}>
+            onPress={() => {
+              SetAuthenEmail(true);
+            }}
+          >
             <Text style={styles.verifyButtonText}>전송</Text>
           </TouchableOpacity>
         </View>
       </View>
       {/* 이메일 인증번호 입력창 */}
-      { authenEmail ? 
-        <View style={[styles.inputContainer, {align:"flex-end"}]}>
+      {authenEmail ? (
+        <View style={[styles.inputContainer, { align: "flex-end" }]}>
           {/* <Text style={styles.inputText}>이메일 인증</Text> */}
           <View style={styles.inputRowContainer}>
             <TextInput
@@ -71,20 +77,22 @@ export default function SignupInformationScreen({ navigation, route }) {
               keyboardType="number-pad" // 숫자로만 받는다는 가정하에 넘버패드로 받음
               maxLength={6}
             />
-            <TouchableOpacity 
+            <TouchableOpacity
               // 차후 백과의 연동에서 인증번호 일치할때만 제대로 작동
-              style={[styles.verifyButton,
-                !(userInfo.email && (authenEmailNum.length == 6)) && {backgroundColor: "grey",}
+              style={[
+                styles.verifyButton,
+                !(userInfo.email && authenEmailNum.length == 6) && {
+                  backgroundColor: "grey",
+                },
               ]}
-              disabled={!(userInfo.email && (authenEmailNum.length == 6))}
+              disabled={!(userInfo.email && authenEmailNum.length == 6)}
               onPress={compareAuthenNum}
-              >
+            >
               <Text style={styles.verifyButtonText}>인증</Text>
             </TouchableOpacity>
           </View>
         </View>
-        : null
-      }
+      ) : null}
       <Text
         style={{
           color: isAuthenEmail ? "blue" : "red",
@@ -94,12 +102,11 @@ export default function SignupInformationScreen({ navigation, route }) {
       >
         {confirmAuthenEmailNum}
       </Text>
-      
 
       <TouchableOpacity
         style={[
           styles.customButton,
-          !(isAuthenEmail) && {
+          !isAuthenEmail && {
             backgroundColor: "grey",
           },
         ]}
@@ -107,7 +114,7 @@ export default function SignupInformationScreen({ navigation, route }) {
         onPress={() =>
           navigation.navigate("SignupInformationScreen", { userInfo: userInfo })
         }
-        disabled={!(isAuthenEmail)}
+        disabled={!isAuthenEmail}
       >
         <Text style={styles.linkText}>다음</Text>
       </TouchableOpacity>
@@ -140,7 +147,7 @@ const styles = StyleSheet.create({
   },
   descriptionText: {
     color: "grey",
-    marginLeft: 10, 
+    marginLeft: 10,
     fontSize: 12,
   },
   inputContainer: {
@@ -150,6 +157,7 @@ const styles = StyleSheet.create({
   inputRowContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
   },
   verifyButton: {
     backgroundColor: "#A175FD",
@@ -158,12 +166,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginLeft: -10,
     height: 50,
+    marginRight: 30,
     marginTop: -20,
+    justifyContent: "center",
   },
   verifyButtonText: {
     color: "black",
+    // marginRight: 20,
   },
   input: {
+    flex: 1,
     borderWidth: 1,
     borderRadius: 10,
     paddingLeft: 10,
@@ -175,7 +187,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
 
     // 그림자 스타일 추가
-    elevation: 3,
+    elevation: 5,
     backgroundColor: "white",
   },
   customButton: {
@@ -184,7 +196,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 30,
     marginRight: 30,
     marginLeft: 30,
     borderRadius: 5,

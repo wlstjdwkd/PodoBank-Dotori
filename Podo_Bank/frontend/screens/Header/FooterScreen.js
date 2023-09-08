@@ -4,7 +4,6 @@ import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 
 export default function FooterScreen({ navigation }) {
   return (
-    //TODO: 푸터 이미지 바꿔야함
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.iconContainer}
@@ -15,7 +14,7 @@ export default function FooterScreen({ navigation }) {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.iconContainer}
-        onPress={() => navigation.navigate("AccountOverviewScreen")}
+        onPress={() => navigation.navigate("HomeScreen")}
       >
         <Image
           style={{ width: 24, height: 24 }}

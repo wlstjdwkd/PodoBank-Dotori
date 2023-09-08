@@ -81,7 +81,9 @@ export default function TransferScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <HeaderScreen navigation={navigation} title="이체"></HeaderScreen>
+      <View style={styles.headerContainer}>
+        <HeaderScreen navigation={navigation} title="이체"></HeaderScreen>
+      </View>
       <Text style={styles.leftAlignLabel}>포도은행</Text>
       <Text style={styles.boldLeftAlignLabel}>1235-4568-4532</Text>
       <Text style={styles.leftAlignLabel}>
@@ -104,7 +106,13 @@ export default function TransferScreen({ navigation }) {
       <Text style={styles.centerLabel}>최근 보낸 계좌</Text>
       <View style={styles.line} />
       {recentAccounts.map((account, index) => (
-        <View key={index}>
+        <TouchableOpacity
+          key={index}
+          onPress={() => {
+            setReceiverBank(account.bankName);
+            setAccountInput(account.accountNumber);
+          }}
+        >
           <View style={styles.accountItem}>
             <Image source={account.profileImage} style={styles.profileImage} />
             <Text style={styles.accountName}>{account.name}</Text>
@@ -114,7 +122,7 @@ export default function TransferScreen({ navigation }) {
             <Text style={styles.accountNumber}>{account.accountNumber}</Text>
           </View>
           <View style={styles.line} />
-        </View>
+        </TouchableOpacity>
       ))}
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.centeredView}>
@@ -183,12 +191,12 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "white",
+    paddingLeft: 30,
+    paddingRight: 30,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
+  headerContainer: {
+    marginLeft: -10,
+    marginRight: -10,
   },
   centeredView: {
     flex: 1,
@@ -231,6 +239,7 @@ const styles = StyleSheet.create({
   },
   leftAlignLabel: {
     fontSize: 16,
+    color: "#5A5A5A",
     textAlign: "left",
   },
   boldLeftAlignLabel: {

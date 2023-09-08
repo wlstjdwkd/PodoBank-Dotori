@@ -19,7 +19,7 @@ const accountDetail = {
     {
       id: "1",
       date: "2023.05.30 15:30:00",
-      place: "카페",
+      place: "고용노동부구미시청",
       type: "출금",
       amount: 500,
       afterBalance: 9500,
@@ -27,10 +27,18 @@ const accountDetail = {
     {
       id: "2",
       date: "2023.05.30 15:30:00",
-      place: "카페",
+      place: "용돈",
       type: "입금",
       amount: 500,
       afterBalance: 9500,
+    },
+    {
+      id: "3",
+      date: "2023.05.30 15:30:00",
+      place: "티머니개인택시",
+      type: "출금",
+      amount: 20000,
+      afterBalance: 11500,
     },
     // ... 필요하면 더 추가
   ],
