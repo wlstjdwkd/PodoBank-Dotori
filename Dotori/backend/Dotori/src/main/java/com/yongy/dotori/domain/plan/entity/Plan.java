@@ -22,7 +22,7 @@ public class Plan {
     @JoinColumn(name = "userSeq")
     private User user;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "accountSeq")
     private Account account;
 

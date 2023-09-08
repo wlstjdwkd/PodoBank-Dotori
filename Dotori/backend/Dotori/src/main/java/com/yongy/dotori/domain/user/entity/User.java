@@ -1,8 +1,12 @@
 package com.yongy.dotori.domain.user.entity;
 
 import com.yongy.dotori.domain.account.entity.Account;
+import com.yongy.dotori.domain.category.entity.Category;
+import com.yongy.dotori.domain.categoryGroup.entity.CategoryGroup;
+import com.yongy.dotori.domain.payment.entity.Payment;
 import com.yongy.dotori.domain.plan.entity.Plan;
 import com.yongy.dotori.domain.purpose.entity.Purpose;
+import com.yongy.dotori.domain.reward.entity.Reward;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -45,6 +49,18 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Plan> planList;
+
+    @OneToMany(mappedBy = "user")
+    private List<Category> categoryList;
+
+    @OneToMany(mappedBy = "user")
+    private List<CategoryGroup> categoryGroupList;
+
+    @OneToMany(mappedBy = "user")
+    private List<Payment> paymentList;
+
+    @OneToOne(mappedBy = "user")
+    private Reward reward;
 
     @Builder
     public User(Long userSeq, String id, String password, LocalDate birthDate, String userName, String phoneNumber, Provider authProvider) {
