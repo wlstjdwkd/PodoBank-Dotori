@@ -50,7 +50,10 @@ export default function SignupInformationScreen({ navigation, route }) {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <HeaderComponent navigation={navigation} title="회원가입(3/3)"></HeaderComponent>
+      <HeaderComponent
+        navigation={navigation}
+        title="회원가입(3/3)"
+      ></HeaderComponent>
 
       {/* 본인 인증 안내 */}
       <Text style={styles.boldText}>비밀번호를 입력해주세요</Text>
@@ -145,7 +148,7 @@ const styles = StyleSheet.create({
   },
   descriptionText: {
     color: "grey",
-    marginLeft: 10, 
+    marginLeft: 10,
     fontSize: 12,
   },
   inputContainer: {
@@ -180,7 +183,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
 
     // 그림자 스타일 추가
-    elevation: 3,
+    elevation: 5,
     backgroundColor: "white",
   },
   customButton: {

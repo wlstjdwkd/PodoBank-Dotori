@@ -7,12 +7,21 @@ import {
   TextInput,
 } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
+import { AntDesign } from "@expo/vector-icons";
 
 export default function AccountConfigurationScreen({ navigation }) {
   const [selectedOption, setSelectedOption] = useState(null);
   const [selectedOption2, setSelectedOption2] = useState(null);
   const [password, setPassword] = useState("");
   const passwordInputRef = useRef(null);
+
+  const isNextButtonEnabled = () => {
+    return (
+      password.length === 4 &&
+      selectedOption === "no" &&
+      selectedOption2 === "no"
+    );
+  };
   return (
     <View style={styles.container}>
       <HeaderComponent navigation={navigation} title="계좌개설" />
@@ -59,10 +68,11 @@ export default function AccountConfigurationScreen({ navigation }) {
       <Text style={{ marginBottom: 15 }}>
         어떤 용도로 통장을 사용하실 건가요?
       </Text>
-      <View style={styles.whiteBox}>
+      <TouchableOpacity style={styles.whiteBox}>
         <Text>계좌사용용도</Text>
-        <Text style={styles.grayText}>선택해주세요</Text>
-      </View>
+
+        <AntDesign name="down" size={20}></AntDesign>
+      </TouchableOpacity>
       <Text style={{ marginBottom: 20 }}>
         타인으로부터 통장대여 요청을 받은 사실이 있나요?
       </Text>
@@ -220,5 +230,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+  },
+  confirmText: {
+    color: "white",
+    fontSize: 20,
   },
 });

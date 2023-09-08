@@ -18,7 +18,10 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <HeaderComponent title="회원가입(1/2)" navigation={navigation}></HeaderComponent>
+      <HeaderComponent
+        title="회원가입(1/3)"
+        navigation={navigation}
+      ></HeaderComponent>
 
       {/* 본인 인증 안내 */}
       <Text style={styles.boldText}>본인 인증을 진행해주세요</Text>
@@ -57,7 +60,9 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
       <TouchableOpacity
         style={styles.customButton}
         onPress={() =>
-          navigation.navigate("SignupInformationScreenEmail", { userInfo: userInfo })
+          navigation.navigate("SignupInformationScreenEmail", {
+            userInfo: userInfo,
+          })
         }
       >
         <Text style={styles.linkText}>확인</Text>
@@ -98,7 +103,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     height: 50,
     textAlignVertical: "center",
-    elevation: 3,
+    elevation: 5,
     backgroundColor: "white",
   },
   customButton: {
