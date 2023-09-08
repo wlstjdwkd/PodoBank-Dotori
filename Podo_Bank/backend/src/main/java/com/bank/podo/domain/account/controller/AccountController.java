@@ -43,6 +43,17 @@ public class AccountController {
         return ResponseEntity.ok(accountList);
     }
 
+    @Operation(summary = "계좌 소유주 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
+    })
+    @GetMapping("/{accountNumber}")
+    public ResponseEntity<String> getAccountOwnerName(@PathVariable Long accountNumber) {
+        String name = accountService.getAccountOwnerName(accountNumber);
+        return ResponseEntity.ok(name);
+    }
+
     @Operation(summary = "계좌 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
