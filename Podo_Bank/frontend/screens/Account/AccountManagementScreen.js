@@ -19,9 +19,11 @@ export default function AccountManagementScreen({ navigation }) {
   };
   const [modalVisible, setModalVisible] = useState(false);
   const [secondModalVisible, setSecondModalVisible] = useState(false);
+  const [thirdModalVisible, setThirdModalVisible] = useState(false);
 
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const removeLast = () => {
     setPassword((prevPassword) => prevPassword.slice(0, -1));
@@ -40,6 +42,16 @@ export default function AccountManagementScreen({ navigation }) {
   const newAppendAmount = (num) => {
     if (newPassword.length < 4) {
       setNewPassword((prevPassword) => prevPassword + num);
+    }
+  };
+
+  const confirmRemoveLast = () => {
+    setConfirmPassword((prevPassword) => prevPassword.slice(0, -1));
+  };
+
+  const confirmAppendAmount = (num) => {
+    if (confirmPassword.length < 4) {
+      setConfirmPassword((prevPassword) => prevPassword + num);
     }
   };
 
@@ -228,6 +240,67 @@ export default function AccountManagementScreen({ navigation }) {
               style={styles.confirmButton}
               onPress={() => {
                 setSecondModalVisible(false);
+                setThirdModalVisible(true);
+              }}
+            >
+              <Text style={styles.confirmButtonText}>확인</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={thirdModalVisible}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalContainer}>
+            <View style={styles.passwordHeader}>
+              <Text style={styles.passwordLabelText}>비밀번호 확인</Text>
+              <TouchableOpacity onPress={() => setThirdModalVisible(false)}>
+                <Text style={styles.closeButtonText}>X</Text>
+              </TouchableOpacity>
+            </View>
+            <TextInput
+              style={styles.passwordInput}
+              placeholder="비밀번호(4자리) 입력"
+              secureTextEntry={true}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+            />
+
+            <View style={styles.numPad}>
+              {[
+                ["1", "2", "3"],
+                ["4", "5", "6"],
+                ["7", "8", "9"],
+                ["", "0", "<-"],
+              ].map((row, rowIndex) => (
+                <View key={rowIndex} style={styles.numRow}>
+                  {row.map((num) => (
+                    <TouchableOpacity
+                      key={num}
+                      style={styles.numButton}
+                      onPress={() => {
+                        if (num === "<-") {
+                          confirmRemoveLast();
+                        } else if (num !== "") {
+                          confirmAppendAmount(num);
+                        }
+                      }}
+                    >
+                      <Text style={styles.numText}>{num}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              ))}
+            </View>
+
+            <TouchableOpacity
+              style={styles.confirmButton}
+              onPress={() => {
+                setThirdModalVisible(false);
               }}
             >
               <Text style={styles.confirmButtonText}>확인</Text>
