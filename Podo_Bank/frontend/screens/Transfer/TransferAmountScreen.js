@@ -16,7 +16,7 @@ export default function TransferAmountScreen({ route, navigation }) {
   const [amount, setAmount] = useState(0);
   const accountBalance = 10000; // 이 값은 실제 계좌 잔액에 따라 바뀌어야 합니다.
 
-  const { receiverBank, receiverAccount } = route.params;
+  const { receiverBank, accountInput } = route.params;
 
   //   console.log(receiverAccount + "11receiverAccount");
 
@@ -102,7 +102,7 @@ export default function TransferAmountScreen({ route, navigation }) {
           navigation.navigate("TransferDetailScreen", {
             amount: amount,
             receiverBank: receiverBank,
-            receiverAccount: receiverAccount,
+            receiverAccount: accountInput,
           });
         }}
       >
