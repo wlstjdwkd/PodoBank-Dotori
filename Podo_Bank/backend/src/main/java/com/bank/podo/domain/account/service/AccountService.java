@@ -1,23 +1,21 @@
 package com.bank.podo.domain.account.service;
 
 import com.bank.podo.domain.account.dto.*;
+import com.bank.podo.domain.account.entity.Account;
+import com.bank.podo.domain.account.entity.TransactionHistory;
+import com.bank.podo.domain.account.entity.TransactionType;
 import com.bank.podo.domain.account.exception.*;
 import com.bank.podo.domain.account.repository.AccountRepository;
 import com.bank.podo.domain.account.repository.TransactionHistoryRepository;
 import com.bank.podo.domain.user.entity.User;
-import com.bank.podo.domain.account.entity.Account;
-import com.bank.podo.domain.account.entity.TransactionHistory;
-import com.bank.podo.domain.account.entity.TransactionType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -29,8 +27,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class AccountService {
-
-    private final PlatformTransactionManager transactionManager;
 
     private final AccountRepository accountRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
@@ -59,21 +55,21 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
-    public String getAccountOwnerName(Long accountNumber) {
+    public String getAccountOwnerName(String accountNumber) {
         Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
         return account.getUser().getName();
     }
 
     @Transactional(readOnly = true)
-    public AccountDTO getAccountDetail(Long accountNumber) {
+    public AccountDTO getAccountDetail(String accountNumber) {
         Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
         return toAccountDTO(account);
     }
 
     @Transactional(readOnly = true)
-    public List<TransactionHistoryDTO> getAccountHistory(Long accountNumber) {
+    public List<TransactionHistoryDTO> getAccountHistory(String accountNumber, HistorySettingDTO historySettingDTO) {
         Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
@@ -81,7 +77,11 @@ public class AccountService {
             throw new AccountUserNotMatchException("계좌의 소유자가 아닙니다.");
         }
 
-        List<TransactionHistory> transactionHistoryList = transactionHistoryRepository.findAllByAccount(account);
+        // 페이지 번호와 정렬 유형에 따라 페이지 요청 생성
+        PageRequest pageRequest = PageRequest.of(historySettingDTO.getPage(), 10,
+                historySettingDTO.getSortType() == 0 ? Sort.Direction.DESC : Sort.Direction.ASC, "createdAt");
+
+        List<TransactionHistory> transactionHistoryList = transactionHistoryRepository.findAllByAccount(account, pageRequest);
 
         return toTransactionHistoryDTOList(transactionHistoryList);
     }
@@ -96,22 +96,11 @@ public class AccountService {
 
         checkAccountPasswordFormat(changePasswordDTO.getNewPassword());
 
-        // Start a transaction
-        TransactionDefinition txDef = new DefaultTransactionDefinition();
-        TransactionStatus txStatus = transactionManager.getTransaction(txDef);
-
-        try {
-            account.unlock();
-            accountRepository.save(account.update(Account.builder()
-                    .password(passwordEncoder.encode(changePasswordDTO.getNewPassword()))
-                    .passwordRetryCount(0)
-                    .build())); // Persist the updated password
-
-            transactionManager.commit(txStatus); // Commit the transaction
-        } catch (Exception e) {
-            transactionManager.rollback(txStatus); // Rollback if an exception occurs
-            throw e; // Rethrow the exception
-        }
+        account.unlock();
+        accountRepository.save(account.update(Account.builder()
+                .password(passwordEncoder.encode(changePasswordDTO.getNewPassword()))
+                .passwordRetryCount(0)
+                .build()));
     }
 
     @Transactional
@@ -126,22 +115,12 @@ public class AccountService {
 
         checkAccountPasswordFormat(resetPasswordDTO.getNewPassword());
 
-        // Start a transaction
-        TransactionDefinition txDef = new DefaultTransactionDefinition();
-        TransactionStatus txStatus = transactionManager.getTransaction(txDef);
+        account.unlock();
+        accountRepository.save(account.update(Account.builder()
+                .password(passwordEncoder.encode(resetPasswordDTO.getNewPassword()))
+                .passwordRetryCount(0)
+                .build()));
 
-        try {
-            account.unlock();
-            accountRepository.save(account.update(Account.builder()
-                    .password(passwordEncoder.encode(resetPasswordDTO.getNewPassword()))
-                    .passwordRetryCount(0)
-                    .build())); // Persist the updated password
-
-            transactionManager.commit(txStatus); // Commit the transaction
-        } catch (Exception e) {
-            transactionManager.rollback(txStatus); // Rollback if an exception occurs
-            throw e; // Rethrow the exception
-        }
     }
 
     @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
@@ -154,30 +133,19 @@ public class AccountService {
 
         BigDecimal depositAmount = depositDTO.getAmount();
 
-        // Start a transaction
-        TransactionDefinition txDef = new DefaultTransactionDefinition();
-        TransactionStatus txStatus = transactionManager.getTransaction(txDef);
 
-        try {
-            account.deposit(depositAmount); // Update balance in memory
+        account.deposit(depositAmount);
 
-            accountRepository.save(account); // Persist the updated balance
+        accountRepository.save(account);
 
-            // Create a transaction history record
-            TransactionHistory depositHistory = TransactionHistory.builder()
-                    .transactionType(TransactionType.DEPOSIT)
-                    .amount(depositAmount)
-                    .balanceAfter(account.getBalance())
-                    .account(account)
-                    .content(depositDTO.getContent())
-                    .build();
-            transactionHistoryRepository.save(depositHistory);
-
-            transactionManager.commit(txStatus); // Commit the transaction
-        } catch (Exception e) {
-            transactionManager.rollback(txStatus); // Rollback if an exception occurs
-            throw e; // Rethrow the exception
-        }
+        TransactionHistory depositHistory = TransactionHistory.builder()
+                .transactionType(TransactionType.DEPOSIT)
+                .amount(depositAmount)
+                .balanceAfter(account.getBalance())
+                .account(account)
+                .content(depositDTO.getContent())
+                .build();
+        transactionHistoryRepository.save(depositHistory);
     }
 
 
@@ -195,30 +163,18 @@ public class AccountService {
             throw new InsufficientBalanceException("잔액이 부족합니다.");
         }
 
-        // Start a transaction
-        TransactionDefinition txDef = new DefaultTransactionDefinition();
-        TransactionStatus txStatus = transactionManager.getTransaction(txDef);
+        account.withdraw(withdrawalAmount);
 
-        try {
-            account.withdraw(withdrawalAmount); // Update balance in memory
+        accountRepository.save(account);
 
-            accountRepository.save(account); // Persist the updated balance
-
-            // Create a transaction history record
-            TransactionHistory withdrawalHistory = TransactionHistory.builder()
-                    .transactionType(TransactionType.WITHDRAWAL)
-                    .amount(withdrawalAmount)
-                    .balanceAfter(account.getBalance())
-                    .account(account)
-                    .content(withdrawDTO.getContent())
-                    .build();
-            transactionHistoryRepository.save(withdrawalHistory);
-
-            transactionManager.commit(txStatus); // Commit the transaction
-        } catch (Exception e) {
-            transactionManager.rollback(txStatus); // Rollback if an exception occurs
-            throw e; // Rethrow the exception
-        }
+        TransactionHistory withdrawalHistory = TransactionHistory.builder()
+                .transactionType(TransactionType.WITHDRAWAL)
+                .amount(withdrawalAmount)
+                .balanceAfter(account.getBalance())
+                .account(account)
+                .content(withdrawDTO.getContent())
+                .build();
+        transactionHistoryRepository.save(withdrawalHistory);
     }
 
     @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
@@ -237,42 +193,30 @@ public class AccountService {
             throw new InsufficientBalanceException("잔액이 부족합니다.");
         }
 
-        // Start a transaction
-        TransactionDefinition txDef = new DefaultTransactionDefinition();
-        TransactionStatus txStatus = transactionManager.getTransaction(txDef);
+        senderAccount.withdraw(transferAmount);
+        receiverAccount.deposit(transferAmount);
 
-        try {
-            senderAccount.withdraw(transferAmount); // Update balance in memory
-            receiverAccount.deposit(transferAmount); // Update balance in memory
+        accountRepository.save(senderAccount);
+        accountRepository.save(receiverAccount);
 
-            accountRepository.save(senderAccount); // Persist the updated balances
-            accountRepository.save(receiverAccount);   // Persist the updated balances
-
-            // Create transaction history records
-            TransactionHistory senderAccountHistory = TransactionHistory.builder()
-                    .transactionType(TransactionType.TRANSFER)
-                    .amount(transferAmount.negate()) // Negative amount for withdrawal
-                    .balanceAfter(senderAccount.getBalance())
-                    .counterAccount(receiverAccount)
-                    .account(senderAccount)
-                    .content(transferDTO.getSenderContent())
-                    .build();
-            TransactionHistory receiverAccountHistory = TransactionHistory.builder()
-                    .transactionType(TransactionType.TRANSFER)
-                    .amount(transferAmount) // Positive amount for deposit
-                    .balanceAfter(receiverAccount.getBalance())
-                    .counterAccount(senderAccount)
-                    .account(receiverAccount)
-                    .content(transferDTO.getReceiverContent())
-                    .build();
-            transactionHistoryRepository.save(senderAccountHistory);
-            transactionHistoryRepository.save(receiverAccountHistory);
-
-            transactionManager.commit(txStatus); // Commit the transaction
-        } catch (Exception e) {
-            transactionManager.rollback(txStatus); // Rollback if an exception occurs
-            throw e; // Rethrow the exception
-        }
+        TransactionHistory senderAccountHistory = TransactionHistory.builder()
+                .transactionType(TransactionType.TRANSFER)
+                .amount(transferAmount.negate())
+                .balanceAfter(senderAccount.getBalance())
+                .counterAccount(receiverAccount)
+                .account(senderAccount)
+                .content(transferDTO.getSenderContent())
+                .build();
+        TransactionHistory receiverAccountHistory = TransactionHistory.builder()
+                .transactionType(TransactionType.TRANSFER)
+                .amount(transferAmount)
+                .balanceAfter(receiverAccount.getBalance())
+                .counterAccount(senderAccount)
+                .account(receiverAccount)
+                .content(transferDTO.getReceiverContent())
+                .build();
+        transactionHistoryRepository.save(senderAccountHistory);
+        transactionHistoryRepository.save(receiverAccountHistory);
     }
 
     public void deleteAccount() {
