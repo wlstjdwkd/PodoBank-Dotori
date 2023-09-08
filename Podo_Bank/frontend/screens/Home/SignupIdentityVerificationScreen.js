@@ -57,7 +57,7 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
       <TouchableOpacity
         style={styles.customButton}
         onPress={() =>
-          navigation.navigate("SignupInformationScreen", { userInfo: userInfo })
+          navigation.navigate("SignupInformationScreenEmail", { userInfo: userInfo })
         }
       >
         <Text style={styles.linkText}>확인</Text>
