@@ -38,7 +38,7 @@ export default function AccountManagementScreen({ navigation }) {
   };
 
   const newAppendAmount = (num) => {
-    if (password.length < 4) {
+    if (newPassword.length < 4) {
       setNewPassword((prevPassword) => prevPassword + num);
     }
   };
