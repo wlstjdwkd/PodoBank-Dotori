@@ -38,7 +38,7 @@ export default function AccountManagementScreen({ navigation }) {
   };
 
   const newAppendAmount = (num) => {
-    if (password.length < 4) {
+    if (newPassword.length < 4) {
       setNewPassword((prevPassword) => prevPassword + num);
     }
   };
@@ -89,8 +89,10 @@ export default function AccountManagementScreen({ navigation }) {
 
       <TouchableOpacity style={styles.row}>
         <Text style={styles.backGrayText}>자동이체</Text>
-        <Text>0건</Text>
-        <Ionicons name="chevron-forward" size={24} color="black" />
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text>0건</Text>
+          <Ionicons name="chevron-forward" size={24} color="black" />
+        </View>
       </TouchableOpacity>
 
       <View style={styles.separator} />
@@ -99,7 +101,16 @@ export default function AccountManagementScreen({ navigation }) {
         style={styles.row}
         onPress={() => setModalVisible(true)}
       >
-        <Text style={styles.backGrayText}>계좌비밀번호 변경/오류 해제</Text>
+        <Text style={styles.backGrayText}>계좌 비밀번호 변경</Text>
+        <Ionicons name="chevron-forward" size={24} color="black" />
+      </TouchableOpacity>
+      <View style={styles.separator} />
+
+      <TouchableOpacity
+        style={styles.row}
+        // onPress={""}
+      >
+        <Text style={styles.backGrayText}>계좌 오류 해제</Text>
         <Ionicons name="chevron-forward" size={24} color="black" />
       </TouchableOpacity>
 
@@ -291,11 +302,13 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     width: "100%",
-    height: "60%",
+    height: "70%",
     backgroundColor: "white",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     padding: 20,
+    paddingLeft: 30,
+    paddingRight: 30,
     justifyContent: "space-between",
   },
   closeButtonView: {
@@ -344,7 +357,7 @@ const styles = StyleSheet.create({
     color: "grey",
   },
   confirmButton: {
-    backgroundColor: "purple",
+    backgroundColor: "#842DC480",
     padding: 15,
     borderRadius: 5,
     alignSelf: "stretch",
@@ -373,6 +386,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderColor: "#e0e0e0",
     borderRadius: 5,
+    color: "#8F1414",
   },
   numText: {
     fontSize: 40,
@@ -384,12 +398,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   passwordLabelText: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 15,
+    // fontWeight: "bold",
   },
   passwordInput: {
     borderBottomWidth: 1,
-    borderBottomColor: "grey",
+    borderBottomColor: "#8F1414",
     marginBottom: 20,
     textAlign: "center",
     fontSize: 18,

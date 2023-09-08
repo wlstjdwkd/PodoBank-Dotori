@@ -1,6 +1,6 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { AntDesign, FontAwesome5 } from "@expo/vector-icons"; // Expo에서 제공하는 아이콘 라이브러리
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 
 export default function FooterScreen({ navigation }) {
   return (
@@ -10,28 +10,35 @@ export default function FooterScreen({ navigation }) {
         style={styles.iconContainer}
         onPress={() => navigation.navigate("HomeScreen")}
       >
-        <AntDesign name="home" size={24} color="black" />
+        <AntDesign name="home" size={24} />
         <Text style={styles.iconText}>홈</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.iconContainer}
         onPress={() => navigation.navigate("AccountOverviewScreen")}
       >
-        <FontAwesome5 name="university" size={24} color="black" />
+        <Image
+          style={{ width: 24, height: 24 }}
+          source={require("../../assets/images/all-account.png")}
+        ></Image>
         <Text style={styles.iconText}>전체계좌</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.iconContainer}
         onPress={() => navigation.navigate("AccountConfigurationScreen")}
       >
-        <FontAwesome5 name="file-invoice-dollar" size={24} color="black" />
+        <Image
+          style={{ width: 30, height: 24 }}
+          source={require("../../assets/images/openAccount.png")}
+        ></Image>
+        {/* <FontAwesome5 name="file-invoice-dollar" size={24} color="black" /> */}
         <Text style={styles.iconText}>계좌개설</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.iconContainer}
         onPress={() => navigation.navigate("MyPageScreen")}
       >
-        <FontAwesome5 name="user" size={24} color="black" />
+        <AntDesign name="user" size={24} />
         <Text style={styles.iconText}>마이페이지</Text>
       </TouchableOpacity>
     </View>
@@ -55,6 +62,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   iconText: {
-    fontSize: 15,
+    fontSize: 10,
   },
 });

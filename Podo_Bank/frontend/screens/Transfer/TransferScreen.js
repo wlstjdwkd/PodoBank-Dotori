@@ -36,11 +36,21 @@ const recentAccounts = [
 
 export default function TransferScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
-  const translateY = useRef(new Animated.Value(height)).current;
+  // const translateY = useRef(new Animated.Value(height)).current;
   const [accountInput, setAccountInput] = useState("");
 
   const [receiverBank, setReceiverBank] = useState("포도은행");
   const [availableAmount, setAvailableAmount] = useState(0); // 출금 가능 금액 state 추가
+
+  const removeLast = () => {
+    setAccountInput((prevAccount) => prevAccount.slice(0, -1));
+  };
+
+  const appendAccount = (num) => {
+    // if (password.length < 4) {
+    setAccountInput((prevAccount) => prevAccount + num);
+    // }
+  };
 
   const handleKeyPress = (key) => {
     if (key === "<-") {
@@ -50,24 +60,24 @@ export default function TransferScreen({ navigation }) {
     }
   };
 
-  const openModal = () => {
-    setModalVisible(true);
-    Animated.timing(translateY, {
-      toValue: height * 0.4,
-      duration: 500,
-      useNativeDriver: true,
-    }).start();
-  };
+  // const openModal = () => {
+  //   setModalVisible(true);
+  //   Animated.timing(translateY, {
+  //     toValue: height * 0.4,
+  //     duration: 500,
+  //     useNativeDriver: true,
+  //   }).start();
+  // };
 
-  const closeModal = () => {
-    Animated.timing(translateY, {
-      toValue: height,
-      duration: 500,
-      useNativeDriver: true,
-    }).start(() => {
-      setModalVisible(false);
-    });
-  };
+  // const closeModal = () => {
+  //   Animated.timing(translateY, {
+  //     toValue: height,
+  //     duration: 500,
+  //     useNativeDriver: true,
+  //   }).start(() => {
+  //     setModalVisible(false);
+  //   });
+  // };
 
   return (
     <View style={styles.container}>
@@ -82,14 +92,14 @@ export default function TransferScreen({ navigation }) {
 
       <TextInput placeholder="포도은행" style={styles.bankLabel}></TextInput>
       <View style={styles.line} />
-      <TextInput
-        style={styles.input}
-        placeholder="계좌번호"
-        // textAlign="center" // 중앙 정렬
-        onFocus={openModal}
-        blurOnSubmit={true}
-        onSubmitEditing={closeModal}
-      />
+
+      <TouchableOpacity
+        style={styles.row}
+        onPress={() => setModalVisible(true)}
+      >
+        <Text style={styles.backGrayText}>계좌번호</Text>
+      </TouchableOpacity>
+
       <View style={styles.line} />
       <Text style={styles.centerLabel}>최근 보낸 계좌</Text>
       <View style={styles.line} />
@@ -106,71 +116,43 @@ export default function TransferScreen({ navigation }) {
           <View style={styles.line} />
         </View>
       ))}
-      {modalVisible && (
-        <Modal
-          transparent={true}
-          animationType="slide"
-          visible={modalVisible}
-          onRequestClose={closeModal}
-        >
-          <Animated.View
-            style={{
-              transform: [{ translateY: translateY }],
-              height: "60%",
-              width: "100%",
-              backgroundColor: "white",
-              borderTopLeftRadius: 20,
-              borderTopRightRadius: 20,
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                paddingHorizontal: 10,
-                paddingVertical: 5,
-              }}
-            >
-              <Text>계좌번호</Text>
-              <TouchableOpacity onPress={closeModal}>
-                <Text>X</Text>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalContainer}>
+            <View style={styles.passwordHeader}>
+              <Text style={styles.passwordLabelText}>계좌번호</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Text style={styles.closeButtonText}>X</Text>
               </TouchableOpacity>
             </View>
-
             <TextInput
-              style={{ ...styles.input, marginHorizontal: 10 }}
-              value={accountInput}
-              editable={false}
+              style={styles.passwordInput}
               placeholder="계좌번호 입력"
-              onChangeText={(text) => setAccountInput(text)}
+              value={accountInput}
+              onChangeText={setAccountInput}
             />
 
-            <View style={{ alignItems: "center", marginVertical: 10 }}>
+            <View style={styles.numPad}>
               {[
                 ["1", "2", "3"],
                 ["4", "5", "6"],
                 ["7", "8", "9"],
                 ["", "0", "<-"],
               ].map((row, rowIndex) => (
-                <View
-                  key={rowIndex}
-                  style={{ flexDirection: "row", marginBottom: 10 }}
-                >
-                  {row.map((key) => (
+                <View key={rowIndex} style={styles.numRow}>
+                  {row.map((num) => (
                     <TouchableOpacity
-                      key={key}
-                      style={{
-                        width: width / 3,
-                        height: 60,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        borderWidth: 1,
-                        borderColor: "grey",
+                      key={num}
+                      style={styles.numButton}
+                      onPress={() => {
+                        if (num === "<-") {
+                          removeLast();
+                        } else if (num !== "") {
+                          appendAccount(num);
+                        }
                       }}
-                      onPress={() => handleKeyPress(key)}
                     >
-                      <Text>{key}</Text>
+                      <Text style={styles.numText}>{num}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -178,25 +160,20 @@ export default function TransferScreen({ navigation }) {
             </View>
 
             <TouchableOpacity
-              style={{
-                backgroundColor: "purple",
-                margin: 20,
-                padding: 15,
-                borderRadius: 5,
-                alignItems: "center",
-              }}
-              onPress={() =>
+              style={styles.confirmButton}
+              onPress={() => {
+                setModalVisible(false);
                 navigation.navigate("TransferAmountScreen", {
                   receiverBank: receiverBank,
-                  receiverAccount: accountInput,
-                })
-              }
+                  accountInput: accountInput,
+                });
+              }}
             >
-              <Text style={{ color: "white" }}>확인</Text>
+              <Text style={styles.confirmButtonText}>확인</Text>
             </TouchableOpacity>
-          </Animated.View>
-        </Modal>
-      )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -212,6 +189,39 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 20,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "100%",
+    height: "70%",
+    backgroundColor: "white",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    paddingLeft: 30,
+    paddingRight: 30,
+    justifyContent: "space-between",
+  },
+  passwordHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  passwordLabelText: {
+    fontSize: 15,
+    // fontWeight: "bold",
+  },
+  passwordInput: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#8F1414",
+    marginBottom: 20,
+    textAlign: "center",
+    fontSize: 18,
   },
   profileImage: {
     width: 16,
@@ -254,6 +264,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 10,
   },
+  backGrayText: {
+    color: "grey",
+    height: 40,
+    fontSize: 16,
+  },
   line: {
     height: 1,
     backgroundColor: "grey",
@@ -284,5 +299,43 @@ const styles = StyleSheet.create({
   accountNumber: {
     fontSize: 16,
     color: "gray",
+  },
+  closeButtonText: {
+    fontSize: 24,
+  },
+  numPad: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  numRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  numButton: {
+    width: width / 3 - 40,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "center",
+    borderColor: "#e0e0e0",
+    borderRadius: 5,
+    color: "#8F1414",
+  },
+  numText: {
+    fontSize: 40,
+  },
+  confirmButton: {
+    backgroundColor: "#842DC480",
+    padding: 15,
+    borderRadius: 5,
+    alignSelf: "stretch",
+    alignItems: "center",
+    marginLeft: -30,
+    marginRight: -30,
+    marginBottom: -20,
+  },
+  confirmButtonText: {
+    color: "white",
+    fontSize: 18,
   },
 });
