@@ -18,7 +18,7 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <HeaderComponent title="회원가입(1/2)"></HeaderComponent>
+      <HeaderComponent title="회원가입(1/2)" navigation={navigation}></HeaderComponent>
 
       {/* 본인 인증 안내 */}
       <Text style={styles.boldText}>본인 인증을 진행해주세요</Text>
