@@ -37,8 +37,8 @@ public class Account {
     @OneToMany(mappedBy = "account")
     private List<PurposeData> purposeDataList;
 
-    @OneToMany(mappedBy = "account")
-    private List<Plan> planList;
+    @OneToOne(mappedBy = "account")
+    private Plan plan;
 
     @Builder
     public Account(Long accountSeq, User user, Bank bank, Long accountNumber,
