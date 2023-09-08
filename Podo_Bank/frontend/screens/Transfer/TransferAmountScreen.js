@@ -17,7 +17,26 @@ export default function TransferAmountScreen({ route, navigation }) {
   const accountBalance = 10000; // 이 값은 실제 계좌 잔액에 따라 바뀌어야 합니다.
 
   const { receiverBank, accountInput } = route.params;
+  const appendAmount = (value) => {
+    setAmount((prevAmount) => {
+      const newAmount = prevAmount * 10 + parseInt(value);
+      return Math.min(newAmount, accountBalance);
+    });
+  };
 
+  const setQuickAmount = (value) => {
+    if (value === "전액") {
+      setAmount(accountBalance);
+    } else {
+      const quickValues = {
+        "100만": 1000000,
+        "10만": 100000,
+        "5만": 50000,
+        "1만": 10000,
+      };
+      setAmount(Math.min(quickValues[value], accountBalance));
+    }
+  };
   //   console.log(receiverAccount + "11receiverAccount");
 
   // const appendAmount = (value) => {
@@ -40,9 +59,9 @@ export default function TransferAmountScreen({ route, navigation }) {
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "원";
   };
 
-  const appendAmount = (value) => {
-    setAmount((prevAmount) => prevAmount * 10 + parseInt(value));
-  };
+  // const appendAmount = (value) => {
+  //   setAmount((prevAmount) => prevAmount * 10 + parseInt(value));
+  // };
 
   const removeLast = () => {
     setAmount((prevAmount) => Math.floor(prevAmount / 10));
@@ -62,7 +81,7 @@ export default function TransferAmountScreen({ route, navigation }) {
           <TouchableOpacity
             key={quickAmount}
             style={styles.quickSelectButton}
-            onPress={() => setAmount(quickAmount)}
+            onPress={() => setQuickAmount(quickAmount)}
           >
             <Text>{quickAmount}</Text>
           </TouchableOpacity>
