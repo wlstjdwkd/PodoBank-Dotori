@@ -13,35 +13,49 @@ import HeaderScreen from "../Header/HeaderScreen";
 const { width } = Dimensions.get("window");
 
 export default function TransferAmountScreen({ route, navigation }) {
-  const [amount, setAmount] = useState("0원");
-  const accountBalance = "10,000원"; // 이 값은 실제 계좌 잔액에 따라 바뀌어야 합니다.
+  const [amount, setAmount] = useState(0);
+  const accountBalance = 10000; // 이 값은 실제 계좌 잔액에 따라 바뀌어야 합니다.
 
   const { receiverBank, receiverAccount } = route.params;
 
   //   console.log(receiverAccount + "11receiverAccount");
 
+  // const appendAmount = (value) => {
+  //   if (amount === "0원") {
+  //     setAmount(`${value}원`);
+  //   } else {
+  //     setAmount(`${amount.slice(0, -1)}${value}원`);
+  //   }
+  // };
+
+  // const removeLast = () => {
+  //   if (amount.length > 2) {
+  //     setAmount(`${amount.slice(0, -2)}`);
+  //   } else {
+  //     setAmount("0원");
+  //   }
+  // };
+
+  const formatCurrency = (value) => {
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "원";
+  };
+
   const appendAmount = (value) => {
-    if (amount === "0원") {
-      setAmount(`${value}원`);
-    } else {
-      setAmount(`${amount.slice(0, -1)}${value}원`);
-    }
+    setAmount((prevAmount) => prevAmount * 10 + parseInt(value));
   };
 
   const removeLast = () => {
-    if (amount.length > 2) {
-      setAmount(`${amount.slice(0, -2)}`);
-    } else {
-      setAmount("0원");
-    }
+    setAmount((prevAmount) => Math.floor(prevAmount / 10));
   };
 
   return (
     <View style={styles.container}>
-      <HeaderScreen navigation={navigation} title="이체하기" />
+      <HeaderScreen navigation={navigation} title="이체" />
 
-      <Text style={styles.amountText}>{amount}</Text>
-      <Text style={styles.balanceText}>출금 가능 금액: {accountBalance}</Text>
+      <Text style={styles.amountText}>{formatCurrency(amount)}</Text>
+      <Text style={styles.balanceText}>
+        출금 가능 금액: {formatCurrency(accountBalance)}
+      </Text>
 
       <View style={styles.quickSelect}>
         {["100만", "10만", "5만", "1만", "전액"].map((quickAmount) => (
@@ -112,7 +126,7 @@ const styles = StyleSheet.create({
   balanceText: {
     fontSize: 16,
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 50,
   },
   quickSelect: {
     flexDirection: "row",
@@ -136,14 +150,16 @@ const styles = StyleSheet.create({
     height: 60,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 1,
+    // borderWidth: 1,
     borderColor: "#e0e0e0",
     borderRadius: 5,
   },
   numText: {
-    fontSize: 24,
+    fontSize: 40,
   },
   confirmButton: {
+    marginLeft: -30,
+    marginRight: -30,
     backgroundColor: "purple",
     padding: 15,
     alignItems: "center",

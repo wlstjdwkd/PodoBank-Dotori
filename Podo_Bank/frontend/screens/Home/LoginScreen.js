@@ -15,7 +15,7 @@ export default function LoginScreen({ navigation }) {
       {/* Logo */}
       <View style={styles.logoContainer}>
         <Image
-          source={require("../../assets/images/podo_bank_text.png")}
+          source={require("../../assets/images/podo_bank_name.png")}
           style={styles.logoImage}
         />
         {/* 로고 이미지 로드 */}
@@ -36,9 +36,10 @@ export default function LoginScreen({ navigation }) {
       </View>
 
       {/* 로그인 버튼 */}
+      {/* 로그인 back 연동해야함 */}
       <TouchableOpacity
         style={styles.customButton}
-        onPress={() => alert("Logged in!")}
+        onPress={() => navigation.navigate("HomeScreen")}
       >
         <Text style={styles.buttonText}>로그인</Text>
       </TouchableOpacity>
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   buttonText: {
-    color: "black",
+    color: "white",
     fontSize: 16,
   },
   inputContainer: {
@@ -122,6 +123,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   separator: {
-    marginHorizontal: 10, // 양쪽 마진을 추가하여 텍스트 간 간격 조절
+    marginHorizontal: 10,
   },
 });

@@ -2,8 +2,9 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons"; // Expo에서 제공하는 아이콘 라이브러리
 
-export default function BottomBarScreen({ navigation }) {
+export default function FooterScreen({ navigation }) {
   return (
+    //TODO: 푸터 이미지 바꿔야함
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.iconContainer}
@@ -19,11 +20,17 @@ export default function BottomBarScreen({ navigation }) {
         <FontAwesome5 name="university" size={24} color="black" />
         <Text style={styles.iconText}>전체계좌</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.iconContainer}>
+      <TouchableOpacity
+        style={styles.iconContainer}
+        onPress={() => navigation.navigate("AccountConfigurationScreen")}
+      >
         <FontAwesome5 name="file-invoice-dollar" size={24} color="black" />
         <Text style={styles.iconText}>계좌개설</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.iconContainer}>
+      <TouchableOpacity
+        style={styles.iconContainer}
+        onPress={() => navigation.navigate("MyPageScreen")}
+      >
         <FontAwesome5 name="user" size={24} color="black" />
         <Text style={styles.iconText}>마이페이지</Text>
       </TouchableOpacity>

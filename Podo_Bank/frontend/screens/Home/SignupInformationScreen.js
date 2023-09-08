@@ -1,24 +1,56 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
-  Image,
   TextInput,
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
 
-export default function SignupInformationScreen({ navigation }) {
+import HeaderComponent from "../Header/HeaderScreen";
+
+export default function SignupInformationScreen({ navigation, route }) {
+  const [userInfo, setUserInfo] = useState(route.params.userInfo);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordMessage, setPasswordMessage] = useState("");
+  const [confirmPasswordMessage, setConfirmPasswordMessage] = useState("");
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(false);
+
+  const validatePassword = (pass) => {
+    const regex =
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,16}$/;
+    return regex.test(pass);
+  };
+
+  const handlePasswordChange = (text) => {
+    setPassword(text);
+    if (validatePassword(text)) {
+      setPasswordMessage("완벽합니당");
+      setIsPasswordValid(true);
+    } else {
+      setPasswordMessage("양식을 맞춰주세요.!");
+      setIsPasswordValid(false);
+    }
+  };
+
+  const handleConfirmPasswordChange = (text) => {
+    setConfirmPassword(text);
+    if (text === password && isPasswordValid) {
+      setConfirmPasswordMessage("완벽합니당");
+      setIsConfirmPasswordValid(true);
+      setUserInfo((prev) => ({ ...prev, password: text }));
+    } else {
+      setConfirmPasswordMessage("비밀번호가 일치하지 않습니다");
+      setIsConfirmPasswordValid(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.headerContainer}>
-        <Image
-          source={require("../../assets/images/normal_podo.png")}
-          style={styles.podoImage}
-        />
-        <Text style={styles.bankText}>포도은행</Text>
-      </View>
+      <HeaderComponent title="회원가입(2/2)"></HeaderComponent>
 
       {/* 본인 인증 안내 */}
       <Text style={styles.boldText}>계정 정보를 입력해주세요</Text>
@@ -29,6 +61,9 @@ export default function SignupInformationScreen({ navigation }) {
         <View style={styles.inputRowContainer}>
           <TextInput
             style={styles.input}
+            onChangeText={(text) =>
+              setUserInfo((prev) => ({ ...prev, email: text }))
+            }
             placeholder="ID로 사용될 이메일을 선택해주세요."
           />
           <TouchableOpacity style={styles.verifyButton}>
@@ -46,19 +81,54 @@ export default function SignupInformationScreen({ navigation }) {
 
         <TextInput
           style={styles.input}
+          onChangeText={handlePasswordChange}
+          secureTextEntry={true}
           placeholder="비밀번호를 입력해 주세요."
         />
       </View>
+      <Text
+        style={{
+          color: isPasswordValid ? "blue" : "red",
+          marginLeft: 30,
+          marginTop: -30,
+        }}
+      >
+        {passwordMessage}
+      </Text>
+
       <View style={styles.inputContainer}>
         <Text style={styles.inputText}>비밀번호 확인</Text>
         <TextInput
           style={styles.input}
+          onChangeText={handleConfirmPasswordChange}
+          secureTextEntry={true}
           placeholder="비밀번호를 한번 더 입력해 주세요."
         />
       </View>
+      <Text
+        style={{
+          color: isConfirmPasswordValid ? "blue" : "red",
+          marginLeft: 30,
+          marginTop: -30,
+        }}
+      >
+        {confirmPasswordMessage}
+      </Text>
+
       <TouchableOpacity
-        style={styles.customButton}
-        onPress={() => navigation.navigate("SignupCompleteScreen")}
+        style={[
+          styles.customButton,
+          !(isPasswordValid && isConfirmPasswordValid) && {
+            backgroundColor: "grey",
+          },
+        ]}
+        // back에 회원가입 정보 보내야함
+        onPress={() =>
+          navigation.navigate("SignupCompleteScreen", {
+            name: userInfo.name,
+          })
+        }
+        disabled={!(isPasswordValid && isConfirmPasswordValid)}
       >
         <Text style={styles.linkText}>확인</Text>
       </TouchableOpacity>
@@ -73,30 +143,11 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     backgroundColor: "white",
   },
-  headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    paddingTop: 30,
-  },
   textRow: {
     flexDirection: "row",
     alignItems: "center",
   },
-  podoImage: {
-    width: 25,
-    height: 25,
-    resizeMode: "contain",
-    marginLeft: 30,
-    marginRight: 15,
-  },
-  bankText: {
-    fontSize: 15,
-    marginRight: 15,
-  },
-  signupText: {
-    color: "grey",
-  },
+
   boldText: {
     fontWeight: "bold",
     fontSize: 20,
@@ -110,13 +161,11 @@ const styles = StyleSheet.create({
   },
   descriptionText: {
     color: "grey",
-    marginLeft: 10, // '비밀번호'와의 간격 조정
-    fontSize: 12, // 폰트 사이즈 조정 (원하는대로 변경 가능)
+    marginLeft: 10, 
+    fontSize: 12,
   },
   inputContainer: {
     marginTop: 10,
-    // flexDirection: "row",
-    // alignItems: "center",
     justifyContent: "flex-start",
   },
   inputRowContainer: {
@@ -128,7 +177,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 15,
-    marginLeft: -10, // 인풋과 버튼 사이의 간격 조절
+    marginLeft: -10,
     height: 50,
     marginTop: -20,
   },
@@ -138,7 +187,6 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderRadius: 10,
-    // flex: 1,
     paddingLeft: 10,
     marginTop: 10,
     marginRight: 30,
@@ -146,6 +194,10 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     height: 50,
     textAlignVertical: "center",
+
+    // 그림자 스타일 추가
+    elevation: 3,
+    backgroundColor: "white",
   },
   customButton: {
     backgroundColor: "#A175FD",

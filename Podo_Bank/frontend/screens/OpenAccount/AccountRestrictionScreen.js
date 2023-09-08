@@ -1,11 +1,21 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+} from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
 
 export default function AccountRestrictionScreen({ navigation }) {
   const [isChecked, setChecked] = useState(false);
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 20 }}
+    >
       <HeaderComponent navigation={navigation} title="계좌개설" />
 
       <View style={styles.box}>
@@ -29,7 +39,7 @@ export default function AccountRestrictionScreen({ navigation }) {
         </Text>
         <View style={styles.innerBox}>
           <View style={styles.highlightedRow}>
-            <Text style={styles.boldText}>금융거래 한도계좌</Text>
+            <Text style={styles.highlightText}>금융거래 한도계좌</Text>
             <Text style={styles.normalText}>(1일 최대한도)</Text>
           </View>
 
@@ -46,7 +56,9 @@ export default function AccountRestrictionScreen({ navigation }) {
         </View>
         <View style={styles.innerBox}>
           <View style={styles.highlightedRow}>
-            <Text style={styles.boldText}>금융거래 한도계좌(미성년자)</Text>
+            <Text style={styles.highlightText}>
+              금융거래 한도계좌(미성년자)
+            </Text>
             <Text style={styles.normalText}>(1일 최대한도)</Text>
           </View>
 
@@ -58,7 +70,7 @@ export default function AccountRestrictionScreen({ navigation }) {
         </View>
         <View style={styles.innerBox}>
           <View style={styles.highlightedRow}>
-            <Text style={styles.boldText}>일반계좌</Text>
+            <Text style={styles.highlightText}>일반계좌</Text>
             <Text style={styles.normalText}>(1일 최대한도)</Text>
           </View>
 
@@ -95,7 +107,7 @@ export default function AccountRestrictionScreen({ navigation }) {
       >
         <Text style={styles.applyText}>신청하기</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -111,9 +123,11 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     padding: 15,
     marginBottom: 15,
+    borderRadius: 5,
   },
   boldText: {
     fontWeight: "bold",
+    fontSize: 15,
   },
   divider: {
     height: 1,
@@ -129,6 +143,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
     marginBottom: 10,
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
   },
   row: {
     flexDirection: "row",
@@ -165,13 +181,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   applyButton: {
-    backgroundColor: "purple",
+    backgroundColor: "#842DC480",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
+    // position: "absolute",
+    // bottom: 0,
+    // left: 0,
+    // right: 0,
   },
   applyText: {
     color: "#fff",
     fontWeight: "bold",
+    // position: "absolute",
+    // bottom: 0,
+    // left: 0,
+    // right: 0,
   },
 });

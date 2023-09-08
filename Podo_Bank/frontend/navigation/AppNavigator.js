@@ -4,7 +4,6 @@ import LoginScreen from "../screens/Home/LoginScreen";
 import SignupIdentityVerificationScreen from "../screens/Home/SignupIdentityVerificationScreen";
 import SignupInformationScreen from "../screens/Home/SignupInformationScreen";
 
-import SignupScreen from "../screens/Home/SignupScreen";
 import SignupCompleteScreen from "../screens/Home/SignupCompleteScreen";
 import HomeScreen from "../screens/Home/HomeScreen";
 import AccountDetailScreen from "../screens/Account/AccountDetailScreen";
@@ -17,6 +16,9 @@ import AccountSetupScreen from "../screens/OpenAccount/AccountSetupScreen";
 import AccountConfigurationScreen from "../screens/OpenAccount/AccountConfigurationScreen";
 import AccountRestrictionScreen from "../screens/OpenAccount/AccountRestrictionScreen";
 import OpenAccountCompleteScreen from "../screens/OpenAccount/OpenAccountCompleteScreen";
+import AccountManagementScreen from "../screens/Account/AccountManagementScreen";
+import TransactionDetailScreen from "../screens/Account/TransactionDetailScreen";
+import MyPageScreen from "../screens/Home/MyPageScreen";
 
 const Stack = createStackNavigator();
 
@@ -36,7 +38,6 @@ function AppNavigator() {
         component={SignupInformationScreen}
       />
 
-      <Stack.Screen name="SignupScreen" component={SignupScreen} />
       <Stack.Screen
         name="SignupCompleteScreen"
         component={SignupCompleteScreen}
@@ -81,6 +82,18 @@ function AppNavigator() {
       <Stack.Screen
         name="OpenAccountCompleteScreen"
         component={OpenAccountCompleteScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="AccountManagementScreen"
+        component={AccountManagementScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="TransactionDetailScreen"
+        component={TransactionDetailScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="MyPageScreen"
+        component={MyPageScreen}
       ></Stack.Screen>
     </Stack.Navigator>
   );
