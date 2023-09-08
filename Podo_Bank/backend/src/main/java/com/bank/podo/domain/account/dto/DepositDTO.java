@@ -11,4 +11,5 @@ public class DepositDTO {
     private Long accountNumber;
     private BigDecimal amount;
     private String password;
+    private String content;
 }

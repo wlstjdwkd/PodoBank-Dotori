@@ -21,6 +21,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -168,6 +169,7 @@ public class AccountService {
                     .amount(depositAmount)
                     .balanceAfter(account.getBalance())
                     .account(account)
+                    .content(depositDTO.getContent())
                     .build();
             transactionHistoryRepository.save(depositHistory);
 
@@ -208,6 +210,7 @@ public class AccountService {
                     .amount(withdrawalAmount)
                     .balanceAfter(account.getBalance())
                     .account(account)
+                    .content(withdrawDTO.getContent())
                     .build();
             transactionHistoryRepository.save(withdrawalHistory);
 
@@ -221,16 +224,16 @@ public class AccountService {
     @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
     public void transfer(TransferDTO transferDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
-        Account fromAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(transferDTO.getFromAccountNumber())
+        Account senderAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(transferDTO.getSenderAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
-        Account toAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(transferDTO.getToAccountNumber())
+        Account receiverAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(transferDTO.getReceiverAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
-        checkAccountUserAndPassword(fromAccount, user, transferDTO.getPassword(), passwordEncoder);
+        checkAccountUserAndPassword(senderAccount, user, transferDTO.getPassword(), passwordEncoder);
 
         BigDecimal transferAmount = transferDTO.getAmount();
 
-        if(fromAccount.getBalance().compareTo(transferAmount) < 0) {
+        if(senderAccount.getBalance().compareTo(transferAmount) < 0) {
             throw new InsufficientBalanceException("잔액이 부족합니다.");
         }
 
@@ -239,29 +242,31 @@ public class AccountService {
         TransactionStatus txStatus = transactionManager.getTransaction(txDef);
 
         try {
-            fromAccount.withdraw(transferAmount); // Update balance in memory
-            toAccount.deposit(transferAmount); // Update balance in memory
+            senderAccount.withdraw(transferAmount); // Update balance in memory
+            receiverAccount.deposit(transferAmount); // Update balance in memory
 
-            accountRepository.save(fromAccount); // Persist the updated balances
-            accountRepository.save(toAccount);   // Persist the updated balances
+            accountRepository.save(senderAccount); // Persist the updated balances
+            accountRepository.save(receiverAccount);   // Persist the updated balances
 
             // Create transaction history records
-            TransactionHistory fromAccountHistory = TransactionHistory.builder()
+            TransactionHistory senderAccountHistory = TransactionHistory.builder()
                     .transactionType(TransactionType.TRANSFER)
                     .amount(transferAmount.negate()) // Negative amount for withdrawal
-                    .balanceAfter(fromAccount.getBalance())
-                    .counterAccount(toAccount)
-                    .account(fromAccount)
+                    .balanceAfter(senderAccount.getBalance())
+                    .counterAccount(receiverAccount)
+                    .account(senderAccount)
+                    .content(transferDTO.getSenderContent())
                     .build();
-            TransactionHistory toAccountHistory = TransactionHistory.builder()
+            TransactionHistory receiverAccountHistory = TransactionHistory.builder()
                     .transactionType(TransactionType.TRANSFER)
                     .amount(transferAmount) // Positive amount for deposit
-                    .balanceAfter(toAccount.getBalance())
-                    .counterAccount(fromAccount)
-                    .account(toAccount)
+                    .balanceAfter(receiverAccount.getBalance())
+                    .counterAccount(senderAccount)
+                    .account(receiverAccount)
+                    .content(transferDTO.getReceiverContent())
                     .build();
-            transactionHistoryRepository.save(fromAccountHistory);
-            transactionHistoryRepository.save(toAccountHistory);
+            transactionHistoryRepository.save(senderAccountHistory);
+            transactionHistoryRepository.save(receiverAccountHistory);
 
             transactionManager.commit(txStatus); // Commit the transaction
         } catch (Exception e) {
@@ -306,18 +311,29 @@ public class AccountService {
     }
 
 
-    private Long generateAccountNumber() {
-        long prefix = 9775L;
-        long randomSuffix = (long) (Math.random() * 9000000000000L) + 1000000000000L;
-        long generatedNumber = prefix * 10000000000000L + randomSuffix;
+    private String generateAccountNumber() {
+        StringBuilder sb = new StringBuilder();
 
-        // 중복 체크
-        while (accountRepository.existsByAccountNumber(generatedNumber)) {
-            randomSuffix = (long) (Math.random() * 9000000000000L) + 1000000000000L;
-            generatedNumber = prefix * 10000000000000L + randomSuffix;
+        sb.append("9775");
+
+        Random random = new Random();
+        for (int i = 0; i < 9; i++) {
+            int digit = random.nextInt(10); // 0부터 9까지의 숫자 생성
+            sb.append(digit);
         }
 
-        return generatedNumber;
+        // 중복 체크
+        while (accountRepository.existsByAccountNumber(sb.toString())) {
+            sb = new StringBuilder();
+            sb.append("9775");
+
+            for (int i = 0; i < 9; i++) {
+                int digit = random.nextInt(10); // 0부터 9까지의 숫자 생성
+                sb.append(digit);
+            }
+        }
+
+        return sb.toString();
     }
 
     private void checkAccountPasswordFormat(String password) {
@@ -351,12 +367,20 @@ public class AccountService {
     }
 
     private TransactionHistoryDTO toTransactionHistoryDTO(TransactionHistory transactionHistory) {
-        return TransactionHistoryDTO.builder()
+        TransactionHistoryDTO.TransactionHistoryDTOBuilder builder = TransactionHistoryDTO.builder()
                 .transactionType(transactionHistory.getTransactionType())
                 .transactionAt(transactionHistory.getTransactionAt())
                 .amount(transactionHistory.getAmount())
                 .balanceAfter(transactionHistory.getBalanceAfter())
-                .counterName(transactionHistory.getCounterAccount().getUser().getName())
-                .build();
+                .content(transactionHistory.getContent());
+
+        if (transactionHistory.getCounterAccount() != null) {
+            builder.counterAccountName(transactionHistory.getCounterAccount().getUser().getName());
+        } else {
+            builder.counterAccountName("");
+        }
+
+        return builder.build();
     }
+
 }

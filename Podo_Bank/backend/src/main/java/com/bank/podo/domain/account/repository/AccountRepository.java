@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
-    boolean existsByAccountNumber(Long generatedNumber);
+    boolean existsByAccountNumber(String generatedNumber);
 
     List<Account> findAllByUser(User user);
 
