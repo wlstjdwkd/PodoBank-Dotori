@@ -3,16 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  Button,
   TouchableOpacity,
   FlatList,
-  Image,
 } from "react-native";
 import { Ionicons, EvilIcons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 
 import HeaderScreen from "../Header/HeaderScreen";
-import BottomBarScreen from "../Header/BottomBarScreen";
 
 // 더미 데이터 (실제 데이터와 연동 필요)
 const accountDetail = {
@@ -25,6 +21,14 @@ const accountDetail = {
       date: "2023.05.30 15:30:00",
       place: "카페",
       type: "출금",
+      amount: 500,
+      afterBalance: 9500,
+    },
+    {
+      id: "2",
+      date: "2023.05.30 15:30:00",
+      place: "카페",
+      type: "입금",
       amount: 500,
       afterBalance: 9500,
     },
@@ -47,23 +51,27 @@ export default function AccountDetail({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* <HeaderScreen navigation={navigation} title="계좌 상세 조회" /> */}
-      <View style={styles.headerContainer}>
-        <Image
-          source={require("../../assets/images/normal_podo.png")}
-          style={styles.podoImage}
-        />
-        <Text style={styles.bankText}>포도은행</Text>
-      </View>
+      <HeaderScreen navigation={navigation} title="거래 내역 조회" />
       <View style={styles.nicknameContainer}>
-        <Text style={styles.nickname}>{accountDetail.nickname}</Text>
-        <TouchableOpacity>
-          <EvilIcons
-            name="pencil"
-            size={20}
-            color="black"
-            style={{ marginBottom: -15 }}
-          />
+        <View style={styles.row}>
+          <Text style={styles.nickname}>{accountDetail.nickname}</Text>
+          <TouchableOpacity>
+            <EvilIcons
+              name="pencil"
+              size={20}
+              color="black"
+              style={{ marginTop: 20 }}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity
+          style={styles.setting}
+          onPress={() => {
+            navigation.navigate("AccountManagementScreen");
+          }}
+        >
+          <EvilIcons name="gear" size={24} color="black" />
         </TouchableOpacity>
       </View>
 
@@ -83,9 +91,9 @@ export default function AccountDetail({ navigation }) {
       <View style={styles.horizontalSeparator} />
       {/* 계좌 내역 조회 방식 선택 */}
       <View style={styles.queryModeContainer}>
-        <Text>3개월 · </Text>
-        <Text>전체 · </Text>
-        <Text>최신순</Text>
+        <Text style={styles.queryText}>3개월 · </Text>
+        <Text style={styles.queryText}>전체 · </Text>
+        <Text style={styles.queryText}>최신순</Text>
         <Ionicons name="chevron-forward" size={24} color="black" />
       </View>
       <View style={styles.horizontalSeparator} />
@@ -96,25 +104,36 @@ export default function AccountDetail({ navigation }) {
           {formatDate(threeMonthsAgo)} ~ {formatDate(currentDate)}
         </Text>
       </View>
-      <View style={styles.horizontalSeparator} />
+      <View style={styles.boldSeparator} />
       <FlatList
         data={accountDetail.transactions}
         renderItem={({ item }) => (
-          <View style={styles.transactionContainer}>
+          <TouchableOpacity
+            style={styles.cardContainer}
+            onPress={() => {
+              navigation.navigate("TransactionDetailScreen");
+            }}
+          >
             <Text style={styles.transactionDate}>{item.date}</Text>
             <Text style={styles.place}>{item.place}</Text>
-            <View style={styles.transactionAmountContainer}>
-              <Text style={styles.transactionType}>{item.type} </Text>
-              <Text style={styles.transactionAmount}>
-                {item.amount.toLocaleString()}
+            <Text style={styles.transactionInfo}>
+              {item.type + " "}
+              <Text
+                style={
+                  item.type === "출금"
+                    ? styles.withdrawalAmount
+                    : styles.depositAmount
+                }
+              >
+                {item.amount.toLocaleString()}원
               </Text>
-              <Text>원</Text>
-            </View>
+            </Text>
             <Text style={styles.afterBalance}>
               잔액: {item.afterBalance.toLocaleString()}원
             </Text>
-            <View style={styles.separator} />
-          </View>
+            <View style={styles.horizontalSeparator} />
+            {/* 각 아이템 밑에 수평 구분선 추가 */}
+          </TouchableOpacity>
         )}
         keyExtractor={(item) => item.id}
       />
@@ -135,6 +154,9 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     paddingTop: 30,
   },
+  row: {
+    flexDirection: "row",
+  },
   podoImage: {
     width: 25,
     height: 25,
@@ -146,10 +168,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginRight: 15,
   },
+  setting: {
+    alignItems: "flex-end",
+  },
 
   nicknameContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between", // 여기를 수정했습니다.
     marginTop: 20,
     marginLeft: 20,
     marginBottom: 5,
@@ -192,6 +218,7 @@ const styles = StyleSheet.create({
     textAlign: "right",
     fontSize: 16,
     marginBottom: 20,
+    color: "gray",
   },
   separator: {
     height: 1,
@@ -216,9 +243,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   dateContainer: {
-    marginTop: 20,
-    marginBottom: 10,
-    alignItems: "center",
+    marginTop: 5,
+    // marginBottom: 5,
+    alignItems: "flex-start",
   },
   dateText: {
     fontSize: 16,
@@ -230,9 +257,64 @@ const styles = StyleSheet.create({
     backgroundColor: "grey",
     marginVertical: 10,
   },
+  boldSeparator: {
+    height: 2,
+    backgroundColor: "black",
+    marginBottom: 20,
+  },
   queryModeContainer: {
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
+  },
+  queryText: {
+    fontWeight: "bold",
+  },
+  cardContainer: {
+    width: 360,
+    height: 100,
+    borderRadius: 23,
+    marginBottom: 15, // 카드 간격
+    // padding: 10, // 카드 내부 패딩
+    alignSelf: "center", // 가운데 정렬
+    // marginLeft: -5,
+    // marginRight: -5,
+  },
+  withdrawalAmount: {
+    color: "red",
+  },
+  depositAmount: {
+    color: "blue",
+  },
+  place: {
+    fontWeight: "600",
+    fontSize: 14,
+    lineHeight: 17,
+    color: "#000000",
+    marginBottom: 5,
+  },
+  transactionDate: {
+    fontWeight: "600",
+    fontSize: 12,
+    lineHeight: 15,
+    textAlign: "right",
+    color: "#000000",
+    marginBottom: 5,
+    textAlign: "left", // 왼쪽 정렬
+  },
+  transactionInfo: {
+    fontWeight: "600",
+    fontSize: 14,
+    lineHeight: 17,
+    textAlign: "right",
+    color: "#000000",
+    marginBottom: 5,
+  },
+  afterBalance: {
+    fontWeight: "600",
+    fontSize: 12,
+    lineHeight: 15,
+    textAlign: "right",
+    color: "#858585",
   },
 });

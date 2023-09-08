@@ -1,16 +1,17 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { AntDesign, Entypo, FontAwesome } from "@expo/vector-icons";
 
 export default function HeaderComponent({ navigation, title }) {
   return (
     <View style={styles.header}>
       <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.backButton}>&lt;</Text>
+        <FontAwesome name="angle-left" style={{ fontSize: 30 }}></FontAwesome>
+        {/* <Text style={styles.backButton}>&lt;</Text> */}
       </TouchableOpacity>
       <Text style={styles.headerTitle}>{title}</Text>
       <TouchableOpacity onPress={() => navigation.navigate("HomeScreen")}>
-        <Ionicons name="home" size={24} color="black" />
+        <AntDesign name="home" size={24} color="black" />
       </TouchableOpacity>
     </View>
   );
@@ -23,6 +24,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 20,
+    marginTop: 20,
   },
   backButton: {
     fontSize: 24,

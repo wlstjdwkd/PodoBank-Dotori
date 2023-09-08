@@ -9,16 +9,28 @@ import {
   Modal,
   Animated,
   Dimensions,
+  Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import HeaderScreen from "../Header/HeaderScreen";
 
 const { height, width } = Dimensions.get("window");
 
 // 더미 데이터 (실제 데이터와 연동 필요)
 const recentAccounts = [
-  { name: "홍길동", accountNumber: "1234-5678-9101", description: "SSAFY" },
-  { name: "방진성", accountNumber: "1234-5678-3101", description: "SSAFY" },
+  {
+    profileImage: require("../../assets/images/normal_podo.png"),
+    name: "홍길동",
+    accountNumber: "1234-5678-9101",
+    bankName: "포도은행",
+  },
+  {
+    profileImage: require("../../assets/images/normal_podo.png"),
+    name: "방진성",
+    accountNumber: "1234-5678-3101",
+    bankName: "포도은행",
+  },
   // ... 필요하면 더 추가
 ];
 
@@ -27,7 +39,8 @@ export default function TransferScreen({ navigation }) {
   const translateY = useRef(new Animated.Value(height)).current;
   const [accountInput, setAccountInput] = useState("");
 
-  const [receiverBank, setReceiverBank] = useState("PODO BANK");
+  const [receiverBank, setReceiverBank] = useState("포도은행");
+  const [availableAmount, setAvailableAmount] = useState(0); // 출금 가능 금액 state 추가
 
   const handleKeyPress = (key) => {
     if (key === "<-") {
@@ -57,25 +70,22 @@ export default function TransferScreen({ navigation }) {
   };
 
   return (
-    <LinearGradient colors={["#6BB5FF", "white"]} style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backButton}>&lt;</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>이체하기</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("HomeScreen")}>
-          <Ionicons name="home" size={24} color="black" />
-        </TouchableOpacity>
-      </View>
+    <View style={styles.container}>
+      <HeaderScreen navigation={navigation} title="이체"></HeaderScreen>
+      <Text style={styles.leftAlignLabel}>포도은행</Text>
+      <Text style={styles.boldLeftAlignLabel}>1235-4568-4532</Text>
+      <Text style={styles.leftAlignLabel}>
+        출금가능금액 {availableAmount}원
+      </Text>
 
       <Text style={styles.receiverLabel}>받는분</Text>
 
-      <TextInput placeholder="PODO BANK" style={styles.bankLabel}></TextInput>
+      <TextInput placeholder="포도은행" style={styles.bankLabel}></TextInput>
       <View style={styles.line} />
       <TextInput
         style={styles.input}
         placeholder="계좌번호"
-        textAlign="center" // 중앙 정렬
+        // textAlign="center" // 중앙 정렬
         onFocus={openModal}
         blurOnSubmit={true}
         onSubmitEditing={closeModal}
@@ -86,13 +96,12 @@ export default function TransferScreen({ navigation }) {
       {recentAccounts.map((account, index) => (
         <View key={index}>
           <View style={styles.accountItem}>
+            <Image source={account.profileImage} style={styles.profileImage} />
             <Text style={styles.accountName}>{account.name}</Text>
           </View>
           <View style={styles.accountItem}>
-            <Text>
-              <Text style={styles.accountDetail}>{account.description}</Text>
-              <Text style={styles.accountNumber}>{account.accountNumber}</Text>
-            </Text>
+            <Text style={styles.accountDetail}>{account.bankName}</Text>
+            <Text style={styles.accountNumber}>{account.accountNumber}</Text>
           </View>
           <View style={styles.line} />
         </View>
@@ -108,7 +117,7 @@ export default function TransferScreen({ navigation }) {
             style={{
               transform: [{ translateY: translateY }],
               height: "60%",
-              width: "100%", // 가로로 꽉 차게 수정
+              width: "100%",
               backgroundColor: "white",
               borderTopLeftRadius: 20,
               borderTopRightRadius: 20,
@@ -188,7 +197,7 @@ export default function TransferScreen({ navigation }) {
           </Animated.View>
         </Modal>
       )}
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -204,10 +213,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
+  profileImage: {
+    width: 16,
+    height: 16,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  leftAlignLabel: {
+    fontSize: 16,
+    textAlign: "left",
+  },
+  boldLeftAlignLabel: {
+    fontSize: 16,
+    textAlign: "left",
+    fontWeight: "bold",
+  },
   receiverLabel: {
     fontSize: 16,
-    marginTop: 100,
-    marginBottom: 10,
+    marginTop: 30,
   },
   backButton: {
     fontSize: 24,
@@ -219,16 +242,17 @@ const styles = StyleSheet.create({
   },
   bankLabel: {
     fontSize: 16,
-    textAlign: "center", // 중앙 정렬
-    marginTop: 80, // 위치 조정이 필요할 수 있습니다.
+    textAlign: "left",
+    marginTop: 20,
     marginBottom: 10,
   },
   input: {
     height: 40,
+    fontSize: 16,
     borderColor: "transparent",
     borderBottomColor: "grey",
     borderWidth: 1,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   line: {
     height: 1,
@@ -254,8 +278,11 @@ const styles = StyleSheet.create({
   accountDetail: {
     fontSize: 16,
     marginRight: 10,
+    marginLeft: 25,
+    color: "gray",
   },
   accountNumber: {
     fontSize: 16,
+    color: "gray",
   },
 });
