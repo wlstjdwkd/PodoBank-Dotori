@@ -1,6 +1,6 @@
 package com.bank.podo.domain.account.dto;
 
-import com.bank.podo.domain.account.entity.AccountType;
+import com.bank.podo.domain.account.enums.AccountType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

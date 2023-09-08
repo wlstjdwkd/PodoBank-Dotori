@@ -2,7 +2,7 @@ package com.bank.podo.global.security.service;
 
 import com.bank.podo.domain.user.exception.UserNotFoundException;
 import com.bank.podo.domain.user.repository.UserRepository;
-import com.bank.podo.domain.user.entity.Role;
+import com.bank.podo.domain.user.enums.Role;
 import com.bank.podo.domain.user.entity.User;
 import com.bank.podo.global.security.entity.Token;
 import io.jsonwebtoken.Claims;

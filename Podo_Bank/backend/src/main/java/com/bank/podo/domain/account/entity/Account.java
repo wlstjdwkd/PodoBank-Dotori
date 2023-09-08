@@ -1,5 +1,6 @@
 package com.bank.podo.domain.account.entity;
 
+import com.bank.podo.domain.account.enums.AccountType;
 import com.bank.podo.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;

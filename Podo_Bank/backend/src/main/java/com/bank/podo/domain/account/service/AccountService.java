@@ -2,8 +2,9 @@ package com.bank.podo.domain.account.service;
 
 import com.bank.podo.domain.account.dto.*;
 import com.bank.podo.domain.account.entity.Account;
+import com.bank.podo.domain.account.enums.AccountType;
 import com.bank.podo.domain.account.entity.TransactionHistory;
-import com.bank.podo.domain.account.entity.TransactionType;
+import com.bank.podo.domain.account.enums.TransactionType;
 import com.bank.podo.domain.account.exception.*;
 import com.bank.podo.domain.account.repository.AccountRepository;
 import com.bank.podo.domain.account.repository.TransactionHistoryRepository;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -32,6 +34,10 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
+
+    public List<AccountType> getAccountTypeList() {
+        return Arrays.asList(AccountType.values());
+    }
 
     public void createAccount(CreateAccountDTO createAccountDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();

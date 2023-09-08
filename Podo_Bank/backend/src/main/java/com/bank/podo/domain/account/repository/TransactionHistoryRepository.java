@@ -2,7 +2,7 @@ package com.bank.podo.domain.account.repository;
 
 import com.bank.podo.domain.account.entity.Account;
 import com.bank.podo.domain.account.entity.TransactionHistory;
-import com.bank.podo.domain.account.entity.TransactionType;
+import com.bank.podo.domain.account.enums.TransactionType;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 

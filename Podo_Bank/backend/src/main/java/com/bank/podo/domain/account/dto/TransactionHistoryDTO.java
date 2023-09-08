@@ -1,6 +1,6 @@
 package com.bank.podo.domain.account.dto;
 
-import com.bank.podo.domain.account.entity.TransactionType;
+import com.bank.podo.domain.account.enums.TransactionType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
