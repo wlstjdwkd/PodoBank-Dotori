@@ -2,7 +2,11 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { AntDesign, Entypo, FontAwesome } from "@expo/vector-icons";
 
-export default function HeaderComponent({ navigation, title }) {
+export default function HeaderComponent({
+  navigation,
+  title,
+  showHome = true,
+}) {
   return (
     <View style={styles.header}>
       <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -10,9 +14,13 @@ export default function HeaderComponent({ navigation, title }) {
         {/* <Text style={styles.backButton}>&lt;</Text> */}
       </TouchableOpacity>
       <Text style={styles.headerTitle}>{title}</Text>
-      <TouchableOpacity onPress={() => navigation.navigate("HomeScreen")}>
-        <AntDesign name="home" size={24} color="black" />
-      </TouchableOpacity>
+      {showHome ? (
+        <TouchableOpacity onPress={() => navigation.navigate("HomeScreen")}>
+          <AntDesign name="home" size={24} color="black" />
+        </TouchableOpacity>
+      ) : (
+        <View style={{ width: 24 }}></View>
+      )}
     </View>
   );
 }

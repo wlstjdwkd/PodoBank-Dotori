@@ -5,12 +5,16 @@ import FooterScreen from "../Header/FooterScreen";
 import { FontAwesome } from "@expo/vector-icons";
 
 export default function MyPageScreen({ navigation }) {
-    //들어올 때 axios로 정보 받아야함
+  //들어올 때 axios로 정보 받아야함
 
   return (
     <View style={styles.container}>
       {/* Header Component (You can replace this with your own component) */}
-      <HeaderComponent title="마이페이지" navigation={navigation} />
+      <HeaderComponent
+        title="마이페이지"
+        navigation={navigation}
+        showHome={false}
+      />
 
       {/* User Information */}
       <View style={styles.userInfoContainer}>
@@ -41,6 +45,7 @@ export default function MyPageScreen({ navigation }) {
         <FontAwesome name="angle-right" style={{ fontSize: 20 }}></FontAwesome>
       </TouchableOpacity>
       <TouchableOpacity
+        //accessToken지우자
         style={styles.logoutButton}
         onPress={() => {
           navigation.navigate("LoginScreen");
@@ -67,7 +72,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 20,
   },
-  
+
   boldText: {
     fontWeight: "bold",
     marginBottom: 30,
@@ -84,8 +89,10 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 5,
-    backgroundColor: "gray",
+    backgroundColor: "#D9D9D9",
     marginBottom: 20,
+    marginLeft: -20,
+    marginRight: -20,
   },
   actionRow: {
     flexDirection: "row",
