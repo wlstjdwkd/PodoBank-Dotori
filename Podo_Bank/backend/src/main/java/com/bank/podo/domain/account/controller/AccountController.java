@@ -48,9 +48,9 @@ public class AccountController {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
-    @GetMapping("/{accountNumber}")
+    @GetMapping("/{accountNumber}/detail")
     public ResponseEntity<AccountDTO> getAccount(@PathVariable Long accountNumber) {
-        AccountDTO account = accountService.getAccount(accountNumber);
+        AccountDTO account = accountService.getAccountDetail(accountNumber);
         return ResponseEntity.ok(account);
     }
 

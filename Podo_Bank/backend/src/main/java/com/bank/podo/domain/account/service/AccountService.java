@@ -58,7 +58,7 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
-    public AccountDTO getAccount(Long accountNumber) {
+    public AccountDTO getAccountDetail(Long accountNumber) {
         Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
         return toAccountDTO(account);
