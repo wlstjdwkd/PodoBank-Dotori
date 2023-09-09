@@ -46,13 +46,7 @@ export default function TransactionDetailScreen({ navigation }) {
         <Text>거래유형</Text>
         <Text>자동이체</Text>
       </View>
-      <View style={styles.transactionRow}>
-        <Text>받는 계좌</Text>
-        <View style={styles.rightAlignedMultiLineText}>
-          <Text>포도은행</Text>
-          <Text>1538-1521-4536</Text>
-        </View>
-      </View>
+
       <View style={styles.transactionRow}>
         <Text>내 통장 표시</Text>
         <Text>고용노동부구미시청</Text>
@@ -114,7 +108,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#842DC480",
     borderRadius: 5,
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 60,
   },
   confirmButtonText: {
     color: "white",

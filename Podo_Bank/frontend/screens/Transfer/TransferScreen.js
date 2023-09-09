@@ -92,7 +92,7 @@ export default function TransferScreen({ navigation }) {
 
       <Text style={styles.receiverLabel}>받는분</Text>
 
-      <TextInput placeholder="포도은행" style={styles.bankLabel}></TextInput>
+      <Text style={styles.bankLabel}>{receiverBank}</Text>
       <View style={styles.line} />
 
       <TouchableOpacity
