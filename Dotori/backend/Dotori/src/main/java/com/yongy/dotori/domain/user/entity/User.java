@@ -9,11 +9,15 @@ import com.yongy.dotori.domain.purpose.entity.Purpose;
 import com.yongy.dotori.domain.reward.entity.Reward;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity(name="users")
 public class User {
@@ -21,6 +25,9 @@ public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_seq")
     private Long userSeq;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Column(nullable = false)
     private String id;

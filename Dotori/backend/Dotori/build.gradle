@@ -22,11 +22,6 @@ repositories {
 }
 
 dependencies {
-//    implementation 'org.springframework.boot:spring-boot-starter-web'
-//    compileOnly 'org.projectlombok:lombok'
-//    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-//    annotationProcessor 'org.projectlombok:lombok'
-//    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     // JPA
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     // Thymeleaf
@@ -42,6 +37,16 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     implementation 'mysql:mysql-connector-java:8.0.33'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    //Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+
+    // Spring Security 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // JWT 의존성
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    implementation 'javax.xml.bind:jaxb-api'
 }
 
 tasks.named('test') {
