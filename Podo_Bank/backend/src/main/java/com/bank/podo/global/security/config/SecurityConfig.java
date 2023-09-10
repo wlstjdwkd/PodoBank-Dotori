@@ -1,7 +1,7 @@
 package com.bank.podo.global.security.config;
 
 import com.bank.podo.global.security.filter.JwtAuthFilter;
-import com.bank.podo.global.security.service.TokenService;
+import com.bank.podo.global.security.service.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final TokenService tokenService;
+    private final JwtProvider jwtProvider;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -39,13 +39,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .antMatchers("/favicon.ico").permitAll()
 
-                .antMatchers("/api/v1/user/register", "/api/v1/user/login").permitAll()
+                .antMatchers("/api/v1/user/register", "/api/v1/user/login", "/api/v1/user/refresh").permitAll()
 
                 .antMatchers("/v2/api-docs/**", "/swagger-ui/**", "/actuator/**", "/swagger-resources/**").permitAll() // Swagger 접속 주소를 허용
                 .antMatchers("/api/v1/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().permitAll()
                 .and()
-                .addFilterBefore(new JwtAuthFilter(tokenService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .logout().disable();
