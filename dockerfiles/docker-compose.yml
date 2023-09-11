@@ -3,7 +3,7 @@ services:
   jenkins:
     build:
       context: .
-      dockerfile: Dockerfile.jenkins
+      dockerfile: Dockerfile.Jenkins
     ports:
       - "8080:8080"
       - "50000:50000"
