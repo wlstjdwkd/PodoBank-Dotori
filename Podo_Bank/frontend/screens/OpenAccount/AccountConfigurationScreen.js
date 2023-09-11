@@ -5,15 +5,26 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Modal,
+  Dimensions,
+  Alert,
 } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
 import { AntDesign } from "@expo/vector-icons";
+
+const { height, width } = Dimensions.get("window");
+
 
 export default function AccountConfigurationScreen({ navigation }) {
   const [selectedOption, setSelectedOption] = useState(null);
   const [selectedOption2, setSelectedOption2] = useState(null);
   const [password, setPassword] = useState("");
+  const [checkPassword, setCheckPassword] = useState("");
+  const [modalVisible, setModalVisible] = useState(false)
+  const [checkPasswordModalVisible, setCheckPasswordModalVisible] = useState(false)
   const passwordInputRef = useRef(null);
+  const [isRight1, setIsRight1] = useState(false)
+  const [isRight2, setIsRight2] = useState(false)
 
   const isNextButtonEnabled = () => {
     return (
@@ -22,6 +33,23 @@ export default function AccountConfigurationScreen({ navigation }) {
       selectedOption2 === "no"
     );
   };
+  const removeLast = () => {
+    setPassword((prevPassword) => prevPassword.slice(0, -1));
+  };
+  const appendPassword = (num) => {
+    if (password.length < 4) {
+      setPassword((prevPassword) => prevPassword + num);
+    }
+  };
+  const removeLast2 = () => {
+    setCheckPassword((prevCheckPassword) => prevCheckPassword.slice(0, -1));
+  };
+  const appendCheckPassword = (num) => {
+    if (checkPassword.length < 4) {
+      setCheckPassword((prevCheckPassword) => prevCheckPassword + num);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <HeaderComponent navigation={navigation} title="계좌개설" />
@@ -30,7 +58,8 @@ export default function AccountConfigurationScreen({ navigation }) {
       </View>
       <TouchableOpacity
         style={styles.whiteBox}
-        onPress={() => passwordInputRef.current.focus()} // 여기서 focus
+        // onPress={() => {passwordInputRef.current.focus(); setModalVisible(true);}} // 여기서 focus
+        onPress={() => {setModalVisible(true); setPassword("")}} // 여기서 focus
       >
         <Text style={styles.blackText}>통장 비밀번호 만들기</Text>
         <View style={styles.passwordDotsContainer}>
@@ -44,7 +73,7 @@ export default function AccountConfigurationScreen({ navigation }) {
             />
           ))}
         </View>
-        <TextInput
+        {/* <TextInput
           ref={passwordInputRef} // 참조 설정
           style={{
             position: "absolute",
@@ -59,7 +88,7 @@ export default function AccountConfigurationScreen({ navigation }) {
           maxLength={4}
           keyboardType="numeric"
           secureTextEntry={true}
-        />
+        /> */}
       </TouchableOpacity>
       <Text style={{ marginBottom: 30, fontSize: 12 }}>
         고객님의 자산을 안전하게 보호하고 전화 금융사기의 피해를 예방하고자
@@ -85,7 +114,9 @@ export default function AccountConfigurationScreen({ navigation }) {
             {selectedOption === "yes" ? "✔" : ""}
           </Text>
         </TouchableOpacity>
-        <Text>예</Text>
+        <TouchableOpacity onPress={() => setSelectedOption("yes")}>
+          <Text>예</Text>
+        </TouchableOpacity>
         <View style={{ marginRight: 160 }} />
         <TouchableOpacity
           style={styles.radioButton}
@@ -95,7 +126,9 @@ export default function AccountConfigurationScreen({ navigation }) {
             {selectedOption === "no" ? "✔" : ""}
           </Text>
         </TouchableOpacity>
-        <Text>아니요</Text>
+        <TouchableOpacity onPress={() => setSelectedOption("no")}>
+          <Text>아니오</Text>
+        </TouchableOpacity>
       </View>
 
       <Text style={{ marginBottom: 20 }}>
@@ -111,7 +144,9 @@ export default function AccountConfigurationScreen({ navigation }) {
             {selectedOption2 === "yes" ? "✔" : ""}
           </Text>
         </TouchableOpacity>
-        <Text>예</Text>
+        <TouchableOpacity onPress={() => setSelectedOption2("yes")}>
+          <Text>예</Text>
+        </TouchableOpacity>
         <View style={{ marginRight: 160 }} />
         <TouchableOpacity
           style={styles.radioButton}
@@ -121,12 +156,184 @@ export default function AccountConfigurationScreen({ navigation }) {
             {selectedOption2 === "no" ? "✔" : ""}
           </Text>
         </TouchableOpacity>
-        <Text>아니요</Text>
+        <TouchableOpacity onPress={() => setSelectedOption2("no")}>
+          <Text>아니오</Text>
+        </TouchableOpacity>
       </View>
 
+      {/* 제작 키보드 */}
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalContainer}>
+            <View style={styles.passwordHeader}>
+              <Text style={styles.passwordLabelText}>비밀번호</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Text style={styles.closeButtonText}>X</Text>
+              </TouchableOpacity>
+            </View>
+            <TextInput
+              style={[styles.passwordInput, {color:'black'}]}
+              placeholder="비밀번호 입력"
+              value={password}
+              onChangeText={setPassword}
+              editable={false}  // textInput이 가진 keyboard열기 방지
+              maxLength={4}
+            />
+
+            <View style={styles.numPad}>
+              {[
+                ["1", "2", "3"],
+                ["4", "5", "6"],
+                ["7", "8", "9"],
+                ["", "0", "←"],
+              ].map((row, rowIndex) => (
+                <View key={rowIndex} style={styles.numRow}>
+                  {row.map((num) => (
+                    <TouchableOpacity
+                      key={num}
+                      style={styles.numButton}
+                      onPress={() => {
+                        if (num === "←") {
+                          removeLast();
+                        } else if (num !== "") {
+                          appendPassword(num);
+                        }
+                      }}
+                    >
+                      <Text style={styles.numText}>{num}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              ))}
+            </View>
+
+            <TouchableOpacity
+              style={styles.confirmButton}
+              // onPress={() => {
+              //   setModalVisible(false);
+              //   navigation.navigate("TransferAmountScreen", {
+              //     receiverBank: receiverBank,
+              //     accountInput: accountInput,
+              //   });
+              // }}
+              onPress={() => {
+                setModalVisible(false);
+                setCheckPasswordModalVisible(true)
+                setCheckPassword("");
+              }}
+            >
+              <Text style={styles.confirmButtonText}>다음</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* 제작 키보드 비밀번호 확인용 */}
+      <Modal animationType="slide" transparent={true} visible={checkPasswordModalVisible}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalContainer}>
+            <View style={styles.passwordHeader}>
+              <Text style={styles.passwordLabelText}>비밀번호 확인</Text>
+              <TouchableOpacity onPress={() => setCheckPasswordModalVisible(false)}>
+                <Text style={styles.closeButtonText}>X</Text>
+              </TouchableOpacity>
+            </View>
+            <TextInput
+              style={[styles.passwordInput, {color:'black'}]}
+              placeholder="비밀번호 입력"
+              value={checkPassword}
+              onChangeText={setCheckPassword}
+              editable={false}  // textInput이 가진 keyboard열기 방지
+              maxLength={4}
+            />
+
+            <View style={styles.numPad}>
+              {[
+                ["1", "2", "3"],
+                ["4", "5", "6"],
+                ["7", "8", "9"],
+                ["", "0", "←"],
+              ].map((row, rowIndex) => (
+                <View key={rowIndex} style={styles.numRow}>
+                  {row.map((num) => (
+                    <TouchableOpacity
+                      key={num}
+                      style={styles.numButton}
+                      onPress={() => {
+                        if (num === "←") {
+                          removeLast2();
+                        } else if (num !== "") {
+                          appendCheckPassword(num);
+                        }
+                      }}
+                    >
+                      <Text style={styles.numText}>{num}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              ))}
+            </View>
+
+            <TouchableOpacity
+              style={styles.confirmButton}
+              // onPress={() => {
+              //   setModalVisible(false);
+              //   navigation.navigate("TransferAmountScreen", {
+              //     receiverBank: receiverBank,
+              //     accountInput: accountInput,
+              //   });
+              // }}
+              onPress={() => {
+                setCheckPasswordModalVisible(false);
+                if(password != checkPassword){
+                  Alert.alert('비밀번호 불일치', '비밀번호가 일치하지 않습니다. 비밀번호를 다시 설정해주세요.');
+                }
+              }}
+            >
+              <Text style={styles.confirmButtonText}>완료</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      {/* <TouchableOpacity
+        style={styles.confirmButtonNext}
+        onPress={() => {
+          if(!password || (password != checkPassword)){
+            Alert.alert('비밀번호 불일치', '비밀번호를 확인해주세요');
+          }else{
+            navigation.navigate("AccountRestrictionScreen");
+          }
+        }
+        }
+      >
+        <Text style={styles.confirmText}>다음</Text>
+      </TouchableOpacity> */}
       <TouchableOpacity
-        style={styles.confirmButton}
-        onPress={() => navigation.navigate("AccountRestrictionScreen")}
+        style={styles.confirmButtonNext}
+        onPress={() => {
+          switch (true) {
+            case (!password || !checkPassword):
+              Alert.alert('비밀번호 확인 필요', '비밀번호를 입력해주세요');
+              break;
+            case (password !== checkPassword):
+              Alert.alert('비밀번호 불일치', '비밀번호가 일치하지 않습니다. 다시 확인해주세요');
+              break;
+            case (!selectedOption):
+              Alert.alert('통장대여 요청 응답 필요', '통장대여 요청에 대한 응답을 해주세요');
+              break;
+            case (selectedOption==="yes"):
+              Alert.alert('통장대여는 불법', '통장대여 불법입니다. 필요시 가까운 경찰서에 방문하세요.');
+              break;
+            case (!selectedOption2):
+              Alert.alert('통장개설 요청 확인 필요', '타인으로부터의 통장 개설 요청 사실을 확인해주세요');
+              break;
+            case (selectedOption2==="yes"):
+              Alert.alert('통장개설 거부', '통장개설 관련 요청을 받은 사실이 있다면, 필욧히 가까운 경찰서에 방문하세요.');
+              break;
+            default:
+              navigation.navigate("AccountRestrictionScreen");
+          }
+        }}
       >
         <Text style={styles.confirmText}>다음</Text>
       </TouchableOpacity>
@@ -139,6 +346,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     padding: 20,
+  },
+  container1:{
+    flex: 0.9,
+  },
+  container2:{
+    flex: 0.1,
+    justifyContent: 'flex-end',
   },
   purpleBox: {
     backgroundColor: "#8B0FD750",
@@ -220,9 +434,10 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: "black",
   },
-  confirmButton: {
+  confirmButtonNext: {
     backgroundColor: "#842DC480",
     padding: 15,
+    // alignSelf: "stretch",
     alignItems: "center",
     // borderTopLeftRadius: 5, // 위쪽 왼쪽 모서리만 둥글게
     // borderTopRightRadius: 5, // 위쪽 오른쪽 모서리만 둥글게
@@ -234,5 +449,78 @@ const styles = StyleSheet.create({
   confirmText: {
     color: "white",
     fontSize: 20,
+  },
+
+  // modal창 css
+  centeredView: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "100%",
+    height: "70%",
+    backgroundColor: "white",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    paddingLeft: 30,
+    paddingRight: 30,
+    justifyContent: "space-between",
+  },
+  passwordHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  passwordLabelText: {
+    fontSize: 15,
+    // fontWeight: "bold",
+  },
+  closeButtonText: {
+    fontSize: 24,
+  },
+  passwordInput: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#8F1414",
+    marginBottom: 20,
+    textAlign: "center",
+    fontSize: 18,
+  },
+  numPad: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  numRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  numButton: {
+    width: width / 3 - 40,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "center",
+    borderColor: "#e0e0e0",
+    borderRadius: 5,
+    color: "#8F1414",
+  },
+  numText: {
+    fontSize: 40,
+  },
+  confirmButton: {
+    backgroundColor: "#842DC480",
+    padding: 15,
+    borderRadius: 5,
+    alignSelf: "stretch",
+    alignItems: "center",
+    marginLeft: -30,
+    marginRight: -30,
+    marginBottom: -20,
+  },
+  confirmButtonText: {
+    color: "white",
+    fontSize: 18,
   },
 });
