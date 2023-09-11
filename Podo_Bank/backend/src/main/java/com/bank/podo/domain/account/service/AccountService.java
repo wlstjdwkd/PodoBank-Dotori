@@ -240,6 +240,28 @@ public class AccountService {
     public void deleteAccount() {
     }
 
+    @Transactional(readOnly = true)
+    public List<RecentAccountDTO> getRecentTransferAccountList(String accountNumber) {
+        User user = getLoginUser();
+        Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(accountNumber)
+                .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
+
+        if(!account.getUser().getUserId().equals(user.getUserId())) {
+            throw new AccountUserNotMatchException("계좌의 소유자가 아닙니다.");
+        }
+
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("transactionAt").descending());
+
+        List<TransactionHistory> accountList = transactionHistoryRepository.findAllByAccountAndTransactionType(account, TransactionType.TRANSFER, pageRequest);
+
+        return accountList.stream()
+                .map(transactionHistory -> RecentAccountDTO.builder()
+                        .accountNumber(transactionHistory.getCounterAccount().getAccountNumber())
+                        .accountName(transactionHistory.getCounterAccount().getUser().getName())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
     private User getLoginUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }

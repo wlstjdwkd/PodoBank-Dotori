@@ -7,12 +7,14 @@ import com.bank.podo.domain.user.dto.UserInfoDTO;
 import com.bank.podo.domain.user.entity.User;
 import com.bank.podo.domain.user.service.UserService;
 import com.bank.podo.global.security.entity.Token;
-import com.bank.podo.global.security.service.TokenService;
+import com.bank.podo.global.security.service.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
 @RestController
@@ -21,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-    private final TokenService tokenService;
+    private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
 
     @PutMapping("/register")
@@ -42,10 +44,13 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Token> login(@RequestBody LoginDTO loginDTO) {
-        User user = userService.login(loginDTO, passwordEncoder);
-        Token token = tokenService.generateToken(user.getId(), user.getRole());
-        return ResponseEntity.ok(token);
+    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO, HttpServletRequest request) {
+        return userService.login(request, loginDTO, passwordEncoder);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<Token> refresh(@RequestParam String refreshToken, HttpServletRequest request) {
+        return userService.refresh(refreshToken, request);
     }
 
     @PostMapping("/logout")

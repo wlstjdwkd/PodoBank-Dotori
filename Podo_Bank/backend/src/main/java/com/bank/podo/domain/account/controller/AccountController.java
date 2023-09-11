@@ -62,7 +62,7 @@ public class AccountController {
         return ResponseEntity.ok(name);
     }
 
-    @Operation(summary = "계좌 조회")
+    @Operation(summary = "계좌 상세 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "Bad Request")
@@ -152,4 +152,10 @@ public class AccountController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "최근 송금 계좌 조회")
+    @GetMapping("/{accountNumber}/recent")
+    public ResponseEntity<List<RecentAccountDTO>> getRecentAccountList(@PathVariable String accountNumber) {
+        List<RecentAccountDTO> recentAccountList = accountService.getRecentTransferAccountList(accountNumber);
+        return ResponseEntity.ok(recentAccountList);
+    }
 }
