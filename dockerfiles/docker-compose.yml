@@ -14,7 +14,7 @@ services:
     networks:
       - yongyong
   dotori_back:
-    image: dotori_back:${BUILD_NUMBER}
+    image: dotori_back
     build:
       context: ../Dotori/backend/Dotori
       dockerfile: Dockerfile.Dotori_back
