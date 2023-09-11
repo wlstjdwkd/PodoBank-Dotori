@@ -1,0 +1,30 @@
+version: "3"
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    user: root
+    networks:
+      - yongyong
+  dotori_back:
+    image: dotori_back:${BUILD_NUMBER}
+    build:
+      context: ../Dotori/backend/Dotori
+      dockerfile: Dockerfile.Dotori_back
+    ports:
+      - "9100:9100"
+
+
+
+networks:
+  yongyong:
+    driver: bridge
+volumes:
+  jenkins_home:
