@@ -1,16 +1,13 @@
 package com.bank.podo.domain.user.service;
 
-import com.bank.podo.domain.user.dto.ChangePasswordDTO;
-import com.bank.podo.domain.user.dto.LoginDTO;
-import com.bank.podo.domain.user.dto.RegisterDTO;
-import com.bank.podo.domain.user.dto.UserInfoDTO;
+import com.bank.podo.domain.user.dto.*;
+import com.bank.podo.domain.user.entity.User;
 import com.bank.podo.domain.user.enums.Role;
 import com.bank.podo.domain.user.exception.AlreadyUsedUsernameException;
 import com.bank.podo.domain.user.exception.PasswordFromatException;
 import com.bank.podo.domain.user.exception.PasswordNotMatchException;
 import com.bank.podo.domain.user.exception.UserNotFoundException;
 import com.bank.podo.domain.user.repository.UserRepository;
-import com.bank.podo.domain.user.entity.User;
 import com.bank.podo.global.others.service.RequestHelper;
 import com.bank.podo.global.security.entity.RefreshToken;
 import com.bank.podo.global.security.entity.Token;
@@ -27,7 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.regex.Pattern;
 
@@ -126,7 +122,21 @@ public class UserService {
                 .build()));
     }
 
-    public void deleteUser() {
+    public void deleteUser(UserDeleteDTO userDeleteDTO, PasswordEncoder passwordEncoder) {
+        User user = getLoginUser();
+
+        if(!passwordEncoder.matches(userDeleteDTO.getPassword(), user.getPassword())) {
+            throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
+        }
+
+        userRepository.save(user.update(User.builder()
+                        .address(null)
+                        .birthdate(null)
+                        .name(null)
+                        .password(null)
+                        .contactInfo(null)
+                        .gender(null)
+                        .build()));
     }
 
     public User findUserByUserId(String userId) {

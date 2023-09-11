@@ -32,6 +32,7 @@ public class AccountController {
     @Operation(summary = "계좌 생성")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "201", description = "Account Created"),
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     @PostMapping("")
