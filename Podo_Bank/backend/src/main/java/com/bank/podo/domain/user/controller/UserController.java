@@ -2,8 +2,10 @@ package com.bank.podo.domain.user.controller;
 
 import com.bank.podo.domain.user.dto.*;
 import com.bank.podo.domain.user.service.UserService;
+import com.bank.podo.global.email.dto.EmailVerificationCheckDTO;
+import com.bank.podo.global.email.dto.EmailVerificationDTO;
+import com.bank.podo.global.email.service.EmailService;
 import com.bank.podo.global.security.entity.Token;
-import com.bank.podo.global.security.service.JwtProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 public class UserController {
 
     private final UserService userService;
-    private final JwtProvider jwtProvider;
+    private final EmailService emailService;
+
     private final PasswordEncoder passwordEncoder;
 
     @Operation(summary = "회원가입")
@@ -28,6 +31,25 @@ public class UserController {
     public ResponseEntity<Void> register(@RequestBody RegisterDTO registerDTO) {
         userService.register(registerDTO, passwordEncoder);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "이메일 인증 코드 전송")
+    @PostMapping("/emailVerification")
+    public ResponseEntity<Void> sendVerificationCode(@RequestBody EmailVerificationDTO emailVerificationDTO) {
+        emailService.sendVerificationCode(emailVerificationDTO.getEmail(), emailVerificationDTO.getType());
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "이메일 인증 코드 확인")
+    @PostMapping("/emailVerification/check")
+    public ResponseEntity<Void> checkVerificationCode(@RequestBody EmailVerificationCheckDTO emailVerificationCheckDTO) {
+        boolean isValidate = emailService.checkVerificationCode(emailVerificationCheckDTO.getEmail(), emailVerificationCheckDTO.getCode());
+
+        if(isValidate) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @Operation(summary = "아이디 중복 체크")
