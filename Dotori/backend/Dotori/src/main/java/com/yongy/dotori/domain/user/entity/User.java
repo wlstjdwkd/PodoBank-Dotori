@@ -72,8 +72,9 @@ public class User {
     private Reward reward;
 
     @Builder
-    public User(Long userSeq, String id, String password, LocalDate birthDate, String userName, String phoneNumber, Provider authProvider) {
+    public User(Long userSeq, Role role, String id, String password, LocalDate birthDate, String userName, String phoneNumber, Provider authProvider) {
         this.userSeq = userSeq;
+        this.role = role;
         this.id = id;
         this.password = password;
         this.birthDate = birthDate;

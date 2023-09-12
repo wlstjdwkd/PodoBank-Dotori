@@ -48,7 +48,7 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/v1/user/check-id","/v1/user/signup", "/v1/user/signin").permitAll()
+                .antMatchers("/v1/user/check-id","/v1/user/signup", "/v1/user/signin", "/v1/user/check-code").permitAll()
                 .antMatchers("/v1/admin/**").hasRole("ADMIN")
                 .antMatchers("/v1/user/**").hasRole("USER")
                 .anyRequest().denyAll()
