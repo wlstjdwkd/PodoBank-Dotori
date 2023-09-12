@@ -8,6 +8,9 @@ import {
 } from "react-native";
 
 import HeaderComponent from "../Header/HeaderScreen";
+import {
+  userRegister,
+} from '../../apis/userapi'
 
 export default function SignupInformationScreen({ navigation, route }) {
   const [userInfo, setUserInfo] = useState(route.params.userInfo);
@@ -46,6 +49,22 @@ export default function SignupInformationScreen({ navigation, route }) {
       setIsConfirmPasswordValid(false);
     }
   };
+
+  // 회원가입
+  const handleUserRegister = async()=>{
+    const response = await userRegister()
+    if(response.status === 200){
+      console.log('회원가입 성공')
+    }else if(response.status === 400){
+      console.log('회원가입 실패')
+    }else if(response.status === 409){
+      console.log('이미 사용중인 아이디')
+    }else if(response.status === 422){
+      console.log('이메일 형식 오류')
+    }else{
+      console.log('오류 발생')
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -110,11 +129,11 @@ export default function SignupInformationScreen({ navigation, route }) {
           },
         ]}
         // back에 회원가입 정보 보내야함
-        onPress={() =>
+        onPress={() =>{
           navigation.navigate("SignupCompleteScreen", {
             name: userInfo.name,
           })
-        }
+        }}
         disabled={!(isPasswordValid && isConfirmPasswordValid)}
       >
         <Text style={styles.linkText}>확인</Text>
