@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -17,12 +16,4 @@ public class PurposeDetailDTO {
     private BigDecimal currentBalance;
     private BigDecimal goalAmount;
     private List<PurposeData> purposeDataList;
-
-//    @Builder
-//    public PurposeDetailDTO(String purposeTitle, BigDecimal currentBalance, BigDecimal goalAmount, List<PurposeData> purposeDataList) {
-//        this.purposeTitle = purposeTitle;
-//        this.currentBalance = currentBalance;
-//        this.goalAmount = goalAmount;
-//        this.purposeDataList = purposeDataList;
-//    }
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface PurposeRepository extends JpaRepository<Purpose, Long> {
-    Purpose findByPurposeSeq();
+    Purpose findByPurposeSeq(Long purposeSeq);
     List<Purpose> findAllByUserUserSeq(Long userSeq);
 
 }

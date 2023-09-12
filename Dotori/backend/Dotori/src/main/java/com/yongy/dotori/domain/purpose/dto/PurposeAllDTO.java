@@ -7,11 +7,10 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class PurposeAllDTO {
-    private BigDecimal currentBalance;
-    private List<PurposeSummaryDTO> purposeList;
+    private BigDecimal currentTotalSavings;
+    private List<PurposeListDTO> purposeList;
 }
