@@ -11,6 +11,7 @@ services:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
     user: root
+    restart: always
     networks:
       - yongyong
 #  dotori_back:
@@ -29,11 +30,15 @@ services:
       - "80:80"
     depends_on:
       - jenkins
+    restart: always
+    networks:
+      - yongyong
 
 
 
 networks:
   yongyong:
     driver: bridge
+
 volumes:
   jenkins_home:
