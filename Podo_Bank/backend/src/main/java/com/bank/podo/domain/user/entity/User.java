@@ -57,5 +57,16 @@ public class User {
 
         return this;
     }
+
+    public User delete() {
+        name = null;
+        birthdate = null;
+        phoneNumber = null;
+        password = null;
+        registrationDate = null;
+        role = Role.ROLE_DELETED;
+
+        return this;
+    }
 }
 

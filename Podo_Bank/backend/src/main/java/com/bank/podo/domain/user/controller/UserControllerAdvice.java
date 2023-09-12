@@ -4,6 +4,7 @@ import com.bank.podo.domain.user.exception.AlreadyUsedUsernameException;
 import com.bank.podo.domain.user.exception.FromatException;
 import com.bank.podo.domain.user.exception.PasswordNotMatchException;
 import com.bank.podo.domain.user.exception.UserNotFoundException;
+import com.bank.podo.global.email.exception.EmailVerificationException;
 import com.bank.podo.global.email.exception.ResendTimeNotExpiredException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -33,7 +34,7 @@ public class UserControllerAdvice {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleEmailVerificationException(ResendTimeNotExpiredException e) {
+    public ResponseEntity<String> handleEmailVerificationException(EmailVerificationException e) {
         return ResponseEntity.status(400).body(e.getMessage());
     }
 

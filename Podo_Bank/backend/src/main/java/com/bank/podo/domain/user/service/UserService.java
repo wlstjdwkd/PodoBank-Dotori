@@ -145,6 +145,25 @@ public class UserService {
     }
 
     @Transactional
+    public void resetPassword(ResetPasswordDTO resetPasswordDTO, PasswordEncoder passwordEncoder) {
+        VerificationSuccess verificationSuccess = verificationSuccessRepository.findById(resetPasswordDTO.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("이메일 인증이 만료되었습니다."));
+
+        if(!verificationSuccess.getSuccessCode().equals(resetPasswordDTO.getSuccessCode())) {
+            throw new IllegalArgumentException("이메일 인증이 만료되었습니다.");
+        }
+
+        User user = userRepository.findByEmail(resetPasswordDTO.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        checkPasswordFormat(resetPasswordDTO.getNewPassword());
+
+        userRepository.save(user.update(User.builder()
+                .password(passwordEncoder.encode(resetPasswordDTO.getNewPassword()))
+                .build()));
+    }
+
+    @Transactional
     public void deleteUser(UserDeleteDTO userDeleteDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
 
@@ -152,12 +171,7 @@ public class UserService {
             throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
         }
 
-        userRepository.save(user.update(User.builder()
-                        .phoneNumber(null)
-                        .birthdate(null)
-                        .name(null)
-                        .password(null)
-                        .build()));
+        userRepository.save(user.delete());
     }
 
     private User getLoginUser() {

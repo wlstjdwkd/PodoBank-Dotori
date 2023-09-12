@@ -135,9 +135,23 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 회원"),
             @ApiResponse(responseCode = "422", description = "비밀번호 형식 오류")
     })
-    @PatchMapping("/password")
+    @PatchMapping("/password/change")
     public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
         userService.changePassword(changePasswordDTO, passwordEncoder);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "비밀번호 초기화")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비밀번호 초기화 성공"),
+            @ApiResponse(responseCode = "400", description = "비밀번호 초기화 실패"),
+            @ApiResponse(responseCode = "401", description = "jwt 인증 실패"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 회원"),
+            @ApiResponse(responseCode = "422", description = "비밀번호 형식 오류")
+    })
+    @PatchMapping("/password/reset")
+    public ResponseEntity<Void> resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO) {
+        userService.resetPassword(resetPasswordDTO, passwordEncoder);
         return ResponseEntity.ok().build();
     }
 
