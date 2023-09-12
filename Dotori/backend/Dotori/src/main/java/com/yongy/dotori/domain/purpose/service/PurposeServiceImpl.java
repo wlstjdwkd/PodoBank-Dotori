@@ -5,6 +5,7 @@ import com.yongy.dotori.domain.purpose.entity.Purpose;
 import com.yongy.dotori.domain.purpose.repository.PurposeRepository;
 import com.yongy.dotori.domain.purposeData.repository.PurposeDataRepository;
 import com.yongy.dotori.domain.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,17 +17,12 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PurposeServiceImpl implements PurposeService{
 
     private final PurposeRepository purposeRepository;
     private final PurposeDataRepository purposeDataRepository;
     private final UserRepository userRepository;
-
-    public PurposeServiceImpl(PurposeRepository purposeRepository, PurposeDataRepository purposeDataRepository, UserRepository userRepository) {
-        this.purposeRepository = purposeRepository;
-        this.purposeDataRepository = purposeDataRepository;
-        this.userRepository = userRepository;
-    }
 
     @Transactional
     @Override

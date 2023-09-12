@@ -6,6 +6,7 @@ import com.yongy.dotori.domain.purpose.dto.PurposeDetailDTO;
 import com.yongy.dotori.domain.purpose.dto.PurposeSummaryDTO;
 import com.yongy.dotori.domain.purpose.service.PurposeServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,13 +14,10 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/v1/purpose")
 public class PurposeController {
     private final PurposeServiceImpl purposeService;
-
-    public PurposeController(PurposeServiceImpl purposeService) {
-        this.purposeService = purposeService;
-    }
 
     @Operation(summary = "새로운 목표 생성")
     @PostMapping("/")
