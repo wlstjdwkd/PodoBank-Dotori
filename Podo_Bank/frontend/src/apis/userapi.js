@@ -26,9 +26,9 @@ const apiAddress ="http://192.168.246.79:8080"
 //   }
 // };
 
-export const userRegister = async () => {
+export const userRegister = async (userData) => {
   try {
-    const response = await axios.post(apiAddress+'/api/v1/user/register');
+    const response = await axios.post(apiAddress+'/api/v1/user/register', userData);
     console.log(response.data)
     return response;
   } catch (error) {
@@ -46,6 +46,8 @@ export const userRefresh = async () => {
     return response.data;
   } catch (error) {
     console.error('토큰 재발급 실패:', error);
+    const response = error.response
+    return response
     // throw error;
   }
 };
@@ -56,27 +58,33 @@ export const userPasswordChange = async () => {
     return response.data;
   } catch (error) {
     console.error('비밀번호 변경 실패:', error);
+    const response = error.response
+    return response
     // throw error;
   }
 };
 export const userLogout = async () => {
   try {
     const response = await axios.post(apiAddress+'/api/v1/user/logout');
-    console.log(response.data)
+    console.log('로그아웃 성공:',response.data)
     return response.data;
   } catch (error) {
     console.error('로그아웃 실패:', error);
+    const response = error.response
+    return response
     // throw error;
   }
 };
 // access token과 refresh token을 받음.
-export const userLogin = async () => {
+export const userLogin = async (email, password) => {
   try {
-    const response = await axios.post(apiAddress+'/api/v1/user/login');
-    console.log(response.data)
-    return response.data;
+    const response = await axios.post(apiAddress+'/api/v1/user/login', {email:email, password:password});
+    console.log('로그인 성공:',response.data)
+    return response;
   } catch (error) {
     console.error('로그인 실패:', error);
+    const response = error.response
+    return response
     // throw error;
   }
 };
@@ -114,11 +122,11 @@ export const userEmailDuplicationCheck = async (email) => {
     console.log('뿅')
     const response = await axios.get(apiAddress+`/api/v1/user/email/${email}`);
     console.log('아이디 중복체크 성공:',response.status)
-    return response.status;
+    return response;
   } catch (error) {
     console.error('아이디 중복 체크 실패:', error);
-    const response = {"data": null, "status": error.response.status}
-    return response.status
+    const response = error.response
+    return response
     // throw error;
   }
 };
@@ -130,6 +138,8 @@ export const userWithdrawal = async () => {
     return response.data;
   } catch (error) {
     console.error('회원 탈퇴 실패:', error); 
+    const response = error.response
+    return response
     // throw error;
   }
 };
@@ -140,6 +150,8 @@ export const userInformationInquiry = async () => {
     return response.data;
   } catch (error) {
     console.error('회원 정보 조회 실패:', error);
+    const response = error.response
+    return response
     // throw error;
   }
 };
