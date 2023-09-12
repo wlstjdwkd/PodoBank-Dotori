@@ -1,6 +1,7 @@
 package com.bank.podo.domain.account.controller;
 
 import com.bank.podo.domain.account.dto.*;
+import com.bank.podo.domain.account.enums.AccountType;
 import com.bank.podo.domain.account.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,9 +22,17 @@ public class AccountController {
 
     private final AccountService accountService;
 
+    @Operation(summary = "계좌 종류 조회")
+    @GetMapping("/type")
+    public ResponseEntity<List<AccountType>> getAccountTypeList() {
+        List<AccountType> accountTypeList = accountService.getAccountTypeList();
+        return ResponseEntity.ok(accountTypeList);
+    }
+
     @Operation(summary = "계좌 생성")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "201", description = "Account Created"),
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     @PostMapping("")
@@ -43,14 +52,25 @@ public class AccountController {
         return ResponseEntity.ok(accountList);
     }
 
-    @Operation(summary = "계좌 조회")
+    @Operation(summary = "계좌 소유주 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     @GetMapping("/{accountNumber}")
-    public ResponseEntity<AccountDTO> getAccount(@PathVariable Long accountNumber) {
-        AccountDTO account = accountService.getAccount(accountNumber);
+    public ResponseEntity<String> getAccountOwnerName(@PathVariable String accountNumber) {
+        String name = accountService.getAccountOwnerName(accountNumber);
+        return ResponseEntity.ok(name);
+    }
+
+    @Operation(summary = "계좌 상세 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Bad Request")
+    })
+    @GetMapping("/{accountNumber}/detail")
+    public ResponseEntity<AccountDTO> getAccount(@PathVariable String accountNumber) {
+        AccountDTO account = accountService.getAccountDetail(accountNumber);
         return ResponseEntity.ok(account);
     }
 
@@ -60,8 +80,11 @@ public class AccountController {
             @ApiResponse(responseCode = "400", description = "Bad Request")
     })
     @GetMapping("/{accountNumber}/history")
-    public ResponseEntity<List<TransactionHistoryDTO>> getAccountHistory(@PathVariable Long accountNumber) {
-        List<TransactionHistoryDTO> accountHistoryList = accountService.getAccountHistory(accountNumber);
+    public ResponseEntity<List<TransactionHistoryDTO>> getAccountHistory(@PathVariable String accountNumber,
+                                             @RequestParam int searchMonth, @RequestParam String transactionType,
+                                             @RequestParam int sortType, @RequestParam int page) {
+        List<TransactionHistoryDTO> accountHistoryList = accountService.getAccountHistory(accountNumber,
+                searchMonth, transactionType, sortType, page);
         return ResponseEntity.ok(accountHistoryList);
     }
 
@@ -130,4 +153,10 @@ public class AccountController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "최근 송금 계좌 조회")
+    @GetMapping("/{accountNumber}/recent")
+    public ResponseEntity<List<RecentAccountDTO>> getRecentAccountList(@PathVariable String accountNumber) {
+        List<RecentAccountDTO> recentAccountList = accountService.getRecentTransferAccountList(accountNumber);
+        return ResponseEntity.ok(recentAccountList);
+    }
 }

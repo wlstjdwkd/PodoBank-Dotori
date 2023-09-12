@@ -1,4 +1,4 @@
-package com.bank.podo.domain.user.entity;
+package com.bank.podo.domain.user.enums;
 
 public enum Gender {
     MALE,
