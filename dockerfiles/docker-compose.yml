@@ -6,20 +6,30 @@ services:
       dockerfile: Dockerfile.Jenkins
     ports:
       - "8080:8080"
-      - "50000:50000"
+#      - "50000:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
     user: root
     networks:
       - yongyong
-  dotori_back:
-    image: dotori_back
-    build:
-      context: ../Dotori/backend/Dotori
-      dockerfile: Dockerfile.Dotori_back
+#  dotori_back:
+#    image: dotori_back
+#    build:
+#      context: ../Dotori/backend/Dotori
+#      dockerfile: Dockerfile.Dotori_back
+#    ports:
+#      - "9100:9100"
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
     ports:
-      - "9100:9100"
+      - "80:80"
+    depends_on:
+      - jenkins
+
 
 
 networks:
