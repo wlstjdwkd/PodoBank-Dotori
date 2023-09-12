@@ -21,6 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
@@ -33,11 +34,10 @@ public class UserService {
 
     private final JwtProvider jwtProvider;
 
-    private final RequestHelper requestHelper;
-
     private final UserRepository userRepository;
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
 
+    @Transactional
     public void register(RegisterDTO registerDTO, PasswordEncoder passwordEncoder) {
         checkEmailFormat(registerDTO.getEmail());
         checkPasswordFormat(registerDTO.getPassword());
@@ -48,6 +48,7 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
     public void checkUsername(String email) {
         checkEmailFormat(email);
 
@@ -56,6 +57,7 @@ public class UserService {
         }
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<?> login(HttpServletRequest request, LoginDTO loginDTO, PasswordEncoder passwordEncoder) {
         User user = userRepository.findByEmail(loginDTO.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("아이디, 비밀번호를 확인해주세요."));
@@ -71,7 +73,7 @@ public class UserService {
         // refresh token 저장
         refreshTokenRedisRepository.save(RefreshToken.builder()
                         .id(user.getEmail())
-                        .ip(requestHelper.getClientIp(request))
+                        .ip(RequestHelper.getClientIp(request))
                         .authorities(authentication.getAuthorities())
                         .refreshToken(token.getRefreshToken())
                         .build());
@@ -79,6 +81,7 @@ public class UserService {
         return ResponseEntity.ok(token);
     }
 
+    @Transactional
     public ResponseEntity<Token> refresh(String token, HttpServletRequest request) {
         if(token != null && jwtProvider.verifyToken(token)) {
 
@@ -88,7 +91,7 @@ public class UserService {
 
                 refreshTokenRedisRepository.save(RefreshToken.builder()
                         .id(refreshToken.getId())
-                        .ip(requestHelper.getClientIp(request))
+                        .ip(RequestHelper.getClientIp(request))
                         .authorities(refreshToken.getAuthorities())
                         .refreshToken(newToken.getRefreshToken())
                         .build());
@@ -98,16 +101,19 @@ public class UserService {
         return ResponseEntity.badRequest().build();
     }
 
+    @Transactional
     public void logout() {
         User user = getLoginUser();
         refreshTokenRedisRepository.deleteById(user.getEmail());
     }
 
+    @Transactional(readOnly = true)
     public UserInfoDTO getUserInfo() {
         User user = getLoginUser();
         return toUserInfoDTO(user);
     }
 
+    @Transactional
     public void changePassword(ChangePasswordDTO changePasswordDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
 
@@ -124,8 +130,12 @@ public class UserService {
         userRepository.save(user.update(User.builder()
                 .password(passwordEncoder.encode(changePasswordDTO.getNewPassword()))
                 .build()));
+
+        // 로그아웃 처리
+        logout();
     }
 
+    @Transactional
     public void deleteUser(UserDeleteDTO userDeleteDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
 
