@@ -1,6 +1,5 @@
 package com.bank.podo.domain.user.dto;
 
-import com.bank.podo.domain.user.enums.Gender;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,19 +11,15 @@ import java.time.LocalDate;
 public class UserInfoDTO {
     private String name;
     private LocalDate birthdate;
-    private Gender gender;
-    private String contactInfo;
-    private String address;
-    private String id;
+    private String email;
+    private String phoneNumber;
 
     @Builder
-    public UserInfoDTO(String name, LocalDate birthdate, Gender gender, String contactInfo, String address, String id) {
+    public UserInfoDTO(String name, LocalDate birthdate, String email, String phoneNumber) {
         this.name = name;
         this.birthdate = birthdate;
-        this.gender = gender;
-        this.contactInfo = contactInfo;
-        this.address = address;
-        this.id = id;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
     }
 
 }

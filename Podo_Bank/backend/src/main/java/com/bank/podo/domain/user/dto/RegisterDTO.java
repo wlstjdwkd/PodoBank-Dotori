@@ -1,6 +1,5 @@
 package com.bank.podo.domain.user.dto;
 
-import com.bank.podo.domain.user.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,9 +14,8 @@ import java.time.LocalDate;
 public class RegisterDTO {
     private String name;
     private LocalDate birthdate;
-    private Gender gender;
-    private String contactInfo;
     private String address;
-    private String id;
+    private String email;
     private String password;
+    private String phoneNumber;
 }

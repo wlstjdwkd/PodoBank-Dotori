@@ -7,6 +7,8 @@ import com.bank.podo.global.email.dto.EmailVerificationDTO;
 import com.bank.podo.global.email.service.EmailService;
 import com.bank.podo.global.security.entity.Token;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -41,21 +43,25 @@ public class UserController {
     }
 
     @Operation(summary = "이메일 인증 코드 확인")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "인증 코드 일치"),
+            @ApiResponse(responseCode = "401", description = "인증 코드 불일치")
+    })
     @PostMapping("/emailVerification/check")
-    public ResponseEntity<Void> checkVerificationCode(@RequestBody EmailVerificationCheckDTO emailVerificationCheckDTO) {
+    public ResponseEntity<String> checkVerificationCode(@RequestBody EmailVerificationCheckDTO emailVerificationCheckDTO) {
         boolean isValidate = emailService.checkVerificationCode(emailVerificationCheckDTO.getEmail(), emailVerificationCheckDTO.getCode());
 
         if(isValidate) {
             return ResponseEntity.ok().build();
         } else {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(401).body("인증 코드가 일치하지 않습니다.");
         }
     }
 
     @Operation(summary = "아이디 중복 체크")
-    @GetMapping("/id/{id}")
-    public ResponseEntity<Void> checkUsername(@PathVariable String id) {
-        userService.checkUsername(id);
+    @GetMapping("/email/{email}")
+    public ResponseEntity<Void> checkUsername(@PathVariable String email) {
+        userService.checkUsername(email);
         return ResponseEntity.ok().build();
     }
 

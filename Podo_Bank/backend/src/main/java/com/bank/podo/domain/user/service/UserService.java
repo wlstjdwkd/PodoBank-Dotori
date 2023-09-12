@@ -40,7 +40,7 @@ public class UserService {
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
 
     public void register(RegisterDTO registerDTO, PasswordEncoder passwordEncoder) {
-        checkUsername(registerDTO.getId());
+        checkUsername(registerDTO.getEmail());
 
         checkPasswordFormat(registerDTO.getPassword());
 
@@ -48,27 +48,27 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void checkUsername(String id) {
-        if(userRepository.existsById(id)) {
+    public void checkUsername(String email) {
+        if(userRepository.existsByEmail(email)) {
             throw new AlreadyUsedUsernameException("이미 사용중인 아이디입니다.");
         }
     }
 
     public ResponseEntity<?> login(HttpServletRequest request, LoginDTO loginDTO, PasswordEncoder passwordEncoder) {
-        User user = userRepository.findById(loginDTO.getId())
+        User user = userRepository.findByEmail(loginDTO.getEmail())
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 아이디입니다."));
 
         if(!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        Token token = jwtProvider.generateToken(user.getId(), user.getRole());
+        Token token = jwtProvider.generateToken(user.getEmail(), user.getRole());
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, Collections.singleton(new SimpleGrantedAuthority(user.getRole().name())));
 
         // refresh token 저장
         refreshTokenRedisRepository.save(RefreshToken.builder()
-                        .id(user.getId())
+                        .id(user.getEmail())
                         .ip(requestHelper.getClientIp(request))
                         .authorities(authentication.getAuthorities())
                         .refreshToken(token.getRefreshToken())
@@ -130,17 +130,11 @@ public class UserService {
         }
 
         userRepository.save(user.update(User.builder()
-                        .address(null)
+                        .phoneNumber(null)
                         .birthdate(null)
                         .name(null)
                         .password(null)
-                        .contactInfo(null)
-                        .gender(null)
                         .build()));
-    }
-
-    public User findUserByUserId(String userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("존재하지 않는 아이디입니다."));
     }
 
     private User getLoginUser() {
@@ -157,14 +151,12 @@ public class UserService {
 
     private User toUserEntity(RegisterDTO registerDTO, PasswordEncoder passwordEncoder) {
         return User.builder()
-                .id(registerDTO.getId())
+                .email(registerDTO.getEmail())
                 .password(registerDTO.getPassword())
                 .name(registerDTO.getName())
                 .password(passwordEncoder.encode(registerDTO.getPassword()))
-                .address(registerDTO.getAddress())
-                .gender(registerDTO.getGender())
                 .birthdate(registerDTO.getBirthdate())
-                .contactInfo(registerDTO.getContactInfo())
+                .phoneNumber(registerDTO.getPhoneNumber())
                 .build();
     }
 
@@ -172,10 +164,7 @@ public class UserService {
         return UserInfoDTO.builder()
                 .name(user.getName())
                 .birthdate(user.getBirthdate())
-                .gender(user.getGender())
-                .contactInfo(user.getContactInfo())
-                .address(user.getAddress())
-                .id(user.getId())
+                .email(user.getEmail())
                 .build();
     }
 }
