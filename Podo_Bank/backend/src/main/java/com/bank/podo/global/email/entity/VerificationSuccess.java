@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@RedisHash(value = "verificationCode", timeToLive = 60 * 5)
-public class VerificationCode {
+@RedisHash(value = "verificationSuccess", timeToLive = 60 * 10)
+public class VerificationSuccess {
 
     @Id
     String email;
 
-    String code;
+    String successCode;
 
-    LocalDateTime sendAt;
+    LocalDateTime successAt;
 }

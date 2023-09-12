@@ -26,8 +26,8 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("Your API Documentation")
-                .description("API documentation for your project")
+                .title("포도 은행")
+                .description("포도은행 API 문서")
                 .version("1.0.0")
                 .build();
     }
