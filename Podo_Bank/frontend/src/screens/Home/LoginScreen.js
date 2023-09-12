@@ -8,8 +8,19 @@ import {
   Image,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
+// import { useSelector, useDispatch } from 'react-redux';
+// import { decrement, increment, incrementByAmount,changeNameNum } from '../../redux/slices/auth/user'
+
+import {userLogin} from '../../apis/userapi'
 
 export default function LoginScreen({ navigation }) {
+  // const count = useSelector((state) => state.counter.count);
+  // const name = useSelector((state) => state.counter.nametmp);
+  // const count2 = useSelector((state) => state.whole.count2);
+  // const name2 = useSelector((state) => state.whole.nameTmp2);
+  // const dispatch = useDispatch();
+
+
   return (
     <View style={styles.container}>
       {/* Logo */}

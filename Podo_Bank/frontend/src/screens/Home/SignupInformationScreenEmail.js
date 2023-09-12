@@ -8,26 +8,92 @@ import {
 } from "react-native";
 
 import HeaderComponent from "../Header/HeaderScreen";
+import {
+  userEmailVerificationCheck, userEmailVerificationSend, userEmailDuplicationCheck
+} from '../../apis/userapi'
 
 export default function SignupInformationScreen({ navigation, route }) {
-  const [userInfo, setUserInfo] = useState(route.params.userInfo);
-  const [authenEmail, SetAuthenEmail] = useState(false);
-  const [authenEmailNum, SetAuthenEmailNum] = useState(""); // 6자리의 인증번호라고 가정
-  const [isAuthenEmail, SetIsAuthenEmail] = useState(false); // 임시로 true로 유지중
-  const [confirmAuthenEmailNum, setConfirmAuthenEmailNum] = useState("");
+  const [userInfo, setUserInfo] = useState(route.params.userInfo);  // 회원가입하면서 router를 통해 가져오고 있는 userInfo
+  const [authenEmail, SetAuthenEmail] = useState(false);      // 이메일 인증버튼 활성화하는 변수
+  const [emailCode, SetEmailCode] = useState("");   // 8자리의 인증번호
+  const [isAuthenEmail, SetIsAuthenEmail] = useState(false);  // E-mail 인증 완료 여부를 나타내는 변수
+  const [codeMessage, setCodeMessage] = useState("");         // 이메일 인증번호 시비 여부를 나타내는 메시지
+  // 이메일 사용가능여부확인 코드
+  const [isValidEmail, setIsValidEmail] = useState("");     // 양식에맞게 이메일 작성
+  const [isCorrectEmail, setIsCorrectEmail] = useState(""); // 사용가능한 이메일여부 확인
+  const [email, setEmail] = useState("");                   // 작성한 E-mail 주소
+  const [emailMessage, setEmailMessage] = useState("");     // E-mail 사용가능 여부를 나타내는 메시지
+  // const [emailDuplicatedCheck, setEmailDuplicatedCheck] = useState(null)  // 이메일 중복확인 결과
 
-  // function compareAuthenNum() {
-  //   // 차후 백에서 정받아와서 비교 해서 true로 바꿀 것
-  //   SetIsAuthenEmail(true)
-  // }
-  function compareAuthenNum() {
-    const backCompare = 111111;
-    if (authenEmailNum != backCompare) {
-      setConfirmAuthenEmailNum("잘못된 인증번호입니다.");
-      SetIsAuthenEmail(false);
+
+  function validateEmail(email) {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    return emailRegex.test(email);
+  }
+
+  const handleEmailChange = (text) => {
+    setEmail(text);
+    if (validateEmail(text)) {
+      setEmailMessage("사용 가능한 이메일입니다.");
+      setIsValidEmail(true);
+      // setEmailDuplicatedCheck(null); // 초기화: 이메일 양식이 올바르므로 중복 확인을 다시 해야 함
+      // setIsCorrectEmail(null);
     } else {
-      setConfirmAuthenEmailNum("인증이 완료되었습니다.");
+      setEmailMessage("이메일 양식을 맞춰주세요!");
+      setIsValidEmail(false);
+      // setEmailDuplicatedCheck(null); // 초기화: 이메일 양식이 올바르지 않으므로 중복 확인을 다시 해야 함
+      // setIsCorrectEmail(null);
+    }
+  };
+  
+  const hanldeUserEmailDuplicationCheck = async (text) => {
+    if (validateEmail(text)) {
+      const response = await userEmailDuplicationCheck(text);
+      if (response === 200) {
+        setEmailMessage("사용 가능한 이메일입니다.");
+        // setEmailDuplicatedCheck(true);
+        setIsCorrectEmail(true);
+      } else if (response === 400) {
+        setEmailMessage("이미 사용 중인 이메일입니다.");
+        // setEmailDuplicatedCheck(false);
+        setIsCorrectEmail(false);
+      } else {
+        setEmailMessage("서버 오류로 중복 확인에 실패했습니다.");
+        // setEmailDuplicatedCheck(null);
+        setIsCorrectEmail(null);
+      }
+    } else {
+      setEmailMessage("이메일 양식을 맞춰주세요!");
+      // setEmailDuplicatedCheck(null);
+      setIsCorrectEmail(null);
+    }
+  };
+
+  // 이메일 전송
+  const handleUserEmailVerificationSend = async()=>{
+    const response = await userEmailVerificationSend(email)
+    if(response.status===200){
+      console.log('이메일 전송 성공')
+    }else if(response.status===400){
+      console.log('이메일 전송 실패')
+    }else if(response.status===422){
+      console.log('이메일 형식 오류')
+    }else if(response.status===429){
+      console.log('재전송 대기중')
+    }
+  }
+  // 이메일 인증번호 확인
+  const handleUserEmailVerificationCheck = async()=>{
+    const response = await userEmailVerificationCheck(emailCode, email)
+    if (response.status===400) {
+      setCodeMessage("잘못된 인증번호입니다.");
+      SetIsAuthenEmail(false);
+    } else if(response.status===200){
+      setCodeMessage("인증이 완료되었습니다.");
       SetIsAuthenEmail(true);
+    }else{
+      setCodeMessage("다시 시도해주세요.");
+      SetIsAuthenEmail(false)
     }
   }
 
@@ -49,22 +115,44 @@ export default function SignupInformationScreen({ navigation, route }) {
         <View style={styles.inputRowContainer}>
           <TextInput
             style={[styles.input]}
-            onChangeText={(text) =>
+            onChangeText={(text) =>{
+              handleEmailChange(text)
+              {hanldeUserEmailDuplicationCheck(text) && isValidEmail}
               setUserInfo((prev) => ({ ...prev, email: text }))
-            }
-            placeholder="ID로 사용될 이메일을 선택해주세요."
+            }}
+            multiline={true}
+            placeholder="ID로 사용할 이메일을 입력해주세요."
             keyboardType="email-address"
+            editable={!isAuthenEmail} // 인증이 완료되면 수정불가
           />
           <TouchableOpacity
-            style={styles.verifyButton}
+            style={[
+              styles.verifyButton,
+              // (isAuthenEmail||!isValidEmail) && {backgroundColor: "grey",},
+              (!isCorrectEmail || isAuthenEmail) && {backgroundColor: "grey",},
+            ]}
+            
             onPress={() => {
               SetAuthenEmail(true);
+              handleUserEmailVerificationSend()
             }}
+            // disabled={!isValidEmail || isAuthenEmail ||!isCorrectEmail}
+            disabled={!isCorrectEmail || isAuthenEmail}
           >
             <Text style={styles.verifyButtonText}>전송</Text>
           </TouchableOpacity>
         </View>
       </View>
+      <Text
+        style={{
+          color: (isCorrectEmail && isValidEmail) ? "blue" : "red",
+          marginLeft: 30,
+          marginTop: -30,
+        }}
+      >
+        {emailMessage}
+      </Text>
+
       {/* 이메일 인증번호 입력창 */}
       {authenEmail ? (
         <View style={[styles.inputContainer, { align: "flex-end" }]}>
@@ -72,21 +160,25 @@ export default function SignupInformationScreen({ navigation, route }) {
           <View style={styles.inputRowContainer}>
             <TextInput
               style={styles.input}
-              onChangeText={(text) => SetAuthenEmailNum(text)}
+              onChangeText={(text) => SetEmailCode(text)}
               placeholder="인증번호를 입력해주세요."
               keyboardType="number-pad" // 숫자로만 받는다는 가정하에 넘버패드로 받음
-              maxLength={6}
+              maxLength={8}
+              editable={!isAuthenEmail}
             />
             <TouchableOpacity
               // 차후 백과의 연동에서 인증번호 일치할때만 제대로 작동
               style={[
                 styles.verifyButton,
-                !(userInfo.email && authenEmailNum.length == 6) && {
+                (!(userInfo.email && emailCode.length == 8)||isAuthenEmail) && {
                   backgroundColor: "grey",
                 },
               ]}
-              disabled={!(userInfo.email && authenEmailNum.length == 6)}
-              onPress={compareAuthenNum}
+              disabled={(!(userInfo.email && emailCode.length == 8)) || isAuthenEmail}
+              onPress={()=>{
+                handleUserEmailVerificationCheck()
+                // compareAuthenNum()
+              }}
             >
               <Text style={styles.verifyButtonText}>인증</Text>
             </TouchableOpacity>
@@ -100,7 +192,7 @@ export default function SignupInformationScreen({ navigation, route }) {
           marginTop: -30,
         }}
       >
-        {confirmAuthenEmailNum}
+        {codeMessage}
       </Text>
 
       <TouchableOpacity
