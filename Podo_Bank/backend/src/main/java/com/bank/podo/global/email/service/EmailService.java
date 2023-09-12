@@ -1,6 +1,7 @@
 package com.bank.podo.global.email.service;
 
 import com.bank.podo.global.email.entity.VerificationCode;
+import com.bank.podo.global.email.enums.VerificationType;
 import com.bank.podo.global.email.exception.ResendTimeNotExpiredException;
 import com.bank.podo.global.email.message.EmailMessage;
 import com.bank.podo.global.email.repository.VerificationCodeRepository;
@@ -25,7 +26,7 @@ public class EmailService {
     private final EmailMessage emailMessage;
     private final VerificationCodeRepository verificationCodeRepository;
 
-    public boolean sendVerificationCode(String email, String type) {
+    public boolean sendVerificationCode(String email, VerificationType type) {
         VerificationCode verificationCode = verificationCodeRepository.findById(email).orElse(null);
 
         if (verificationCode != null && isResendTimeNotExpired(verificationCode)) {
@@ -36,8 +37,8 @@ public class EmailService {
         String subject = "[포도은행] 인증 코드";
         String info = gernerateEmailMessage(type, code);
 
-        boolean messageSendSuccess = sendMessage(email, subject, info);
-
+//        boolean messageSendSuccess = sendMessage(email, subject, info);
+        boolean messageSendSuccess = true;
         if(messageSendSuccess) {
             verificationCodeRepository.save(VerificationCode.builder()
                     .email(email)
@@ -78,10 +79,10 @@ public class EmailService {
         }
     }
 
-    private String gernerateEmailMessage(String type, String code) {
-        if(type.equals("register")) {
+    private String gernerateEmailMessage(VerificationType type, String code) {
+        if(type.equals(VerificationType.REGISTER)) {
             return emailMessage.generateRegisterMessage(code);
-        } else if(type.equals("passwordReset")) {
+        } else if(type.equals(VerificationType.RESET_PASSWORD)) {
             return emailMessage.generatePasswordResetMessage(code);
         } else {
             return null;
