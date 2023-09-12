@@ -7,6 +7,8 @@ import com.bank.podo.domain.user.exception.AlreadyUsedUsernameException;
 import com.bank.podo.domain.user.exception.FromatException;
 import com.bank.podo.domain.user.exception.PasswordNotMatchException;
 import com.bank.podo.domain.user.repository.UserRepository;
+import com.bank.podo.global.email.entity.VerificationSuccess;
+import com.bank.podo.global.email.repository.VerificationSuccessRepository;
 import com.bank.podo.global.others.service.RequestHelper;
 import com.bank.podo.global.security.entity.RefreshToken;
 import com.bank.podo.global.security.entity.Token;
@@ -36,10 +38,17 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
+    private final VerificationSuccessRepository verificationSuccessRepository;
 
     @Transactional
     public void register(RegisterDTO registerDTO, PasswordEncoder passwordEncoder) {
-        checkEmailFormat(registerDTO.getEmail());
+        VerificationSuccess verificationSuccess = verificationSuccessRepository.findById(registerDTO.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("이메일 인증이 만료되었습니다."));
+
+        if(!verificationSuccess.getSuccessCode().equals(registerDTO.getSuccessCode())) {
+            throw new IllegalArgumentException("이메일 인증이 만료되었습니다.");
+        }
+
         checkPasswordFormat(registerDTO.getPassword());
 
         checkUsername(registerDTO.getEmail());

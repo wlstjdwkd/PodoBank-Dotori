@@ -33,6 +33,11 @@ public class UserControllerAdvice {
     }
 
     @ExceptionHandler
+    public ResponseEntity<String> handleEmailVerificationException(ResendTimeNotExpiredException e) {
+        return ResponseEntity.status(400).body(e.getMessage());
+    }
+
+    @ExceptionHandler
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
         return ResponseEntity.status(400).body(e.getMessage());
     }

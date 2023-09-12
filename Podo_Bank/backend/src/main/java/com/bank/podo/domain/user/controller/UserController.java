@@ -4,6 +4,7 @@ import com.bank.podo.domain.user.dto.*;
 import com.bank.podo.domain.user.service.UserService;
 import com.bank.podo.global.email.dto.EmailVerificationCheckDTO;
 import com.bank.podo.global.email.dto.EmailVerificationDTO;
+import com.bank.podo.global.email.dto.EmailVerificationSuccessDTO;
 import com.bank.podo.global.email.service.EmailService;
 import com.bank.podo.global.security.entity.Token;
 import io.swagger.annotations.Api;
@@ -61,17 +62,13 @@ public class UserController {
     @Operation(summary = "이메일 인증 코드 확인")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "인증 코드 일치"),
-            @ApiResponse(responseCode = "403", description = "인증 코드 불일치")
+            @ApiResponse(responseCode = "400", description = "인증 실패")
     })
     @PostMapping("/emailVerification/check")
-    public ResponseEntity<String> checkVerificationCode(@RequestBody EmailVerificationCheckDTO emailVerificationCheckDTO) {
-        boolean isValidate = emailService.checkVerificationCode(emailVerificationCheckDTO.getEmail(), emailVerificationCheckDTO.getCode());
+    public ResponseEntity<EmailVerificationSuccessDTO> checkVerificationCode(@RequestBody EmailVerificationCheckDTO emailVerificationCheckDTO) {
+        EmailVerificationSuccessDTO successCode = emailService.checkVerificationCode(emailVerificationCheckDTO.getEmail(), emailVerificationCheckDTO.getCode());
 
-        if(isValidate) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.status(403).body("인증 코드가 일치하지 않습니다.");
-        }
+        return ResponseEntity.ok(successCode);
     }
 
     @Operation(summary = "아이디 중복 체크")
