@@ -97,8 +97,11 @@ public class PurposeServiceImpl implements PurposeService{
     public void terminatePurpose(Long purposeSeq) {
         // 목표 중단
         Purpose purpose = purposeRepository.findByPurposeSeq(purposeSeq);
-        purpose.setTerminated(true);
-        purpose.setTerminatedAt(LocalDateTime.now());
+
+        purpose.update(Purpose.builder()
+                .terminatedAt(LocalDateTime.now())
+                .isTerminated(true)
+                .build());
     }
 
     @Override

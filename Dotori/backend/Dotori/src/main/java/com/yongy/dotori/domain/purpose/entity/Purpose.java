@@ -64,4 +64,9 @@ public class Purpose {
         this.isTerminated = isTerminated;
         this.terminatedAt = terminatedAt;
     }
+
+    public void update(Purpose purpose){
+        this.isTerminated = purpose.isTerminated;
+        this.terminatedAt = purpose.terminatedAt;
+    }
 }
