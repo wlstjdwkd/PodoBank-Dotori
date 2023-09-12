@@ -1,5 +1,6 @@
 package com.bank.podo.domain.account.entity;
 
+import com.bank.podo.domain.account.enums.AccountType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ public class InterestRate {
     private Long interestId;
 
     @Enumerated(EnumType.STRING)
+    @Column(unique = true)
     private AccountType accountType;
 
     @Column

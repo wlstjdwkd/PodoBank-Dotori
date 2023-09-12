@@ -1,5 +1,6 @@
 package com.bank.podo.domain.account.entity;
 
+import com.bank.podo.domain.account.enums.TransactionType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ public class TransactionHistory {
     private Long transactionId;
 
     @ManyToOne
-    @JoinColumn(name = "account_number")
+    @JoinColumn(name = "account_seq")
     private Account account;
 
     @Enumerated(EnumType.STRING)
@@ -33,20 +34,20 @@ public class TransactionHistory {
     private BigDecimal balanceAfter;
 
     @ManyToOne
-    @JoinColumn(name = "counter_account_number")
+    @JoinColumn(name = "counter_account_seq")
     private Account counterAccount;
 
     @Column
-    private String transactionDetails;
+    private String content;
 
     @Builder
-    public TransactionHistory(Account account, TransactionType transactionType, BigDecimal amount, BigDecimal balanceAfter, Account counterAccount, String transactionDetails) {
+    public TransactionHistory(Account account, TransactionType transactionType, BigDecimal amount, BigDecimal balanceAfter, Account counterAccount, String content) {
         this.account = account;
         this.transactionType = transactionType;
         this.transactionAt = LocalDateTime.now();
         this.amount = amount;
         this.balanceAfter = balanceAfter;
         this.counterAccount = counterAccount;
-        this.transactionDetails = transactionDetails;
+        this.content = content;
     }
 }

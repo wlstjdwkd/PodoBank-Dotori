@@ -1,6 +1,6 @@
 package com.bank.podo.domain.user.dto;
 
-import com.bank.podo.domain.user.entity.Gender;
+import com.bank.podo.domain.user.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
