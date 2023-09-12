@@ -4,9 +4,8 @@ import com.bank.podo.domain.user.dto.*;
 import com.bank.podo.domain.user.entity.User;
 import com.bank.podo.domain.user.enums.Role;
 import com.bank.podo.domain.user.exception.AlreadyUsedUsernameException;
-import com.bank.podo.domain.user.exception.PasswordFromatException;
+import com.bank.podo.domain.user.exception.FromatException;
 import com.bank.podo.domain.user.exception.PasswordNotMatchException;
-import com.bank.podo.domain.user.exception.UserNotFoundException;
 import com.bank.podo.domain.user.repository.UserRepository;
 import com.bank.podo.global.others.service.RequestHelper;
 import com.bank.podo.global.security.entity.RefreshToken;
@@ -40,15 +39,18 @@ public class UserService {
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
 
     public void register(RegisterDTO registerDTO, PasswordEncoder passwordEncoder) {
-        checkUsername(registerDTO.getEmail());
-
+        checkEmailFormat(registerDTO.getEmail());
         checkPasswordFormat(registerDTO.getPassword());
+
+        checkUsername(registerDTO.getEmail());
 
         User user = toUserEntity(registerDTO, passwordEncoder);
         userRepository.save(user);
     }
 
     public void checkUsername(String email) {
+        checkEmailFormat(email);
+
         if(userRepository.existsByEmail(email)) {
             throw new AlreadyUsedUsernameException("이미 사용중인 아이디입니다.");
         }
@@ -56,10 +58,10 @@ public class UserService {
 
     public ResponseEntity<?> login(HttpServletRequest request, LoginDTO loginDTO, PasswordEncoder passwordEncoder) {
         User user = userRepository.findByEmail(loginDTO.getEmail())
-                .orElseThrow(() -> new UserNotFoundException("존재하지 않는 아이디입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("아이디, 비밀번호를 확인해주세요."));
 
         if(!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new IllegalArgumentException("아이디, 비밀번호를 확인해주세요.");
         }
 
         Token token = jwtProvider.generateToken(user.getEmail(), user.getRole());
@@ -97,6 +99,8 @@ public class UserService {
     }
 
     public void logout() {
+        User user = getLoginUser();
+        refreshTokenRedisRepository.deleteById(user.getEmail());
     }
 
     public UserInfoDTO getUserInfo() {
@@ -141,11 +145,20 @@ public class UserService {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
+    public void checkEmailFormat(String email) {
+        String emailPattern =
+                "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
+        if(Pattern.compile(emailPattern).matcher(email).matches()) {
+            throw new FromatException("이메일 형식이 올바르지 않습니다.");
+        }
+    }
+
     private void checkPasswordFormat(String password) {
         String passwordPattern = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
 
         if(Pattern.compile(passwordPattern).matcher(password).matches()) {
-            throw new PasswordFromatException("비밀번호는 영문, 숫자, 특수문자를 포함하여 8자리 이상이어야 합니다.");
+            throw new FromatException("비밀번호는 영문, 숫자, 특수문자를 포함하여 8자리 이상이어야 합니다.");
         }
     }
 
