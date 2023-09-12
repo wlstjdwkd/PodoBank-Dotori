@@ -2,19 +2,21 @@ package com.yongy.dotori.domain.payment.entity;
 
 import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotori.domain.user.entity.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.*;
-import jakarta.persistence.GenerationType;
+//import jakarta.persistence.Entity;
+//import jakarta.persistence.*;
+//import jakarta.persistence.GenerationType;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity(name = "payments")
 @NoArgsConstructor
 public class Payment {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_seq")
     private Long paymentSeq;
 

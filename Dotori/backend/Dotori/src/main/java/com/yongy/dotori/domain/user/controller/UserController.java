@@ -1,36 +1,65 @@
 package com.yongy.dotori.domain.user.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.yongy.dotori.domain.user.entity.User;
+import com.yongy.dotori.domain.user.repository.UserRepository;
+import com.yongy.dotori.global.common.BaseResponseBody;
+import com.yongy.dotori.global.security.jwt.JwtTokenProvider;
+import com.yongy.dotori.global.security.jwtDto.JwtToken;
 
-import java.util.Arrays;
-import java.util.List;
+//import io.swagger.v3.oas.annotations.Operation;
+//import io.swagger.v3.oas.annotations.media.Content;
+//import io.swagger.v3.oas.annotations.media.Schema;
+//import io.swagger.v3.oas.annotations.responses.ApiResponse;
+//import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/v1/user")
 public class UserController {
-    // 이메일이 DB에 있는지 확인한다.
-    // 회원가입
 
+    @Autowired
+    private UserRepository userRepository;
 
+    @Autowired
+    private JwtTokenProvider provider;
 
-//    @Operation(summary = "회원 탈퇴 요청", description = "회원 정보가 삭제됩니다.", tags = { "Member Controller" })
-//    @ApiResponses({
-//            @ApiResponse(responseCode = "200", description = "OK"),
-//            @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
-//            @ApiResponse(responseCode = "404", description = "NOT FOUND"),
-//            @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
-//    })
-//    @GetMapping
-//    public List<String> list() {
-//        return Arrays.asList("Junho Park, Jinyong Park");
+//    @PostMapping("/id/check")
+//    public ResponseEntity<? extends BaseResponseBody> validIdCheck(){
+//        return ResponseEntity.status(HttpStatus.O
 //    }
+
+
+    @PostMapping("/signin")
+    public ResponseEntity<?> signin(@RequestBody Map<String, String> loginForm){
+        String id = loginForm.get("id");
+
+        User user = userRepository.findById(id);
+
+        if(user == null){
+            // 유효한 토큰이지만 DB에 데이터가 없는 경우
+            return null;
+        }else{
+//            User authUser = provider.getAuthUser();
+//
+//            if(authUser != null && !authUser.getId().equals(id)){
+//                JwtToken newToken = provider.createToken(user.getId(), user.getRole());
+//                return new ResponseEntity<>(newToken, HttpStatus.OK);
+//            }
+            JwtToken newToken = provider.createToken(user.getId(), user.getRole());
+
+            return new ResponseEntity<>(newToken, HttpStatus.OK);
+
+           // return new ResponseEntity<>("이미 인증이 완료된 토큰입니다.", HttpStatus.OK);
+        }
+
+
+    }
+
 }

@@ -4,10 +4,11 @@ import com.yongy.dotori.domain.category.entity.Category;
 import com.yongy.dotori.domain.categoryGroup.entity.CategoryGroup;
 import com.yongy.dotori.domain.payment.entity.Payment;
 import com.yongy.dotori.domain.plan.entity.Plan;
-import jakarta.persistence.*;
+//import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -15,7 +16,8 @@ import java.util.List;
 @Entity(name="plan_details")
 public class PlanDetail {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "plan_detail_seq")
     private Long planDetailSeq;
 

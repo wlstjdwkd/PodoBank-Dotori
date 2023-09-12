@@ -1,15 +1,18 @@
 package com.yongy.dotori.domain.categoryData.entity;
 
 import com.yongy.dotori.domain.category.entity.Category;
-import jakarta.persistence.*;
+// import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
 
 @Entity(name = "category_data")
 @NoArgsConstructor
 public class CategoryData {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_data_seq")
     private Long categoryDataSeq;
 

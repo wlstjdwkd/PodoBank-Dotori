@@ -7,12 +7,13 @@ import com.yongy.dotori.domain.payment.entity.Payment;
 import com.yongy.dotori.domain.plan.entity.Plan;
 import com.yongy.dotori.domain.purpose.entity.Purpose;
 import com.yongy.dotori.domain.reward.entity.Reward;
-import jakarta.persistence.*;
+// import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -22,7 +23,8 @@ import java.util.List;
 @Entity(name="users")
 public class User {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_seq")
     private Long userSeq;
 

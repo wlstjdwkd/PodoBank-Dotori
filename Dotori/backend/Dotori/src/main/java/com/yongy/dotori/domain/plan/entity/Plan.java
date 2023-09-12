@@ -3,10 +3,11 @@ package com.yongy.dotori.domain.plan.entity;
 import com.yongy.dotori.domain.account.entity.Account;
 import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotori.domain.user.entity.User;
-import jakarta.persistence.*;
+//import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,7 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 @Entity(name="plans")
 public class Plan {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="plan_seq")
     private Long planSeq;
 

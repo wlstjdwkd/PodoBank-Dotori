@@ -2,17 +2,19 @@ package com.yongy.dotori.domain.purposeData.entity;
 
 import com.yongy.dotori.domain.account.entity.Account;
 import com.yongy.dotori.domain.purpose.entity.Purpose;
-import jakarta.persistence.*;
+// import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Entity(name="purpose_data")
 public class PurposeData {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="purpose_data_seq")
     private Long purposeDataSeq;
 
