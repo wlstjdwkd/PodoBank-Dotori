@@ -22,20 +22,6 @@ services:
 #    ports:
 #      - "9100:9100"
 
-  nginx:
-    image: nginx:latest
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    ports:
-      - "80:80"
-    depends_on:
-      - jenkins
-    restart: always
-    networks:
-      - yongyong
-
-
-
 networks:
   yongyong:
     driver: bridge
