@@ -37,12 +37,12 @@ public class SecurityConfig {
                 .httpBasic().disable()
                 .formLogin().disable()
                 .authorizeHttpRequests()
-                .antMatchers("/favicon.ico").permitAll()
+                .requestMatchers("/favicon.ico").permitAll()
 
-                .antMatchers("/api/v1/user/register", "/api/v1/user/login", "/api/v1/user/refresh", "/api/v1/user/emailVerification/**").permitAll()
+                .requestMatchers("/api/v1/user/register", "/api/v1/user/login", "/api/v1/user/refresh", "/api/v1/user/emailVerification/**", "/api/v1/user/email/**").permitAll()
 
-                .antMatchers("/v2/api-docs/**", "/swagger-ui/**", "/actuator/**", "/swagger-resources/**").permitAll() // Swagger 접속 주소를 허용
-                .antMatchers("/api/v1/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/v2/api-docs/**", "/swagger-ui/**", "/actuator/**", "/swagger-resources/**").permitAll() // Swagger 접속 주소를 허용
+                .requestMatchers("/api/v1/**").hasAnyRole("USER", "MANAGER", "ADMIN")
                 .anyRequest().permitAll()
                 .and()
                 .addFilterBefore(new JwtAuthFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)

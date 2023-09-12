@@ -9,13 +9,13 @@ import com.bank.podo.global.email.exception.ResendTimeNotExpiredException;
 import com.bank.podo.global.email.message.EmailMessage;
 import com.bank.podo.global.email.repository.VerificationCodeRepository;
 import com.bank.podo.global.email.repository.VerificationSuccessRepository;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.UUID;
@@ -57,7 +57,7 @@ public class EmailService {
         return messageSendSuccess;
     }
 
-    public EmailVerificationSuccessDTO checkVerificationCode(String code, String email) {
+    public EmailVerificationSuccessDTO checkVerificationCode(String email, String code) {
         VerificationCode verificationCode = verificationCodeRepository.findById(email).orElse(null);
 
         if(verificationCode == null) {
@@ -107,7 +107,9 @@ public class EmailService {
     }
 
     private boolean isResendTimeNotExpired(VerificationCode verificationCode) {
-        return verificationCode.getSendAt().plusMinutes(1).isAfter(LocalDateTime.now());
+        // TODO: 수정 필요
+        return verificationCode.getSendAt().plusSeconds(10).isAfter(LocalDateTime.now());
+//        return verificationCode.getSendAt().plusMinutes(1).isAfter(LocalDateTime.now());
     }
 
     private String generateCode() {

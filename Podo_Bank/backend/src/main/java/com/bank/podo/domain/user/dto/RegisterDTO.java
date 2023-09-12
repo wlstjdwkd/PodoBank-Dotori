@@ -14,7 +14,6 @@ import java.time.LocalDate;
 public class RegisterDTO {
     private String name;
     private LocalDate birthdate;
-    private String address;
     private String email;
     private String password;
     private String phoneNumber;
