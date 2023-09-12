@@ -43,7 +43,7 @@ public class AccountController {
             @ApiResponse(responseCode = "401", description = "권한 없음"),
             @ApiResponse(responseCode = "429", description = "계좌 비밀번호 형식 오류")
     })
-    @PostMapping("")
+    @PostMapping("/create")
     public ResponseEntity<Void> createAccount(@RequestBody CreateAccountDTO createAccountDTO) {
         accountService.createAccount(createAccountDTO, passwordEncoder);
         return ResponseEntity.ok().build();
@@ -55,7 +55,7 @@ public class AccountController {
             @ApiResponse(responseCode = "400", description = "계좌 목록 조회 실패"),
             @ApiResponse(responseCode = "401", description = "권한 없음"),
     })
-    @GetMapping("")
+    @GetMapping("/list")
     public ResponseEntity<List<AccountDTO>> getAccountList() {
         List<AccountDTO> accountList = accountService.getAccountList();
         return ResponseEntity.ok(accountList);
@@ -182,7 +182,7 @@ public class AccountController {
             @ApiResponse(responseCode = "401", description = "권한 없음"),
             @ApiResponse(responseCode = "403", description = "계좌 소유주 불일치")
     })
-    @PostMapping("")
+    @PostMapping("/delete")
     public ResponseEntity<Void> deleteAccount() {
         accountService.deleteAccount();
         return ResponseEntity.ok().build();
