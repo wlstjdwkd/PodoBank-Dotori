@@ -1,11 +1,11 @@
 package com.bank.podo.domain.account.entity;
 
 import com.bank.podo.domain.account.enums.AccountType;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 

@@ -25,7 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.regex.Pattern;
 
@@ -60,7 +60,6 @@ public class UserService {
     @Transactional(readOnly = true)
     public void checkUsername(String email) {
         checkEmailFormat(email);
-
         if(userRepository.existsByEmail(email)) {
             throw new AlreadyUsedUsernameException("이미 사용중인 아이디입니다.");
         }
@@ -182,7 +181,7 @@ public class UserService {
         String emailPattern =
                 "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
-        if(Pattern.compile(emailPattern).matcher(email).matches()) {
+        if(!Pattern.compile(emailPattern).matcher(email).matches()) {
             throw new FromatException("이메일 형식이 올바르지 않습니다.");
         }
     }
