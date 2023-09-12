@@ -25,13 +25,13 @@ public class CategoryController {
     }
 
 
-//    @Operation(summary = "카테고리 등록")
-//    @PostMapping("/")
-//    public ResponseEntity<Void> createCategory(){
-//
-//
-//        return ResponseEntity.ok().build();
-//    }
+    @Operation(summary = "카테고리 등록")
+    @PostMapping("/")
+    public ResponseEntity<Void> createCategory(){
+
+
+        return ResponseEntity.ok().build();
+    }
 
 
     @Operation(summary = "카테고리 리스트")
