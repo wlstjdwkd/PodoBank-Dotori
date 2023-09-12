@@ -1,4 +1,4 @@
-package com.bank.podo.global.swagger.config;
+package com.bank.podo.global.others.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

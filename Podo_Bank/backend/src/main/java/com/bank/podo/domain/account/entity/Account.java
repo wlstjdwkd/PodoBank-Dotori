@@ -1,5 +1,6 @@
 package com.bank.podo.domain.account.entity;
 
+import com.bank.podo.domain.account.enums.AccountType;
 import com.bank.podo.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +22,7 @@ public class Account {
     private Long accountId;
 
     @Column(nullable = false)
-    private Long accountNumber;
+    private String accountNumber;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -58,7 +59,7 @@ public class Account {
     private boolean locked;
 
     @Builder
-    public Account(Long accountNumber, User user, AccountType accountType, BigDecimal balance, LocalDateTime maturityAt, InterestRate interestRate, String loanInfo, String password, int passwordRetryCount, boolean locked) {
+    public Account(String accountNumber, User user, AccountType accountType, BigDecimal balance, LocalDateTime maturityAt, InterestRate interestRate, String loanInfo, String password, int passwordRetryCount, boolean locked) {
         this.accountNumber = accountNumber;
         this.user = user;
         this.accountType = accountType;
