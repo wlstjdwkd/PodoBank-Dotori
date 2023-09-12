@@ -20,11 +20,13 @@ export default function SignupInformationScreen({ navigation, route }) {
   const [confirmPasswordMessage, setConfirmPasswordMessage] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(false);
+  const [isSucceed, setIsSucceed] = useState(false);              // 회원가입 성공여부
+  const [registeredMessage, setRegisteredMessage] = useState(""); // 회원가입 버튼 클릭시 메시지
 
-  const validatePassword = (pass) => {
+  const validatePassword = (password) => {
     const regex =
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,16}$/;
-    return regex.test(pass);
+    return regex.test(password);
   };
 
   const handlePasswordChange = (text) => {
@@ -52,17 +54,23 @@ export default function SignupInformationScreen({ navigation, route }) {
 
   // 회원가입
   const handleUserRegister = async()=>{
-    const response = await userRegister()
+    const response = await userRegister(userInfo)
     if(response.status === 200){
       console.log('회원가입 성공')
+      setIsSucceed(true)
+      setRegisteredMessage('회원가입 성공')
     }else if(response.status === 400){
       console.log('회원가입 실패')
+      setRegisteredMessage('회원가입 실패')
     }else if(response.status === 409){
       console.log('이미 사용중인 아이디')
+      setRegisteredMessage('이미 사용중인 아이디')
     }else if(response.status === 422){
       console.log('이메일 형식 오류')
+      setRegisteredMessage('이메일 형식 오류')
     }else{
       console.log('오류 발생')
+      setRegisteredMessage('오류 발생')
     }
   }
 
@@ -120,6 +128,15 @@ export default function SignupInformationScreen({ navigation, route }) {
       >
         {confirmPasswordMessage}
       </Text>
+      <Text
+        style={{
+          color: isSucceed ? "blue" : "red",
+          marginLeft: 30,
+          marginTop: -30,
+        }}
+      >
+        {registeredMessage}
+      </Text>
 
       <TouchableOpacity
         style={[
@@ -130,9 +147,12 @@ export default function SignupInformationScreen({ navigation, route }) {
         ]}
         // back에 회원가입 정보 보내야함
         onPress={() =>{
-          navigation.navigate("SignupCompleteScreen", {
-            name: userInfo.name,
-          })
+          handleUserRegister()
+          if(isSucceed){
+            navigation.navigate("SignupCompleteScreen", {
+              name: userInfo.name,
+            })
+          }
         }}
         disabled={!(isPasswordValid && isConfirmPasswordValid)}
       >

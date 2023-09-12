@@ -20,6 +20,8 @@ import OpenAccountCompleteScreen from "../screens/OpenAccount/OpenAccountComplet
 import AccountManagementScreen from "../screens/Account/AccountManagementScreen";
 import TransactionDetailScreen from "../screens/Account/TransactionDetailScreen";
 import MyPageScreen from "../screens/Home/MyPageScreen";
+import FindIDScreen from "../screens/Home/FindIDScreen";
+import FindPasswordScreen from "../screens/Home/FindPasswordScreen";
 
 const Stack = createStackNavigator();
 
@@ -95,6 +97,14 @@ function AppNavigator() {
       <Stack.Screen
         name="TransactionDetailScreen"
         component={TransactionDetailScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="FindIDScreen"
+        component={FindIDScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="FindPasswordScreen"
+        component={FindPasswordScreen}
       ></Stack.Screen>
       <Stack.Screen name="MyPageScreen" component={MyPageScreen}></Stack.Screen>
     </Stack.Navigator>
