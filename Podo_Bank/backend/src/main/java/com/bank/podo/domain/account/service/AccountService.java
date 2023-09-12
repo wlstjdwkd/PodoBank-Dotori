@@ -151,7 +151,6 @@ public class AccountService {
 
         BigDecimal depositAmount = depositDTO.getAmount();
 
-
         account.deposit(depositAmount);
 
         accountRepository.save(account);
@@ -276,14 +275,15 @@ public class AccountService {
 
         }
 
-        if(account.getPasswordRetryCount() >= 3) {
-            throw new PasswordRetryCountExceededException("비밀번호 재시도 횟수를 초과했습니다.");
-        }
-
         if(!passwordEncoder.matches(password, account.getPassword())) {
             increasePasswordRetryCount(account);
             throw new PasswordRetryCountExceededException("비밀번호가 일치하지 않습니다.");
         }
+
+        // 비밀번호 일치 시, 비밀번호 재시도 횟수 초기화
+        accountRepository.save(account.update(Account.builder()
+                .passwordRetryCount(0)
+                .build()));
     }
 
     private void increasePasswordRetryCount(Account account) {

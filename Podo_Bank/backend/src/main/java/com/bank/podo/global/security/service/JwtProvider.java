@@ -1,10 +1,9 @@
 package com.bank.podo.global.security.service;
 
+import com.bank.podo.domain.user.entity.User;
+import com.bank.podo.domain.user.enums.Role;
 import com.bank.podo.domain.user.exception.UserNotFoundException;
 import com.bank.podo.domain.user.repository.UserRepository;
-import com.bank.podo.domain.user.enums.Role;
-import com.bank.podo.domain.user.entity.User;
-import com.bank.podo.domain.user.service.UserService;
 import com.bank.podo.global.security.entity.Token;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
@@ -35,10 +34,10 @@ public class JwtProvider {
 
     private final UserRepository userRepository;
 
-    public Token generateToken(String id, Role role) {
+    public Token generateToken(String email, Role role) {
         // Access Token 생성
         String accessToken = Jwts.builder()
-                .setSubject(id)
+                .setSubject(email)
                 .claim("role", role)
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_SECONDS * 1000))
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
@@ -46,7 +45,7 @@ public class JwtProvider {
 
         // Refresh Token 생성
         String refreshToken = Jwts.builder()
-                .setSubject(id)
+                .setSubject(email)
                 .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY_SECONDS * 1000))
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .compact();
@@ -66,12 +65,12 @@ public class JwtProvider {
         }
     }
 
-    public String getUserIdFromToken(String token) {
+    public String getUserEmailFromToken(String token) {
         return getClaims(token).getSubject();
     }
 
     public Authentication getAuthentication(String token) {
-        User user = userRepository.findById(getUserIdFromToken(token)).orElseThrow(() -> new UserNotFoundException("존재하지 않는 아이디입니다."));
+        User user = userRepository.findByEmail(getUserEmailFromToken(token)).orElseThrow(() -> new UserNotFoundException("존재하지 않는 아이디입니다."));
         return new UsernamePasswordAuthenticationToken(user, null, Collections.singleton(new SimpleGrantedAuthority(user.getRole().name())));
     }
 

@@ -7,4 +7,5 @@ public interface RefreshTokenRedisRepository extends CrudRepository<RefreshToken
 
     RefreshToken findByRefreshToken(String refreshToken);
 
+    void deleteById(String email);
 }

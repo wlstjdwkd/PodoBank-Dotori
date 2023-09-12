@@ -1,9 +1,14 @@
 package com.bank.podo.global.email.service;
 
+import com.bank.podo.global.email.dto.EmailVerificationSuccessDTO;
 import com.bank.podo.global.email.entity.VerificationCode;
+import com.bank.podo.global.email.entity.VerificationSuccess;
+import com.bank.podo.global.email.enums.VerificationType;
+import com.bank.podo.global.email.exception.EmailVerificationException;
 import com.bank.podo.global.email.exception.ResendTimeNotExpiredException;
 import com.bank.podo.global.email.message.EmailMessage;
 import com.bank.podo.global.email.repository.VerificationCodeRepository;
+import com.bank.podo.global.email.repository.VerificationSuccessRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -13,6 +18,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.Random;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -23,9 +29,11 @@ public class EmailService {
 
     private final JavaMailSender javaMailSender;
     private final EmailMessage emailMessage;
-    private final VerificationCodeRepository verificationCodeRepository;
 
-    public boolean sendVerificationCode(String email, String type) {
+    private final VerificationCodeRepository verificationCodeRepository;
+    private final VerificationSuccessRepository verificationSuccessRepository;
+
+    public boolean sendVerificationCode(String email, VerificationType type) {
         VerificationCode verificationCode = verificationCodeRepository.findById(email).orElse(null);
 
         if (verificationCode != null && isResendTimeNotExpired(verificationCode)) {
@@ -49,19 +57,28 @@ public class EmailService {
         return messageSendSuccess;
     }
 
-    public boolean checkVerificationCode(String code, String email) {
+    public EmailVerificationSuccessDTO checkVerificationCode(String code, String email) {
         VerificationCode verificationCode = verificationCodeRepository.findById(email).orElse(null);
 
         if(verificationCode == null) {
-            return false;
+            throw new EmailVerificationException("인증 코드를 재발송 해주세요.");
         }
 
-        if(verificationCode.getCode().equals(code)) {
-            verificationCodeRepository.deleteById(email);
-            return true;
-        } else {
-            return false;
+        if(!verificationCode.getCode().equals(code)) {
+            throw new EmailVerificationException("인증 코드가 일치하지 않습니다.");
         }
+
+        String successCode = UUID.randomUUID().toString();
+
+        // 인증 성공 여부 저장
+        verificationSuccessRepository.save(VerificationSuccess.builder()
+                        .email(email)
+                        .successAt(LocalDateTime.now())
+                        .successCode(successCode)
+                        .build());
+        // 인증 코드 삭제
+        verificationCodeRepository.deleteById(email);
+        return EmailVerificationSuccessDTO.builder().email(email).successCode(successCode).build();
     }
 
     private boolean sendMessage(String email, String subject, String info) {
@@ -78,10 +95,10 @@ public class EmailService {
         }
     }
 
-    private String gernerateEmailMessage(String type, String code) {
-        if(type.equals("register")) {
+    private String gernerateEmailMessage(VerificationType type, String code) {
+        if(type.equals(VerificationType.REGISTER)) {
             return emailMessage.generateRegisterMessage(code);
-        } else if(type.equals("passwordReset")) {
+        } else if(type.equals(VerificationType.RESET_PASSWORD)) {
             return emailMessage.generatePasswordResetMessage(code);
         } else {
             return null;
