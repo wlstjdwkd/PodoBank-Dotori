@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/account")
-@Api(tags = "계좌관리", description = "ROLE_USER")
+@Api(tags = "계좌관리")
 public class AccountController {
 
     private final PasswordEncoder passwordEncoder;
@@ -182,7 +182,7 @@ public class AccountController {
             @ApiResponse(responseCode = "401", description = "권한 없음"),
             @ApiResponse(responseCode = "403", description = "계좌 소유주 불일치")
     })
-    @DeleteMapping("")
+    @PostMapping("")
     public ResponseEntity<Void> deleteAccount() {
         accountService.deleteAccount();
         return ResponseEntity.ok().build();

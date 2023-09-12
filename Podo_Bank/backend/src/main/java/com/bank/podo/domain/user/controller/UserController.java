@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")
-@Api(tags = "유저관리", description = "ROLE_USER")
+@Api(tags = "유저관리")
 public class UserController {
 
     private final UserService userService;
