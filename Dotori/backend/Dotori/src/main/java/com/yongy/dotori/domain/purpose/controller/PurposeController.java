@@ -27,7 +27,6 @@ public class PurposeController {
         return ResponseEntity.ok().build();
     }
 
-
     @Operation(summary = "전체 목표 리스트 조회")
     @GetMapping("/")
     public ResponseEntity<PurposeAllDTO> findAllPurpose(){
@@ -36,10 +35,9 @@ public class PurposeController {
         return ResponseEntity.ok(result);
     }
 
-
     @Operation(summary = "목표 상세 조회")
-    @GetMapping("/{purposeId}")
-    public ResponseEntity<PurposeDetailDTO> findPurposeDetail(@PathVariable("purposeId") Long purposeSeq){
+    @GetMapping("/{purposeSeq}")
+    public ResponseEntity<PurposeDetailDTO> findPurposeDetail(@PathVariable("purposeSeq") Long purposeSeq){
         // 목표 조회
         // TODO 로그인 된 사용자의 purpose가 맞는지 확인하는 작업 필요
         PurposeDetailDTO purposeDetailDTO = purposeService.findPurposeDetail(purposeSeq);
