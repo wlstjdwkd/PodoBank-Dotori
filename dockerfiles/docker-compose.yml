@@ -1,30 +1,26 @@
 version: "3"
 services:
-  jenkins:
-    build:
-      context: .
-      dockerfile: Dockerfile.Jenkins
+  podobank:
+    image: podobank:latest
     ports:
-      - "8080:8080"
-#      - "50000:50000"
-    volumes:
-      - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    user: root
-    restart: always
-    networks:
-      - yongyong
+      - "9000:9000"
+    environment:
+      - SPRING_REDIS_HOST=redis
+    depends_on:
+      - redis
 #  dotori_back:
-#    image: dotori_back
+#    image: dotori_back:latest
 #    build:
 #      context: ../Dotori/backend/Dotori
 #      dockerfile: Dockerfile.Dotori_back
+#    environment:
+#      - SPRING_REDIS_HOST=redis
 #    ports:
 #      - "9100:9100"
+#    depends_on:
+#      - redis
 
-networks:
-  yongyong:
-    driver: bridge
-
-volumes:
-  jenkins_home:
+  redis:
+    image: redis:latest
+    ports:
+      - "9050:6379"
