@@ -3,7 +3,6 @@ package com.bank.podo.domain.account.controller;
 import com.bank.podo.domain.account.dto.*;
 import com.bank.podo.domain.account.enums.AccountType;
 import com.bank.podo.domain.account.service.AccountService;
-import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -17,7 +16,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/account")
-@Api(tags = "계좌관리")
 public class AccountController {
 
     private final PasswordEncoder passwordEncoder;
