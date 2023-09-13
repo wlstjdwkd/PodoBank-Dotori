@@ -124,4 +124,8 @@ public class PurposeServiceImpl implements PurposeService{
         log.info(summary.getPercentage()+"");
         return summary;
     }
+
+//        private User getLoginUser() {
+//        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//    }
 }

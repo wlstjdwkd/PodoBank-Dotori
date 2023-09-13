@@ -1,9 +1,10 @@
 package com.yongy.dotori.domain.plan.repository;
 
-import lombok.RequiredArgsConstructor;
+import com.yongy.dotori.domain.plan.entity.Plan;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Repository
-public interface PlanRepository {
+public interface PlanRepository extends JpaRepository<Plan, Long> {
+
 }

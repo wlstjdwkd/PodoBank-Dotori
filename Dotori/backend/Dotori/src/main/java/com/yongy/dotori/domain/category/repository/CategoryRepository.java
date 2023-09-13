@@ -1,6 +1,5 @@
 package com.yongy.dotori.domain.category.repository;
 
-import com.yongy.dotori.domain.category.dto.CategoryDTO;
 import com.yongy.dotori.domain.category.entity.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 
