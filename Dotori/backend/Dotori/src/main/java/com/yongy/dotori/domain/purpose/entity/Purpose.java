@@ -4,12 +4,17 @@ import com.yongy.dotori.domain.purposeData.entity.PurposeData;
 import com.yongy.dotori.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity(name="purposes")
 public class Purpose {
@@ -31,8 +36,8 @@ public class Purpose {
     @Column(name="current_balance", nullable = false)
     private BigDecimal currentBalance;
 
-    @Column(name="start_at", nullable = false)
-    private LocalDateTime startAt;
+    @Column(name="started_at", nullable = false)
+    private LocalDateTime startedAt;
 
     @Column(name="end_at", nullable = false)
     private LocalDateTime endAt;
@@ -40,23 +45,28 @@ public class Purpose {
     @Column(name="is_terminated", nullable = false)
     private boolean isTerminated;
 
-    @Column(name="termination_at", nullable = false)
-    private LocalDateTime terminationAt;
+    @Column(name="terminated_at")
+    private LocalDateTime terminatedAt;
 
     @OneToMany(mappedBy = "purpose")
     private List<PurposeData> purposeDataList;
 
     @Builder
     public Purpose(Long purposeSeq, User user, String purposeTitle, BigDecimal goalAmount,
-                   BigDecimal currentBalance, LocalDateTime startAt, LocalDateTime endAt, boolean isTerminated, LocalDateTime terminationAt) {
+                   BigDecimal currentBalance, LocalDateTime startedAt, LocalDateTime endAt, boolean isTerminated, LocalDateTime terminatedAt) {
         this.purposeSeq = purposeSeq;
         this.user = user;
         this.purposeTitle = purposeTitle;
         this.goalAmount = goalAmount;
         this.currentBalance = currentBalance;
-        this.startAt = startAt;
+        this.startedAt = startedAt;
         this.endAt = endAt;
         this.isTerminated = isTerminated;
-        this.terminationAt = terminationAt;
+        this.terminatedAt = terminatedAt;
+    }
+
+    public void update(Purpose purpose){
+        this.isTerminated = purpose.isTerminated;
+        this.terminatedAt = purpose.terminatedAt;
     }
 }
