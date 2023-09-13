@@ -1,13 +1,18 @@
 package com.yongy.dotori.domain;
 
 import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.yongy.dotori.domain.user.entity.Provider;
+import com.yongy.dotori.domain.user.entity.Role;
 import com.yongy.dotori.domain.user.entity.User;
+import com.yongy.dotori.domain.user.repository.UserRepository;
 import com.yongy.dotori.global.common.BaseResponseBody;
 import com.yongy.dotori.global.redis.RedisUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -17,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 @Service
 public class KakaoService {
     @Value("${kakao.client.id}")
@@ -30,6 +36,9 @@ public class KakaoService {
     private final RedisUtil redisUtil;
     private String accessToken = "";
     private String refreshToken = "";
+
+    @Autowired
+    private UserRepository userRepository;
 
     // TODO : 인가코드 받기
     public String getKakaoLogin() {
@@ -76,13 +85,24 @@ public class KakaoService {
             log.info("access_token :  "+ accessToken);
             log.info("refresh_token : "+ refreshToken);
 
-            // RedisDB에 refreshToken 저장
-            User user = getUserInfo(accessToken);
-            redisUtil.setData(user.getId(), refreshToken);
 
+            User user = getUserInfo(accessToken);
+
+            // RefreshToken이 없는 경우(시간이 만료되었거나, 처음 들어오는 사용자)
+            if(redisUtil.getData(user.getId()) == null){
+                // DB에 사용자의 정보가 없는 경우
+                if(userRepository.findById(user.getId()) == null){
+                    user.setAuthProvider(Provider.KAKAO);
+                    user.setRole(Role.USER);
+                    userRepository.save(user); // DB에 사용자 저장
+                }
+            }
+
+            redisUtil.setData(user.getId(), refreshToken);
             return accessToken;
         }catch(Exception e){
-            return "";
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -156,14 +176,10 @@ public class KakaoService {
     // TODO : 토큰 갱신하기
     public String tokenUpdate(String id){
         String refreshToken = redisUtil.getData(id);
-        // refreshToken도 만료되었으면? ===> 인가코드 새로 발급받기
-//        if(refreshToken == null){
-//            this.getKakaoLogin();
-//        }
 
         try{
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Type", "application/x-www-form-urlencoded");
+            headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
             params.add("grant_type", "refresh_token");
@@ -181,19 +197,20 @@ public class KakaoService {
                     String.class
             );
 
-            JSONParser jsonParser = new JSONParser();
-            JSONObject jsonObj = (JSONObject) jsonParser.parse(response.getBody());
+            if(response.getBody()!=null){
+                JSONParser jsonParser = new JSONParser();
+                JSONObject jsonObj = (JSONObject) jsonParser.parse(response.getBody());
 
-            accessToken = (String) jsonObj.get("access_token");
-            refreshToken = (String) jsonObj.get("refresh_token");
-
-            log.info(accessToken+"//"+refreshToken);
-
-            redisUtil.setData(id, refreshToken);
+                // 기존 refresh_Token의 유효기간이 1개월 미만인 경우에만 갱신한다.
+                accessToken = (String) jsonObj.get("access_token");
+                refreshToken = (String) jsonObj.get("refresh_token");
+                redisUtil.setData(id, refreshToken);
+            }
 
             return accessToken;
         }catch (Exception e){
-            return "";
+            e.printStackTrace();
+            return null;
         }
     }
 

@@ -18,6 +18,7 @@ public class KakaoController {
     @GetMapping("/callback")
     public ResponseEntity<? extends BaseResponseBody> callback(HttpServletRequest request) throws Exception {
         String code = request.getParameter("code");
+
         if(code == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "인증 코드를 가져오는데 실패했습니다."));
         }else{
