@@ -1,14 +1,18 @@
 package com.yongy.dotori.domain.category.entity;
 
 import com.yongy.dotori.domain.categoryData.entity.CategoryData;
+import com.yongy.dotori.domain.categoryGroup.entity.CategoryGroup;
 import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotori.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
+@Getter
 @Entity(name = "categories")
 @NoArgsConstructor
 public class Category {
