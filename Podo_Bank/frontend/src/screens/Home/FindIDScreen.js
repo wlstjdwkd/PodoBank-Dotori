@@ -27,47 +27,12 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
     const regex = /^[A-Za-z가-힣]{2,}$/
     return regex.test(text);
   };
-  const validateBirthDate = (text) => {
-    const regex = /^\d{8}$/;
-    return regex.test(text);
-  };
-  const validatePhoneNumber = (text) => {
-    const regex = /^01\d{9}$/;
-    return regex.test(text);
-  };
-  const handleNameChange = (text) => {
-    if (validateName(text)) {
-      setNameMessage("이름 작성 완료");
-      setIsValid((prev) => ({ ...prev, isNameValid: true }))
-    } else {
-      setNameMessage("이름은 2글자 이상이어야합니다.");
-      setIsValid((prev) => ({ ...prev, isNameValid: false }))
-    }
-  };
-  const handleBirthDateChange = (text) => {
-    if (validateBirthDate(text)) {
-      setBirthDateMessage("생년월일 작성 완료");
-      setIsValid((prev) => ({ ...prev, isBirthdateValid: true }))
-    } else {
-      setBirthDateMessage('8자리 숫자로 작성해야 합니다.');
-      setIsValid((prev) => ({ ...prev, isBirthdateValid: false }))
-    }
-  };
-  const handlePhoneNumberMessageChange = (text) => {
-    if (validatePhoneNumber(text)) {
-      setPhoneNumberMessage("휴대폰번호 작성 완료");
-      setIsValid((prev) => ({ ...prev, isPhoneNumberValid: true }))
-    } else {
-      setPhoneNumberMessage('01X로 시작하는 11자리 숫자로 작성해야 합니다.');
-      setIsValid((prev) => ({ ...prev, isPhoneNumberValid: false }))
-    }
-  };
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <HeaderComponent
-        title="회원가입(1/3)"
+        title="아이디 찾기"
         navigation={navigation}
       ></HeaderComponent>
 

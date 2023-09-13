@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 // import { useSelector, useDispatch } from 'react-redux';
@@ -19,8 +20,28 @@ export default function LoginScreen({ navigation }) {
   // const count2 = useSelector((state) => state.whole.count2);
   // const name2 = useSelector((state) => state.whole.nameTmp2);
   // const dispatch = useDispatch();
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [isSucceed, setIsSucceed] = useState(false)
+  const [loginMessage, setLoginMessage] = useState("서버 연결 실패")
 
-
+ // 회원가입
+ const handleUserLogin = async()=>{
+  const response = await userLogin(email, password)
+  if(response.status === 200){
+    console.log('로그인 성공')
+    setIsSucceed(true)
+    setLoginMessage('로그인 성공')
+  }else if(response.status === 400){
+    console.log('로그인 실패')
+    setLoginMessage('아이디 또는 비밀번호를 다시 확인해주세요.')
+    setIsSucceed(false)
+  }else{
+    console.log('오류 발생')
+    setLoginMessage('오류 발생')
+    setIsSucceed(false)
+  }
+}
   return (
     <View style={styles.container}>
       {/* Logo */}
@@ -35,7 +56,14 @@ export default function LoginScreen({ navigation }) {
       {/* ID, PW 입력창 */}
       <View style={styles.inputContainer}>
         <AntDesign name="user" size={20} style={styles.iconStyle} />
-        <TextInput placeholder="아이디" style={styles.input} />
+        <TextInput
+          placeholder="아이디"
+          style={styles.input}
+          onChangeText={(text)=>{
+            setEmail(text)
+          }}
+          keyboardType="email-address"
+        />
       </View>
       <View style={styles.inputContainer}>
         <AntDesign name="lock" size={20} style={styles.iconStyle} />
@@ -43,6 +71,9 @@ export default function LoginScreen({ navigation }) {
           placeholder="비밀번호"
           style={styles.input}
           secureTextEntry={true}
+          onChangeText={(text)=>{
+            setPassword(text)
+          }}
         />
       </View>
 
@@ -50,7 +81,16 @@ export default function LoginScreen({ navigation }) {
       {/* 로그인 back 연동해야함 */}
       <TouchableOpacity
         style={styles.customButton}
-        onPress={() => navigation.navigate("HomeScreen")}
+        onPress={() => {
+          handleUserLogin()
+          if(!email || !password){
+            Alert.alert('입력 오류','아이디와 비밀번호를 입력해주세요.')
+          }else if(isSucceed){
+            navigation.navigate("HomeScreen")
+          }else{
+            Alert.alert('로그인 실패',loginMessage)
+          }
+        }}
       >
         <Text style={styles.buttonText}>로그인</Text>
       </TouchableOpacity>

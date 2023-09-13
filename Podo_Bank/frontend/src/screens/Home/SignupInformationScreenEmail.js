@@ -49,11 +49,11 @@ export default function SignupInformationScreen({ navigation, route }) {
   const hanldeUserEmailDuplicationCheck = async (text) => {
     if (validateEmail(text)) {
       const response = await userEmailDuplicationCheck(text);
-      if (response === 200) {
+      if (response.status === 200) {
         setEmailMessage("사용 가능한 이메일입니다.");
         // setEmailDuplicatedCheck(true);
         setIsCorrectEmail(true);
-      } else if (response === 400) {
+      } else if (response.status === 400) {
         setEmailMessage("이미 사용 중인 이메일입니다.");
         // setEmailDuplicatedCheck(false);
         setIsCorrectEmail(false);
@@ -91,6 +91,7 @@ export default function SignupInformationScreen({ navigation, route }) {
     } else if(response.status===200){
       setCodeMessage("인증이 완료되었습니다.");
       SetIsAuthenEmail(true);
+      setUserInfo((prev) => ({ ...prev, successCode: response.data.successCode }))
     }else{
       setCodeMessage("다시 시도해주세요.");
       SetIsAuthenEmail(false)
