@@ -8,7 +8,7 @@ import com.yongy.dotori.domain.plan.entity.Plan;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
 

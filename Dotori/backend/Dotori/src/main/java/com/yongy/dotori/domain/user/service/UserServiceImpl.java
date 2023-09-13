@@ -1,10 +1,9 @@
 package com.yongy.dotori.domain.user.service;
 
-import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.user.repository.UserRepository;
 import com.yongy.dotori.global.redis.RedisUtil;
-import com.yongy.dotori.global.security.jwt.JwtTokenProvider;
-import com.yongy.dotori.global.security.jwtDto.JwtToken;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -17,8 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+
 import java.util.Random;
 
 @Service

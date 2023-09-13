@@ -72,7 +72,6 @@ public class UserController {
         }
     }
 
-
     @PostMapping("/signup")
     public ResponseEntity<? extends BaseResponseBody> signup(@RequestBody UserInfoDto userInfoDto){
         try{
@@ -96,20 +95,19 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4004, "회원가입 오류"));
         }
 
-
     }
 
 
     @PostMapping("/signin")
-    public ResponseEntity<?> signin(@RequestBody Map<String, String> loginForm){
+    public ResponseEntity<?> signin(@RequestBody Map<String, String> loginForm) {
         String id = loginForm.get("id");
 
         User user = userRepository.findById(id);
 
-        if(user == null){
+        if (user == null) {
             // 유효한 토큰이지만 DB에 데이터가 없는 경우
             return null;
-        }else{
+        } else {
 //            User authUser = provider.getAuthUser();
 //
 //            if(authUser != null && !authUser.getId().equals(id)){
@@ -120,10 +118,33 @@ public class UserController {
 
             return new ResponseEntity<>(newToken, HttpStatus.OK);
 
-           // return new ResponseEntity<>("이미 인증이 완료된 토큰입니다.", HttpStatus.OK);
+            // return new ResponseEntity<>("이미 인증이 완료된 토큰입니다.", HttpStatus.OK);
         }
-
-
+//
+//        @PostMapping("/signin")
+//        public ResponseEntity<?> signin(@RequestBody Map<String, String> loginForm){
+//            String id = loginForm.get("id");
+//
+//            User user = userRepository.findById(id);
+//
+//            if(user == null){
+//                // 유효한 토큰이지만 DB에 데이터가 없는 경우
+//                return null;
+//            }else{
+////            User authUser = provider.getAuthUser();
+////
+////            if(authUser != null && !authUser.getId().equals(id)){
+////                JwtToken newToken = provider.createToken(user.getId(), user.getRole());
+////                return new ResponseEntity<>(newToken, HttpStatus.OK);
+////            }
+//                JwtToken newToken = provider.createToken(user.getId(), user.getRole());
+//
+//                return new ResponseEntity<>(newToken, HttpStatus.OK);
+//
+//                // return new ResponseEntity<>("이미 인증이 완료된 토큰입니다.", HttpStatus.OK);
+//            }
+//
+//
+//    }
     }
-
 }

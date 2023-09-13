@@ -2,10 +2,10 @@ package com.yongy.dotori.global.security.security;
 
 import com.yongy.dotori.global.security.jwt.JwtAuthenticationFilter;
 import com.yongy.dotori.global.security.jwt.JwtTokenProvider;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
@@ -19,9 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 @Slf4j
@@ -30,15 +28,14 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtTokenProvider jwtTokenProvider;
 
-    private Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
     public BCryptPasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
-
+// "/v1/user/check-id","/v1/user/check-code","/v1/user/signup", "/v1/user/signin"
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         System.out.println("START");
@@ -48,9 +45,9 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/v1/user/check-id","/v1/user/signup", "/v1/user/signin", "/v1/user/check-code").permitAll()
-                .antMatchers("/v1/admin/**").hasRole("ADMIN")
-                .antMatchers("/v1/user/**").hasRole("USER")
+                .requestMatchers("/**").permitAll()
+                .requestMatchers("/v1/admin/**").hasRole("ADMIN")
+                .requestMatchers("/v1/user/**").hasRole("USER")
                 .anyRequest().denyAll()
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)

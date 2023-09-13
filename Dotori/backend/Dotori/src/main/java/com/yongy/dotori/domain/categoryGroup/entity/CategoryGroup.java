@@ -2,11 +2,11 @@ package com.yongy.dotori.domain.categoryGroup.entity;
 
 import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotori.domain.user.entity.User;
-// import jakarta.persistence.*;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+
 import java.util.List;
 
 @Entity(name = "category_groups")

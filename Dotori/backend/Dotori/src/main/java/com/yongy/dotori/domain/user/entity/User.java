@@ -7,13 +7,13 @@ import com.yongy.dotori.domain.payment.entity.Payment;
 import com.yongy.dotori.domain.plan.entity.Plan;
 import com.yongy.dotori.domain.purpose.entity.Purpose;
 import com.yongy.dotori.domain.reward.entity.Reward;
-// import jakarta.persistence.*;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -34,16 +34,16 @@ public class User {
     @Column(nullable = false)
     private String id;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private String password;
 
-    @Column(name="birth_date", nullable = false)
+//    @Column(name="birth_date", nullable = false)
     private LocalDate birthDate;
 
     @Column(name="user_name", nullable = false)
     private String userName;
 
-    @Column(name="phone_number", nullable = false)
+//    @Column(name="phone_number", nullable = false)
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
