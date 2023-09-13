@@ -24,3 +24,4 @@ services:
   #redis_dotori:
     #image: redis_dotori:{BUILD_NUMBER_DOTORI}
     #ports:
+      # -"9150:6379"
