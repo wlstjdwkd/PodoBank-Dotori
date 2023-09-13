@@ -19,7 +19,6 @@ public class PlanController {
 
     private final PlanServiceImpl planService;
 
-
     @Operation(summary = "새로운 계획 등록")
     @PostMapping("/")
     public ResponseEntity<Void> createPlan(@RequestBody PlanDTO planDTO){
