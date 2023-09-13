@@ -1,35 +1,37 @@
 package com.yongy.dotori.domain;
 
 import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.yongy.dotori.domain.user.entity.User;
+import com.yongy.dotori.global.common.BaseResponseBody;
+import com.yongy.dotori.global.redis.RedisUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class KakaoService {
-
     @Value("${kakao.client.id}")
-    private String KAKAO_CLIENT_ID;
-
+    private String KAKAO_CLIENT_ID; // REST_API_KEY
     @Value("${kakao.client.secret}")
     private String KAKAO_CLIENT_SECRET;
-
     @Value("${kakao.redirect.url}")
     private String KAKAO_REDIRECT_URL;
-
     private final static String KAKAO_AUTH_URI = "https://kauth.kakao.com";
     private final static String KAKAO_API_URI = "https://kapi.kakao.com";
+    private final RedisUtil redisUtil;
+    private String accessToken = "";
+    private String refreshToken = "";
 
+    // TODO : 인가코드 받기
     public String getKakaoLogin() {
         return KAKAO_AUTH_URI + "/oauth/authorize"
                 + "?client_id=" + KAKAO_CLIENT_ID
@@ -37,12 +39,8 @@ public class KakaoService {
                 + "&response_type=code";
     }
 
-    public KakaoDTO getKakaoInfo(String code) throws Exception{
-        if(code == null) throw new Exception("인증 코드를 가져오는데 실패함");
-
-        String accessToken = "";
-        String refreshToken = "";
-
+    // TODO : 새로운 accessToken, refreshToken을 발급하기
+    public String newTokens(String code){
         try{
             HttpHeaders headers = new HttpHeaders();
             headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -78,52 +76,125 @@ public class KakaoService {
             log.info("access_token :  "+ accessToken);
             log.info("refresh_token : "+ refreshToken);
 
-        }catch(Exception e){
-            throw new Exception("API 호출에 실패함");
-        }
+            // RedisDB에 refreshToken 저장
+            User user = getUserInfo(accessToken);
+            redisUtil.setData(user.getId(), refreshToken);
 
-        return getUserInfoFromToken(accessToken);
+            return accessToken;
+        }catch(Exception e){
+            return "";
+        }
     }
 
-    private KakaoDTO getUserInfoFromToken(String accessToken) throws Exception{
+    // TODO : accessToken으로 사용자 정보 가져오기
+    public User getUserInfo(String accessToken) throws Exception{
+        // 유효한 accessToken인지 검사함
+        if(validateToken(accessToken).getStatusCode() == HttpStatus.OK){
+            // HttpHeader 생성
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", "Bearer " + accessToken);
+            headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
+            // HttpHeader 담기
+            RestTemplate restTemplate = new RestTemplate();
+            HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(headers);
+            ResponseEntity<String> response = restTemplate.exchange(
+                    KAKAO_API_URI + "/v2/user/me",
+                    HttpMethod.POST,
+                    httpEntity,
+                    String.class
+            );
+
+            // Response 데이터 파싱
+            JSONParser jsonParser = new JSONParser();
+
+            log.info(jsonParser.toString());
+
+            JSONObject jsonObj = (JSONObject) jsonParser.parse(response.getBody());
+            JSONObject account = (JSONObject) jsonObj.get("kakao_account");
+            JSONObject profile = (JSONObject) account.get("profile");
+
+            long id = (long) jsonObj.get("id");
+            String email = String.valueOf(account.get("email"));
+            String nickname = String.valueOf(profile.get("nickname"));
+
+            log.info("info : "+ id+","+email+","+nickname);
+
+            return User.builder()
+                    .id(String.valueOf(account.get("email")))
+                    .userName(String.valueOf(profile.get("nickname"))).build();
+        }else{
+            return null;
+        }
+    }
+
+
+    // TODO : 토큰의 유효성 검사
+    public ResponseEntity<? extends BaseResponseBody> validateToken(String accessToken){
         // HttpHeader 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
-        // HttpHeader 담기
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(headers);
-        ResponseEntity<String> response = restTemplate.exchange(
-            KAKAO_API_URI + "/v2/user/me",
-                HttpMethod.POST,
-                httpEntity,
-                String.class
-        );
 
-        // Response 데이터 파싱
-        JSONParser jsonParser = new JSONParser();
+        try{
+            ResponseEntity<String> response = restTemplate.exchange(
+                    KAKAO_API_URI + "/v1/user/access_token_info",
+                    HttpMethod.GET,
+                    httpEntity,
+                    String.class
+            );
+            System.out.println(response.getHeaders());
 
-        log.info(jsonParser.toString());
+            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "유효한 토큰입니다."));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(401, "유효하지 않은 앱키나 액세스 토큰입니다."));
+        }
+    }
 
-        JSONObject jsonObj = (JSONObject) jsonParser.parse(response.getBody());
-        JSONObject account = (JSONObject) jsonObj.get("kakao_account");
-        JSONObject profile = (JSONObject) account.get("profile");
+    // TODO : 토큰 갱신하기
+    public String tokenUpdate(String id){
+        String refreshToken = redisUtil.getData(id);
+        // refreshToken도 만료되었으면? ===> 인가코드 새로 발급받기
+//        if(refreshToken == null){
+//            this.getKakaoLogin();
+//        }
 
-        long id = (long) jsonObj.get("id");
-        String email = String.valueOf(account.get("email"));
-        String nickname = String.valueOf(profile.get("nickname"));
+        try{
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Type", "application/x-www-form-urlencoded");
 
-        log.info("info : "+ id+","+email+","+nickname);
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("grant_type", "refresh_token");
+            params.add("client_id", KAKAO_CLIENT_ID);
+            params.add("refresh_token", refreshToken);
 
-        KakaoDTO kakaoDTO = KakaoDTO.builder()
-                .id(id)
-                .email(email)
-                .nickname(nickname).build();
-        log.info("info : "+ kakaoDTO.getId()+","+kakaoDTO.getEmail()+","+kakaoDTO.getNickname());
+            RestTemplate restTemplate = new RestTemplate();
 
-        return kakaoDTO;
+            HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    KAKAO_AUTH_URI + "/oauth/token",
+                    HttpMethod.POST,
+                    httpEntity,
+                    String.class
+            );
+
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObj = (JSONObject) jsonParser.parse(response.getBody());
+
+            accessToken = (String) jsonObj.get("access_token");
+            refreshToken = (String) jsonObj.get("refresh_token");
+
+            log.info(accessToken+"//"+refreshToken);
+
+            redisUtil.setData(id, refreshToken);
+
+            return accessToken;
+        }catch (Exception e){
+            return "";
+        }
     }
 
 
