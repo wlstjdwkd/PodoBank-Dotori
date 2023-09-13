@@ -33,3 +33,5 @@ services:
 
   #redis_dotori:
   #  image: redis_dotori:latest
+  # ports:
+  # -"9150:6379"
