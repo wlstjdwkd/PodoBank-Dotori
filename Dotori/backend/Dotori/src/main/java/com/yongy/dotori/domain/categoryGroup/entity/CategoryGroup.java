@@ -1,5 +1,6 @@
 package com.yongy.dotori.domain.categoryGroup.entity;
 
+import com.yongy.dotori.domain.category.entity.Category;
 import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotori.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -20,13 +21,12 @@ public class CategoryGroup {
     @JoinColumn(name = "userSeq")
     private User user;
 
-
     @Column(name = "group_title", nullable = false)
     private String groupTitle;
 
-
     @OneToMany(mappedBy = "categoryGroup")
     private List<PlanDetail> planDetailList;
+
 
     @Builder
     public CategoryGroup(Long categoryGroupSeq, User user, String groupTitle) {
