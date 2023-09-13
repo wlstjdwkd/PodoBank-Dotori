@@ -2,6 +2,9 @@ version: "3"
 services:
   podobank:
     image: podobank:latest
+    build:
+      context: ../Podo_Bank/backend
+      dockerfile: Dockerfile.Podo_back
     ports:
       - "9000:9000"
     environment:
