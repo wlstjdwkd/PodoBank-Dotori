@@ -54,6 +54,7 @@ export default function SignupInformationScreen({ navigation, route }) {
 
   // 회원가입
   const handleUserRegister = async()=>{
+    await handleFixBirthDate()
     const response = await userRegister(userInfo)
     if(response.status === 200){
       console.log('회원가입 성공')
@@ -73,6 +74,24 @@ export default function SignupInformationScreen({ navigation, route }) {
       setRegisteredMessage('오류 발생')
     }
   }
+  
+  const handleFixBirthDate = () => {
+    if (userInfo.birthDate && userInfo.birthDate.length === 8) {
+      const year = userInfo.birthDate.substring(0, 4);
+      const month = userInfo.birthDate.substring(4, 6);
+      const day = userInfo.birthDate.substring(6, 8);
+  
+      // YYYY-MM-DD 형식으로 변환
+      const formattedBirthDate = `${year}-${month}-${day}`;
+  
+      // 변경된 형식으로 userInfo의 birthDate를 업데이트
+      setUserInfo((prev) => ({
+        ...prev,
+        birthDate: formattedBirthDate,
+      }));
+    }
+    console.log(userInfo)
+  };
 
   return (
     <View style={styles.container}>
@@ -119,6 +138,7 @@ export default function SignupInformationScreen({ navigation, route }) {
           placeholder="비밀번호를 한번 더 입력해 주세요."
         />
       </View>
+      
       <Text
         style={{
           color: isConfirmPasswordValid ? "blue" : "red",
@@ -128,15 +148,17 @@ export default function SignupInformationScreen({ navigation, route }) {
       >
         {confirmPasswordMessage}
       </Text>
-      <Text
-        style={{
-          color: isSucceed ? "blue" : "red",
-          marginLeft: 30,
-          marginTop: -30,
-        }}
-      >
-        {registeredMessage}
-      </Text>
+      <View>
+        <Text
+          style={{
+            color: isSucceed ? "blue" : "red",
+            alignSelf: 'center',
+          }}
+        >
+          {registeredMessage}
+        </Text>
+      </View>
+      
 
       <TouchableOpacity
         style={[
@@ -156,7 +178,7 @@ export default function SignupInformationScreen({ navigation, route }) {
         }}
         disabled={!(isPasswordValid && isConfirmPasswordValid)}
       >
-        <Text style={styles.linkText}>확인</Text>
+        <Text style={styles.linkText}>회원가입</Text>
       </TouchableOpacity>
     </View>
   );

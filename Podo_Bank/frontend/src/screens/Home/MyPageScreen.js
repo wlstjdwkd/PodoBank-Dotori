@@ -1,11 +1,34 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
 import FooterScreen from "../Header/FooterScreen";
+import {
+  userInformationInquiry,
+} from '../../apis/userapi'
 import { FontAwesome } from "@expo/vector-icons";
 
 export default function MyPageScreen({ navigation }) {
+  const [userInfo, setUserInfo] = useState(null)
+
   //들어올 때 axios로 정보 받아야함
+  const hanldeUserInformationInquiry = async() =>{
+    const response = await userInformationInquiry()
+    if(response.status===200){
+      console.log('good')
+      setUserInfo(response.data)
+    }else if(response.status===400){
+      console.log('bad400 회원정보를 받아올 수 없습니다.')
+    }else if(response.status===401){
+      console.log('bad401 회원정보를 받아올 수 없습니다.')
+    }
+  }
+
+  // 페이지가 로드될 때 hanldeUserInformationInquiry() 함수 실행
+  useEffect(() => {
+    hanldeUserInformationInquiry();
+  }, []);
+
+
 
   return (
     <View style={styles.container}>
@@ -21,18 +44,22 @@ export default function MyPageScreen({ navigation }) {
         <Text style={styles.boldText}>기본정보</Text>
         <View style={styles.infoRow}>
           <Text>이름</Text>
+          {/* <Text>정예진 {userInfo.name}</Text> */}
           <Text>정예진</Text>
         </View>
         <View style={styles.infoRow}>
           <Text>이메일</Text>
+          {/* <Text>abc1234@naver.com {userInfo.email}</Text> */}
           <Text>abc1234@naver.com</Text>
         </View>
         <View style={styles.infoRow}>
           <Text>생년월일</Text>
+          {/* <Text>1999.05.08 {userInfo.birthdate}</Text> */}
           <Text>1999.05.08</Text>
         </View>
         <View style={styles.infoRow}>
           <Text>핸드폰번호</Text>
+          {/* <Text>010-****-1908 {userInfo.phoneNumber}</Text> */}
           <Text>010-****-1908</Text>
         </View>
       </View>
@@ -40,7 +67,12 @@ export default function MyPageScreen({ navigation }) {
       <View style={styles.divider} />
 
       {/* Password Change and Logout */}
-      <TouchableOpacity style={styles.actionRow}>
+      <TouchableOpacity
+        style={styles.actionRow}
+        onPress={()=>{
+          navigation.navigate('ChangePasswordScreen')
+        }}
+      >
         <Text>비밀번호 변경</Text>
         <FontAwesome name="angle-right" style={{ fontSize: 20 }}></FontAwesome>
       </TouchableOpacity>

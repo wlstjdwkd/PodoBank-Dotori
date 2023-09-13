@@ -102,9 +102,9 @@ export default function LoginScreen({ navigation }) {
         </TouchableOpacity>
         <Text style={styles.separator}> | </Text>
         <TouchableOpacity
-          onPress={() => navigation.navigate("FindPasswordScreen")}
+          onPress={() => navigation.navigate("ResetPasswordOneScreen")}
         >
-          <Text style={styles.linkText}>비밀번호 찾기</Text>
+          <Text style={styles.linkText}>비밀번호 초기화</Text>
         </TouchableOpacity>
         <Text style={styles.separator}> | </Text>
         <TouchableOpacity

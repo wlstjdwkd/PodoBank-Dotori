@@ -152,7 +152,7 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
           },
         ]}
         onPress={() =>
-          navigation.navigate("SignupInformationScreenEmail", {
+          navigation.navigate("SignupInformationEmailScreen", {
             userInfo: userInfo,
           })
         }

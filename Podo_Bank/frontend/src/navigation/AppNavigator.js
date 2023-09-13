@@ -3,7 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import LoginScreen from "../screens/Home/LoginScreen";
 import SignupIdentityVerificationScreen from "../screens/Home/SignupIdentityVerificationScreen";
 import SignupInformationScreen from "../screens/Home/SignupInformationScreen";
-import SignupInformationScreenEmail from "../screens/Home/SignupInformationScreenEmail";
+import SignupInformationEmailScreen from "../screens/Home/SignupInformationEmailScreen";
 
 import SignupCompleteScreen from "../screens/Home/SignupCompleteScreen";
 import HomeScreen from "../screens/Home/HomeScreen";
@@ -21,7 +21,11 @@ import AccountManagementScreen from "../screens/Account/AccountManagementScreen"
 import TransactionDetailScreen from "../screens/Account/TransactionDetailScreen";
 import MyPageScreen from "../screens/Home/MyPageScreen";
 import FindIDScreen from "../screens/Home/FindIDScreen";
-import FindPasswordScreen from "../screens/Home/FindPasswordScreen";
+import ResetPasswordOneScreen from "../screens/Home/ResetPasswordOneScreen";
+import FindIDSucceessScreen from "../screens/Home/FindIDSucceessScreen";
+import ResetPasswordSucceessScreen from "../screens/Home/ResetPasswordSucceessScreen";
+import ExamScreen from "../screens/Home/ExamScreen";
+import ChangePasswordScreen from "../screens/Home/ChangePasswordScreen";
 
 const Stack = createStackNavigator();
 
@@ -41,8 +45,8 @@ function AppNavigator() {
         component={SignupInformationScreen}
       />
       <Stack.Screen
-        name="SignupInformationScreenEmail"
-        component={SignupInformationScreenEmail}
+        name="SignupInformationEmailScreen"
+        component={SignupInformationEmailScreen}
       />
 
       <Stack.Screen
@@ -103,8 +107,24 @@ function AppNavigator() {
         component={FindIDScreen}
       ></Stack.Screen>
       <Stack.Screen
-        name="FindPasswordScreen"
-        component={FindPasswordScreen}
+        name="ResetPasswordOneScreen"
+        component={ResetPasswordOneScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="FindIDSucceessScreen"
+        component={FindIDSucceessScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="ResetPasswordSucceessScreen"
+        component={ResetPasswordSucceessScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="ChangePasswordScreen"
+        component={ChangePasswordScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="ExamScreen"
+        component={ExamScreen}
       ></Stack.Screen>
       <Stack.Screen name="MyPageScreen" component={MyPageScreen}></Stack.Screen>
     </Stack.Navigator>
