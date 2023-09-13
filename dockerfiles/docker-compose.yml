@@ -14,7 +14,7 @@ services:
     depends_on:
       - redis
   redis:
-    image: redis:latest
+    image: redis:${BUILD_NUMBER}
     ports:
       - "9050:6379"
     volumes:
