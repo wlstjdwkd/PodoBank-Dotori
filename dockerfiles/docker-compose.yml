@@ -1,30 +1,20 @@
 version: "3"
 services:
   podobank:
-    image: podobank:latest
+    image: podobank:${BUILD_NUMBER}
     build:
       context: ../Podo_Bank/backend
       dockerfile: Dockerfile.Podo_back
+      args:
+        - BUILD_NUMBER
     ports:
       - "9000:9000"
     environment:
       - SPRING_REDIS_HOST=redis
     depends_on:
       - redis
-#  dotori_back:
-#    image: dotori_back:latest
-#    build:
-#      context: ../Dotori/backend/Dotori
-#      dockerfile: Dockerfile.Dotori_back
-#    environment:
-#      - SPRING_REDIS_HOST=redis
-#    ports:
-#      - "9100:9100"
-#    depends_on:
-#      - redis
-
   redis:
-    image: redis:latest
+    image: redis:${BUILD_NUMBER}
     ports:
       - "9050:6379"
     volumes:
