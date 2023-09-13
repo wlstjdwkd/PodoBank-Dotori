@@ -21,4 +21,5 @@ services:
       - /etc/redis/redis.conf:/usr/local/etc/redis/redis.conf
     command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
 
-  #redis:
+  #redis_dotori:
+    #image: redis_dotori
