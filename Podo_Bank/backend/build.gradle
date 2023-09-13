@@ -33,6 +33,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail:3.1.1'
 
     implementation 'javax.servlet:javax.servlet-api:4.0.1'
+    implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
 
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

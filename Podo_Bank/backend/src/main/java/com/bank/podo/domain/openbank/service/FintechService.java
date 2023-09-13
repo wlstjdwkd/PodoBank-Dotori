@@ -39,44 +39,45 @@ public class FintechService {
 
     @Transactional
     public void oneCentVerification(FintechOneCentVerificationDTO fintechOneCentVerificationDTO) {
+        System.out.println(fintechOneCentVerificationDTO.getFintechServiceCode());
         FTService FTService = serviceRepository.findByServiceCode(fintechOneCentVerificationDTO.getFintechServiceCode())
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
 
         Account userAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(fintechOneCentVerificationDTO.getAccount())
                 .orElseThrow(() -> new AccountNotFoundException("존재하지 않는 계좌입니다."));
 
-        Account ptAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(FTService.getAccount().getAccountNumber())
+        Account ftAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(FTService.getAccount().getAccountNumber())
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 계좌입니다."));
 
         BigDecimal transferAmount = BigDecimal.ONE;
 
-        if(ptAccount.getBalance().compareTo(transferAmount) < 0) {
+        if(ftAccount.getBalance().compareTo(transferAmount) < 0) {
             throw new InsufficientBalanceException("잔액이 부족합니다.");
         }
 
         String verificationCode = generateVerificationCode(FTService.getServiceName());
 
-        ptAccount.withdraw(transferAmount);
+        ftAccount.withdraw(transferAmount);
         userAccount.deposit(transferAmount);
 
-        accountRepository.save(ptAccount);
+        accountRepository.save(ftAccount);
         accountRepository.save(userAccount);
 
         TransactionHistory senderAccountHistory = TransactionHistory.builder()
                 .transactionType(TransactionType.TRANSFER)
                 .amount(transferAmount.negate())
-                .balanceAfter(ptAccount.getBalance())
+                .balanceAfter(ftAccount.getBalance())
                 .counterAccount(userAccount)
-                .account(ptAccount)
-                .content(verificationCode)
+                .account(ftAccount)
+                .content("1원 인증을 위한 출금")
                 .build();
         TransactionHistory receiverAccountHistory = TransactionHistory.builder()
-                .transactionType(TransactionType.TRANSFER)
+                .transactionType(TransactionType.WITHDRAWAL)
                 .amount(transferAmount)
                 .balanceAfter(userAccount.getBalance())
-                .counterAccount(ptAccount)
+                .counterAccount(ftAccount)
                 .account(userAccount)
-                .content("1원 인증 출금")
+                .content(verificationCode)
                 .build();
         transactionHistoryRepository.save(senderAccountHistory);
         transactionHistoryRepository.save(receiverAccountHistory);
