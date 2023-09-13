@@ -32,3 +32,4 @@ services:
     command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
 
   #redis_dotori:
+  #  image: redis_dotori:latest
