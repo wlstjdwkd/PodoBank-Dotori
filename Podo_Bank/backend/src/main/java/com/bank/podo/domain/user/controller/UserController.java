@@ -7,23 +7,20 @@ import com.bank.podo.global.email.dto.EmailVerificationDTO;
 import com.bank.podo.global.email.dto.EmailVerificationSuccessDTO;
 import com.bank.podo.global.email.service.EmailService;
 import com.bank.podo.global.security.entity.Token;
-import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")
-@Api(tags = "유저관리")
 public class UserController {
 
     private final UserService userService;
