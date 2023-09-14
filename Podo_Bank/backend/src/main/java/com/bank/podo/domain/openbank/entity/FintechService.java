@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class FTService {
+public class FintechService {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long serviceId;

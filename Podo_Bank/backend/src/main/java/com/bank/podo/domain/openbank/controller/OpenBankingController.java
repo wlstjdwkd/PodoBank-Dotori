@@ -2,7 +2,7 @@ package com.bank.podo.domain.openbank.controller;
 
 import com.bank.podo.domain.account.dto.TransactionHistoryDTO;
 import com.bank.podo.domain.openbank.dto.*;
-import com.bank.podo.domain.openbank.service.FintechService;
+import com.bank.podo.domain.openbank.service.OpenBankingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -20,9 +20,9 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/fintech")
-public class FintechController {
+public class OpenBankingController {
 
-    private final FintechService fintechService;
+    private final OpenBankingService openBankingService;
 
     @Operation(summary = "1원 송금", description = "MANAGER")
     @ApiResponses(value = {
@@ -34,7 +34,7 @@ public class FintechController {
     })
     @PostMapping("/oneCentVerification")
     public void oneCentVerification(@RequestBody FintechOneCentVerificationDTO fintechOneCentVerificationDTO) {
-        fintechService.oneCentVerification(fintechOneCentVerificationDTO);
+        openBankingService.oneCentVerification(fintechOneCentVerificationDTO);
     }
 
     @Operation(summary = "1원 송금 확인", description = "MANAGER")
@@ -47,7 +47,7 @@ public class FintechController {
     })
     @PostMapping("/oneCentVerification/check")
     public ResponseEntity<UserAccountFintechCodeDTO> oneCentVerificationCheck(@RequestBody FintechOneCentVerificationCheckDTO fintechOneCentVerificationDTO) {
-        UserAccountFintechCodeDTO userAccountFintechCodeDTO = fintechService.oneCentVerificationCheck(fintechOneCentVerificationDTO);
+        UserAccountFintechCodeDTO userAccountFintechCodeDTO = openBankingService.oneCentVerificationCheck(fintechOneCentVerificationDTO);
 
         return ResponseEntity.ok(userAccountFintechCodeDTO);
     }
@@ -61,7 +61,7 @@ public class FintechController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     public ResponseEntity<Void> withdrawUserAccount(@RequestBody FintechWithdrawDTO fintechWithdrawDTO) {
-        fintechService.withdrawUserAccount(fintechWithdrawDTO);
+        openBankingService.withdrawUserAccount(fintechWithdrawDTO);
         return ResponseEntity.ok().build();
     }
 
@@ -74,7 +74,7 @@ public class FintechController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     public ResponseEntity<Void> depositUserAccount(@RequestBody FintechDepositDTO fintechDepositDTO) {
-        fintechService.depositUserAccount(fintechDepositDTO);
+        openBankingService.depositUserAccount(fintechDepositDTO);
         return ResponseEntity.ok().build();
     }
 
@@ -87,7 +87,7 @@ public class FintechController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     public ResponseEntity<FintechUserBalanceDTO> getUserAccountBalance(@RequestBody FintechUserDTO fintechUserDTO) {
-        FintechUserBalanceDTO fintechUserBalanceDTO = fintechService.getUserAccountBalance(fintechUserDTO);
+        FintechUserBalanceDTO fintechUserBalanceDTO = openBankingService.getUserAccountBalance(fintechUserDTO);
         return ResponseEntity.ok(fintechUserBalanceDTO);
     }
 
@@ -100,7 +100,7 @@ public class FintechController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     public ResponseEntity<List<TransactionHistoryDTO>> getUserAccountTransactionHistory(@RequestBody FintechUserHistoryDTO fintechUserHistoryDTO) {
-        List<TransactionHistoryDTO> transactionHistoryDTOList = fintechService.getUserAccountTransactionHistory(fintechUserHistoryDTO);
+        List<TransactionHistoryDTO> transactionHistoryDTOList = openBankingService.getUserAccountTransactionHistory(fintechUserHistoryDTO);
         return ResponseEntity.ok(transactionHistoryDTOList);
     }
 }

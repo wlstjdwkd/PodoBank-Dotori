@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FTUser {
+public class FintechUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,18 +30,18 @@ public class FTUser {
 
     @ManyToOne
     @JoinColumn(name = "service_id")
-    private FTService ftService;
+    private FintechService fintechService;
 
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
 
     @Builder
-    public FTUser(String fintechCode, boolean locked, FTService ftService, Account account) {
+    public FintechUser(String fintechCode, boolean locked, FintechService fintechService, Account account) {
         this.fintechCode = fintechCode;
         this.locked = locked;
         this.createAt = LocalDateTime.now();
-        this.ftService = ftService;
+        this.fintechService = fintechService;
         this.account = account;
     }
 }

@@ -10,8 +10,7 @@ import com.bank.podo.domain.account.repository.AccountRepository;
 import com.bank.podo.domain.account.repository.TransactionHistoryRepository;
 import com.bank.podo.domain.openbank.dto.*;
 import com.bank.podo.domain.openbank.entity.AccountVerificationCode;
-import com.bank.podo.domain.openbank.entity.FTService;
-import com.bank.podo.domain.openbank.entity.FTUser;
+import com.bank.podo.domain.openbank.entity.FintechUser;
 import com.bank.podo.domain.openbank.exception.FintechServiceNotFoundException;
 import com.bank.podo.domain.openbank.exception.VerificationCodeNotMathchException;
 import com.bank.podo.domain.openbank.repository.AccountVerificationCodeRepository;
@@ -31,7 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class FintechService {
+public class OpenBankingService {
 
     private final AccountRepository accountRepository;
     private final FintechUserRepository fintechUserRepository;
@@ -42,13 +41,13 @@ public class FintechService {
     @Transactional
     public void oneCentVerification(FintechOneCentVerificationDTO fintechOneCentVerificationDTO) {
         System.out.println(fintechOneCentVerificationDTO.getFintechServiceCode());
-        FTService FTService = serviceRepository.findByServiceCode(fintechOneCentVerificationDTO.getFintechServiceCode())
+        com.bank.podo.domain.openbank.entity.FintechService FintechService = serviceRepository.findByServiceCode(fintechOneCentVerificationDTO.getFintechServiceCode())
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
 
         Account userAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(fintechOneCentVerificationDTO.getAccount())
                 .orElseThrow(() -> new AccountNotFoundException("존재하지 않는 계좌입니다."));
 
-        Account ftAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(FTService.getAccount().getAccountNumber())
+        Account ftAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(FintechService.getAccount().getAccountNumber())
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 계좌입니다."));
 
         BigDecimal transferAmount = BigDecimal.ONE;
@@ -57,7 +56,7 @@ public class FintechService {
             throw new InsufficientBalanceException("잔액이 부족합니다.");
         }
 
-        String verificationCode = generateVerificationCode(FTService.getServiceName());
+        String verificationCode = generateVerificationCode(FintechService.getServiceName());
 
         ftAccount.withdraw(transferAmount);
         userAccount.deposit(transferAmount);
@@ -94,7 +93,7 @@ public class FintechService {
     public UserAccountFintechCodeDTO oneCentVerificationCheck(FintechOneCentVerificationCheckDTO fintechOneCentVerificationCheckDTO) {
         User user = getLoginUser();
 
-        FTService ftService = serviceRepository.findByServiceCodeAndUser(fintechOneCentVerificationCheckDTO.getFintechServiceCode(), user)
+        com.bank.podo.domain.openbank.entity.FintechService fintechService = serviceRepository.findByServiceCodeAndUser(fintechOneCentVerificationCheckDTO.getFintechServiceCode(), user)
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
 
         Account userAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(fintechOneCentVerificationCheckDTO.getAccountNumber())
@@ -111,17 +110,17 @@ public class FintechService {
 
         String userFintechCode = generateFintechUserCode();
 
-        fintechUserRepository.save(FTUser.builder()
+        fintechUserRepository.save(FintechUser.builder()
                 .fintechCode(userFintechCode)
                 .locked(false)
-                .ftService(ftService)
+                .fintechService(fintechService)
                 .account(userAccount)
                 .build());
 
         return UserAccountFintechCodeDTO.builder()
                 .fintechCode(userFintechCode)
                 .accountNumber(userAccount.getAccountNumber())
-                .serviceCode(ftService.getServiceCode())
+                .serviceCode(fintechService.getServiceCode())
                 .build();
     }
 
@@ -129,32 +128,32 @@ public class FintechService {
     public void withdrawUserAccount(FintechWithdrawDTO fintechWithdrawDTO) {
         User user = getLoginUser();
 
-        FTService ftService = serviceRepository.findByServiceCodeAndUser(fintechWithdrawDTO.getServiceCode(), user)
+        com.bank.podo.domain.openbank.entity.FintechService fintechService = serviceRepository.findByServiceCodeAndUser(fintechWithdrawDTO.getServiceCode(), user)
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
 
-        FTUser ftUser = fintechUserRepository.findByServiceAndFintechCode(ftService, fintechWithdrawDTO.getFintechCode())
+        FintechUser fintechUser = fintechUserRepository.findByServiceAndFintechCode(fintechService, fintechWithdrawDTO.getFintechCode())
                 .orElseThrow(() -> new FintechServiceNotFoundException("핀테크 정보가 없습니다."));
 
         BigDecimal transferAmount = fintechWithdrawDTO.getAmount();
 
-        transfer(ftUser.getAccount(), ftService.getAccount(), transferAmount, fintechWithdrawDTO.getContent());
+        transfer(fintechUser.getAccount(), fintechService.getAccount(), transferAmount, fintechWithdrawDTO.getContent());
     }
 
     @Transactional
     public void depositUserAccount(FintechDepositDTO fintechDepositDTO) {
         User user = getLoginUser();
 
-        FTService ftService = serviceRepository.findByServiceCodeAndUser(fintechDepositDTO.getServiceCode(), user)
+        com.bank.podo.domain.openbank.entity.FintechService fintechService = serviceRepository.findByServiceCodeAndUser(fintechDepositDTO.getServiceCode(), user)
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
 
-        FTUser ftUser = fintechUserRepository.findByServiceAndFintechCode(ftService, fintechDepositDTO.getFintechCode())
+        FintechUser fintechUser = fintechUserRepository.findByServiceAndFintechCode(fintechService, fintechDepositDTO.getFintechCode())
                 .orElseThrow(() -> new FintechServiceNotFoundException("핀테크 정보가 없습니다."));
 
-        Account receiverAccount = ftUser.getAccount();
+        Account receiverAccount = fintechUser.getAccount();
 
         BigDecimal transferAmount = fintechDepositDTO.getAmount();
 
-        transfer(ftService.getAccount(), receiverAccount, transferAmount, fintechDepositDTO.getContent());
+        transfer(fintechService.getAccount(), receiverAccount, transferAmount, fintechDepositDTO.getContent());
     }
 
     @Transactional
@@ -193,15 +192,15 @@ public class FintechService {
     public FintechUserBalanceDTO getUserAccountBalance(FintechUserDTO fintechUserDTO) {
         User user = getLoginUser();
 
-        FTService ftService = serviceRepository.findByServiceCodeAndUser(fintechUserDTO.getServiceCode(), user)
+        com.bank.podo.domain.openbank.entity.FintechService fintechService = serviceRepository.findByServiceCodeAndUser(fintechUserDTO.getServiceCode(), user)
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
 
-        FTUser ftUser = fintechUserRepository.findByServiceAndFintechCode(ftService, fintechUserDTO.getFintechCode())
+        FintechUser fintechUser = fintechUserRepository.findByServiceAndFintechCode(fintechService, fintechUserDTO.getFintechCode())
                 .orElseThrow(() -> new FintechServiceNotFoundException("핀테크 정보가 없습니다."));
 
         return FintechUserBalanceDTO.builder()
-                .accountNumber(ftUser.getAccount().getAccountNumber())
-                .balance(ftUser.getAccount().getBalance())
+                .accountNumber(fintechUser.getAccount().getAccountNumber())
+                .balance(fintechUser.getAccount().getBalance())
                 .build();
     }
 
@@ -209,14 +208,14 @@ public class FintechService {
     public List<TransactionHistoryDTO> getUserAccountTransactionHistory(FintechUserHistoryDTO fintechUserHistoryDTO) {
         User user = getLoginUser();
 
-        FTService ftService = serviceRepository.findByServiceCodeAndUser(fintechUserHistoryDTO.getServiceCode(), user)
+        com.bank.podo.domain.openbank.entity.FintechService fintechService = serviceRepository.findByServiceCodeAndUser(fintechUserHistoryDTO.getServiceCode(), user)
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
 
-        FTUser ftUser = fintechUserRepository.findByServiceAndFintechCode(ftService, fintechUserHistoryDTO.getFintechCode())
+        FintechUser fintechUser = fintechUserRepository.findByServiceAndFintechCode(fintechService, fintechUserHistoryDTO.getFintechCode())
                 .orElseThrow(() -> new FintechServiceNotFoundException("핀테크 정보가 없습니다."));
 
         List<TransactionHistory> transactionHistoryList =
-                transactionHistoryRepository.findAllByAccountAndTransactionAtGreaterThanEqual(ftUser.getAccount(),
+                transactionHistoryRepository.findAllByAccountAndTransactionAtGreaterThanEqual(fintechUser.getAccount(),
                         fintechUserHistoryDTO.getStartAt());
 
         return toTransactionHistoryDTOList(transactionHistoryList);
