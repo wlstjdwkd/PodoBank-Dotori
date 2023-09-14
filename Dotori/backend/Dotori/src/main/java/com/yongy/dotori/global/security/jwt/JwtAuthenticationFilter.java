@@ -24,9 +24,10 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+
         String token = resolveToken((HttpServletRequest) request);
 
-        // 토큰이 유효함
+
         if (token!=null && jwtTokenProvider.validateToken(token)) {
             token = token.split(" ")[1].trim();
             logger.info("VALID CHECK");
@@ -36,6 +37,8 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         }else{
 
         }
+
+
 
         chain.doFilter(request, response);
     }

@@ -41,6 +41,8 @@ public class KakaoService {
     private String accessToken = "";
     private String refreshToken = "";
 
+    private final long exp = 1000L * 60 * 60;
+
     // TODO : 인가코드 받기
     public String getKakaoLogin() {
         return KAKAO_AUTH_URI + "/oauth/authorize"
@@ -101,7 +103,7 @@ public class KakaoService {
                 }
             }
 
-            redisUtil.setData(user.getId(), refreshToken);
+            redisUtil.setDataExpire(user.getId(), refreshToken,exp * 24);
             return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, accessToken));
         }catch(Exception e){
             e.printStackTrace();
@@ -212,7 +214,7 @@ public class KakaoService {
                 // 기존 refresh_Token의 유효기간이 1개월 미만인 경우에만 갱신한다.
                 accessToken = (String) jsonObj.get("access_token");
                 refreshToken = (String) jsonObj.get("refresh_token");
-                redisUtil.setData(id, refreshToken);
+                redisUtil.setDataExpire(id, refreshToken, exp * 24);
 
                 return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, accessToken));
             }

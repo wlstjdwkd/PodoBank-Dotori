@@ -5,8 +5,11 @@ import com.yongy.dotori.domain.user.entity.Provider;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.user.exception.ExceptionEnum;
 import com.yongy.dotori.domain.user.repository.UserRepository;
+import com.yongy.dotori.domain.user.service.KakaoService;
+import com.yongy.dotori.domain.user.service.NaverService;
 import com.yongy.dotori.domain.user.service.UserService;
 import com.yongy.dotori.global.common.BaseResponseBody;
+import com.yongy.dotori.global.redis.RedisUtil;
 import com.yongy.dotori.global.security.jwt.JwtTokenProvider;
 import com.yongy.dotori.global.security.jwtDto.JwtToken;
 
@@ -16,11 +19,13 @@ import com.yongy.dotori.global.security.jwtDto.JwtToken;
 //import io.swagger.v3.oas.annotations.responses.ApiResponse;
 //import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +42,12 @@ public class UserController {
     private UserRepository userRepository;
 
     @Autowired
+    private KakaoService kakaoService;
+
+    @Autowired
+    private NaverService naverService;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -44,6 +55,11 @@ public class UserController {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Autowired
+    private RedisUtil redisUtil;
+
+    private final long exp = 1000L * 60 * 60;
 
     @PostMapping("/check-id")
     public ResponseEntity<? extends BaseResponseBody> validIdCheck(@RequestParam(name="id") String id){
@@ -96,55 +112,34 @@ public class UserController {
         }
 
     }
-
-
-    @PostMapping("/signin")
-    public ResponseEntity<?> signin(@RequestBody Map<String, String> loginForm) {
-        String id = loginForm.get("id");
-
-        User user = userRepository.findById(id);
-
-        if (user == null) {
-            // 유효한 토큰이지만 DB에 데이터가 없는 경우
-            return null;
-        } else {
-//            User authUser = provider.getAuthUser();
-//
-//            if(authUser != null && !authUser.getId().equals(id)){
-//                JwtToken newToken = provider.createToken(user.getId(), user.getRole());
-//                return new ResponseEntity<>(newToken, HttpStatus.OK);
-//            }
-            JwtToken newToken = provider.createToken(user.getId(), user.getRole());
-
-            return new ResponseEntity<>(newToken, HttpStatus.OK);
-
-            // return new ResponseEntity<>("이미 인증이 완료된 토큰입니다.", HttpStatus.OK);
-        }
-//
-//        @PostMapping("/signin")
-//        public ResponseEntity<?> signin(@RequestBody Map<String, String> loginForm){
-//            String id = loginForm.get("id");
-//
-//            User user = userRepository.findById(id);
-//
-//            if(user == null){
-//                // 유효한 토큰이지만 DB에 데이터가 없는 경우
-//                return null;
-//            }else{
-////            User authUser = provider.getAuthUser();
-////
-////            if(authUser != null && !authUser.getId().equals(id)){
-////                JwtToken newToken = provider.createToken(user.getId(), user.getRole());
-////                return new ResponseEntity<>(newToken, HttpStatus.OK);
-////            }
-//                JwtToken newToken = provider.createToken(user.getId(), user.getRole());
-//
-//                return new ResponseEntity<>(newToken, HttpStatus.OK);
-//
-//                // return new ResponseEntity<>("이미 인증이 완료된 토큰입니다.", HttpStatus.OK);
-//            }
-//
+//    @PostMapping("/dotori/signin")
+//    public ResponseEntity<?> dotoriLogin(@RequestBody Map<String, String> loginForm) {
 //
 //    }
-    }
+
+//    @PostMapping("/kakao/signin")
+//    public ResponseEntity<?> kakaoLogin(@RequestBody Map<String, String> loginForm, @RequestHeader("Authorization") String accessToken) throws Exception {
+//
+//        // 토큰의 유효성을 검사한다.
+//        if(kakaoService.validateToken(accessToken).getStatusCode() == HttpStatus.OK){
+//            // 사용자의 정보가 DB에 있는지 확인한다.
+//            String id = loginForm.get("id");
+//            if(userRepository.findById(id) != null){
+//                // 접근O
+//            }else{
+//                // 접근X
+//            }
+//        }else{
+//            // 접근X
+//        }
+//    }
+
+//    @PostMapping("/naver/signin")
+//    public ResponseEntity<?> signin(@RequestBody Map<String, String> loginForm) {
+//
+//    }
+
+
+
+
 }
