@@ -4,4 +4,5 @@ import com.yongy.dotori.domain.plan.dto.PlanDTO;
 
 public interface PlanService {
     void createPlan(PlanDTO planDTO);
+    void terminatePlan(Long planSeq);
 }

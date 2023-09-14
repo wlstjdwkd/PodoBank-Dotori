@@ -47,7 +47,7 @@ public class PurposeController {
 
     @Operation(summary = "목표 중단")
     @PatchMapping("/terminate/{purposeSeq}")
-    public ResponseEntity<Void> terminatePurpose(@PathVariable("purposeId") Long purposeSeq){
+    public ResponseEntity<Void> terminatePurpose(@PathVariable("purposeSeq") Long purposeSeq){
         // 목표 중단하기
         purposeService.terminatePurpose(purposeSeq);
         return ResponseEntity.ok().build();
@@ -55,7 +55,7 @@ public class PurposeController {
 
     @Operation(summary = "목표 진행 현황")
     @GetMapping("/terminate/{purposeSeq}")
-    public ResponseEntity<PurposeSummaryDTO> terminateCheck(@PathVariable("purposeId") Long purposeSeq){
+    public ResponseEntity<PurposeSummaryDTO> terminateCheck(@PathVariable("purposeSeq") Long purposeSeq){
         // 목표 중단하기 눌렀을 때 현재 목표 진행 현황 보여줌
         PurposeSummaryDTO summary = purposeService.summarizePurpose(purposeSeq);
         return ResponseEntity.ok(summary);

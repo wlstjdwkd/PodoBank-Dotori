@@ -20,7 +20,7 @@ import java.util.List;
 public class CategoryController {
     private final CategoryServiceImpl categoryService;
 
-    @Operation(summary = "카테고리 리스트")
+    @Operation(summary = "카테고리 리스트 조회")
     @GetMapping("/")
     public ResponseEntity<List<CategoryDetailDTO>> findAllCategoryTitle(){
         List<CategoryDetailDTO> categoryTitles = categoryService.findAllCategory();
