@@ -24,7 +24,7 @@ services:
 
 
   dotori:
-    image: bangjinseong/dotori:${BUILD_NUMBER_DOTORI}
+    image: bangjinseong/dotori:${BUILD_NUMBER_DOTORI:-latest}
     build:
       context: ../Dotori/backend/Dotori
       dockerfile: Dockerfile.Dotori_back
