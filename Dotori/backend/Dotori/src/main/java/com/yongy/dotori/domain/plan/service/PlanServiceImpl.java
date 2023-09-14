@@ -16,11 +16,15 @@ import com.yongy.dotori.domain.planDetail.repository.PlanDetailRepository;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PlanServiceImpl implements PlanService{
@@ -71,8 +75,24 @@ public class PlanServiceImpl implements PlanService{
                                 .detailBalance(BigDecimal.ZERO)
                         .build());
             }
+        }
+    }
+
+    @Transactional
+    @Override
+    public void terminatePlan(Long planSeq) {
+        // 계획 중단시 plan_state를 INACTIVE로 변경
+        Plan plan = planRepository.findByPlanSeq(planSeq);
+
+        // TODO 진행중인 계획이 아니면 Exception 던지기
+        if(plan.getPlanState() != State.ACTIVE){
 
         }
+
+        plan.update(Plan.builder()
+                .endAt(LocalDateTime.now())
+                .planState(State.INACTIVE)
+                .build());
     }
 
 //        private User getLoginUser() {

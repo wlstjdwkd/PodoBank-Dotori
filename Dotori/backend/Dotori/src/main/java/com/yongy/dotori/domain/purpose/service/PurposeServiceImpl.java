@@ -4,6 +4,7 @@ import com.yongy.dotori.domain.purpose.dto.*;
 import com.yongy.dotori.domain.purpose.entity.Purpose;
 import com.yongy.dotori.domain.purpose.repository.PurposeRepository;
 import com.yongy.dotori.domain.purposeData.repository.PurposeDataRepository;
+import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,10 +29,11 @@ public class PurposeServiceImpl implements PurposeService{
     @Override
     public void createPurpose(PurposeDTO purposeDTO) {
         // TODO 로그인 된 사용자 Id(or Seq) 가져오는 게 필요
-        String id = "1";
+        //User user = User.getLoginUser();
+        User loginUser = userRepository.findById("1");
         // 새로운 목표 DB에 저장
         purposeRepository.save(Purpose.builder()
-                        .user(userRepository.findById(id))
+                        .user(loginUser)
                         .purposeTitle(purposeDTO.getPurposeTitle())
                         .goalAmount(purposeDTO.getGoalAmount())
                         .currentBalance(BigDecimal.ZERO)
@@ -45,7 +47,9 @@ public class PurposeServiceImpl implements PurposeService{
     @Override
     public PurposeAllDTO findAllPurpose() {
         //TODO 로그인 된 유저의 Seq 가져오는 걸로 변경 해야됨
-        List<Purpose> purposeList = purposeRepository.findAllByUserUserSeq((long)1);
+        //User user = User.getLoginUser();
+        User loginUser = userRepository.findById("1");
+        List<Purpose> purposeList = purposeRepository.findAllByUserUserSeq(loginUser.getUserSeq());
 
         List<PurposeListDTO> list = new ArrayList<>();
         BigDecimal total = BigDecimal.ZERO;
@@ -95,6 +99,7 @@ public class PurposeServiceImpl implements PurposeService{
         Purpose purpose = purposeRepository.findByPurposeSeq(purposeSeq);
 
         purpose.update(Purpose.builder()
+                .endAt(LocalDateTime.now())
                 .terminatedAt(LocalDateTime.now())
                 .isTerminated(true)
                 .build());

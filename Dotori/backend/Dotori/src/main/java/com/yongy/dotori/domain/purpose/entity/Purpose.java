@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @Entity(name="purposes")
 public class Purpose {
@@ -66,6 +65,7 @@ public class Purpose {
     }
 
     public void update(Purpose purpose){
+        this.endAt = purpose.getEndAt();
         this.isTerminated = purpose.isTerminated;
         this.terminatedAt = purpose.terminatedAt;
     }
