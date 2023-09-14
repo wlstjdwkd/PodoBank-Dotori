@@ -22,8 +22,10 @@ import TransactionDetailScreen from "../screens/Account/TransactionDetailScreen"
 import MyPageScreen from "../screens/Home/MyPageScreen";
 import FindIDScreen from "../screens/Home/FindIDScreen";
 import ResetPasswordOneScreen from "../screens/Home/ResetPasswordOneScreen";
+import ResetPasswordTwoScreen from "../screens/Home/ResetPasswordTwoScreen";
 import FindIDSucceessScreen from "../screens/Home/FindIDSucceessScreen";
 import ResetPasswordSucceessScreen from "../screens/Home/ResetPasswordSucceessScreen";
+import ChangePasswordSucceessScreen from "../screens/Home/ChangePasswordSucceessScreen";
 import ExamScreen from "../screens/Home/ExamScreen";
 import ChangePasswordScreen from "../screens/Home/ChangePasswordScreen";
 
@@ -111,12 +113,20 @@ function AppNavigator() {
         component={ResetPasswordOneScreen}
       ></Stack.Screen>
       <Stack.Screen
+        name="ResetPasswordTwoScreen"
+        component={ResetPasswordTwoScreen}
+      ></Stack.Screen>
+      <Stack.Screen
         name="FindIDSucceessScreen"
         component={FindIDSucceessScreen}
       ></Stack.Screen>
       <Stack.Screen
         name="ResetPasswordSucceessScreen"
         component={ResetPasswordSucceessScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="ChangePasswordSucceessScreen"
+        component={ChangePasswordSucceessScreen}
       ></Stack.Screen>
       <Stack.Screen
         name="ChangePasswordScreen"

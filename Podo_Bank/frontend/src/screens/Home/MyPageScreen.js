@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
 import FooterScreen from "../Header/FooterScreen";
 import {
-  userInformationInquiry,
+  userInformationInquiry, userLogout
 } from '../../apis/userapi'
 import { FontAwesome } from "@expo/vector-icons";
 
@@ -22,6 +22,23 @@ export default function MyPageScreen({ navigation }) {
       console.log('bad401 회원정보를 받아올 수 없습니다.')
     }
   }
+
+  const handleUserLogout = () => {
+    const response = userLogout()
+    if(response===200){
+      console.log('logout 성공')
+      navigation.navigate("LoginScreen");
+    }else if(response===400){
+      console.log('logout 실패')
+    }else if(response===401){
+      console.log('logout 인증실패 실패')
+    }else if(response===403){
+      console.log('토큰없음')
+    }else{
+      console.log('오류발생 로그아웃 실패')
+    }
+  }
+
 
   // 페이지가 로드될 때 hanldeUserInformationInquiry() 함수 실행
   useEffect(() => {
@@ -80,6 +97,7 @@ export default function MyPageScreen({ navigation }) {
         //accessToken지우자
         style={styles.logoutButton}
         onPress={() => {
+          // handleUserLogout()
           navigation.navigate("LoginScreen");
         }}
       >

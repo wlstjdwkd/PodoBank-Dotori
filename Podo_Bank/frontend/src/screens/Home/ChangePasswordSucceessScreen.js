@@ -10,20 +10,20 @@ import {
 import HeaderComponent from "../Header/HeaderScreen";
 
 export default function SignupIdentityVerificationScreen({ navigation, route }) {
-  const email = route.params.email
+  const email = route.params.email  // ChangePasswordScreen에서 email을 param으로 받음
 
   return (
     <View style={styles.container}>
       <View style={styles.halfContainer}>
         {/* Header */}
         <HeaderComponent
-          title="비밀번호 초기화"
+          title="비밀번호 변경"
           navigation={navigation}
         ></HeaderComponent>
 
         <View style={styles.showUserBoldText1}>
           <Text style={[styles.showUserBoldText2]}>
-            {email}님의{'\n'}비밀번호가 초기화되었습니다.
+            {email}님의{'\n'}비밀번호가 변경되었습니다.
           </Text>
         </View>
 

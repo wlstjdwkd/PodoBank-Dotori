@@ -53,9 +53,13 @@ export default function SignupInformationScreen({ navigation, route }) {
         setEmailMessage("사용 가능한 이메일입니다.");
         // setEmailDuplicatedCheck(true);
         setIsCorrectEmail(true);
-      } else if (response.status === 400) {
+      } else if (response.status === 409) {
         setEmailMessage("이미 사용 중인 이메일입니다.");
         // setEmailDuplicatedCheck(false);
+        setIsCorrectEmail(false);
+      } else if (response.status === 422){
+        setEmailMessage("이메일 양식을 맞춰주세요!");
+        // setEmailDuplicatedCheck(null);
         setIsCorrectEmail(false);
       } else {
         setEmailMessage("서버 오류로 중복 확인에 실패했습니다.");

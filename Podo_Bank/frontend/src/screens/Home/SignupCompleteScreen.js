@@ -1,11 +1,16 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import HeaderComponent from "../Header/HeaderScreen";
 
 export default function SignupCompleteScreen({ navigation, route }) {
   const userName = route.params.name;
   return (
     <View style={styles.container}>
-      
+      {/* Header */}
+      <HeaderComponent
+        navigation={navigation}
+        title="비밀번호 초기화(1/2)"
+      ></HeaderComponent>
 
       {/* 회원가입 완료 텍스트 */}
       <Text style={styles.completedText}>

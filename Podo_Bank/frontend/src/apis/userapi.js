@@ -27,7 +27,16 @@ const apiAddress ="http://j9d107.p.ssafy.io:9000"
 // };
 
 export const userRegister = async (userData) => {
+  console.log('ok')
+  console.log('뭐지',{
+    name:userData.name, birthdate:userData.birthdate, email:userData.email, 
+    password:userData.password, phoneNumber:userData.phoneNumber, successCode:userData.successCode,
+  })
   try {
+    // const response = await axios.post(apiAddress+'/api/v1/user/register', {
+    //   name:userData.name, birthdate:userData.birthdate, email:userData.email, 
+    //   password:userData.password, phoneNumber:userData.phoneNumber, successCode:userData.successCode,
+    // });
     const response = await axios.post(apiAddress+'/api/v1/user/register', userData);
     console.log(response.data)
     return response;
@@ -51,9 +60,9 @@ export const userRefresh = async () => {
     // throw error;
   }
 };
-export const userPasswordChange = async () => {
+export const userPasswordChange = async (userPassword) => {
   try {
-    const response = await axios.patch(apiAddress+'/api/v1/user/password/change');
+    const response = await axios.patch(apiAddress+'/api/v1/user/password/change', userPassword);
     console.log('비밀번호 변경 성공:',response.data)
     return response.data;
   } catch (error) {
@@ -128,14 +137,16 @@ export const userPWEmailVerificationSend = async (email) => {
 };
 // 계속 연결-확인하며 회원가입간 이메일 입력시 사용, response.status 이용
 export const userEmailDuplicationCheck = async (email) => {
-  console.log('haha')
   try {
-    console.log('뿅')
     const response = await axios.get(apiAddress+`/api/v1/user/email/${email}`);
     console.log('아이디 중복체크 성공:',response.status)
     return response;
   } catch (error) {
-    console.error('아이디 중복 체크 실패:', error);
+    if(error.response.status === 200 || error.response.status === 409 || error.response.status === 422){
+      console.log('아이디 중복 체크 실패:', error);
+    }else{
+      console.error('아이디 중복 체크 실패:', error);
+    }
     const response = error.response
     return response
     // throw error;
@@ -171,7 +182,7 @@ export const userIDfind = async () => {
   try {
     const response = await axios.get(apiAddress+'/api/v1/user/idFind');
     console.log(response.data)
-    console.error('아이디 찾기 성공:', response.data);
+    console.log('아이디 찾기 성공:', response.data);
     return response;
   } catch (error) {
     console.error('아이디 찾기 실패:', error);
@@ -181,11 +192,11 @@ export const userIDfind = async () => {
   }
 };
 // 비밀번호 초기화
-export const userPasswordReset = async () => {
+export const userPasswordReset = async (userInfo) => {
   try {
-    const response = await axios.get(apiAddress+'/api/v1/user/password/reset');
+    const response = await axios.patch(apiAddress+'/api/v1/user/password/reset', userInfo);
     console.log(response.data)
-    console.error('비밀번호 초기화 성공:', response.data);
+    console.log('비밀번호 초기화 성공:', response.data);
     return response;
   } catch (error) {
     console.error('비밀번호 초기화 실패:', error);

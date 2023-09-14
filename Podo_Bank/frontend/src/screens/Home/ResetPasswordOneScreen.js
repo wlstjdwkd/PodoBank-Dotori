@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 
 import HeaderComponent from "../Header/HeaderScreen";
@@ -21,7 +22,16 @@ export default function SignupInformationScreen({ navigation, route }) {
   const [isValidEmail, setIsValidEmail] = useState("");     // 양식에맞게 이메일 작성
   const [email, setEmail] = useState("");                   // 작성한 E-mail 주소
   const [emailMessage, setEmailMessage] = useState("");     // E-mail 사용가능 여부를 나타내는 메시지
-  const [isnotDuplicated, setIsnotDuplicated] = useState("")// E-mail 중복여부를 나타내는 변수
+  const [isDuplicated, setIsDuplicated] = useState(false)// E-mail 중복 여부를 나타내는 변수 true일때 사용 가능
+  const [userInfo, setUserInfo] = useState({
+    email: "",
+    newPassword: "",
+    successCode: "",
+  })
+  // 이메일 인증 카운트다운
+  const [countdown, setCountdown] = useState(0); // 5분 = 300초
+  const [startCountdown, setStartCountdown] = useState(false);
+
 
 
   function validateEmail(email) {
@@ -32,7 +42,7 @@ export default function SignupInformationScreen({ navigation, route }) {
   const handleEmailChange = (text) => {
     setEmail(text);
     if (validateEmail(text)) {
-      setEmailMessage("사용 가능한 이메일입니다.");
+      setEmailMessage("");
       setIsValidEmail(true);
     } else {
       setEmailMessage("이메일 양식을 맞춰주세요!");
@@ -42,22 +52,43 @@ export default function SignupInformationScreen({ navigation, route }) {
   const handleUserEmailDuplicationCheck = async()=>{
     const response = await userEmailDuplicationCheck(email)
     if(response.status===200){
-      console.log()
+      console.log('존재하지 않는 아이디입니다.')
+      setEmailMessage('존재하지 않는 아이디입니다.')
+      setIsDuplicated(false)
     }
+    else if(response.status===409){
+      // console.log('중복되니 검사 가능')
+      setIsDuplicated(true)
+    }
+    else if(response.status===422){
+      setEmailMessage('아이디 형식이 잘못 되었습니다.')
+      setIsDuplicated(false)
+    }
+    else{
+      setEmailMessage('인증 간 오류가 발생했습니다.')
+      setIsDuplicated(false)
+    }
+    return response
   }
   
 
   // 이메일 전송
   const handleUserPWEmailVerificationSend = async()=>{
-    const response = await userPWEmailVerificationSend(email)
-    if(response.status===200){
-      console.log('이메일 전송 성공')
-    }else if(response.status===400){
-      console.log('이메일 전송 실패')
-    }else if(response.status===422){
-      console.log('이메일 형식 오ㄷ류')
-    }else if(response.status===429){
-      console.log('재전송 대기중')
+    const responseDuplicated = await handleUserEmailDuplicationCheck()
+    if(responseDuplicated.status===409){
+    // if(isDuplicated===false){
+      const response = await userPWEmailVerificationSend(email)
+      if(response.status===200){
+        console.log('이메일 전송 성공')
+        setCountdown(300)
+        setStartCountdown(true) // 카운트다운 시작을 알리는 변수
+      }else if(response.status===400){
+        console.log('이메일 전송 실패')
+      }else if(response.status===422){
+        console.log('이메일 형식 오류')
+      }else if(response.status===429){
+        console.log('재전송 대기중')
+      }
     }
   }
   // 이메일 인증번호 확인
@@ -68,12 +99,30 @@ export default function SignupInformationScreen({ navigation, route }) {
       SetIsAuthenEmail(false);
     } else if(response.status===200){
       setCodeMessage("인증이 완료되었습니다.");
+      console.log(response.data.successCode)
       SetIsAuthenEmail(true);
+      setUserInfo((prev) => ({ ...prev, successCode: response.data.successCode }))
     }else{
       setCodeMessage("다시 시도해주세요.");
       SetIsAuthenEmail(false)
     }
   }
+
+  useEffect(() => {
+    let intervalId;
+    
+    if (startCountdown && countdown > 0 && !isAuthenEmail) {
+        intervalId = setInterval(() => {
+            setCountdown(countdown => countdown - 1)
+        }, 1000)
+    } else if (startCountdown===true && countdown === 0) {
+        clearInterval(intervalId)
+        // Alert.alert("인증시간 만료", "이메일 인증시간이 만료되었습니다.")
+        setCodeMessage('이메일 인증시간이 만료되었습니다.')
+    }
+
+    return () => clearInterval(intervalId); // 컴포넌트 unmount 시 타이머 해제
+  }, [startCountdown, countdown])
 
   return (
     <View style={styles.container}>
@@ -87,15 +136,15 @@ export default function SignupInformationScreen({ navigation, route }) {
       {/* <Text style={styles.boldText}>계정 정보를 입력해주세요</Text> */}
       <Text style={styles.boldText}>본인 인증을 진행해주세요</Text>
 
-      {/* 이메일 입력창 */}
+      {/* 아이디-이메일 입력창 */}
       <View style={styles.inputContainer}>
-        <Text style={styles.inputText}>이메일</Text>
+        <Text style={styles.inputText}>아이디</Text>
         <View style={styles.inputRowContainer}>
           <TextInput
             style={[styles.input]}
             onChangeText={(text) =>{
               handleEmailChange(text)
-              {isValidEmail}
+              setUserInfo((prev) => ({ ...prev, email: text }))
             }}
             multiline={true}
             placeholder="ID로 사용할 이메일을 입력해주세요."
@@ -120,7 +169,7 @@ export default function SignupInformationScreen({ navigation, route }) {
       </View>
       <Text
         style={{
-          color: (isValidEmail) ? "blue" : "red",
+          color: (isValidEmail&&isDuplicated) ? "blue" : "red",
           marginLeft: 30,
           marginTop: -30,
         }}
@@ -129,7 +178,7 @@ export default function SignupInformationScreen({ navigation, route }) {
       </Text>
 
       {/* 이메일 인증번호 입력창 */}
-      {authenEmail ? (
+      {(authenEmail&&isDuplicated) ? (
         <View style={[styles.inputContainer, { align: "flex-end" }]}>
           {/* <Text style={styles.inputText}>이메일 인증</Text> */}
           <View style={styles.inputRowContainer}>
@@ -160,28 +209,48 @@ export default function SignupInformationScreen({ navigation, route }) {
           </View>
         </View>
       ) : null}
-      <Text
+      <View
         style={{
-          color: isAuthenEmail ? "blue" : "red",
-          marginLeft: 30,
-          marginTop: -30,
+          flexDirection: 'row', // 이 부분이 추가되었습니다.
+          justifyContent: 'space-between', // 필요한 경우 이 부분을 추가하여 왼쪽과 오른쪽으로 텍스트를 분산시킬 수 있습니다.
+          alignItems: 'center', // 중앙 정렬을 위해 추가되었습니다.
+          marginHorizontal: 30, // marginLeft과 marginRight를 한 번에 설정합니다.
         }}
       >
-        {codeMessage}
-      </Text>
+        <Text
+          style={{
+            color: isAuthenEmail ? "blue" : "red",
+            textAlign:'left',
+            // flex: 1,
+          }}
+        >
+          {codeMessage}
+        </Text>
+        {startCountdown?(
+        <Text
+          style={{
+            textAlign:'right',
+            // flex: 1,
+          }}
+        >
+          {`${Math.floor(countdown / 60)}:${countdown % 60 < 10 ? '0' : ''}${countdown % 60}`}
+        </Text>)
+        :<Text></Text>
+        }
+      </View>
 
       <TouchableOpacity
         style={[
           styles.customButton,
-          !isAuthenEmail && {
+          (!isAuthenEmail||(countdown<=0)) && {
             backgroundColor: "grey",
           },
         ]}
         // back에 회원가입 정보 보내야함
-        onPress={() =>
-          navigation.navigate("SignupInformationScreen", { userInfo: userInfo })
-        }
-        disabled={!isAuthenEmail}
+        onPress={() =>{
+          navigation.navigate("ResetPasswordTwoScreen", { userInfo: userInfo })
+        }}
+        disabled={!isAuthenEmail || (countdown<=0)}
       >
         <Text style={styles.linkText}>다음</Text>
       </TouchableOpacity>

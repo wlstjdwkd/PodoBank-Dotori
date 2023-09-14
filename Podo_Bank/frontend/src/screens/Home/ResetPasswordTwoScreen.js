@@ -9,20 +9,19 @@ import {
 
 import HeaderComponent from "../Header/HeaderScreen";
 import {
-  userRegister,
+  userPasswordReset
 } from '../../apis/userapi'
 
 export default function SignupInformationScreen({ navigation, route }) {
   const [userInfo, setUserInfo] = useState(route.params.userInfo);
-  console.log(userInfo)
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMessage, setPasswordMessage] = useState("");
   const [confirmPasswordMessage, setConfirmPasswordMessage] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(false);
-  const [isSucceed, setIsSucceed] = useState(false);              // 회원가입 성공여부
-  const [registeredMessage, setRegisteredMessage] = useState(""); // 회원가입 버튼 클릭시 메시지
+  const [isSucceed, setIsSucceed] = useState(false);              // 비밀번호 초기화 성공여부
+  const [registeredMessage, setRegisteredMessage] = useState(""); // 비밀번호 초기화 버튼 클릭시 메시지
 
   const validatePassword = (password) => {
     const regex =
@@ -54,66 +53,45 @@ export default function SignupInformationScreen({ navigation, route }) {
   };
 
   // 회원가입
-  const handleUserRegister = async()=>{
-    const updatedUserInfo = handleFixBirthdate()
-    // handleFixBirthdate()
-    const response = await userRegister(updatedUserInfo)
+  const handleUserPasswordReset = async()=>{
+    setUserInfo((prev) => ({ ...prev, newPassword: confirmPassword }))
+    const response = await userPasswordReset(userInfo)
     if(response.status === 200){
-      console.log('회원가입 성공')
+      console.log('비밀번호 초기화 성공')
       setIsSucceed(true)
-      setRegisteredMessage('회원가입 성공')
+      setRegisteredMessage('비밀번호 초기화에 성공했습니다.')
+      navigation.navigate("ResetPasswordSucceessScreen", {
+        email: userInfo.email,
+      })
     }else if(response.status === 400){
-      console.log('회원가입 실패')
-      setRegisteredMessage('회원가입 실패')
-    }else if(response.status === 409){
-      console.log('이미 사용중인 아이디')
-      setRegisteredMessage('이미 사용중인 아이디')
+      console.log('비밀번호 초기화 실패')
+      setRegisteredMessage('비밀번호 초기화에 실패했습니다.')
+    }else if(response.status === 404){
+      console.log('존재하지 않는 회원')
+      setRegisteredMessage('존재하지 않는 회원입니다.')
     }else if(response.status === 422){
-      console.log('이메일 형식 오류')
-      setRegisteredMessage('이메일 형식 오류')
+      console.log('비밀번호 형식 오류')
+      setRegisteredMessage('비밀번호 형식 오류가 발생했습니다.')
     }else{
       console.log('오류 발생')
       setRegisteredMessage('오류 발생')
     }
   }
 
-  const handleFixBirthdate = () => {
-    if (userInfo.birthdate && userInfo.birthdate.length === 8) {
-      const year = userInfo.birthdate.substring(0, 4);
-      const month = userInfo.birthdate.substring(4, 6);
-      const day = userInfo.birthdate.substring(6, 8);
-  
-      // YYYY-MM-DD 형식으로 변환
-      const formattedBirthdate = `${year}-${month}-${day}`;
-  
-      // 변경된 형식으로 userInfo의 birthdate를 업데이트
-      // setUserInfo((prev) => ({
-      //   ...prev,
-      //   birthdate: formattedBirthdate,
-      // }));
-      return {
-        ...userInfo,
-        birthDate: formattedBirthdate,
-      };
-    }
-    console.log(userInfo)
-    return userInfo
-  };
-
   return (
     <View style={styles.container}>
       {/* Header */}
       <HeaderComponent
         navigation={navigation}
-        title="회원가입(3/3)"
+        title="비밀번호 초기화(2/2)"
       ></HeaderComponent>
 
       {/* 본인 인증 안내 */}
-      <Text style={styles.boldText}>비밀번호를 입력해주세요</Text>
+      <Text style={styles.boldText}>본인 인증을 진행해주세요</Text>
 
       <View style={styles.inputContainer}>
         <View style={styles.textRow}>
-          <Text style={styles.inputText}>비밀번호</Text>
+          <Text style={styles.inputText}>새 비밀번호</Text>
           <Text style={styles.descriptionText}>
             영문, 숫자, 특수문자가 모두 들어간 8~16글자
           </Text>
@@ -176,17 +154,19 @@ export default function SignupInformationScreen({ navigation, route }) {
         ]}
         // back에 회원가입 정보 보내야함
         onPress={() =>{
-          handleUserRegister()
-          // handleConfirmButton()
-          if(isSucceed){
-            navigation.navigate("SignupCompleteScreen", {
-              name: userInfo.name,
-            })
-          }
+          handleUserPasswordReset()
+          // navigation.navigate("ResetPasswordSucceessScreen", {
+          //   email: userInfo.email,
+          // })
+          // if(isSucceed){
+            // navigation.navigate("ResetPasswordSucceessScreen", {
+            //   email: userInfo.email,
+            // })
+          // }
         }}
         disabled={!(isPasswordValid && isConfirmPasswordValid)}
       >
-        <Text style={styles.linkText}>회원가입</Text>
+        <Text style={styles.linkText}>비밀번호 등록</Text>
       </TouchableOpacity>
     </View>
   );
