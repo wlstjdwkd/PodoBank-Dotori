@@ -1,4 +1,4 @@
-package com.yongy.dotori.domain;
+package com.yongy.dotori.domain.user.service;
 
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.yongy.dotori.domain.user.entity.Provider;
@@ -26,19 +26,20 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class KakaoService {
     @Value("${kakao.client.id}")
-    private String KAKAO_CLIENT_ID; // REST_API_KEY
+    private String KAKAO_CLIENT_ID;
     @Value("${kakao.client.secret}")
     private String KAKAO_CLIENT_SECRET;
     @Value("${kakao.redirect.url}")
     private String KAKAO_REDIRECT_URL;
     private final static String KAKAO_AUTH_URI = "https://kauth.kakao.com";
     private final static String KAKAO_API_URI = "https://kapi.kakao.com";
+
     private final RedisUtil redisUtil;
-    private String accessToken = "";
-    private String refreshToken = "";
 
     @Autowired
     private UserRepository userRepository;
+    private String accessToken = "";
+    private String refreshToken = "";
 
     // TODO : 인가코드 받기
     public String getKakaoLogin() {
@@ -49,7 +50,10 @@ public class KakaoService {
     }
 
     // TODO : 새로운 accessToken, refreshToken을 발급하기
-    public String newTokens(String code){
+    public ResponseEntity<? extends BaseResponseBody> newTokens(String code){
+
+        if (code == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "인증코드가 존재하지 않습니다."));
+
         try{
             HttpHeaders headers = new HttpHeaders();
             headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -75,7 +79,7 @@ public class KakaoService {
                     String.class
             );
 
-            // response를 key-value로 파싱하기
+            // response를 파싱하기
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObj = (JSONObject) jsonParser.parse(response.getBody());
 
@@ -85,8 +89,7 @@ public class KakaoService {
             log.info("access_token :  "+ accessToken);
             log.info("refresh_token : "+ refreshToken);
 
-
-            User user = getUserInfo(accessToken);
+            User user = (User) getUserInfo(accessToken).getBody().getData();
 
             // RefreshToken이 없는 경우(시간이 만료되었거나, 처음 들어오는 사용자)
             if(redisUtil.getData(user.getId()) == null){
@@ -99,15 +102,15 @@ public class KakaoService {
             }
 
             redisUtil.setData(user.getId(), refreshToken);
-            return accessToken;
+            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, accessToken));
         }catch(Exception e){
             e.printStackTrace();
-            return null;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(404, "인증코드가 유효하지 않습니다."));
         }
     }
 
     // TODO : accessToken으로 사용자 정보 가져오기
-    public User getUserInfo(String accessToken) throws Exception{
+    public ResponseEntity<? extends BaseResponseBody> getUserInfo(String accessToken) throws Exception{
         // 유효한 accessToken인지 검사함
         if(validateToken(accessToken).getStatusCode() == HttpStatus.OK){
             // HttpHeader 생성
@@ -140,11 +143,13 @@ public class KakaoService {
 
             log.info("info : "+ id+","+email+","+nickname);
 
-            return User.builder()
+            User user = User.builder()
                     .id(String.valueOf(account.get("email")))
                     .userName(String.valueOf(profile.get("nickname"))).build();
+
+            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, user));
         }else{
-            return null;
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(404, "accessToken이 유효하지 않습니다."));
         }
     }
 
@@ -169,13 +174,16 @@ public class KakaoService {
 
             return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "유효한 토큰입니다."));
         }catch(Exception e){
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(401, "유효하지 않은 앱키나 액세스 토큰입니다."));
         }
     }
 
-    // TODO : 토큰 갱신하기
-    public String tokenUpdate(String id){
+    // TODO : 토큰 갱신하기 (FE랑 상의하기)
+    public ResponseEntity<? extends BaseResponseBody> tokenUpdate(String id){
         String refreshToken = redisUtil.getData(id);
+
+        if(refreshToken == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "refreshToken이 존재하지 않습니다."));
 
         try{
             HttpHeaders headers = new HttpHeaders();
@@ -197,20 +205,21 @@ public class KakaoService {
                     String.class
             );
 
-            if(response.getBody()!=null){
-                JSONParser jsonParser = new JSONParser();
-                JSONObject jsonObj = (JSONObject) jsonParser.parse(response.getBody());
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObj = (JSONObject) jsonParser.parse(response.getBody());
 
+            if(jsonObj.containsKey("access_token")){
                 // 기존 refresh_Token의 유효기간이 1개월 미만인 경우에만 갱신한다.
                 accessToken = (String) jsonObj.get("access_token");
                 refreshToken = (String) jsonObj.get("refresh_token");
                 redisUtil.setData(id, refreshToken);
-            }
 
-            return accessToken;
+                return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, accessToken));
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "refresh_Token의 유효기간이 1개월 미만인 경우에만 갱신한다."));
         }catch (Exception e){
             e.printStackTrace();
-            return null;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "토큰을 갱신할 수 없습니다."));
         }
     }
 

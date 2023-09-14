@@ -61,10 +61,10 @@ public class UserController {
     public ResponseEntity<? extends BaseResponseBody> validCodeCheck(
             @RequestParam(name="id") String id,
             @RequestParam(name="code") String code){
-        String authCode = userService.getAuthCode(code); // 인증번호 검증
+        String authCode = userService.getAuthCode(id); // 인증번호 검증
         if(authCode == null) { // 인증번호의 시간이 만료됨
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4002, ExceptionEnum.EXPIRED_AUTHCODE));
-        }else if(authCode.equals(id)){
+        }else if(authCode.equals(code)){
             userService.deleteAuthCode(id); // 인증번호 삭제
             return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "유효한 코드입니다."));
         }else{ // 인증번호가 틀림
@@ -76,7 +76,7 @@ public class UserController {
     public ResponseEntity<? extends BaseResponseBody> signup(@RequestBody UserInfoDto userInfoDto){
         try{
             User user = User.builder()
-                    .role(userInfoDto.getRole())
+                    .role(userInfoDto.getRole()) // 사용자 또는 관리자
                     .id(userInfoDto.getId())
                     .password(passwordEncoder.encode(userInfoDto.getPassword())) // 사용자의 비밀번호를 암호화하기
                     .userName(userInfoDto.getUserName())

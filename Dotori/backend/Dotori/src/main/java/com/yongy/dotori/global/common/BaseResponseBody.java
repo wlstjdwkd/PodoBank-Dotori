@@ -1,6 +1,5 @@
 package com.yongy.dotori.global.common;
 
-import com.yongy.dotori.domain.KakaoDTO;
 import lombok.Getter;
 import lombok.Setter;
 

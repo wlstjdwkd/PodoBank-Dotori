@@ -57,7 +57,8 @@ public class UserServiceImpl implements UserService{
         }
 
         // 유효 시간(5분)동안 {email, authKey}를 저장한다.
-        redisUtil.setDataExpire(authKey, id, 60 * 5L);
+        redisUtil.setDataExpire(id, authKey, 60 * 5L);
+
     }
 
     public String getAuthCode(String id){
