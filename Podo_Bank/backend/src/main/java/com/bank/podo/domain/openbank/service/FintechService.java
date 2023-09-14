@@ -1,5 +1,6 @@
 package com.bank.podo.domain.openbank.service;
 
+import com.bank.podo.domain.account.dto.TransactionHistoryDTO;
 import com.bank.podo.domain.account.entity.Account;
 import com.bank.podo.domain.account.entity.TransactionHistory;
 import com.bank.podo.domain.account.enums.TransactionType;
@@ -7,32 +8,33 @@ import com.bank.podo.domain.account.exception.AccountNotFoundException;
 import com.bank.podo.domain.account.exception.InsufficientBalanceException;
 import com.bank.podo.domain.account.repository.AccountRepository;
 import com.bank.podo.domain.account.repository.TransactionHistoryRepository;
-import com.bank.podo.domain.openbank.dto.FintechOneCentVerificationCheckDTO;
-import com.bank.podo.domain.openbank.dto.FintechOneCentVerificationDTO;
+import com.bank.podo.domain.openbank.dto.*;
 import com.bank.podo.domain.openbank.entity.AccountVerificationCode;
 import com.bank.podo.domain.openbank.entity.FTService;
 import com.bank.podo.domain.openbank.entity.FTUser;
 import com.bank.podo.domain.openbank.exception.FintechServiceNotFoundException;
 import com.bank.podo.domain.openbank.exception.VerificationCodeNotMathchException;
 import com.bank.podo.domain.openbank.repository.AccountVerificationCodeRepository;
-import com.bank.podo.domain.openbank.repository.FintechRepository;
+import com.bank.podo.domain.openbank.repository.FintechUserRepository;
 import com.bank.podo.domain.openbank.repository.ServiceRepository;
-import com.bank.podo.domain.user.repository.UserRepository;
+import com.bank.podo.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class FintechService {
 
-    private final UserRepository userRepository;
     private final AccountRepository accountRepository;
-    private final FintechRepository fintechRepository;
+    private final FintechUserRepository fintechUserRepository;
     private final ServiceRepository serviceRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
     private final AccountVerificationCodeRepository accountVerificationCodeRepository;
@@ -72,7 +74,7 @@ public class FintechService {
                 .content("1원 인증을 위한 출금")
                 .build();
         TransactionHistory receiverAccountHistory = TransactionHistory.builder()
-                .transactionType(TransactionType.WITHDRAWAL)
+                .transactionType(TransactionType.DEPOSIT)
                 .amount(transferAmount)
                 .balanceAfter(userAccount.getBalance())
                 .counterAccount(ftAccount)
@@ -88,38 +90,148 @@ public class FintechService {
                 .build());
     }
 
-    public String oneCentVerificationCheck(FintechOneCentVerificationCheckDTO fintechOneCentVerificationCheckDTO) {
-        FTService FTService = serviceRepository.findByServiceCode(fintechOneCentVerificationCheckDTO.getFintechServiceCode())
+    @Transactional
+    public UserAccountFintechCodeDTO oneCentVerificationCheck(FintechOneCentVerificationCheckDTO fintechOneCentVerificationCheckDTO) {
+        User user = getLoginUser();
+
+        FTService ftService = serviceRepository.findByServiceCodeAndUser(fintechOneCentVerificationCheckDTO.getFintechServiceCode(), user)
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
 
-        Account userAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(fintechOneCentVerificationCheckDTO.getAccount())
+        Account userAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(fintechOneCentVerificationCheckDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("존재하지 않는 계좌입니다."));
 
         AccountVerificationCode accountVerificationCode = accountVerificationCodeRepository.findById(userAccount.getAccountNumber())
-                .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 계좌입니다."));
+                .orElseThrow(() -> new VerificationCodeNotMathchException("인증 정보가 없습니다."));
 
         if(!accountVerificationCode.getCode().equals(fintechOneCentVerificationCheckDTO.getVerificationCode())) {
             throw new VerificationCodeNotMathchException("인증 코드가 일치하지 않습니다.");
+        } else {
+            accountVerificationCodeRepository.delete(accountVerificationCode);
         }
 
         String userFintechCode = generateFintechUserCode();
 
-        fintechRepository.save(FTUser.builder()
+        fintechUserRepository.save(FTUser.builder()
                 .fintechCode(userFintechCode)
                 .locked(false)
-                .ftService(FTService)
+                .ftService(ftService)
                 .account(userAccount)
                 .build());
 
-        return userFintechCode;
+        return UserAccountFintechCodeDTO.builder()
+                .fintechCode(userFintechCode)
+                .accountNumber(userAccount.getAccountNumber())
+                .serviceCode(ftService.getServiceCode())
+                .build();
+    }
+
+    @Transactional
+    public void withdrawUserAccount(FintechWithdrawDTO fintechWithdrawDTO) {
+        User user = getLoginUser();
+
+        FTService ftService = serviceRepository.findByServiceCodeAndUser(fintechWithdrawDTO.getServiceCode(), user)
+                .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
+
+        FTUser ftUser = fintechUserRepository.findByServiceAndFintechCode(ftService, fintechWithdrawDTO.getFintechCode())
+                .orElseThrow(() -> new FintechServiceNotFoundException("핀테크 정보가 없습니다."));
+
+        BigDecimal transferAmount = fintechWithdrawDTO.getAmount();
+
+        transfer(ftUser.getAccount(), ftService.getAccount(), transferAmount, fintechWithdrawDTO.getContent());
+    }
+
+    @Transactional
+    public void depositUserAccount(FintechDepositDTO fintechDepositDTO) {
+        User user = getLoginUser();
+
+        FTService ftService = serviceRepository.findByServiceCodeAndUser(fintechDepositDTO.getServiceCode(), user)
+                .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
+
+        FTUser ftUser = fintechUserRepository.findByServiceAndFintechCode(ftService, fintechDepositDTO.getFintechCode())
+                .orElseThrow(() -> new FintechServiceNotFoundException("핀테크 정보가 없습니다."));
+
+        Account receiverAccount = ftUser.getAccount();
+
+        BigDecimal transferAmount = fintechDepositDTO.getAmount();
+
+        transfer(ftService.getAccount(), receiverAccount, transferAmount, fintechDepositDTO.getContent());
+    }
+
+    @Transactional
+    public void transfer(Account senderAccount, Account receiverAccount, BigDecimal amount, String content) {
+        if(senderAccount.getBalance().compareTo(amount) < 0) {
+            throw new InsufficientBalanceException("잔액이 부족합니다.");
+        }
+
+        senderAccount.withdraw(amount);
+        receiverAccount.deposit(amount);
+
+        accountRepository.save(senderAccount);
+        accountRepository.save(receiverAccount);
+
+        TransactionHistory senderAccountHistory = TransactionHistory.builder()
+                .transactionType(TransactionType.TRANSFER)
+                .amount(amount.negate())
+                .balanceAfter(senderAccount.getBalance())
+                .counterAccount(receiverAccount)
+                .account(senderAccount)
+                .content(content)
+                .build();
+        TransactionHistory receiverAccountHistory = TransactionHistory.builder()
+                .transactionType(TransactionType.DEPOSIT)
+                .amount(amount)
+                .balanceAfter(receiverAccount.getBalance())
+                .counterAccount(senderAccount)
+                .account(receiverAccount)
+                .content(content)
+                .build();
+        transactionHistoryRepository.save(senderAccountHistory);
+        transactionHistoryRepository.save(receiverAccountHistory);
+    }
+
+    @Transactional(readOnly = true)
+    public FintechUserBalanceDTO getUserAccountBalance(FintechUserDTO fintechUserDTO) {
+        User user = getLoginUser();
+
+        FTService ftService = serviceRepository.findByServiceCodeAndUser(fintechUserDTO.getServiceCode(), user)
+                .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
+
+        FTUser ftUser = fintechUserRepository.findByServiceAndFintechCode(ftService, fintechUserDTO.getFintechCode())
+                .orElseThrow(() -> new FintechServiceNotFoundException("핀테크 정보가 없습니다."));
+
+        return FintechUserBalanceDTO.builder()
+                .accountNumber(ftUser.getAccount().getAccountNumber())
+                .balance(ftUser.getAccount().getBalance())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<TransactionHistoryDTO> getUserAccountTransactionHistory(FintechUserHistoryDTO fintechUserHistoryDTO) {
+        User user = getLoginUser();
+
+        FTService ftService = serviceRepository.findByServiceCodeAndUser(fintechUserHistoryDTO.getServiceCode(), user)
+                .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
+
+        FTUser ftUser = fintechUserRepository.findByServiceAndFintechCode(ftService, fintechUserHistoryDTO.getFintechCode())
+                .orElseThrow(() -> new FintechServiceNotFoundException("핀테크 정보가 없습니다."));
+
+        List<TransactionHistory> transactionHistoryList =
+                transactionHistoryRepository.findAllByAccountAndTransactionAtGreaterThanEqual(ftUser.getAccount(),
+                        fintechUserHistoryDTO.getStartAt());
+
+        return toTransactionHistoryDTOList(transactionHistoryList);
     }
 
     private String generateFintechUserCode() {
         UUID uuid = UUID.randomUUID();
+        String withoutHyphens = uuid.toString().replace("-", "");
 
-        String fintechUserCode = Long.toString(uuid.node());
-
-        return fintechUserCode;
+        int length = withoutHyphens.length();
+        if (length >= 12) {
+            return withoutHyphens.substring(length - 12);
+        } else {
+            return withoutHyphens;
+        }
     }
 
     private String generateVerificationCode(String serviceName) {
@@ -135,4 +247,30 @@ public class FintechService {
 
         return code.toString();
     }
+
+    private User getLoginUser() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    private List<TransactionHistoryDTO> toTransactionHistoryDTOList(List<TransactionHistory> transactionHistoryList) {
+        return transactionHistoryList.stream()
+                .map(this::toTransactionHistoryDTO)
+                .collect(Collectors.toList());
+    }
+
+    private TransactionHistoryDTO toTransactionHistoryDTO(TransactionHistory transactionHistory) {
+        TransactionHistoryDTO.TransactionHistoryDTOBuilder builder = TransactionHistoryDTO.builder()
+                .transactionType(transactionHistory.getTransactionType())
+                .transactionAt(transactionHistory.getTransactionAt())
+                .amount(transactionHistory.getAmount())
+                .balanceAfter(transactionHistory.getBalanceAfter())
+                .content(transactionHistory.getContent());
+
+        if (transactionHistory.getCounterAccount() != null) {
+            builder.counterAccountName(transactionHistory.getCounterAccount().getUser().getName());
+        }
+
+        return builder.build();
+    }
+
 }

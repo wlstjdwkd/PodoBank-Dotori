@@ -2,12 +2,11 @@ package com.bank.podo.domain.openbank.dto;
 
 import lombok.Data;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
-public class FintechWithdrawDTO {
+public class FintechUserHistoryDTO {
     private String serviceCode;
     private String fintechCode;
-    private BigDecimal amount;
-    private String content;
+    private LocalDateTime startAt;
 }
