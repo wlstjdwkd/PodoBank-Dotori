@@ -8,3 +8,6 @@ spring:
     config:
       name: dotori
       profile: default
+
+encrypt:
+  key: ${ENCRYPT_KEY}
