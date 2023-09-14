@@ -60,6 +60,7 @@ public class OpenBankingController {
             @ApiResponse(responseCode = "404", description = "무언가 존재하지 않습니다(서비스코드, 계좌 등)."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
+    @PostMapping("/withdraw")
     public ResponseEntity<Void> withdrawUserAccount(@RequestBody FintechWithdrawDTO fintechWithdrawDTO) {
         openBankingService.withdrawUserAccount(fintechWithdrawDTO);
         return ResponseEntity.ok().build();
@@ -73,6 +74,7 @@ public class OpenBankingController {
             @ApiResponse(responseCode = "404", description = "무언가 존재하지 않습니다(서비스코드, 계좌 등)."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
+    @PostMapping("/deposit")
     public ResponseEntity<Void> depositUserAccount(@RequestBody FintechDepositDTO fintechDepositDTO) {
         openBankingService.depositUserAccount(fintechDepositDTO);
         return ResponseEntity.ok().build();
@@ -86,6 +88,7 @@ public class OpenBankingController {
             @ApiResponse(responseCode = "404", description = "무언가 존재하지 않습니다(서비스코드, 계좌 등)."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
+    @PostMapping("/balance")
     public ResponseEntity<FintechUserBalanceDTO> getUserAccountBalance(@RequestBody FintechUserDTO fintechUserDTO) {
         FintechUserBalanceDTO fintechUserBalanceDTO = openBankingService.getUserAccountBalance(fintechUserDTO);
         return ResponseEntity.ok(fintechUserBalanceDTO);
@@ -99,6 +102,7 @@ public class OpenBankingController {
             @ApiResponse(responseCode = "404", description = "무언가 존재하지 않습니다(서비스코드, 계좌 등)."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
+    @PostMapping("/history")
     public ResponseEntity<List<TransactionHistoryDTO>> getUserAccountTransactionHistory(@RequestBody FintechUserHistoryDTO fintechUserHistoryDTO) {
         List<TransactionHistoryDTO> transactionHistoryDTOList = openBankingService.getUserAccountTransactionHistory(fintechUserHistoryDTO);
         return ResponseEntity.ok(transactionHistoryDTOList);
