@@ -30,6 +30,7 @@ services:
       dockerfile: Dockerfile.Dotori_back
       args:
         - BUILD_NUMBER_DOTORI
+        - ENCRYPT_KEY=${ENCRYPT_KEY_VALUE}
     ports:
       - "9100:9100"
     environment:
