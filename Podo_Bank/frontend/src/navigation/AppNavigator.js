@@ -28,6 +28,7 @@ import ResetPasswordSucceessScreen from "../screens/Home/ResetPasswordSucceessSc
 import ChangePasswordSucceessScreen from "../screens/Home/ChangePasswordSucceessScreen";
 import ExamScreen from "../screens/Home/ExamScreen";
 import ChangePasswordScreen from "../screens/Home/ChangePasswordScreen";
+import WithdrawalScreen from "../screens/Home/WithdrawalScreen";
 
 const Stack = createStackNavigator();
 
@@ -131,6 +132,10 @@ function AppNavigator() {
       <Stack.Screen
         name="ChangePasswordScreen"
         component={ChangePasswordScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="WithdrawalScreen"
+        component={WithdrawalScreen}
       ></Stack.Screen>
       <Stack.Screen
         name="ExamScreen"

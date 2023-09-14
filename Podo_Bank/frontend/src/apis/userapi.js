@@ -152,9 +152,13 @@ export const userEmailDuplicationCheck = async (email) => {
     // throw error;
   }
 };
-export const userWithdrawal = async () => {
+export const userWithdrawal = async (accessToken, password) => {
   try {
-    const response = await axios.post(apiAddress+'/api/v1/user');
+    const response = await axios.post(apiAddress + '/api/v1/user', {password:password}, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
     console.log('회원 탈퇴 성공:',response.data)
     // return response.data;
     return response;
@@ -165,10 +169,15 @@ export const userWithdrawal = async () => {
     // throw error;
   }
 };
-export const userInformationInquiry = async () => {
+export const userInformationInquiry = async (accessToken) => {
   try {
-    const response = await axios.get(apiAddress+'/api/v1/user');
-    console.log(response.data)
+    // const response = await axios.get(apiAddress+'/api/v1/user');
+    const response = await axios.get(apiAddress + '/api/v1/user', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    console.log('회원 정보 조회 성공:',response.data)
     return response;
   } catch (error) {
     console.error('회원 정보 조회 실패:', error);

@@ -9,17 +9,16 @@ import {
   Alert,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-// import { useSelector, useDispatch } from 'react-redux';
-// import { decrement, increment, incrementByAmount,changeNameNum } from '../../redux/slices/auth/user'
+import { useSelector, useDispatch } from 'react-redux';
+import { inputAccessToken, inputRefreshToken } from '../../redux/slices/auth/user'
 
 import {userLogin} from '../../apis/userapi'
 
 export default function LoginScreen({ navigation }) {
-  // const count = useSelector((state) => state.counter.count);
-  // const name = useSelector((state) => state.counter.nametmp);
-  // const count2 = useSelector((state) => state.whole.count2);
-  // const name2 = useSelector((state) => state.whole.nameTmp2);
-  // const dispatch = useDispatch();
+  // const accessToken = useSelector((state) => state.user.accessToken)
+  // const refreshToken = useSelector((state) => state.user.refreshToken)
+  const dispatch = useDispatch();
+  
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isSucceed, setIsSucceed] = useState(false)
@@ -48,6 +47,8 @@ export default function LoginScreen({ navigation }) {
     const response = await userLogin(email, password);
     if (response.status === 200) {
       console.log("로그인 성공");
+      dispatch(inputAccessToken(response.data.accessToken))
+      dispatch(inputRefreshToken(response.data.refreshToken))
       handleLoginSuccess();
     } else {
       console.log("로그인 실패");

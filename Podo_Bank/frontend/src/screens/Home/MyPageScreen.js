@@ -1,18 +1,24 @@
 import React, {useState, useEffect} from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Modal,Pressable, } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
 import FooterScreen from "../Header/FooterScreen";
 import {
-  userInformationInquiry, userLogout
+  userInformationInquiry, userLogout, userWithdrawal
 } from '../../apis/userapi'
 import { FontAwesome } from "@expo/vector-icons";
+import { useSelector, useDispatch } from 'react-redux';
+import { inputAccessToken, inputRefreshToken } from '../../redux/slices/auth/user'
 
 export default function MyPageScreen({ navigation }) {
   const [userInfo, setUserInfo] = useState(null)
+  const [userWithdrawalModalVisible, setUserWithdrawalModalVisible] = useState(false)
+  const accessToken = useSelector((state) => state.user.accessToken)
+  const refreshToken = useSelector((state) => state.user.refreshToken)
+  const dispatch = useDispatch();
 
   //들어올 때 axios로 정보 받아야함
   const hanldeUserInformationInquiry = async() =>{
-    const response = await userInformationInquiry()
+    const response = await userInformationInquiry(accessToken)
     if(response.status===200){
       console.log('good')
       setUserInfo(response.data)
@@ -25,20 +31,19 @@ export default function MyPageScreen({ navigation }) {
 
   const handleUserLogout = () => {
     const response = userLogout()
-    if(response===200){
+    if(response.status===200){
       console.log('logout 성공')
       navigation.navigate("LoginScreen");
-    }else if(response===400){
+    }else if(response.status===400){
       console.log('logout 실패')
-    }else if(response===401){
+    }else if(response.status===401){
       console.log('logout 인증실패 실패')
-    }else if(response===403){
+    }else if(response.status===403){
       console.log('토큰없음')
     }else{
       console.log('오류발생 로그아웃 실패')
     }
   }
-
 
   // 페이지가 로드될 때 hanldeUserInformationInquiry() 함수 실행
   useEffect(() => {
@@ -61,23 +66,33 @@ export default function MyPageScreen({ navigation }) {
         <Text style={styles.boldText}>기본정보</Text>
         <View style={styles.infoRow}>
           <Text>이름</Text>
-          {/* <Text>정예진 {userInfo.name}</Text> */}
-          <Text>정예진</Text>
+          {userInfo?
+            (<Text>{userInfo.name}</Text>)
+            :(<Text>정예진</Text>)
+          }
+          
         </View>
         <View style={styles.infoRow}>
           <Text>이메일</Text>
-          {/* <Text>abc1234@naver.com {userInfo.email}</Text> */}
-          <Text>abc1234@naver.com</Text>
+          {userInfo?
+            (<Text>{userInfo.email}</Text>)
+            :(<Text>abc1234@naver.com</Text>)
+          }
+          
         </View>
         <View style={styles.infoRow}>
           <Text>생년월일</Text>
-          {/* <Text>1999.05.08 {userInfo.birthdate}</Text> */}
-          <Text>1999.05.08</Text>
+          {userInfo?
+            (<Text>{userInfo.birthdate}</Text>)
+            :(<Text>1999.05.08</Text>)
+          }
         </View>
         <View style={styles.infoRow}>
           <Text>핸드폰번호</Text>
-          {/* <Text>010-****-1908 {userInfo.phoneNumber}</Text> */}
-          <Text>010-****-1908</Text>
+          {userInfo?
+            (<Text>{userInfo.phoneNumber}</Text>)
+            :(<Text>010-1234-1234</Text>)
+          }
         </View>
       </View>
 
@@ -103,7 +118,50 @@ export default function MyPageScreen({ navigation }) {
       >
         <Text style={styles.logoutButtonText}>로그아웃</Text>
       </TouchableOpacity>
-      <TouchableOpacity>
+
+      {/* 회원탈퇴 모달창 */}
+      <Modal
+        animationType="none"//slide, fade가 있음
+        transparent={true}
+        visible={userWithdrawalModalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setUserWithdrawalModalVisible(!userWithdrawalModalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={[styles.modalView]}>
+            <Text style={styles.modalText}>정말로 탈퇴하시겠습니까?</Text>
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginHorizontal: 0,
+            }}>
+              <TouchableOpacity
+                style={[styles.button, styles.buttonClose, {flex: 1, marginRight: 5 }]}
+                onPress={() => {
+                  setUserWithdrawalModalVisible(!userWithdrawalModalVisible)
+                  navigation.navigate("WithdrawalScreen")
+                }}>
+                <Text style={[styles.textStyle,]}>예</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, styles.buttonClose, {flex: 1, marginLeft: 5 }]}
+                onPress={() => {
+                  setUserWithdrawalModalVisible(!userWithdrawalModalVisible)
+                }}>
+                <Text style={[styles.textStyle,]}>아니오</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <TouchableOpacity
+        onPress={()=>{
+          setUserWithdrawalModalVisible(true)
+        }}
+      >
         <Text style={styles.grayText}>
           포도은행을 탈퇴하시려면 여기를 눌러주세요
         </Text>
@@ -171,5 +229,48 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     marginTop: 220,
+  },
+  // 모달부분
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    color:'red'
   },
 });

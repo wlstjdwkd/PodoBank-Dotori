@@ -8,6 +8,8 @@ const userSlice = createSlice({
     count: 0,
     nameorigin: null,
     nametmp:null,
+    accessToken:null,
+    refreshToken:null,
   },
   reducers: {
     increment(state) {
@@ -29,11 +31,16 @@ const userSlice = createSlice({
       const randomNum = Math.floor(Math.random() * 100) +1;
       state.nametmp = `${state.nameorigin}${randomNum}`;
     },
+    inputAccessToken(state, action){
+      state.accessToken = action.payload
+    },
+    inputRefreshToken(state, action){
+      state.refreshToken = action.payload
+    },
   },
 });
 
-export const { increment, decrement, incrementByAmount, changeNameNum } =
-userSlice.actions;
+export const { increment, decrement, incrementByAmount, changeNameNum, inputAccessToken, inputRefreshToken } = userSlice.actions;
 
 export default userSlice.reducer;
 
