@@ -7,5 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PlanRepository extends JpaRepository<Plan, Long> {
     Plan findByPlanSeq(Long planSeq);
+    Plan findByAccountAccountSeq(Long accountSeq);
 
 }

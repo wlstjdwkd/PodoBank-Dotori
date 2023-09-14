@@ -6,12 +6,14 @@ import com.yongy.dotori.domain.purposeData.entity.PurposeData;
 import com.yongy.dotori.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
+@Getter
 @Entity(name="accounts")
 public class Account {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

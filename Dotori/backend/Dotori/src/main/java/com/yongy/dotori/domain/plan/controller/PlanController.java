@@ -1,5 +1,6 @@
 package com.yongy.dotori.domain.plan.controller;
 
+import com.yongy.dotori.domain.plan.dto.ActivePlanDTO;
 import com.yongy.dotori.domain.plan.dto.PlanDTO;
 import com.yongy.dotori.domain.plan.service.PlanServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -7,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -24,9 +27,16 @@ public class PlanController {
     }
 
     @Operation(summary = "실행중인 계획 중단")
-    @GetMapping("/stop/{planSeq}")
+    @GetMapping("/terminate/{planSeq}")
     public ResponseEntity<Void> terminatePlan(@PathVariable Long planSeq){
         planService.terminatePlan(planSeq);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "계좌에 연결된 실행중인 계획 조회")
+    @GetMapping("/{accountSeq}")
+    public ResponseEntity<ActivePlanDTO> findAllPlan(@PathVariable Long accountSeq){
+        ActivePlanDTO result = planService.findAllPlan(accountSeq);
+        return ResponseEntity.ok(result);
     }
 }
