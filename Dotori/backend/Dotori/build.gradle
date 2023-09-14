@@ -11,6 +11,11 @@ java {
     sourceCompatibility = '17'
 }
 
+ext {
+    set('springCloudVersion', "2022.0.4")
+}
+
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
@@ -42,11 +47,25 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     implementation 'mysql:mysql-connector-java:8.0.33'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.hibernate.validator:hibernate-validator:7.0.2.Final'
+
+
 
     // implementation 'org.springframework.boot:spring-boot-starter-security'
 
     // swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+
+    // Spring Cloud Config Client
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+// actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 tasks.named('test') {

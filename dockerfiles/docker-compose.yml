@@ -22,6 +22,28 @@ services:
       - /etc/redis/redis.conf:/usr/local/etc/redis/redis.conf
     command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
 
+
+  dotori:
+    image: bangjinseong/dotori:${BUILD_NUMBER_DOTORI}
+    build:
+      context: ../Dotori/backend/Dotori
+      dockerfile: Dockerfile.Dotori_back
+      args:
+        - BUILD_NUMBER_DOTORI
+    ports:
+      - "9100:9100"
+    environment:
+      - SPRING_REDIS_HOST=redis_dotori
+      # 필요한 추가 환경 변수는 여기에 추가하십시오.
+    depends_on:
+      - redis_dotori
+  redis_dotori:
+    image: redis
+    ports:
+      - "9150:6379"
+    volumes:
+      - /etc/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
   #redis_dotori:
     #image: redis_dotori:{BUILD_NUMBER_DOTORI}
     #ports:
