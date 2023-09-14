@@ -225,7 +225,7 @@ public class AccountService {
                 .content(transferDTO.getSenderContent())
                 .build();
         TransactionHistory receiverAccountHistory = TransactionHistory.builder()
-                .transactionType(TransactionType.TRANSFER)
+                .transactionType(TransactionType.DEPOSIT)
                 .amount(transferAmount)
                 .balanceAfter(receiverAccount.getBalance())
                 .counterAccount(senderAccount)

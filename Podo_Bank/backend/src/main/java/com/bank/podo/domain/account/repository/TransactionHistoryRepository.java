@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface TransactionHistoryRepository extends JpaRepository<TransactionHistory, Long> {
+
+    List<TransactionHistory> findAllByAccountAndTransactionAtGreaterThanEqual(Account account, LocalDateTime transactionAt);
     List<TransactionHistory> findAllByAccountAndTransactionAtGreaterThanEqual(Account account, LocalDateTime transactionAt, PageRequest pageRequest);
 
     List<TransactionHistory> findAllByAccountAndTransactionType(Account account, TransactionType transactionType, PageRequest pageRequest);

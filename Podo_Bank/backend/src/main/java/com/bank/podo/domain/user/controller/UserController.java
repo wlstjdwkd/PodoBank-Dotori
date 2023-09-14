@@ -100,11 +100,12 @@ public class UserController {
         return userService.refresh(refreshToken, request);
     }
 
-    @Operation(summary = "로그아웃")
+    @Operation(summary = "로그아웃", description = "USER")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그아웃 성공"),
             @ApiResponse(responseCode = "400", description = "로그아웃 실패"),
-            @ApiResponse(responseCode = "401", description = "jwt 인증 실패"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "토큰 없음")
     })
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
@@ -112,11 +113,12 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "회원 정보 조회")
+    @Operation(summary = "회원 정보 조회", description = "USER")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공"),
             @ApiResponse(responseCode = "400", description = "회원 정보 조회 실패"),
-            @ApiResponse(responseCode = "401", description = "jwt 인증 실패"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "토큰 없음")
     })
     @GetMapping("")
     public ResponseEntity<UserInfoDTO> getUserInfo() {
@@ -124,11 +126,12 @@ public class UserController {
         return ResponseEntity.ok(userInfoDTO);
     }
 
-    @Operation(summary = "비밀번호 변경")
+    @Operation(summary = "비밀번호 변경", description = "USER")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "비밀번호 변경 성공"),
             @ApiResponse(responseCode = "400", description = "비밀번호 변경 실패"),
-            @ApiResponse(responseCode = "401", description = "jwt 인증 실패"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "토큰 없음"),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 회원"),
             @ApiResponse(responseCode = "422", description = "비밀번호 형식 오류")
     })
@@ -142,7 +145,6 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "비밀번호 초기화 성공"),
             @ApiResponse(responseCode = "400", description = "비밀번호 초기화 실패"),
-            @ApiResponse(responseCode = "401", description = "jwt 인증 실패"),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 회원"),
             @ApiResponse(responseCode = "422", description = "비밀번호 형식 오류")
     })
@@ -152,11 +154,12 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "회원 탈퇴")
+    @Operation(summary = "회원 탈퇴", description = "USER")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공"),
             @ApiResponse(responseCode = "400", description = "회원 탈퇴 실패"),
-            @ApiResponse(responseCode = "401", description = "jwt 인증 실패"),
+            @ApiResponse(responseCode = "401", description = "인증 실패"),
+            @ApiResponse(responseCode = "403", description = "토큰 없음"),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 회원")
     })
     @PostMapping("")
