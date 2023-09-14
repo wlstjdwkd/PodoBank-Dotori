@@ -27,4 +27,4 @@ services:
       # -"9150:6379"
     #volumes:
       # - /etc/redis/redis_dotori.conf
-    #command:
+    #command: []
