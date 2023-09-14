@@ -9,5 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface FintechUserRepository extends JpaRepository<FintechUser, Long> {
-    Optional<FintechUser> findByServiceAndFintechCode(FintechService fintechService, String fintechCode);
+    Optional<FintechUser> findByFintechServiceAndFintechCode(FintechService fintechService, String fintechCode);
 }
