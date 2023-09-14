@@ -1,7 +1,7 @@
 version: "3"
 services:
   podobank:
-    image: podobank:${BUILD_NUMBER}
+    image: bangjinseong/podobank:${BUILD_NUMBER}
     build:
       context: ../Podo_Bank/backend
       dockerfile: Dockerfile.Podo_back
@@ -14,7 +14,7 @@ services:
     depends_on:
       - redis
   redis:
-    image: redis:${BUILD_NUMBER}
+    image: bangjinseong/redis:${BUILD_NUMBER}
     ports:
       - "9050:6379"
     volumes:
