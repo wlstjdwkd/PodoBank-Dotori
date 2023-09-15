@@ -30,12 +30,11 @@ services:
       dockerfile: Dockerfile.Dotori_back
       args:
         - BUILD_NUMBER_DOTORI
-        - ENCRYPT_KEY=${ENCRYPT_KEY_VALUE}
     ports:
       - "9100:9100"
     environment:
       - SPRING_REDIS_HOST=redis_dotori
-      # 필요한 추가 환경 변수는 여기에 추가하십시오.
+      - ENCRYPT_KEY=${ENCRYPT_KEY_VALUE}
     depends_on:
       - redis_dotori
   redis_dotori:
