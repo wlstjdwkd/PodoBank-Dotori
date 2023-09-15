@@ -14,12 +14,12 @@ import java.time.Duration;
 public class RedisUtil {
 
     @Autowired
-    private StringRedisTemplate redisTemplate = redisTemplate = new StringRedisTemplate();
+    private StringRedisTemplate redisTemplate;
 
-//    @PostConstruct
-//    private void init(){
-//        redisTemplate = new StringRedisTemplate();
-//    }
+    @PostConstruct
+    private void init(){
+        redisTemplate = new StringRedisTemplate();
+    }
 
     // key를 통해 value를 반환한다.
     public String getData(String key){

@@ -4,8 +4,6 @@ import org.springframework.http.HttpStatus;
 
 public enum ExceptionEnum {
 
-
-
     ALREADY_EXIST_ID(HttpStatus.BAD_REQUEST,4001,"이미 존재하는 아이디입니다."),
 
     EXPIRED_AUTHCODE(HttpStatus.BAD_REQUEST, 4002, "인증번호가 만료되었습니다."),

@@ -6,13 +6,11 @@ import com.yongy.dotori.domain.user.entity.Role;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.user.exception.ExceptionEnum;
 import com.yongy.dotori.domain.user.repository.UserRepository;
-import com.yongy.dotori.domain.user.service.KakaoService;
-import com.yongy.dotori.domain.user.service.NaverService;
 import com.yongy.dotori.domain.user.service.UserService;
 import com.yongy.dotori.global.common.BaseResponseBody;
 import com.yongy.dotori.global.redis.RedisUtil;
-import com.yongy.dotori.global.security.jwt.JwtTokenProvider;
-import com.yongy.dotori.global.security.jwtDto.JwtToken;
+import com.yongy.dotori.global.security.provider.JwtTokenProvider;
+import com.yongy.dotori.global.security.dto.JwtToken;
 
 //import io.swagger.v3.oas.annotations.Operation;
 //import io.swagger.v3.oas.annotations.media.Content;
@@ -20,15 +18,11 @@ import com.yongy.dotori.global.security.jwtDto.JwtToken;
 //import io.swagger.v3.oas.annotations.responses.ApiResponse;
 //import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -109,37 +103,28 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4004, "회원가입 오류"));
         }
     }
+
     @PostMapping("/signin")
     public ResponseEntity<? extends BaseResponseBody> dotoriLogin(@RequestBody Map<String, String> loginForm) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        System.out.println(authentication.isAuthenticated());
+        User user = userRepository.findById(loginForm.get("id"));
 
-        System.out.println(authentication.getName());
-
-        if(authentication == null || !authentication.isAuthenticated()){
-            User user = userRepository.findById(loginForm.get("id"));
-
-            if(user == null || user.getExpiredAt() == null){
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "존재하지 않는 사용자의 정보입니다."));
-            }
-
-            if(user.getAuthProvider().equals(Provider.DOTORI)){
-                if(!passwordEncoder.encode(loginForm.get("password")).equals(user.getPassword())){
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "비밀번호가 올바르지 않습니다."));
-                }
-            }
-
-            JwtToken jwtToken = jwtTokenProvider.createToken(user.getId(), Role.USER);
-
-            // refreshToken 저장
-            redisUtil.setDataExpire(user.getId(), jwtToken.getRefreshToken(), exp*24);
-
-            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, jwtToken.getAccessToken()));
-        }else{
-            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "이미 로그인되어 있습니다."));
+        if(user == null || user.getExpiredAt() != null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "아이디를 확인해주세요."));
         }
+
+        if(user.getAuthProvider().equals(Provider.DOTORI)){
+            if(!passwordEncoder.matches(loginForm.get("password"), user.getPassword())){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "비밀번호를 확인해주세요."));
+            }
+        }
+
+        JwtToken jwtToken = jwtTokenProvider.createToken(user.getId(), Role.USER);
+
+        // refreshToken 저장
+        redisUtil.setDataExpire(user.getId(), jwtToken.getRefreshToken(), exp*24);
+
+        // accessToken 전달
+        return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, jwtToken.getAccessToken()));
     }
-
-
 }

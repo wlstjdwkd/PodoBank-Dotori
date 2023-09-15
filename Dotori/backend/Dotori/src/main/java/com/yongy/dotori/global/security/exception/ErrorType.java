@@ -1,4 +1,4 @@
-package com.yongy.dotori.global.security.jwt;
+package com.yongy.dotori.global.security.exception;
 
 import lombok.Getter;
 

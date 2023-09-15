@@ -35,16 +35,13 @@ public class User {
     @Column(nullable = false)
     private String id;
 
-//    @Column(nullable = false)
     private String password;
 
-//    @Column(name="birth_date", nullable = false)
     private LocalDate birthDate;
 
     @Column(name="user_name", nullable = false)
     private String userName;
 
-//    @Column(name="phone_number", nullable = false)
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)

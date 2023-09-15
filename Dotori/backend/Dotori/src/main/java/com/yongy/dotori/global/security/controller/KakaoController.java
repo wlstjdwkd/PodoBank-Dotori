@@ -1,6 +1,6 @@
-package com.yongy.dotori.domain.user.controller;
+package com.yongy.dotori.global.security.controller;
 
-import com.yongy.dotori.domain.user.service.KakaoService;
+import com.yongy.dotori.global.security.service.KakaoService;
 import com.yongy.dotori.global.common.BaseResponseBody;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

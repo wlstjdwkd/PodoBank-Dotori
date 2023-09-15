@@ -1,4 +1,4 @@
-package com.yongy.dotori.domain.user.service;
+package com.yongy.dotori.global.security.service;
 
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.yongy.dotori.domain.user.entity.Provider;

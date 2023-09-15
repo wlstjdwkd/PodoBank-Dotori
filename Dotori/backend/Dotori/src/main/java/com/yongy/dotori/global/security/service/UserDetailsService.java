@@ -1,4 +1,4 @@
-package com.yongy.dotori.global.security.jwt;
+package com.yongy.dotori.global.security.service;
 
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.user.repository.UserRepository;
@@ -9,11 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
-@RequiredArgsConstructor
 public class UserDetailsService {
 
-
+    @Autowired
     private UserRepository userRepository;
 
     public User getUserInfo(String id){

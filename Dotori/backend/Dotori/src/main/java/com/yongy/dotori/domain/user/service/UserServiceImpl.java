@@ -23,16 +23,12 @@ import java.util.Random;
 @Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private final JavaMailSender javaMailSender;
-
     @Autowired
     private final RedisUtil redisUtil;
-
     public void authEmail(String id){
         // 임의의 authKey 생성
         Random random = new Random();
