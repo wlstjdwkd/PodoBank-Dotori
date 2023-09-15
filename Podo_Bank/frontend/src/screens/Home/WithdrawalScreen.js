@@ -5,24 +5,30 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  Modal,
+  Pressable,
 } from "react-native";
 
 import HeaderComponent from "../Header/HeaderScreen";
 import {
-  userRegister,
+  userWithdrawal,
 } from '../../apis/userapi'
+import { useSelector, useDispatch } from 'react-redux';
+import {  } from '../../redux/slices/auth/user'
 
 export default function SignupInformationScreen({ navigation, route }) {
-  const [userInfo, setUserInfo] = useState(route.params.userInfo);
-  console.log(userInfo)
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMessage, setPasswordMessage] = useState("");
   const [confirmPasswordMessage, setConfirmPasswordMessage] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(false);
-  const [isSucceed, setIsSucceed] = useState(false);              // 회원가입 성공여부
-  const [registeredMessage, setRegisteredMessage] = useState(""); // 회원가입 버튼 클릭시 메시지
+  const [clickWithdrawalBtn, setIsClickWithdrawalBtn] = useState(false);              // 회원탈퇴 성공여부
+  const [registeredMessage, setRegisteredMessage] = useState(""); // 회원탈퇴 버튼 클릭시 메시지
+  const [userWithdrawalModalVisible, setUserWithdrawalModalVisible] = useState(false); // 회원탈퇴 마지막 모달창
+  const accessToken = useSelector((state) => state.user.accessToken)
+  const refreshToken = useSelector((state) => state.user.refreshToken)
+  const dispatch = useDispatch();
 
   const validatePassword = (password) => {
     const regex =
@@ -33,10 +39,10 @@ export default function SignupInformationScreen({ navigation, route }) {
   const handlePasswordChange = (text) => {
     setPassword(text);
     if (validatePassword(text)) {
-      setPasswordMessage("완벽합니당");
+      // setPasswordMessage("완벽합니당");
       setIsPasswordValid(true);
     } else {
-      setPasswordMessage("양식을 맞춰주세요!");
+      // setPasswordMessage("양식을 맞춰주세요!");
       setIsPasswordValid(false);
     }
   };
@@ -44,68 +50,49 @@ export default function SignupInformationScreen({ navigation, route }) {
   const handleConfirmPasswordChange = (text) => {
     setConfirmPassword(text);
     if (text === password && isPasswordValid) {
-      setConfirmPasswordMessage("완벽합니당");
+      // setConfirmPasswordMessage("완벽합니당");
+      setConfirmPasswordMessage("");
       setIsConfirmPasswordValid(true);
-      setUserInfo((prev) => ({ ...prev, password: text }));
     } else {
       setConfirmPasswordMessage("비밀번호가 일치하지 않습니다");
       setIsConfirmPasswordValid(false);
     }
   };
 
-  // 회원가입
-  const handleUserRegister = async()=>{
-    const updatedUserInfo = handleFixBirthdate()
-    // handleFixBirthdate()
-    const response = await userRegister(updatedUserInfo)
-    if(response.status === 200){
-      console.log('회원가입 성공')
-      setIsSucceed(true)
-      setRegisteredMessage('회원가입 성공')
-    }else if(response.status === 400){
-      console.log('회원가입 실패')
-      setRegisteredMessage('회원가입 실패')
-    }else if(response.status === 409){
-      console.log('이미 사용중인 아이디')
-      setRegisteredMessage('이미 사용중인 아이디')
-    }else if(response.status === 422){
-      console.log('이메일 형식 오류')
-      setRegisteredMessage('이메일 형식 오류')
+  // 회원탈퇴
+  const handleUserWithdrawal = async()=>{
+    setIsClickWithdrawalBtn(true)
+    console.log('되냐?', clickWithdrawalBtn)
+    const response = await userWithdrawal(accessToken,confirmPassword)
+    console.log('안되냐?', clickWithdrawalBtn)
+    if(response.status==200){
+      console.log('회원탈퇴 성공')
+      setRegisteredMessage('회원 탈퇴가 완료되었습니다.')
+      navigation.navigate("LoginScreen")
+    }else if(response.status===400){
+      console.log('회원탈퇴 실패')
+      setRegisteredMessage('회원 탈퇴에 실패하셨습니다.')
+    }else if(response.status===401){
+      console.log('인증 실패')
+      setRegisteredMessage('인증 실패')
+    }else if(response.status===403){
+      console.log('토큰 없음')
+      setRegisteredMessage('토큰 없음')
+    }else if(response.status===404){
+      console.log('존재하지 않는 회원')
+      setRegisteredMessage('존재하지 않는 회원입니다.')
     }else{
-      console.log('오류 발생')
-      setRegisteredMessage('오류 발생')
+      console.log('오류발생 회원탈퇴 실패')
+      setRegisteredMessage('진행 중 오류가 발생했습니다.')
     }
   }
-
-  const handleFixBirthdate = () => {
-    if (userInfo.birthdate && userInfo.birthdate.length === 8) {
-      const year = userInfo.birthdate.substring(0, 4);
-      const month = userInfo.birthdate.substring(4, 6);
-      const day = userInfo.birthdate.substring(6, 8);
-  
-      // YYYY-MM-DD 형식으로 변환
-      const formattedBirthdate = `${year}-${month}-${day}`;
-  
-      // 변경된 형식으로 userInfo의 birthdate를 업데이트
-      // setUserInfo((prev) => ({
-      //   ...prev,
-      //   birthdate: formattedBirthdate,
-      // }));
-      return {
-        ...userInfo,
-        birthDate: formattedBirthdate,
-      };
-    }
-    console.log(userInfo)
-    return userInfo
-  };
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <HeaderComponent
         navigation={navigation}
-        title="회원가입(3/3)"
+        title="회원탈퇴"
       ></HeaderComponent>
 
       {/* 본인 인증 안내 */}
@@ -114,9 +101,9 @@ export default function SignupInformationScreen({ navigation, route }) {
       <View style={styles.inputContainer}>
         <View style={styles.textRow}>
           <Text style={styles.inputText}>비밀번호</Text>
-          <Text style={styles.descriptionText}>
+          {/* <Text style={styles.descriptionText}>
             영문, 숫자, 특수문자가 모두 들어간 8~16글자
-          </Text>
+          </Text> */}
         </View>
 
         <TextInput
@@ -158,7 +145,7 @@ export default function SignupInformationScreen({ navigation, route }) {
       <View>
         <Text
           style={{
-            color: isSucceed ? "blue" : "red",
+            color: clickWithdrawalBtn ? "blue" : "red",
             alignSelf: 'center',
           }}
         >
@@ -176,18 +163,51 @@ export default function SignupInformationScreen({ navigation, route }) {
         ]}
         // back에 회원가입 정보 보내야함
         onPress={() =>{
-          handleUserRegister()
-          // handleConfirmButton()
-          if(isSucceed){
-            navigation.navigate("SignupCompleteScreen", {
-              name: userInfo.name,
-            })
-          }
+          setUserWithdrawalModalVisible(true)
         }}
         disabled={!(isPasswordValid && isConfirmPasswordValid)}
       >
-        <Text style={styles.linkText}>회원가입</Text>
+        <Text style={styles.linkText}>회원 탈퇴</Text>
       </TouchableOpacity>
+      {/* 회원탈퇴 마지막 확인창 */}
+      <View style={styles.centeredView}>
+        <Modal
+          animationType="none"//slide, fade가 있음
+          transparent={true}
+          visible={userWithdrawalModalVisible}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setUserWithdrawalModalVisible(!userWithdrawalModalVisible);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={[styles.modalView]}>
+              <Text style={styles.modalText}>정말로 탈퇴하시겠습니까?</Text>
+              <View style={{
+                flexDirection: 'row', 
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginHorizontal: 0,
+              }}>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonClose, {flex: 1, marginRight: 5 }]}
+                  onPress={() => {
+                    handleUserWithdrawal()
+                    setUserWithdrawalModalVisible(!userWithdrawalModalVisible)
+                  }}>
+                  <Text style={[styles.textStyle,]}>예</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonClose, {flex: 1, marginLeft: 5 }]}
+                  onPress={() => {
+                    setUserWithdrawalModalVisible(!userWithdrawalModalVisible)
+                  }}>
+                  <Text style={[styles.textStyle,]}>아니오</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </View>
     </View>
   );
 }
@@ -265,5 +285,47 @@ const styles = StyleSheet.create({
     marginRight: 30,
     marginLeft: 30,
     borderRadius: 5,
+  },
+  // 모달 창에 쓰이는 스타일
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });

@@ -11,11 +11,11 @@ import HeaderComponent from "../Header/HeaderScreen";
 export default function SignupIdentityVerificationScreen({ navigation }) {
   const [userInfo, setUserInfo] = useState({
     name: "",
-    birthDate: "",
+    birthdate: "",
     phoneNumber: "",
   });
   const [nameMessage, setNameMessage] = useState("")
-  const [birthDateMessage, setBirthDateMessage] = useState("")
+  const [birthdateMessage, setBirthdateMessage] = useState("")
   const [phoneNumberMessage, setPhoneNumberMessage] = useState("")
   const [isValid, setIsValid] = useState({
     isNameValid: false,
@@ -27,7 +27,7 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
     const regex = /^[A-Za-z가-힣]{2,}$/
     return regex.test(text);
   };
-  const validateBirthDate = (text) => {
+  const validateBirthdate = (text) => {
     const regex = /^\d{8}$/;
     return regex.test(text);
   };
@@ -44,12 +44,12 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
       setIsValid((prev) => ({ ...prev, isNameValid: false }))
     }
   };
-  const handleBirthDateChange = (text) => {
-    if (validateBirthDate(text)) {
-      setBirthDateMessage("생년월일 작성 완료");
+  const handleBirthdateChange = (text) => {
+    if (validateBirthdate(text)) {
+      setBirthdateMessage("생년월일 작성 완료");
       setIsValid((prev) => ({ ...prev, isBirthdateValid: true }))
     } else {
-      setBirthDateMessage('8자리 숫자로 작성해야 합니다.');
+      setBirthdateMessage('8자리 숫자로 작성해야 합니다.');
       setIsValid((prev) => ({ ...prev, isBirthdateValid: false }))
     }
   };
@@ -105,10 +105,10 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
           keyboardType="number-pad"
           maxLength={8}
           onChangeText={(text) => {
-            handleBirthDateChange(text)
-            setUserInfo({ ...userInfo, birthDate: text })
+            handleBirthdateChange(text)
+            setUserInfo({ ...userInfo, birthdate: text })
           }}
-          value={userInfo.birthDate}
+          value={userInfo.birthdate}
         />
       </View>
       <Text
@@ -118,7 +118,7 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
           marginTop: -30,
         }}
       >
-        {birthDateMessage}
+        {birthdateMessage}
       </Text>
       {/* 휴대폰번호입력 */}
       <View style={styles.inputContainer}>
@@ -151,11 +151,11 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
             backgroundColor: "grey",
           },
         ]}
-        onPress={() =>
-          navigation.navigate("SignupInformationScreenEmail", {
+        onPress={() =>{
+          navigation.navigate("SignupInformationEmailScreen", {
             userInfo: userInfo,
           })
-        }
+        }}
         disabled={!isValid.isNameValid || !isValid.isBirthdateValid || !isValid.isPhoneNumberValid}
       >
         <Text style={styles.linkText}>확인</Text>
