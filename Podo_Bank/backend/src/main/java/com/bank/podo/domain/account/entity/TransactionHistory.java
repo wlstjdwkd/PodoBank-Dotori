@@ -1,18 +1,18 @@
 package com.bank.podo.domain.account.entity;
 
 import com.bank.podo.domain.account.enums.TransactionType;
+import com.bank.podo.global.others.entity.BaseEntity;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor
-public class TransactionHistory {
+public class TransactionHistory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transactionId;
@@ -23,9 +23,6 @@ public class TransactionHistory {
 
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
-
-    @Column
-    private LocalDateTime transactionAt;
 
     @Column
     private BigDecimal amount;
@@ -44,7 +41,6 @@ public class TransactionHistory {
     public TransactionHistory(Account account, TransactionType transactionType, BigDecimal amount, BigDecimal balanceAfter, Account counterAccount, String content) {
         this.account = account;
         this.transactionType = transactionType;
-        this.transactionAt = LocalDateTime.now();
         this.amount = amount;
         this.balanceAfter = balanceAfter;
         this.counterAccount = counterAccount;

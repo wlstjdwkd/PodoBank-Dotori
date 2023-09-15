@@ -215,7 +215,7 @@ public class OpenBankingService {
                 .orElseThrow(() -> new FintechServiceNotFoundException("핀테크 정보가 없습니다."));
 
         List<TransactionHistory> transactionHistoryList =
-                transactionHistoryRepository.findAllByAccountAndTransactionAtGreaterThanEqual(fintechUser.getAccount(),
+                transactionHistoryRepository.findAllByAccountAndCreatedAtGreaterThanEqual(fintechUser.getAccount(),
                         fintechUserHistoryDTO.getStartAt());
 
         return toTransactionHistoryDTOList(transactionHistoryList);
@@ -260,7 +260,7 @@ public class OpenBankingService {
     private TransactionHistoryDTO toTransactionHistoryDTO(TransactionHistory transactionHistory) {
         TransactionHistoryDTO.TransactionHistoryDTOBuilder builder = TransactionHistoryDTO.builder()
                 .transactionType(transactionHistory.getTransactionType())
-                .transactionAt(transactionHistory.getTransactionAt())
+                .transactionAt(transactionHistory.getCreatedAt())
                 .amount(transactionHistory.getAmount())
                 .balanceAfter(transactionHistory.getBalanceAfter())
                 .content(transactionHistory.getContent());

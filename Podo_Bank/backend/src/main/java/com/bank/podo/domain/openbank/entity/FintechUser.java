@@ -1,19 +1,18 @@
 package com.bank.podo.domain.openbank.entity;
 
 import com.bank.podo.domain.account.entity.Account;
+import com.bank.podo.global.others.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FintechUser {
+public class FintechUser extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,9 +23,6 @@ public class FintechUser {
 
     @Column
     private boolean locked;
-
-    @Column
-    private LocalDateTime createAt;
 
     @ManyToOne
     @JoinColumn(name = "service_id")
@@ -40,7 +36,6 @@ public class FintechUser {
     public FintechUser(String fintechCode, boolean locked, FintechService fintechService, Account account) {
         this.fintechCode = fintechCode;
         this.locked = locked;
-        this.createAt = LocalDateTime.now();
         this.fintechService = fintechService;
         this.account = account;
     }

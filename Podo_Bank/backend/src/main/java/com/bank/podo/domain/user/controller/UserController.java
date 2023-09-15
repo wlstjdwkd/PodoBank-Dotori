@@ -71,7 +71,7 @@ public class UserController {
     @Operation(summary = "아이디 중복 체크")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "이메일 사용 가능"),
-            @ApiResponse(responseCode = "400", description = "이메일 사용 불가능"),
+            @ApiResponse(responseCode = "409", description = "이메일 중복"),
             @ApiResponse(responseCode = "422", description = "이메일 형식 오류")
     })
     @GetMapping("/email/{email}")
