@@ -2,6 +2,7 @@ package com.yongy.dotori.domain.user.controller;
 
 import com.yongy.dotori.domain.user.dto.request.UserInfoDto;
 import com.yongy.dotori.domain.user.entity.Provider;
+import com.yongy.dotori.domain.user.entity.Role;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.user.exception.ExceptionEnum;
 import com.yongy.dotori.domain.user.repository.UserRepository;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -63,7 +65,7 @@ public class UserController {
 
     @PostMapping("/check-id")
     public ResponseEntity<? extends BaseResponseBody> validIdCheck(@RequestParam(name="id") String id){
-        User user = userRepository.findById(id);
+        User user = userRepository.findUserByIdAndExpiredAtIsNull(id);
         if(user == null){
             // 이메일 인증을 한다.
             userService.authEmail(id);
@@ -92,7 +94,7 @@ public class UserController {
     public ResponseEntity<? extends BaseResponseBody> signup(@RequestBody UserInfoDto userInfoDto){
         try{
             User user = User.builder()
-                    .role(userInfoDto.getRole()) // 사용자 또는 관리자
+                    .role(Role.USER)
                     .id(userInfoDto.getId())
                     .password(passwordEncoder.encode(userInfoDto.getPassword())) // 사용자의 비밀번호를 암호화하기
                     .userName(userInfoDto.getUserName())
@@ -110,7 +112,6 @@ public class UserController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4004, "회원가입 오류"));
         }
-
     }
 //    @PostMapping("/dotori/signin")
 //    public ResponseEntity<?> dotoriLogin(@RequestBody Map<String, String> loginForm) {
@@ -134,10 +135,29 @@ public class UserController {
 //        }
 //    }
 
-//    @PostMapping("/naver/signin")
-//    public ResponseEntity<?> signin(@RequestBody Map<String, String> loginForm) {
-//
-//    }
+    @PostMapping("/signin")
+    public ResponseEntity<?> naverLogin(@RequestBody Map<String, String> loginForm) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        User user = null;
+        if(authentication != null && authentication.isAuthenticated()){ // DOTORI, KAKAO, NAVER
+            // DB 확인
+            user = userRepository.findUserByIdAndExpiredAtIsNull(authentication.getName());
+
+
+
+            // DB에 없다? 권한 제거
+
+
+        }else{
+            // DB확인 - loginForm과 맞는 사용자의 정보가 있다? 토큰 발급 + 권한 부여
+
+            // DB에 없다?
+            SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
+        }
+
+        return null;
+    }
 
 
 

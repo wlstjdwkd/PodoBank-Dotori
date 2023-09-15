@@ -1,5 +1,6 @@
 package com.yongy.dotori.global.security.jwt;
 
+import com.yongy.dotori.domain.user.entity.Provider;
 import com.yongy.dotori.domain.user.entity.Role;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.user.repository.UserRepository;
@@ -30,6 +31,7 @@ public class JwtTokenProvider {
     private String salt;
 
     private final long exp = 1000L * 60 * 60;
+
 
     private Key secretKey;
 
@@ -73,10 +75,19 @@ public class JwtTokenProvider {
     // 권한정보 획득
     // Spring Security 인증과정에서 권한획득을 위한 기능
     public Authentication getAuthentication(String token){
-        String id = this.getUserId(token);
-        User user = userRepository.findById(id);
+        String authId = this.getUserId(token);
+        User user = userRepository.findUserByIdAndExpiredAtIsNull(authId);
+
+        if(user == null){
+            // TODO : 회원가입을 진행해주세요
+
+        }else if(user.getId() != authId){
+            // TODO : 아이디가 틀렸습니다.
+
+        }
+
         System.out.println("ID : " + user.getId());
-        return new UsernamePasswordAuthenticationToken(user, "", Collections.singleton(new SimpleGrantedAuthority(user.getRole().name())));
+        return new UsernamePasswordAuthenticationToken(user, "", Collections.singleton(new SimpleGrantedAuthority(user.getAuthProvider().name())));
     }
 
     public String getUserId(String token){
@@ -99,6 +110,7 @@ public class JwtTokenProvider {
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         }catch(Exception e){
+            //
             return false;
         }
     }

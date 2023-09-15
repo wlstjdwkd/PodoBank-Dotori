@@ -8,6 +8,7 @@ import com.yongy.dotori.domain.user.repository.UserRepository;
 import com.yongy.dotori.global.common.BaseResponseBody;
 import com.yongy.dotori.global.redis.RedisUtil;
 import jakarta.transaction.Transactional;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -34,7 +35,8 @@ public class KakaoService {
     private final static String KAKAO_AUTH_URI = "https://kauth.kakao.com";
     private final static String KAKAO_API_URI = "https://kapi.kakao.com";
 
-    private final RedisUtil redisUtil;
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Autowired
     private UserRepository userRepository;
@@ -96,9 +98,7 @@ public class KakaoService {
             // RefreshToken이 없는 경우(시간이 만료되었거나, 처음 들어오는 사용자)
             if(redisUtil.getData(user.getId()) == null){
                 // DB에 사용자의 정보가 없는 경우
-                if(userRepository.findById(user.getId()) == null){
-                    user.setAuthProvider(Provider.KAKAO);
-                    user.setRole(Role.USER);
+                if(userRepository.findUserByIdAndExpiredAtIsNull(user.getId()) == null){
                     userRepository.save(user); // DB에 사용자 저장
                 }
             }
@@ -147,7 +147,10 @@ public class KakaoService {
 
             User user = User.builder()
                     .id(String.valueOf(account.get("email")))
-                    .userName(String.valueOf(profile.get("nickname"))).build();
+                    .userName(String.valueOf(profile.get("nickname")))
+                    .role(Role.USER)
+                    .authProvider(Provider.KAKAO)
+                    .build();
 
             return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, user));
         }else{

@@ -15,6 +15,7 @@ import lombok.Setter;
 
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -50,6 +51,9 @@ public class User {
     @Column(name="auth_provider", nullable = false)
     private Provider authProvider;
 
+    @Column(name="expired_at", nullable = true)
+    private LocalDateTime expiredAt;
+
     @OneToMany(mappedBy = "user")
     private List<Purpose> purposeList;
 
@@ -71,8 +75,9 @@ public class User {
     @OneToOne(mappedBy = "user")
     private Reward reward;
 
+
     @Builder
-    public User(Long userSeq, Role role, String id, String password, LocalDate birthDate, String userName, String phoneNumber, Provider authProvider) {
+    public User(Long userSeq,Role role, String id, String password, LocalDate birthDate, String userName, String phoneNumber, Provider authProvider, LocalDateTime expiredAt) {
         this.userSeq = userSeq;
         this.role = role;
         this.id = id;
@@ -81,5 +86,6 @@ public class User {
         this.userName = userName;
         this.phoneNumber = phoneNumber;
         this.authProvider = authProvider;
+        this.expiredAt = expiredAt;
     }
 }

@@ -1,6 +1,5 @@
 package com.yongy.dotori.global.security.security;
 
-import com.yongy.dotori.global.security.jwt.JwtAuthenticationFilter;
 import com.yongy.dotori.global.security.jwt.JwtTokenProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
@@ -35,10 +34,7 @@ public class SecurityConfig {
     public BCryptPasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
-/*
-                .requestMatchers("/v1/admin/**").hasRole("ADMIN")
-                .requestMatchers("/v1/user/**").hasRole("USER")
-*/
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         System.out.println("START");
@@ -48,8 +44,9 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .requestMatchers("/kakao/**", "/naver/**", "/v1/user/signup", "/v1/user/signin"
-                , "/v1/user/check-code", "/v1/user/check-id").permitAll()
+                .requestMatchers("/v1/user/check-id", "/v1/user/check-code", "/v1/user/signup", "/v1/user/signin").permitAll()
+                .requestMatchers("/v1/**").hasRole("USER")
+                .requestMatchers("/v1/**", "/v2/**").hasRole("ADMIN")
                 .anyRequest().denyAll()
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
