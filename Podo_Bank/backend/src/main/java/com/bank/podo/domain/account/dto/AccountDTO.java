@@ -1,10 +1,11 @@
 package com.bank.podo.domain.account.dto;
 
 import com.bank.podo.domain.account.enums.AccountType;
-import com.bank.podo.domain.account.entity.InterestRate;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
@@ -13,10 +14,10 @@ public class AccountDTO {
     private AccountType accountType;
     private String balance;
     private String createAt;
-    private InterestRate interestRate;
+    private BigDecimal interestRate;
 
     @Builder
-    public AccountDTO(String accountNumber, AccountType accountType, String balance, String createAt, InterestRate interestRate) {
+    public AccountDTO(String accountNumber, AccountType accountType, String balance, String createAt, BigDecimal interestRate) {
         this.accountNumber = accountNumber;
         this.accountType = accountType;
         this.balance = balance;

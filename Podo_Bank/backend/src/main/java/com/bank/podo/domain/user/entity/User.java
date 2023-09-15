@@ -1,6 +1,7 @@
 package com.bank.podo.domain.user.entity;
 
 import com.bank.podo.domain.user.enums.Role;
+import com.bank.podo.global.others.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-public class User {
+public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
@@ -30,15 +31,16 @@ public class User {
     @Column(nullable = false)
     private String phoneNumber;
 
-    @Column(nullable = false)
-    private LocalDateTime registrationDate;
-
     // 로그인 아이디
     @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String password;
+
+    // 회원 탈퇴 시간
+    @Column
+    private LocalDateTime expiredAt;
 
     @Builder
     public User(String name, LocalDate birthdate, String phoneNumber, String email, String password) {
@@ -47,7 +49,6 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.password = password;
-        this.registrationDate = LocalDateTime.now();
         this.role = Role.ROLE_USER;
     }
 
@@ -63,7 +64,6 @@ public class User {
         birthdate = null;
         phoneNumber = null;
         password = null;
-        registrationDate = null;
         role = Role.ROLE_DELETED;
 
         return this;
