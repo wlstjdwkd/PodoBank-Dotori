@@ -36,7 +36,7 @@ public class JwtTokenProvider {
     private Key secretKey;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserDetailsService userDetailsService;
 
     @PostConstruct
     protected void init(){
@@ -76,18 +76,8 @@ public class JwtTokenProvider {
     // Spring Security 인증과정에서 권한획득을 위한 기능
     public Authentication getAuthentication(String token){
         String authId = this.getUserId(token);
-        User user = userRepository.findUserByIdAndExpiredAtIsNull(authId);
-
-        if(user == null){
-            // TODO : 회원가입을 진행해주세요
-
-        }else if(user.getId() != authId){
-            // TODO : 아이디가 틀렸습니다.
-
-        }
-
-        System.out.println("ID : " + user.getId());
-        return new UsernamePasswordAuthenticationToken(user, "", Collections.singleton(new SimpleGrantedAuthority(user.getAuthProvider().name())));
+        User user = userDetailsService.getUserInfo(authId);
+        return new UsernamePasswordAuthenticationToken(user, "", Collections.singleton(new SimpleGrantedAuthority(user.getRole().name())));
     }
 
     public String getUserId(String token){

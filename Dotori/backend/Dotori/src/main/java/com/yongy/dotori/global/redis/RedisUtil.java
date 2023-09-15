@@ -1,7 +1,9 @@
 package com.yongy.dotori.global.redis;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -11,12 +13,13 @@ import java.time.Duration;
 @Service
 public class RedisUtil {
 
-    private StringRedisTemplate redisTemplate;
+    @Autowired
+    private StringRedisTemplate redisTemplate = redisTemplate = new StringRedisTemplate();
 
-    @PostConstruct
-    private void init(){
-        redisTemplate = new StringRedisTemplate();
-    }
+//    @PostConstruct
+//    private void init(){
+//        redisTemplate = new StringRedisTemplate();
+//    }
 
     // key를 통해 value를 반환한다.
     public String getData(String key){

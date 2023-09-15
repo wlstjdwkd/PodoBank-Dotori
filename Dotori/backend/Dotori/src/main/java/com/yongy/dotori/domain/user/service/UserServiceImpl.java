@@ -27,8 +27,10 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
     private final JavaMailSender javaMailSender;
 
+    @Autowired
     private final RedisUtil redisUtil;
 
     public void authEmail(String id){

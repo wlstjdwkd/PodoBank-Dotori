@@ -21,6 +21,7 @@ import com.yongy.dotori.global.security.jwtDto.JwtToken;
 //import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequiredArgsConstructor
+@AllArgsConstructor
 @RequestMapping("/v1/user")
 public class UserController {
 
@@ -44,16 +45,10 @@ public class UserController {
     private UserRepository userRepository;
 
     @Autowired
-    private KakaoService kakaoService;
-
-    @Autowired
-    private NaverService naverService;
-
-    @Autowired
     private UserService userService;
 
     @Autowired
-    private JwtTokenProvider provider;
+    private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -65,10 +60,11 @@ public class UserController {
 
     @PostMapping("/check-id")
     public ResponseEntity<? extends BaseResponseBody> validIdCheck(@RequestParam(name="id") String id){
-        User user = userRepository.findUserByIdAndExpiredAtIsNull(id);
+        User user = userRepository.findById(id);
         if(user == null){
             // 이메일 인증을 한다.
             userService.authEmail(id);
+            log.info("come!");
             return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "이메일 인증을 끝냈습니다."));
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4001, ExceptionEnum.ALREADY_EXIST_ID));
@@ -113,53 +109,37 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4004, "회원가입 오류"));
         }
     }
-//    @PostMapping("/dotori/signin")
-//    public ResponseEntity<?> dotoriLogin(@RequestBody Map<String, String> loginForm) {
-//
-//    }
-
-//    @PostMapping("/kakao/signin")
-//    public ResponseEntity<?> kakaoLogin(@RequestBody Map<String, String> loginForm, @RequestHeader("Authorization") String accessToken) throws Exception {
-//
-//        // 토큰의 유효성을 검사한다.
-//        if(kakaoService.validateToken(accessToken).getStatusCode() == HttpStatus.OK){
-//            // 사용자의 정보가 DB에 있는지 확인한다.
-//            String id = loginForm.get("id");
-//            if(userRepository.findById(id) != null){
-//                // 접근O
-//            }else{
-//                // 접근X
-//            }
-//        }else{
-//            // 접근X
-//        }
-//    }
-
     @PostMapping("/signin")
-    public ResponseEntity<?> naverLogin(@RequestBody Map<String, String> loginForm) {
+    public ResponseEntity<? extends BaseResponseBody> dotoriLogin(@RequestBody Map<String, String> loginForm) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        User user = null;
-        if(authentication != null && authentication.isAuthenticated()){ // DOTORI, KAKAO, NAVER
-            // DB 확인
-            user = userRepository.findUserByIdAndExpiredAtIsNull(authentication.getName());
+        System.out.println(authentication.isAuthenticated());
 
+        System.out.println(authentication.getName());
 
+        if(authentication == null || !authentication.isAuthenticated()){
+            User user = userRepository.findById(loginForm.get("id"));
 
-            // DB에 없다? 권한 제거
+            if(user == null || user.getExpiredAt() == null){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "존재하지 않는 사용자의 정보입니다."));
+            }
 
+            if(user.getAuthProvider().equals(Provider.DOTORI)){
+                if(!passwordEncoder.encode(loginForm.get("password")).equals(user.getPassword())){
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "비밀번호가 올바르지 않습니다."));
+                }
+            }
 
+            JwtToken jwtToken = jwtTokenProvider.createToken(user.getId(), Role.USER);
+
+            // refreshToken 저장
+            redisUtil.setDataExpire(user.getId(), jwtToken.getRefreshToken(), exp*24);
+
+            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, jwtToken.getAccessToken()));
         }else{
-            // DB확인 - loginForm과 맞는 사용자의 정보가 있다? 토큰 발급 + 권한 부여
-
-            // DB에 없다?
-            SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
+            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "이미 로그인되어 있습니다."));
         }
-
-        return null;
     }
-
-
 
 
 }
