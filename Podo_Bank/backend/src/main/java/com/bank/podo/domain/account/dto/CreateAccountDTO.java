@@ -8,5 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateAccountDTO {
     private AccountType accountType;
+    private Long accountCategoryId;
     private String password;
 }

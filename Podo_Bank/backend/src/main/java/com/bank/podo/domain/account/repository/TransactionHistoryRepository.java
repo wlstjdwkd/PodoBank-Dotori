@@ -11,10 +11,10 @@ import java.util.List;
 
 public interface TransactionHistoryRepository extends JpaRepository<TransactionHistory, Long> {
 
-    List<TransactionHistory> findAllByAccountAndTransactionAtGreaterThanEqual(Account account, LocalDateTime transactionAt);
-    List<TransactionHistory> findAllByAccountAndTransactionAtGreaterThanEqual(Account account, LocalDateTime transactionAt, PageRequest pageRequest);
+    List<TransactionHistory> findAllByAccountAndCreatedAtGreaterThanEqual(Account account, LocalDateTime createdAt);
+    List<TransactionHistory> findAllByAccountAndCreatedAtGreaterThanEqual(Account account, LocalDateTime createdAt, PageRequest pageRequest);
 
     List<TransactionHistory> findAllByAccountAndTransactionType(Account account, TransactionType transactionType, PageRequest pageRequest);
 
-    List<TransactionHistory> findAllByAccountAndTransactionTypeAndTransactionAtGreaterThanEqual(Account account, TransactionType transactionType, LocalDateTime transactionAt, PageRequest pageRequest);
+    List<TransactionHistory> findAllByAccountAndTransactionTypeAndCreatedAtGreaterThanEqual(Account account, TransactionType transactionType, LocalDateTime createdAt, PageRequest pageRequest);
 }
