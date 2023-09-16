@@ -14,9 +14,9 @@ import {
   userWithdrawal,
 } from '../../apis/userapi'
 import { useSelector, useDispatch } from 'react-redux';
-import {  } from '../../redux/slices/auth/user'
+import { inputAccessToken, inputRefreshToken } from '../../redux/slices/auth/user'
 
-export default function SignupInformationScreen({ navigation, route }) {
+export default function WithdrawalScreen({ navigation, route }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMessage, setPasswordMessage] = useState("");
@@ -67,6 +67,9 @@ export default function SignupInformationScreen({ navigation, route }) {
     console.log('안되냐?', clickWithdrawalBtn)
     if(response.status==200){
       console.log('회원탈퇴 성공')
+      // user Token null값으로 변경
+      dispatch(inputAccessToken(null))
+      dispatch(inputRefreshToken(null))
       setRegisteredMessage('회원 탈퇴가 완료되었습니다.')
       navigation.navigate("LoginScreen")
     }else if(response.status===400){
@@ -145,7 +148,8 @@ export default function SignupInformationScreen({ navigation, route }) {
       <View>
         <Text
           style={{
-            color: clickWithdrawalBtn ? "blue" : "red",
+            // color: clickWithdrawalBtn ? "blue" : "red",
+            color: "red",
             alignSelf: 'center',
           }}
         >

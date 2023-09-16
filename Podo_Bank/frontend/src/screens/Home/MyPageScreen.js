@@ -18,6 +18,7 @@ export default function MyPageScreen({ navigation }) {
 
   //들어올 때 axios로 정보 받아야함
   const hanldeUserInformationInquiry = async() =>{
+    console.log('mypage',accessToken)
     const response = await userInformationInquiry(accessToken)
     if(response.status===200){
       console.log('good')
@@ -26,13 +27,19 @@ export default function MyPageScreen({ navigation }) {
       console.log('bad400 회원정보를 받아올 수 없습니다.')
     }else if(response.status===401){
       console.log('bad401 회원정보를 받아올 수 없습니다.')
+    }else if(response.status===403){
+      console.log('bad403 회원정보를 받아올 수 없습니다.')
+    }else{
+      console.log('오류발생: 회원정보')
     }
   }
 
   const handleUserLogout = () => {
-    const response = userLogout()
+    const response = userLogout(accessToken)
     if(response.status===200){
       console.log('logout 성공')
+      dispatch(inputAccessToken(null))
+      dispatch(inputRefreshToken(null))
       navigation.navigate("LoginScreen");
     }else if(response.status===400){
       console.log('logout 실패')
@@ -68,7 +75,7 @@ export default function MyPageScreen({ navigation }) {
           <Text>이름</Text>
           {userInfo?
             (<Text>{userInfo.name}</Text>)
-            :(<Text>정예진</Text>)
+            :(<Text>박포도</Text>)
           }
           
         </View>
@@ -84,7 +91,7 @@ export default function MyPageScreen({ navigation }) {
           <Text>생년월일</Text>
           {userInfo?
             (<Text>{userInfo.birthdate}</Text>)
-            :(<Text>1999.05.08</Text>)
+            :(<Text>1999.12.12</Text>)
           }
         </View>
         <View style={styles.infoRow}>
@@ -112,8 +119,8 @@ export default function MyPageScreen({ navigation }) {
         //accessToken지우자
         style={styles.logoutButton}
         onPress={() => {
-          // handleUserLogout()
-          navigation.navigate("LoginScreen");
+          handleUserLogout()
+          // navigation.navigate("LoginScreen");
         }}
       >
         <Text style={styles.logoutButtonText}>로그아웃</Text>

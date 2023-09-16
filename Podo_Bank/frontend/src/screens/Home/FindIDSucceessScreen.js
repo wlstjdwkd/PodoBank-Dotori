@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
 
-export default function SignupIdentityVerificationScreen({ navigation, route }) {
+export default function FindIDSucceessScreen({ navigation, route }) {
   const userName = route.params.name;
   const userID = route.params.userID
 

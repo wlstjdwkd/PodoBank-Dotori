@@ -27,18 +27,13 @@ const apiAddress ="http://j9d107.p.ssafy.io:9000"
 // };
 
 export const userRegister = async (userData) => {
-  console.log('ok')
-  console.log('뭐지',{
-    name:userData.name, birthdate:userData.birthdate, email:userData.email, 
-    password:userData.password, phoneNumber:userData.phoneNumber, successCode:userData.successCode,
-  })
   try {
     // const response = await axios.post(apiAddress+'/api/v1/user/register', {
     //   name:userData.name, birthdate:userData.birthdate, email:userData.email, 
     //   password:userData.password, phoneNumber:userData.phoneNumber, successCode:userData.successCode,
     // });
     const response = await axios.post(apiAddress+'/api/v1/user/register', userData);
-    console.log(response.data)
+    console.log('회원가입 서버 연결 성공:',response.data)
     return response;
   } catch (error) {
     console.error('회원가입 서버 연결 실패:', error);
@@ -48,10 +43,14 @@ export const userRegister = async (userData) => {
   }
 };
 // refresh토큰을 이용해 access token을 받음
-export const userRefresh = async () => {
+export const userRefresh = async (refreshToken) => {
   try {
-    const response = await axios.post(apiAddress+'/api/v1/user/refresh');
-    console.log(response.data)
+    const response = await axios.post(apiAddress+'/api/v1/user/refresh', null, {
+      headers: {
+        Authorization: `Bearer ${refreshToken}`,
+      },
+    });
+    console.log('토큰 재발급 성공:', response.data);
     return response.data;
   } catch (error) {
     console.error('토큰 재발급 실패:', error);
@@ -72,11 +71,17 @@ export const userPasswordChange = async (userPassword) => {
     // throw error;
   }
 };
-export const userLogout = async () => {
+export const userLogout = async (accessToken) => {
   try {
-    const response = await axios.post(apiAddress+'/api/v1/user/logout');
+    console.log('로그아웃중',accessToken)
+    const response = await axios.post(apiAddress+'/api/v1/user/logout', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    
     console.log('로그아웃 성공:',response.data)
-    return response.data;
+    return response;
   } catch (error) {
     console.error('로그아웃 실패:', error);
     const response = error.response
@@ -153,6 +158,8 @@ export const userEmailDuplicationCheck = async (email) => {
   }
 };
 export const userWithdrawal = async (accessToken, password) => {
+  console.log(accessToken)
+  console.log(password)
   try {
     const response = await axios.post(apiAddress + '/api/v1/user', {password:password}, {
       headers: {

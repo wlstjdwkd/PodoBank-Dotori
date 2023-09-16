@@ -12,7 +12,7 @@ import {
   userIDfind,
 } from '../../apis/userapi'
 
-export default function SignupIdentityVerificationScreen({ navigation }) {
+export default function FindIDScreen({ navigation }) {
   const [userInfo, setUserInfo] = useState({
     name: "",
     birthDate: "",

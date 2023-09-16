@@ -13,7 +13,7 @@ import {
   userEmailVerificationCheck, userPWEmailVerificationSend, userEmailDuplicationCheck,
 } from '../../apis/userapi'
 
-export default function SignupInformationScreen({ navigation, route }) {
+export default function ResetPasswordOneScreen({ navigation, route }) {
   const [authenEmail, SetAuthenEmail] = useState(false);      // 이메일 인증버튼 활성화하는 변수
   const [emailCode, SetEmailCode] = useState("");   // 8자리의 인증번호
   const [isAuthenEmail, SetIsAuthenEmail] = useState(false);  // E-mail 인증 완료 여부를 나타내는 변수

@@ -12,7 +12,7 @@ import {
   userPasswordChange
 } from '../../apis/userapi'
 
-export default function SignupInformationScreen({ navigation, }) {
+export default function ChangePasswordScreen({ navigation, }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");

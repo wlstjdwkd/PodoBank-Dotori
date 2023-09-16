@@ -12,7 +12,7 @@ import {
   userPasswordReset
 } from '../../apis/userapi'
 
-export default function SignupInformationScreen({ navigation, route }) {
+export default function ResetPasswordTwoScreen({ navigation, route }) {
   const [userInfo, setUserInfo] = useState(route.params.userInfo);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

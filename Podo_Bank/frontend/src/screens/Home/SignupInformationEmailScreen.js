@@ -12,7 +12,7 @@ import {
   userEmailVerificationCheck, userEmailVerificationSend, userEmailDuplicationCheck
 } from '../../apis/userapi'
 
-export default function SignupInformationScreen({ navigation, route }) {
+export default function SignupInformationEmailScreen({ navigation, route }) {
   const [userInfo, setUserInfo] = useState(route.params.userInfo);  // 회원가입하면서 router를 통해 가져오고 있는 userInfo
   const [authenEmail, SetAuthenEmail] = useState(false);      // 이메일 인증버튼 활성화하는 변수
   const [emailCode, SetEmailCode] = useState("");   // 8자리의 인증번호

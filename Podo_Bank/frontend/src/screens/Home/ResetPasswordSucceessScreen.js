@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
 
-export default function SignupIdentityVerificationScreen({ navigation, route }) {
+export default function ResetPasswordSucceessScreen({ navigation, route }) {
   const email = route.params.email
 
   return (

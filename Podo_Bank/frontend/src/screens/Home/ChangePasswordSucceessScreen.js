@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
 
-export default function SignupIdentityVerificationScreen({ navigation, route }) {
+export default function ChangePasswordSucceessScreen({ navigation, route }) {
   const email = route.params.email  // ChangePasswordScreen에서 email을 param으로 받음
 
   return (

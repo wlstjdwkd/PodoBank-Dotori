@@ -5,42 +5,49 @@ import { createSlice } from '@reduxjs/toolkit';
 const userSlice = createSlice({
   name: 'user',
   initialState: {
-    count: 0,
-    nameorigin: null,
-    nametmp:null,
+    // count: 0,
+    // nameorigin: null,
+    // nametmp:null,
     accessToken:null,
     refreshToken:null,
+    userTokenRefreshModalVisible:false,
   },
   reducers: {
-    increment(state) {
-      state.count += 1;
-      state.nameorigin = 'kim';
-      state.nametmp = state.nameorigin;
-    },
-    decrement(state) {
-      state.count -= 1;
-      state.nameorigin ='no';
-      state.nametmp = state.nameorigin;
-    },
-    incrementByAmount(state, action) {
-      state.count += action.payload;
-      state.nameorigin = 'what';
-      state.nametmp = state.nameorigin;
-    },
-    changeNameNum(state) {
-      const randomNum = Math.floor(Math.random() * 100) +1;
-      state.nametmp = `${state.nameorigin}${randomNum}`;
-    },
+    // increment(state) {
+    //   state.count += 1;
+    //   state.nameorigin = 'kim';
+    //   state.nametmp = state.nameorigin;
+    // },
+    // decrement(state) {
+    //   state.count -= 1;
+    //   state.nameorigin ='no';
+    //   state.nametmp = state.nameorigin;
+    // },
+    // incrementByAmount(state, action) {
+    //   state.count += action.payload;
+    //   state.nameorigin = 'what';
+    //   state.nametmp = state.nameorigin;
+    // },
+    // changeNameNum(state) {
+    //   const randomNum = Math.floor(Math.random() * 100) +1;
+    //   state.nametmp = `${state.nameorigin}${randomNum}`;
+    // },
     inputAccessToken(state, action){
+      console.log('어세스토큰1',action.payload)
       state.accessToken = action.payload
+      console.log('어세스토큰2',state.accessToken)
     },
     inputRefreshToken(state, action){
       state.refreshToken = action.payload
     },
+    setUserTokenRefreshModalVisible(state, action){
+      state.userTokenRefreshModalVisible = action.payload
+    }
   },
 });
 
-export const { increment, decrement, incrementByAmount, changeNameNum, inputAccessToken, inputRefreshToken } = userSlice.actions;
+// export const { increment, decrement, incrementByAmount, changeNameNum, inputAccessToken, inputRefreshToken } = userSlice.actions;
+export const { inputAccessToken, inputRefreshToken, setUserTokenRefreshModalVisible } = userSlice.actions;
 
 export default userSlice.reducer;
 
