@@ -5,63 +5,42 @@ import { createSlice } from '@reduxjs/toolkit';
 const userSlice = createSlice({
   name: 'user',
   initialState: {
-    // count: 0,
-    // nameorigin: null,
-    // nametmp:null,
     accessToken:null,
     refreshToken:null,
-    userTokenRefreshModalVisible:false,
+    userTokenRefreshModalVisible:false, // AccessToken 만료 시 띄우는 모달창
+    accessTokenExpiration: null,  // AccessToken 만료 시간을 저장
+    isnotReissuanceToken : false, // 재발급 여부에서 안할 시 True
+    userInfo: null,
   },
   reducers: {
-    // increment(state) {
-    //   state.count += 1;
-    //   state.nameorigin = 'kim';
-    //   state.nametmp = state.nameorigin;
-    // },
-    // decrement(state) {
-    //   state.count -= 1;
-    //   state.nameorigin ='no';
-    //   state.nametmp = state.nameorigin;
-    // },
-    // incrementByAmount(state, action) {
-    //   state.count += action.payload;
-    //   state.nameorigin = 'what';
-    //   state.nametmp = state.nameorigin;
-    // },
-    // changeNameNum(state) {
-    //   const randomNum = Math.floor(Math.random() * 100) +1;
-    //   state.nametmp = `${state.nameorigin}${randomNum}`;
-    // },
     inputAccessToken(state, action){
-      console.log('어세스토큰1',action.payload)
       state.accessToken = action.payload
-      console.log('어세스토큰2',state.accessToken)
     },
     inputRefreshToken(state, action){
       state.refreshToken = action.payload
     },
     setUserTokenRefreshModalVisible(state, action){
       state.userTokenRefreshModalVisible = action.payload
-    }
+      console.log('모달창 등장!')
+    },
+    setAccessTokenExpiration(state, action) {
+      state.accessTokenExpiration = action.payload; // AccessToken의 만료 시간 설정
+      // console.log(action.payload)
+    },
+    setIsnotReissuanceToken(state, action) {
+      state.accessTokenExpiration = action.payload; // AccessToken의 재발급 여부 미발급 결정시 True
+      console.log("action.payload:",action.payload, 'state.accessTokenExpiration:', state.accessTokenExpiration)
+    },
+    setUserInfo(state, action){
+      state.userInfo = action.payload
+      console.log(state.userInfo)
+    },
   },
 });
 
-// export const { increment, decrement, incrementByAmount, changeNameNum, inputAccessToken, inputRefreshToken } = userSlice.actions;
-export const { inputAccessToken, inputRefreshToken, setUserTokenRefreshModalVisible } = userSlice.actions;
+export const { 
+  inputAccessToken, inputRefreshToken, setUserTokenRefreshModalVisible,
+  setAccessTokenExpiration, setIsnotReissuanceToken, setUserInfo,
+} = userSlice.actions;
 
 export default userSlice.reducer;
-
-
-// // 사용 예시 
-// import { useSelector, useDispatch } from 'react-redux';
-// import { decrement, increment, incrementByAmount,changeNameNum } from '../../redux/slices/auth/user'
-// const count = useSelector((state) => state.counter.count);
-// const name = useSelector((state) => state.counter.nametmp);
-// const count2 = useSelector((state) => state.whole.count2);
-// const name2 = useSelector((state) => state.whole.nameTmp2);
-// const dispatch = useDispatch();
-// <Button
-//   title="Increment"
-//   aria-label="Increment value"
-//   onPress={() => dispatch(increment())}
-// />

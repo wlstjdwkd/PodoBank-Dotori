@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,9 +8,11 @@ import {
 } from "react-native";
 
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 import {
   userEmailVerificationCheck, userEmailVerificationSend, userEmailDuplicationCheck
 } from '../../apis/userapi'
+import { useSelector } from "react-redux";
 
 export default function SignupInformationEmailScreen({ navigation, route }) {
   const [userInfo, setUserInfo] = useState(route.params.userInfo);  // 회원가입하면서 router를 통해 가져오고 있는 userInfo
@@ -23,8 +25,12 @@ export default function SignupInformationEmailScreen({ navigation, route }) {
   const [isCorrectEmail, setIsCorrectEmail] = useState(""); // 사용가능한 이메일여부 확인
   const [email, setEmail] = useState("");                   // 작성한 E-mail 주소
   const [emailMessage, setEmailMessage] = useState("");     // E-mail 사용가능 여부를 나타내는 메시지
-  // const [emailDuplicatedCheck, setEmailDuplicatedCheck] = useState(null)  // 이메일 중복확인 결과
+  // 이메일 인증 카운트 다운
+  const [countdown, setCountdown] = useState(0); // 5분 = 300초\
+  const [startCountdown, setStartCountdown] = useState(false);
 
+  // const [emailDuplicatedCheck, setEmailDuplicatedCheck] = useState(null)  // 이메일 중복확인 결과
+  // const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
 
   function validateEmail(email) {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
@@ -78,6 +84,8 @@ export default function SignupInformationEmailScreen({ navigation, route }) {
     const response = await userEmailVerificationSend(email)
     if(response.status===200){
       console.log('이메일 전송 성공')
+      setCountdown(300)
+      setStartCountdown(true) // 카운트다운 시작을 알리는 변수
     }else if(response.status===400){
       console.log('이메일 전송 실패')
     }else if(response.status===422){
@@ -101,6 +109,24 @@ export default function SignupInformationEmailScreen({ navigation, route }) {
       SetIsAuthenEmail(false)
     }
   }
+
+
+  useEffect(() => {
+    let intervalId;
+    
+    if (startCountdown && countdown > 0 && !isAuthenEmail) {
+        intervalId = setInterval(() => {
+            setCountdown(countdown => countdown - 1)
+        }, 1000)
+    } else if (startCountdown===true && countdown === 0) {
+        clearInterval(intervalId)
+        // Alert.alert("인증시간 만료", "이메일 인증시간이 만료되었습니다.")
+        setCodeMessage('이메일 인증시간이 만료되었습니다.')
+    }
+
+    return () => clearInterval(intervalId); // 컴포넌트 unmount 시 타이머 해제
+  }, [startCountdown, countdown])
+
 
   return (
     <View style={styles.container}>
@@ -190,7 +216,7 @@ export default function SignupInformationEmailScreen({ navigation, route }) {
           </View>
         </View>
       ) : null}
-      <Text
+      {/* <Text
         style={{
           color: isAuthenEmail ? "blue" : "red",
           marginLeft: 30,
@@ -198,7 +224,37 @@ export default function SignupInformationEmailScreen({ navigation, route }) {
         }}
       >
         {codeMessage}
-      </Text>
+      </Text> */}
+
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center', // 중앙 정렬을 위해 추가
+          marginHorizontal: 30,
+        }}
+      >
+        <Text
+          style={{
+            color: isAuthenEmail ? "blue" : "red",
+            textAlign:'left',
+            // flex: 1,
+          }}
+        >
+          {codeMessage}
+        </Text>
+        {startCountdown?(
+        <Text
+          style={{
+            textAlign:'right',
+            // flex: 1,
+          }}
+        >
+          {`${Math.floor(countdown / 60)}:${countdown % 60 < 10 ? '0' : ''}${countdown % 60}`}
+        </Text>)
+        :<Text></Text>
+        }
+      </View>
 
       <TouchableOpacity
         style={[
@@ -215,6 +271,7 @@ export default function SignupInformationEmailScreen({ navigation, route }) {
       >
         <Text style={styles.linkText}>다음</Text>
       </TouchableOpacity>
+      {/* {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />} */}
     </View>
   );
 }

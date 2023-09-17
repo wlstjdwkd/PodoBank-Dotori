@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useSelector, useDispatch } from 'react-redux';
-import { inputAccessToken, inputRefreshToken } from '../../redux/slices/auth/user'
+import { inputAccessToken, inputRefreshToken, setAccessTokenExpiration } from '../../redux/slices/auth/user'
 
 import {userLogin} from '../../apis/userapi'
 
@@ -26,7 +26,16 @@ export default function LoginScreen({ navigation }) {
 
   const handleLoginSuccess = () => {
     // 로그인 성공 시 처리
-    navigation.navigate("HomeScreen");
+    setEmail("")
+    setPassword("")
+    setLoginMessage("")
+    dispatch(setAccessTokenExpiration(60000)) // accessToken 만료 시간 10분으로 설정
+    // navigation.navigate("HomeScreen");
+    // 로그인 하면 이 화면은 못오게 하기 위해 HomeScreen을 첫 화면으로 설정
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'HomeScreen' }],
+    });
   };
 
   const handleLoginFailure = (statusCode) => {
@@ -47,6 +56,8 @@ export default function LoginScreen({ navigation }) {
     const response = await userLogin(email, password);
     if (response.status === 200) {
       console.log("로그인 성공");
+      console.log(response.data)
+      console.log('잠깐!')
       console.log(response.data.accessToken)
       console.log(response.data.refreshToken)
       dispatch(inputAccessToken(response.data.accessToken))

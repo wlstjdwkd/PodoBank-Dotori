@@ -9,9 +9,11 @@ import {
 } from "react-native";
 
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 import {
   userEmailVerificationCheck, userPWEmailVerificationSend, userEmailDuplicationCheck,
 } from '../../apis/userapi'
+import { useSelector } from "react-redux";
 
 export default function ResetPasswordOneScreen({ navigation, route }) {
   const [authenEmail, SetAuthenEmail] = useState(false);      // 이메일 인증버튼 활성화하는 변수
@@ -31,7 +33,7 @@ export default function ResetPasswordOneScreen({ navigation, route }) {
   // 이메일 인증 카운트다운
   const [countdown, setCountdown] = useState(0); // 5분 = 300초
   const [startCountdown, setStartCountdown] = useState(false);
-
+  // const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
 
 
   function validateEmail(email) {
@@ -211,10 +213,10 @@ export default function ResetPasswordOneScreen({ navigation, route }) {
       ) : null}
       <View
         style={{
-          flexDirection: 'row', // 이 부분이 추가되었습니다.
-          justifyContent: 'space-between', // 필요한 경우 이 부분을 추가하여 왼쪽과 오른쪽으로 텍스트를 분산시킬 수 있습니다.
-          alignItems: 'center', // 중앙 정렬을 위해 추가되었습니다.
-          marginHorizontal: 30, // marginLeft과 marginRight를 한 번에 설정합니다.
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center', // 중앙 정렬을 위해 추가
+          marginHorizontal: 30, 
         }}
       >
         <Text
@@ -254,6 +256,7 @@ export default function ResetPasswordOneScreen({ navigation, route }) {
       >
         <Text style={styles.linkText}>다음</Text>
       </TouchableOpacity>
+      {/* {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />} */}
     </View>
   );
 }

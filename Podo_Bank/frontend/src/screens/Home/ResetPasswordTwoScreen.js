@@ -8,20 +8,23 @@ import {
 } from "react-native";
 
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 import {
   userPasswordReset
 } from '../../apis/userapi'
+import { useSelector } from "react-redux";
 
 export default function ResetPasswordTwoScreen({ navigation, route }) {
   const [userInfo, setUserInfo] = useState(route.params.userInfo);
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  // const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMessage, setPasswordMessage] = useState("");
   const [confirmPasswordMessage, setConfirmPasswordMessage] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(false);
   const [isSucceed, setIsSucceed] = useState(false);              // 비밀번호 초기화 성공여부
   const [registeredMessage, setRegisteredMessage] = useState(""); // 비밀번호 초기화 버튼 클릭시 메시지
+  // const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
 
   const validatePassword = (password) => {
     const regex =
@@ -41,28 +44,31 @@ export default function ResetPasswordTwoScreen({ navigation, route }) {
   };
 
   const handleConfirmPasswordChange = (text) => {
-    setConfirmPassword(text);
+    // setConfirmPassword(text);
     if (text === password && isPasswordValid) {
       setConfirmPasswordMessage("완벽합니당");
       setIsConfirmPasswordValid(true);
-      setUserInfo((prev) => ({ ...prev, password: text }));
+      setUserInfo((prev) => ({ ...prev, password: text, newPassword: text }));
     } else {
       setConfirmPasswordMessage("비밀번호가 일치하지 않습니다");
       setIsConfirmPasswordValid(false);
     }
   };
 
-  // 회원가입
+  // 비밀번호 초기화
   const handleUserPasswordReset = async()=>{
-    setUserInfo((prev) => ({ ...prev, newPassword: confirmPassword }))
     const response = await userPasswordReset(userInfo)
     if(response.status === 200){
       console.log('비밀번호 초기화 성공')
       setIsSucceed(true)
       setRegisteredMessage('비밀번호 초기화에 성공했습니다.')
-      navigation.navigate("ResetPasswordSucceessScreen", {
-        email: userInfo.email,
-      })
+      // navigation.navigate("ResetPasswordSucceessScreen", {
+      //   email: userInfo.email,
+      // })
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'ResetPasswordSucceessScreen', params: { email: userInfo.email },}],
+      });
     }else if(response.status === 400){
       console.log('비밀번호 초기화 실패')
       setRegisteredMessage('비밀번호 초기화에 실패했습니다.')
@@ -155,19 +161,12 @@ export default function ResetPasswordTwoScreen({ navigation, route }) {
         // back에 회원가입 정보 보내야함
         onPress={() =>{
           handleUserPasswordReset()
-          // navigation.navigate("ResetPasswordSucceessScreen", {
-          //   email: userInfo.email,
-          // })
-          // if(isSucceed){
-            // navigation.navigate("ResetPasswordSucceessScreen", {
-            //   email: userInfo.email,
-            // })
-          // }
         }}
         disabled={!(isPasswordValid && isConfirmPasswordValid)}
       >
         <Text style={styles.linkText}>비밀번호 등록</Text>
       </TouchableOpacity>
+      {/* {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />} */}
     </View>
   );
 }

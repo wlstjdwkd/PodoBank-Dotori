@@ -6,11 +6,47 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Alert,
 } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
+import { accountCreate, } from '../../apis/accountapi'
+import { useDispatch, useSelector } from "react-redux";
 
-export default function AccountRestrictionScreen({ navigation }) {
+export default function AccountRestrictionScreen({ navigation, route }) {
+  const [createInfo, setCreateInfo] = useState(route.params.createInfo)
   const [isChecked, setChecked] = useState(false);
+  const accessToken = useSelector((state) => state.user.accessToken)
+  const dispatch = useDispatch()
+
+  const handleIsSuccess = () => {
+    if(isChecked){
+      handleAccountCreate()
+    }else{
+      Alert.alert('미동의','계좌를 개설하시려면 동의서를 확인하고 동의를 눌러주시기 바랍니다.')
+    }
+  }
+
+  const handleAccountCreate = async () =>{
+    console.log(createInfo)
+    const response = await accountCreate(createInfo, accessToken)
+    if(response.status===200){
+      navigation.reset({
+        index: 0,
+        // routes: [{ name: 'OpenAccountCompleteScreen', params: { name: userInfo.name },}],
+        routes: [{ name: 'OpenAccountCompleteScreen', }],
+      });
+      console.log('bad400 계좌 생성에 성공했습니다..')
+    }else if(response.status===400){
+      console.log('bad400 계좌 생성에 실패했습니다.')
+    }else if(response.status===401){
+      console.log('bad401 권환이 없어 계좌 생성에 실패했습니다.')
+    }else if(response.status===429){
+      console.log('bad429 계좌 비밀번호 형식오류로 계좌 생성에 실패했습니다.')
+    }else{
+      console.log('오류발생: 계좌 생성에 실패했습니다.')
+    }
+  }
+
   return (
     <ScrollView
       style={styles.container}
@@ -97,13 +133,17 @@ export default function AccountRestrictionScreen({ navigation }) {
           </Text>
         </TouchableOpacity>
         <Text style={styles.confirmText}>
-          위 안내에 대해 확인하고 이체합니다.
+          {/* 위 안내에 대해 확인하고 이체합니다. */}
+          위 안내에 대해 확인하고 개설합니다.
         </Text>
       </View>
 
       <TouchableOpacity
         style={styles.applyButton}
-        onPress={() => navigation.navigate("OpenAccountCompleteScreen")}
+        onPress={() => {
+          // navigation.navigate("OpenAccountCompleteScreen")
+          handleIsSuccess()
+        }}
       >
         <Text style={styles.applyText}>신청하기</Text>
       </TouchableOpacity>

@@ -1,16 +1,68 @@
-import React from "react";
+import React,{useEffect, useState} from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { AntDesign, EvilIcons } from "@expo/vector-icons"; // AntDesign과 Entypo 아이콘 라이브러리 추가
+import { AntDesign, Octicons  } from "@expo/vector-icons"; // AntDesign과 Entypo 아이콘 라이브러리 추가
 import FooterScreen from "../Header/FooterScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
+import { useDispatch, useSelector } from "react-redux";
+import { userInformationInquiry, } from '../../apis/userapi'
+import { accountListInquiry, } from '../../apis/accountapi'
+import { setUserInfo } from '../../redux/slices/auth/user'
 
 export default function HomeScreen({ navigation }) {
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
+  const accessToken = useSelector((state) => state.user.accessToken)
+  const userInfo = useSelector((state) => state.user.userInfo)
+  const [accountList, setAccountList] = useState([])
+
+  const dispatch = useDispatch()
   //대표계좌 axios로 가져와야함
+
+  //들어올 때 axios로 유저 정보 받아야함
+  const hanldeUserInformationInquiry = async() =>{
+    const response = await userInformationInquiry(accessToken)
+    if(response.status===200){
+      dispatch(setUserInfo(response.data))
+    }else if(response.status===400){
+      console.log('bad400 회원정보를 받아올 수 없습니다.')
+    }else if(response.status===401){
+      console.log('bad401 회원정보를 받아올 수 없습니다.')
+    }else if(response.status===403){
+      console.log('bad403 회원정보를 받아올 수 없습니다.')
+    }else{
+      console.log('오류발생: 회원정보를 받아올 수 없습니다.')
+    }
+  }
+
+  // 계좌 목록 불러오는 함수
+  const handleAccountListInquiry = async()=>{
+    const response = await accountListInquiry(accessToken)
+    if(response.status===200){
+      console.log(userInfo.name,'님의 계좌 목록을 받아왔습니다.')
+      setAccountList(response.data)
+    }else if(response.status===400){
+      console.log('bad400 조회실패로 계좌 목록을 받아올 수 없습니다.')
+    }else if(response.status===401){
+      console.log('bad401 권한 없음으로 계좌 목록을 받아올 수 없습니다.')
+    }else{
+      console.log('오류발생: 계좌 목록을 받아올 수 없습니다.')
+    }
+  }
+
+  // 페이지가 로드될 때 hanldeUserInformationInquiry() 함수 실행
+  useEffect(() => {
+    hanldeUserInformationInquiry()
+    handleAccountListInquiry()
+  }, []);
+
 
   return (
     <View style={styles.container}>
       {/* 사용자 이름 */}
       <View style={styles.nameContainer}>
-        <Text style={styles.userNameBold}>정예진</Text>
+        {userInfo?
+            (<Text style={styles.userNameBold}>{userInfo.name}</Text>)
+            :(<Text style={styles.userNameBold}>정예진</Text>)
+          }
         <Text style={styles.userName}>님</Text>
       </View>
 
@@ -43,6 +95,39 @@ export default function HomeScreen({ navigation }) {
           <Text style={styles.buttonText}>이체</Text>
         </TouchableOpacity>
       </View>
+      
+      {/* 보유 계좌 목록 */}
+      {accountList.map((account, index) => (
+        <View key={index} style={styles.accountBox}>
+          <TouchableOpacity
+            style={styles.touchableOpacity}
+            onPress={() => {
+              navigation.navigate("AccountDetailScreen");
+            }}
+          >
+            <View style={styles.bankInfo}>
+              <View style={styles.bankLogoContainer}>
+                <Image
+                  source={require("../../assets/images/logo_podo.png")}
+                  style={styles.bankLogo}
+                />
+              </View>
+              <Text style={styles.bankName}>포도은행 통장</Text>
+            </View>
+
+            <Text style={styles.accountNumber}>{account.accountNumber}</Text>
+            <Text style={styles.balance}>{account.balance}원</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.transferButton}
+            onPress={() => navigation.navigate("TransferScreen")}
+          >
+            <Text style={styles.buttonText}>이체</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+
 
       {/* 계좌 추가 버튼 */}
       <TouchableOpacity
@@ -56,10 +141,11 @@ export default function HomeScreen({ navigation }) {
 
       {/* 설정 버튼 */}
       <View style={styles.settingsContainer}>
-        <EvilIcons name="gear" size={25} style={styles.settingsIcon} />
-        <Text style={styles.settingsText}>대표계좌 설정</Text>
+        <Octicons name="gear" size={16} color="black" />
+        <Text style={styles.settingsText}>  대표계좌 설정</Text>
       </View>
       <FooterScreen navigation={navigation} />
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }

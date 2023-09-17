@@ -8,9 +8,12 @@ import {
   Alert,
 } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
+import { useSelector } from "react-redux";
 
 export default function ResetPasswordSucceessScreen({ navigation, route }) {
   const email = route.params.email
+  // const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
 
   return (
     <View style={styles.container}>
@@ -40,6 +43,7 @@ export default function ResetPasswordSucceessScreen({ navigation, route }) {
           </TouchableOpacity>
         </View>
       </View>
+      {/* {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />} */}
     </View>
   );
 }

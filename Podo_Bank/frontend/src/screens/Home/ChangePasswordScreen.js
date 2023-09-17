@@ -8,11 +8,17 @@ import {
 } from "react-native";
 
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 import {
   userPasswordChange
 } from '../../apis/userapi'
 
-export default function ChangePasswordScreen({ navigation, }) {
+import { useSelector, useDispatch } from 'react-redux';
+import { inputAccessToken, inputRefreshToken } from '../../redux/slices/auth/user'
+
+
+export default function ChangePasswordScreen({ navigation, route}) {
+  const [userEmail, setUserEmail] = useState(route.params.userEmail);  // 회원가입하면서 router를 통해 가져오고 있는 userInfo
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -22,6 +28,9 @@ export default function ChangePasswordScreen({ navigation, }) {
   const [isConfirmNewPasswordValid, setIsConfirmNewPasswordValid] = useState(false);
   const [isSucceed, setIsSucceed] = useState(false);              // 회원가입 성공여부
   const [passwordChangedMessage, setPasswordChangedMessage] = useState(""); // 회원가입 버튼 클릭시 메시지
+  const accessToken = useSelector((state) => state.user.accessToken)
+  const refreshToken = useSelector((state) => state.user.refreshToken)
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
 
   const validateNewPassword = (newPassword) => {
     const regex =
@@ -59,12 +68,21 @@ export default function ChangePasswordScreen({ navigation, }) {
 
   // 비밀번호 변경
   const handleUserNewPasswordChange = async()=>{
-    const userPassword = { password: currentPassword, newPassword: confirmNewPassword };
-    const response = await userPasswordChange(userPassword)
+    // const userPassword = { password: currentPassword, newPassword: confirmNewPassword };
+    // console.log(userPassword)
+    // const response = await userPasswordChange(userPassword, accessToken)
+    const response = await userPasswordChange(currentPassword, confirmNewPassword, accessToken)
     if(response.status === 200){
       console.log('비밀번호 변경 성공')
       setIsSucceed(true)
       setPasswordChangedMessage('비밀번호 변경에 성공했습니다.')
+      // navigation.navigate("ChangePasswordSucceessScreen", {
+      //   userEmail: userEmail,
+      // })
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'ChangePasswordSucceessScreen', params: { userEmail: userEmail },}],
+      });
     }else if(response.status === 400){
       console.log('비밀번호 변경 실패')
       setPasswordChangedMessage('비밀번호 변경에 실패했습니다.')
@@ -190,17 +208,18 @@ export default function ChangePasswordScreen({ navigation, }) {
         // back에 회원가입 정보 보내야함
         onPress={() =>{
           handleUserNewPasswordChange()
-          if(isSucceed){
-            navigation.navigate("ResetNewPasswordSucceessScreen", {
-              email: "abc123@naver.com",
-              // email: email,
-            })
-          }
+          // if(isSucceed){
+          //   navigation.navigate("ResetNewPasswordSucceessScreen", {
+          //     email: "abc123@naver.com",
+          //     // email: email,
+          //   })
+          // }
         }}
         disabled={!(isNewPasswordValid && isConfirmNewPasswordValid)}
       >
         <Text style={styles.linkText}>비밀번호 등록</Text>
       </TouchableOpacity>
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }

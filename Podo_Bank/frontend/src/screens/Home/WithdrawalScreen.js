@@ -10,6 +10,7 @@ import {
 } from "react-native";
 
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 import {
   userWithdrawal,
 } from '../../apis/userapi'
@@ -28,6 +29,7 @@ export default function WithdrawalScreen({ navigation, route }) {
   const [userWithdrawalModalVisible, setUserWithdrawalModalVisible] = useState(false); // 회원탈퇴 마지막 모달창
   const accessToken = useSelector((state) => state.user.accessToken)
   const refreshToken = useSelector((state) => state.user.refreshToken)
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   const dispatch = useDispatch();
 
   const validatePassword = (password) => {
@@ -212,6 +214,7 @@ export default function WithdrawalScreen({ navigation, route }) {
           </View>
         </Modal>
       </View>
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }

@@ -8,6 +8,7 @@ import {
   Platform // 추가
 } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 
 // 링크들을 상수로 정의
 // const GOOGLE_PLAY_STORE_LINK = "market://details?id=io.github.Antodo";

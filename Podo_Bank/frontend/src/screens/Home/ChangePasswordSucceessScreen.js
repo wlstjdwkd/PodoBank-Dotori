@@ -8,9 +8,12 @@ import {
   Alert,
 } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
+import { useSelector } from "react-redux";
 
 export default function ChangePasswordSucceessScreen({ navigation, route }) {
-  const email = route.params.email  // ChangePasswordScreen에서 email을 param으로 받음
+  const [userEmail] = useState(route.params.userEmail)  // ChangePasswordScreen에서 email을 param으로 받음
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
 
   return (
     <View style={styles.container}>
@@ -23,7 +26,7 @@ export default function ChangePasswordSucceessScreen({ navigation, route }) {
 
         <View style={styles.showUserBoldText1}>
           <Text style={[styles.showUserBoldText2]}>
-            {email}님의{'\n'}비밀번호가 변경되었습니다.
+            {userEmail}님의{'\n'}비밀번호가 변경되었습니다.
           </Text>
         </View>
 
@@ -33,13 +36,14 @@ export default function ChangePasswordSucceessScreen({ navigation, route }) {
               styles.customButton,
             ]}
             onPress={() =>{
-              navigation.navigate("LoginScreen")
+              navigation.navigate("MyPageScreen")
             }}
             >
-            <Text style={styles.buttonText}>로그인 페이지로</Text>
+            <Text style={styles.buttonText}>마이 페이지로</Text>
           </TouchableOpacity>
         </View>
       </View>
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }

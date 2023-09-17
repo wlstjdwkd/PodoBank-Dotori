@@ -7,18 +7,23 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  Modal,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useSelector, useDispatch } from 'react-redux';
-import { inputAccessToken, inputRefreshToken, setUserTokenRefreshModalVisible } from '../../redux/slices/auth/user'
+import {
+  inputAccessToken, inputRefreshToken, setUserTokenRefreshModalVisible, 
+  setAccessTokenExpiration, setIsnotReissuanceToken, setUserInfo
+} from '../../redux/slices/auth/user'
 
 import {userRefresh} from '../../apis/userapi'
+import LoginScreen from "../Home/LoginScreen";
 
 export default function AccessTokenRefreshModalScreen({ navigation }) {
   const accessToken = useSelector((state) => state.user.accessToken)
   const refreshToken = useSelector((state) => state.user.refreshToken)
   const dispatch = useDispatch();
-  const userTokenRefreshModalVisible = useSelector((state) => state.user.refreshToken)
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible);
   // dispatch(setUserTokenRefreshModalVisible(false))  // 모달창 닫기에 사용됨
   // dispatch(setUserTokenRefreshModalVisible(!userTokenRefreshModalVisible))  // 모달창 닫기에 사용됨
 
@@ -28,12 +33,53 @@ export default function AccessTokenRefreshModalScreen({ navigation }) {
       console.log('토큰 재발급 성공')
       dispatch(inputAccessToken(response.data.accessToken))
       dispatch(inputRefreshToken(response.data.refreshToken))
-      dispatch(setUserTokenRefreshModalVisible(!userTokenRefreshModalVisible))      
+      dispatch(setUserTokenRefreshModalVisible(false))      
+      dispatch(setAccessTokenExpiration(30))
     }else if(response.status === 400){
       console.log('토큰 재발급 실패')
     }else{
       console.log('오류 발생: 토큰 재발급')
     }
+  }
+
+  // const handleUserLogout = async() => {
+  //   const response = await userLogout(accessToken)
+  //   console.log('리스폰스',response.data)
+  //   if(response.status===200){
+  //     console.log('logout 성공')
+  //     dispatch(inputAccessToken(null))
+  //     dispatch(inputRefreshToken(null))
+  //     dispatch(setAccessTokenExpiration(0))
+  //     dispatch(setUserTokenRefreshModalVisible(false))
+  //     dispatch(setIsnotReissuanceToken(false))
+  //     navigation.reset({
+  //       index: 0,
+  //       routes: [{ name: 'LoginScreen',}],
+  //     })
+  //   }else if(response.status===400){
+  //     console.log('logout 실패')
+  //   }else if(response.status===401){
+  //     console.log('logout 인증실패 실패')
+  //   }else if(response.status===403){
+  //     console.log('토큰없음')
+  //   }else{
+  //     console.log('오류발생 로그아웃 실패')
+  //   }
+  // }
+
+  const handleNoButtonPress = () => {
+    // handleUserLogout()
+    // 아니오 버튼을 눌렀을 때 실행될 코드
+    // accessToken과 refreshToken을 null로 만들고 LoginScreen로 이동
+    dispatch(inputAccessToken(null));
+    dispatch(inputRefreshToken(null));
+    dispatch(setUserTokenRefreshModalVisible(false))
+    dispatch(setIsnotReissuanceToken(true)) // 모달창을 닫고 재발급 안함을 true로 만들기;
+    dispatch(setUserInfo(null))
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'LoginScreen',}],
+    })
   }
 
   return (
@@ -46,7 +92,8 @@ export default function AccessTokenRefreshModalScreen({ navigation }) {
           visible={userTokenRefreshModalVisible}
           onRequestClose={() => {
             Alert.alert('Modal has been closed.');
-            dispatch(setUserTokenRefreshModalVisible(!userTokenRefreshModalVisible));
+            // dispatch(setUserTokenRefreshModalVisible(!userTokenRefreshModalVisible));
+            dispatch(setUserTokenRefreshModalVisible(false));
           }}>
           <View style={styles.centeredView}>
             <View style={[styles.modalView]}>
@@ -68,7 +115,7 @@ export default function AccessTokenRefreshModalScreen({ navigation }) {
                 <TouchableOpacity
                   style={[styles.button, styles.buttonClose, {flex: 1, marginLeft: 5 }]}
                   onPress={() => {
-                    dispatch(setUserTokenRefreshModalVisible(!userTokenRefreshModalVisible))
+                    handleNoButtonPress()
                   }}>
                   <Text style={[styles.textStyle,]}>아니오</Text>
                 </TouchableOpacity>

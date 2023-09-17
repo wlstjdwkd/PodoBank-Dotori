@@ -29,6 +29,7 @@ import ChangePasswordSucceessScreen from "../screens/Home/ChangePasswordSucceess
 import ExamScreen from "../screens/Home/ExamScreen";
 import ChangePasswordScreen from "../screens/Home/ChangePasswordScreen";
 import WithdrawalScreen from "../screens/Home/WithdrawalScreen";
+// import AccessTokenRefreshModalScreen from "../screens/Modal/AccessTokenRefreshModalScreen";
 
 const Stack = createStackNavigator();
 
@@ -137,6 +138,10 @@ function AppNavigator() {
         name="WithdrawalScreen"
         component={WithdrawalScreen}
       ></Stack.Screen>
+      {/* <Stack.Screen
+        name="AccessTokenRefreshModalScreen"
+        component={AccessTokenRefreshModalScreen}
+      ></Stack.Screen> */}
       <Stack.Screen
         name="ExamScreen"
         component={ExamScreen}
