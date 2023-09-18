@@ -8,9 +8,11 @@ import {
 } from "react-native";
 
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 import {
   userRegister,
 } from '../../apis/userapi'
+import { useSelector } from "react-redux";
 
 export default function SignupInformationScreen({ navigation, route }) {
   const [userInfo, setUserInfo] = useState(route.params.userInfo);
@@ -23,6 +25,7 @@ export default function SignupInformationScreen({ navigation, route }) {
   const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(false);
   const [isSucceed, setIsSucceed] = useState(false);              // 회원가입 성공여부
   const [registeredMessage, setRegisteredMessage] = useState(""); // 회원가입 버튼 클릭시 메시지
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
 
   const validatePassword = (password) => {
     const regex =
@@ -62,6 +65,11 @@ export default function SignupInformationScreen({ navigation, route }) {
       console.log('회원가입 성공')
       setIsSucceed(true)
       setRegisteredMessage('회원가입 성공')
+      // navigation.navigate("SignupCompleteScreen", {name: userInfo.name,})
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'SignupCompleteScreen', params: { name: userInfo.name },}],
+      });
     }else if(response.status === 400){
       console.log('회원가입 실패')
       setRegisteredMessage('회원가입 실패')
@@ -93,7 +101,7 @@ export default function SignupInformationScreen({ navigation, route }) {
       // }));
       return {
         ...userInfo,
-        birthDate: formattedBirthdate,
+        birthdate: formattedBirthdate,
       };
     }
     console.log(userInfo)
@@ -178,16 +186,15 @@ export default function SignupInformationScreen({ navigation, route }) {
         onPress={() =>{
           handleUserRegister()
           // handleConfirmButton()
-          if(isSucceed){
-            navigation.navigate("SignupCompleteScreen", {
-              name: userInfo.name,
-            })
-          }
+          // if(isSucceed){
+          //   navigation.navigate("SignupCompleteScreen", {name: userInfo.name,})
+          // }
         }}
         disabled={!(isPasswordValid && isConfirmPasswordValid)}
       >
         <Text style={styles.linkText}>회원가입</Text>
       </TouchableOpacity>
+      {/* {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />} */}
     </View>
   );
 }

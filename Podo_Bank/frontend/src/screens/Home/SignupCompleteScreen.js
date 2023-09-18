@@ -1,9 +1,12 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
+import { useSelector } from "react-redux";
 
 export default function SignupCompleteScreen({ navigation, route }) {
   const userName = route.params.name;
+  // const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -24,6 +27,7 @@ export default function SignupCompleteScreen({ navigation, route }) {
       >
         <Text style={styles.linkText}>시작하기</Text>
       </TouchableOpacity>
+      {/* {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />} */}
     </View>
   );
 }

@@ -17,6 +17,7 @@ import AccountSetupScreen from "../screens/OpenAccount/AccountSetupScreen";
 import AccountConfigurationScreen from "../screens/OpenAccount/AccountConfigurationScreen";
 import AccountRestrictionScreen from "../screens/OpenAccount/AccountRestrictionScreen";
 import OpenAccountCompleteScreen from "../screens/OpenAccount/OpenAccountCompleteScreen";
+import AccountWhatMakeScreen from "../screens/OpenAccount/AccountWhatMakeScreen";
 import AccountManagementScreen from "../screens/Account/AccountManagementScreen";
 import TransactionDetailScreen from "../screens/Account/TransactionDetailScreen";
 import MyPageScreen from "../screens/Home/MyPageScreen";
@@ -29,6 +30,7 @@ import ChangePasswordSucceessScreen from "../screens/Home/ChangePasswordSucceess
 import ExamScreen from "../screens/Home/ExamScreen";
 import ChangePasswordScreen from "../screens/Home/ChangePasswordScreen";
 import WithdrawalScreen from "../screens/Home/WithdrawalScreen";
+// import AccessTokenRefreshModalScreen from "../screens/Modal/AccessTokenRefreshModalScreen";
 
 const Stack = createStackNavigator();
 
@@ -98,6 +100,10 @@ function AppNavigator() {
         component={OpenAccountCompleteScreen}
       ></Stack.Screen>
       <Stack.Screen
+        name="AccountWhatMakeScreen"
+        component={AccountWhatMakeScreen}
+      ></Stack.Screen>
+      <Stack.Screen
         name="AccountManagementScreen"
         component={AccountManagementScreen}
       ></Stack.Screen>
@@ -137,6 +143,10 @@ function AppNavigator() {
         name="WithdrawalScreen"
         component={WithdrawalScreen}
       ></Stack.Screen>
+      {/* <Stack.Screen
+        name="AccessTokenRefreshModalScreen"
+        component={AccessTokenRefreshModalScreen}
+      ></Stack.Screen> */}
       <Stack.Screen
         name="ExamScreen"
         component={ExamScreen}

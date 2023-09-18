@@ -24,7 +24,7 @@ export default function FooterScreen({ navigation }) {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.iconContainer}
-        onPress={() => navigation.navigate("AccountConfigurationScreen")}
+        onPress={() => navigation.navigate("AccountWhatMakeScreen")}
       >
         <Image
           style={{ width: 30, height: 24 }}

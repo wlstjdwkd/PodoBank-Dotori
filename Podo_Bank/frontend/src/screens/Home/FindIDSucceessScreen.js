@@ -8,8 +8,11 @@ import {
   Alert,
 } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
+import { useSelector } from "react-redux";
 
-export default function SignupIdentityVerificationScreen({ navigation, route }) {
+export default function FindIDSucceessScreen({ navigation, route }) {
+  // const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   const userName = route.params.name;
   const userID = route.params.userID
 
@@ -48,6 +51,7 @@ export default function SignupIdentityVerificationScreen({ navigation, route }) 
           </TouchableOpacity>
         </View>
       </View>
+      {/* {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />} */}
     </View>
   );
 }
