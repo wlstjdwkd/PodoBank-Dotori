@@ -3,7 +3,6 @@ package com.bank.podo.domain.account.service;
 import com.bank.podo.domain.account.dto.*;
 import com.bank.podo.domain.account.entity.Account;
 import com.bank.podo.domain.account.entity.AccountCategory;
-import com.bank.podo.domain.account.enums.AccountType;
 import com.bank.podo.domain.account.entity.TransactionHistory;
 import com.bank.podo.domain.account.enums.TransactionType;
 import com.bank.podo.domain.account.exception.*;
@@ -23,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -38,8 +36,9 @@ public class AccountService {
     private final AccountCategoryRepository accountCategoryRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
 
-    public List<AccountType> getAccountTypeList() {
-        return Arrays.asList(AccountType.values());
+    public List<AccountCategoryDTO> getAccountTypeList() {
+        List<AccountCategory> accountCategories = accountCategoryRepository.findAll();
+        return toAccountCategoryDTOList(accountCategories);
     }
 
     public void createAccount(CreateAccountDTO createAccountDTO, PasswordEncoder passwordEncoder) {
@@ -54,7 +53,7 @@ public class AccountService {
         Account account = Account.builder()
                 .accountNumber(generateAccountNumber())
                 .user(user)
-                .accountType(createAccountDTO.getAccountType())
+                .accountType(accountCategory.getAccountType())
                 .balance(BigDecimal.ZERO)
                 .password(passwordEncoder.encode(createAccountDTO.getPassword()))
                 .accountCategory(accountCategory)
@@ -372,4 +371,19 @@ public class AccountService {
         return builder.build();
     }
 
+    private List<AccountCategoryDTO> toAccountCategoryDTOList(List<AccountCategory> accountCategories) {
+        return accountCategories.stream()
+                .map(this::toAccountCategoryDTO)
+                .collect(Collectors.toList());
+    }
+
+    private AccountCategoryDTO toAccountCategoryDTO(AccountCategory accountCategory) {
+        return AccountCategoryDTO.builder()
+                .accountCategoryId(accountCategory.getAccountCategoryId())
+                .accountType(accountCategory.getAccountType())
+                .accountName(accountCategory.getAccountName())
+                .accountDescription(accountCategory.getAccountDescription())
+                .interestRate(accountCategory.getInterestRate())
+                .build();
+    }
 }
