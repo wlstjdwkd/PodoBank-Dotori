@@ -97,7 +97,7 @@ export default function AccountConfigurationScreen({ navigation }) {
         >
           <Text style={{fontWeight:'bold', fontSize:20}}>차후 추가 예정</Text>
           <Text style={{color:'grey'}}>년 0.0% 이율</Text>
-          <Text style={{color:'grey'}}>차후 추가 예정될 통장</Text>
+          <Text style={{color:'grey'}}>차후 추가 예정될 상품</Text>
         </View>
       </View>
       
