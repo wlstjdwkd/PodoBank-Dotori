@@ -7,6 +7,8 @@ import SignUp2Screen from "../screens/SignUp/SignUp2Screen";
 import SignUp3Screen from "../screens/SignUp/SignUp3Screen";
 import SignUp4Screen from "../screens/SignUp/SignUp4Screen";
 import SignUpCompleteScreen from "../screens/SignUp/SignUpCompleteScreen";
+import MainPageScreen from "../screens/Home/MainPageScreen";
+import OneCent1Screen from "../screens/OneCent/OneCent1Screen";
 
 const Stack = createStackNavigator();
 
@@ -37,6 +39,14 @@ export default function AppNavigator() {
         name="SignUpCompleteScreen"
         component={SignUpCompleteScreen}
       ></Stack.Screen> */}
+      <Stack.Screen
+        name="MainPageScreen"
+        component={MainPageScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="OneCent1Screen"
+        component={OneCent1Screen}
+      ></Stack.Screen>
     </Stack.Navigator>
   );
 }
