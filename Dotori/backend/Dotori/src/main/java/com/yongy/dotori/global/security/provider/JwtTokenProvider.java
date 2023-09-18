@@ -72,9 +72,7 @@ public class JwtTokenProvider {
 
     // 권한정보 획득
     // Spring Security 인증과정에서 권한획득을 위한 기능
-    public Authentication getAuthentication(String token){
-        String authId = this.getUserId(token);
-        User user = userDetailsService.getUserInfo(authId);
+    public Authentication getAuthentication(User user, String authId){
         return new UsernamePasswordAuthenticationToken(user, "", Collections.singleton(new SimpleGrantedAuthority(user.getRole().name())));
     }
 

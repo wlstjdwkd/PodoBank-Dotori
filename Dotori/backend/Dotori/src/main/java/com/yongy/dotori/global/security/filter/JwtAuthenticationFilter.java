@@ -60,8 +60,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 generalJwtExceptionHandler((HttpServletResponse) response, ErrorType.NOT_OURS_TOKEN);
                 return;
             }
-            log.info("TOKEN ID : "+ tokenId);
-
 
             // NOTE : DB에 사용자가 없는 경우 or 정보는 있지만 탈퇴한 경우
             User user = userDetailsService.getUserInfo(tokenId);
@@ -69,23 +67,14 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 generalJwtExceptionHandler((HttpServletResponse)response, ErrorType.NOT_FOUND_USER);
                 return;
             }
-            log.info("USER ID : "+ user.getId());
 
-
-            if(jwtTokenProvider.validateToken(token)){
+            if(jwtTokenProvider.validateToken(resolveToken((HttpServletRequest) request))){
                 // NOTE : DB에 사용자의 정보가 있는 경우 (인증객체 생성)
-                Authentication auth = jwtTokenProvider.getAuthentication(token);
+                Authentication auth = jwtTokenProvider.getAuthentication(user, tokenId);
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }else {
-                // NOTE : refreshToken의 여부에 관계없이 재발급
-                String refreshToken = redisUtil.getData(tokenId);
-                JwtToken jwtToken = jwtTokenProvider.createToken(tokenId, Role.USER);
-
-                // refreshToken 저장하기
-                redisUtil.setDataExpire(tokenId, jwtToken.getRefreshToken(), exp * 24);
-
-                // accessToken을 client에게 반환하기
-                newJwtExceptionHandler((HttpServletResponse) response, ErrorType.NEW_ACCESS_TOKEN, jwtToken.getAccessToken());
+                // NOTE : refreshToken을 다시 발급받으세요
+                generalJwtExceptionHandler((HttpServletResponse) response, ErrorType.EXPIRATION_ACCESS_TOKEN);
                 return;
             }
         }else{
@@ -121,20 +110,20 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     }
 
     // code, message, accessToken을 담아서 반환한다.
-    public void newJwtExceptionHandler(HttpServletResponse response, ErrorType error, String accessToken) {
-        response.setStatus(error.getCode());
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        TokenMsgResDto dto = new TokenMsgResDto(error.getCode(), error.getMessage(), accessToken);
-
-        try {
-            String json = new ObjectMapper().writeValueAsString(dto);
-            response.getWriter().write(json);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-    }
+//    public void newJwtExceptionHandler(HttpServletResponse response, ErrorType error, String accessToken) {
+//        response.setStatus(error.getCode());
+//        response.setContentType("application/json");
+//        response.setCharacterEncoding("UTF-8");
+//
+//        TokenMsgResDto dto = new TokenMsgResDto(error.getCode(), error.getMessage(), accessToken);
+//
+//        try {
+//            String json = new ObjectMapper().writeValueAsString(dto);
+//            response.getWriter().write(json);
+//        } catch (Exception e) {
+//            log.error(e.getMessage());
+//        }
+//    }
 
 
 }

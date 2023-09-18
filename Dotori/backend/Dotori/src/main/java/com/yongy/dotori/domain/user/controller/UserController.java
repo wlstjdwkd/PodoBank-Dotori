@@ -10,6 +10,7 @@ import com.yongy.dotori.domain.user.repository.UserRepository;
 import com.yongy.dotori.domain.user.service.UserService;
 import com.yongy.dotori.global.common.BaseResponseBody;
 import com.yongy.dotori.global.redis.RedisUtil;
+import com.yongy.dotori.global.security.exception.ErrorType;
 import com.yongy.dotori.global.security.provider.JwtTokenProvider;
 import com.yongy.dotori.global.security.dto.JwtToken;
 
@@ -19,6 +20,7 @@ import com.yongy.dotori.global.security.dto.JwtToken;
 //import io.swagger.v3.oas.annotations.responses.ApiResponse;
 //import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +87,6 @@ public class UserController {
     public ResponseEntity<? extends BaseResponseBody> signup(@RequestBody UserInfoDto userInfoDto){
         try{
             User user = User.builder()
-                    .role(Role.USER)
                     .id(userInfoDto.getId())
                     .password(passwordEncoder.encode(userInfoDto.getPassword())) // 사용자의 비밀번호를 암호화하기
                     .userName(userInfoDto.getUserName())
@@ -120,12 +121,34 @@ public class UserController {
             }
         }
 
-        JwtToken jwtToken = jwtTokenProvider.createToken(user.getId(), Role.USER);
+        JwtToken jwtToken = jwtTokenProvider.createToken(user.getId(), Role.ROLE_USER);
 
         // refreshToken 저장
         redisUtil.setDataExpire(user.getId(), jwtToken.getRefreshToken(), exp*24);
 
         // accessToken 전달
-        return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, jwtToken.getAccessToken()));
+        return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, jwtToken));
+    }
+
+
+    // NOTE : RefreshToken이 유효하면 accessToken, refreshToken을 재발급 받아서 반환
+    @PostMapping("/new-token")
+    public ResponseEntity<? extends BaseResponseBody> generateNewToken(String refreshToken){
+
+
+        String id = jwtTokenProvider.getUserId(refreshToken);
+
+        String db_refreshToken = redisUtil.getData(id);
+
+        // refreshToken이 유효하면
+        if(db_refreshToken != null){
+            JwtToken jwtToken = jwtTokenProvider.createToken(id, Role.ROLE_USER);
+            // refreshToken 저장하기
+            redisUtil.setDataExpire(id, jwtToken.getRefreshToken(), exp * 24);
+
+            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, jwtToken));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(404, "다시 로그인하세요"));
     }
 }
