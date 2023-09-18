@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {
   View,
   Text,
@@ -10,13 +10,13 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useSelector, useDispatch } from 'react-redux';
-import { inputAccessToken, inputRefreshToken } from '../../redux/slices/auth/user'
+import { inputAccessToken, inputRefreshToken, setAccessTokenExpiration } from '../../redux/slices/auth/user'
 
 import {userLogin} from '../../apis/userapi'
 
 export default function LoginScreen({ navigation }) {
-  // const accessToken = useSelector((state) => state.user.accessToken)
-  // const refreshToken = useSelector((state) => state.user.refreshToken)
+  const accessToken = useSelector((state) => state.user.accessToken)
+  const refreshToken = useSelector((state) => state.user.refreshToken)
   const dispatch = useDispatch();
   
   const [email, setEmail] = useState("")
@@ -26,7 +26,16 @@ export default function LoginScreen({ navigation }) {
 
   const handleLoginSuccess = () => {
     // 로그인 성공 시 처리
-    navigation.navigate("HomeScreen");
+    setEmail("")
+    setPassword("")
+    setLoginMessage("")
+    dispatch(setAccessTokenExpiration(600)) // accessToken 만료 시간 10분으로 설정
+    // navigation.navigate("HomeScreen");
+    // 로그인 하면 이 화면은 못오게 하기 위해 HomeScreen을 첫 화면으로 설정
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'HomeScreen' }],
+    });
   };
 
   const handleLoginFailure = (statusCode) => {
@@ -47,6 +56,7 @@ export default function LoginScreen({ navigation }) {
     const response = await userLogin(email, password);
     if (response.status === 200) {
       console.log("로그인 성공");
+      console.log(response.data)
       dispatch(inputAccessToken(response.data.accessToken))
       dispatch(inputRefreshToken(response.data.refreshToken))
       handleLoginSuccess();
@@ -55,6 +65,20 @@ export default function LoginScreen({ navigation }) {
       handleLoginFailure(response.status);
     }
   };
+
+
+  // 로그인 상태 확인 및 처리
+  useEffect(() => {
+    // accessToken과 refreshToken이 이미 존재하는 경우에는 HomeScreen으로 넘어감
+    console.log({'accessToken':accessToken, 'refreshToken':refreshToken})
+    if (accessToken && refreshToken) {
+      handleLoginSuccess();
+    } else {
+      dispatch(inputAccessToken(null));
+      dispatch(inputRefreshToken(null));
+    }
+  }, []);
+
   return (
     <View style={styles.container}>
       {/* Logo */}

@@ -8,6 +8,7 @@ import {
   Platform // 추가
 } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 
 // 링크들을 상수로 정의
 // const GOOGLE_PLAY_STORE_LINK = "market://details?id=io.github.Antodo";
@@ -29,7 +30,7 @@ const STARBUCKS_LINK = "market://details?id=com.starbucks.co";
 // 인스타그램이 설치되어 있지 않을 때 웹 링크
 const STARBUCKS_WEB_LINK = "https://www.starbucks.co.kr/index.do";
 
-export default function SignupIdentityVerificationScreen({ navigation }) {
+export default function ExamScreen({ navigation }) {
 
    const handlePress = useCallback(async (url, alterUrl) => {
     const supported = await Linking.canOpenURL(url);

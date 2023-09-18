@@ -8,11 +8,14 @@ import {
   Alert,
 } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 import {
   userIDfind,
 } from '../../apis/userapi'
+import { useSelector } from "react-redux";
 
-export default function SignupIdentityVerificationScreen({ navigation }) {
+export default function FindIDScreen({ navigation }) {
+  // const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   const [userInfo, setUserInfo] = useState({
     name: "",
     birthDate: "",
@@ -166,10 +169,14 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
           },
         ]}
         onPress={() =>{
-          navigation.navigate("FindIDSucceessScreen", {
-            name: userInfo.name,
-            userID : userInfo.userID,
-          })
+          // navigation.navigate("FindIDSucceessScreen", {
+          //   name: userInfo.name,
+          //   userID : userInfo.userID,
+          // })
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'FindIDSucceessScreen', params: { name: userInfo.name,userID : userInfo.userID },}],
+          });
         }}
         // onPress={() =>{
         //   handleUserIDfind()
@@ -198,6 +205,7 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
       >
         <Text style={styles.linkText}>다른 앱 연결되나 확인중</Text>
       </TouchableOpacity>
+      {/* {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />} */}
     </View>
   );
 }

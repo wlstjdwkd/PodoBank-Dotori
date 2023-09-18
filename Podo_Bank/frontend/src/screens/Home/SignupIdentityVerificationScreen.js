@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
+import { useSelector } from "react-redux";
 
 export default function SignupIdentityVerificationScreen({ navigation }) {
   const [userInfo, setUserInfo] = useState({
@@ -22,6 +24,7 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
     isBirthdateValid: false,
     isPhoneNumberValid: false,
   })
+  // const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
 
   const validateName = (text) => {
     const regex = /^[A-Za-z가-힣]{2,}$/
@@ -160,6 +163,7 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
       >
         <Text style={styles.linkText}>확인</Text>
       </TouchableOpacity>
+      {/* {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />} */}
     </View>
   );
 }

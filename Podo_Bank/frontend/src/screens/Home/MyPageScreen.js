@@ -7,33 +7,51 @@ import {
 } from '../../apis/userapi'
 import { FontAwesome } from "@expo/vector-icons";
 import { useSelector, useDispatch } from 'react-redux';
-import { inputAccessToken, inputRefreshToken } from '../../redux/slices/auth/user'
+import { inputAccessToken, inputRefreshToken, setIsnotReissuanceToken, setAccessTokenExpiration, setUserInfo } from '../../redux/slices/auth/user'
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 
 export default function MyPageScreen({ navigation }) {
-  const [userInfo, setUserInfo] = useState(null)
+  // const [userInfo, setUserInfo] = useState(null)
+  const userInfo = useSelector((state) => state.user.userInfo)
   const [userWithdrawalModalVisible, setUserWithdrawalModalVisible] = useState(false)
   const accessToken = useSelector((state) => state.user.accessToken)
   const refreshToken = useSelector((state) => state.user.refreshToken)
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
+
   const dispatch = useDispatch();
 
-  //들어올 때 axios로 정보 받아야함
-  const hanldeUserInformationInquiry = async() =>{
-    const response = await userInformationInquiry(accessToken)
-    if(response.status===200){
-      console.log('good')
-      setUserInfo(response.data)
-    }else if(response.status===400){
-      console.log('bad400 회원정보를 받아올 수 없습니다.')
-    }else if(response.status===401){
-      console.log('bad401 회원정보를 받아올 수 없습니다.')
-    }
-  }
+  // //들어올 때 axios로 정보 받아야함
+  // const hanldeUserInformationInquiry = async() =>{
+  //   console.log('mypage',accessToken)
+  //   const response = await userInformationInquiry(accessToken)
+  //   if(response.status===200){
+  //     console.log('good')
+  //     setUserInfo(response.data)
+  //   }else if(response.status===400){
+  //     console.log('bad400 회원정보를 받아올 수 없습니다.')
+  //   }else if(response.status===401){
+  //     console.log('bad401 회원정보를 받아올 수 없습니다.')
+  //   }else if(response.status===403){
+  //     console.log('bad403 회원정보를 받아올 수 없습니다.')
+  //   }else{
+  //     console.log('오류발생: 회원정보')
+  //   }
+  // }
 
-  const handleUserLogout = () => {
-    const response = userLogout()
+  const handleUserLogout = async() => {
+    const response = await userLogout(accessToken)
+    console.log('리스폰스',response.data)
     if(response.status===200){
       console.log('logout 성공')
-      navigation.navigate("LoginScreen");
+      dispatch(inputAccessToken(null))
+      dispatch(inputRefreshToken(null))
+      dispatch(setAccessTokenExpiration(0))
+      dispatch(setUserInfo(null))
+      // navigation.navigate("LoginScreen");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'LoginScreen' }],
+      });
     }else if(response.status===400){
       console.log('logout 실패')
     }else if(response.status===401){
@@ -46,29 +64,27 @@ export default function MyPageScreen({ navigation }) {
   }
 
   // 페이지가 로드될 때 hanldeUserInformationInquiry() 함수 실행
-  useEffect(() => {
-    hanldeUserInformationInquiry();
-  }, []);
-
-
+  // useEffect(() => {
+  //   hanldeUserInformationInquiry();
+  // }, []);
 
   return (
     <View style={styles.container}>
-      {/* Header Component (You can replace this with your own component) */}
       <HeaderComponent
         title="마이페이지"
         navigation={navigation}
-        showHome={false}
+        showHome={true}
       />
 
-      {/* User Information */}
+      
+      {/* 유저 정보 */}
       <View style={styles.userInfoContainer}>
         <Text style={styles.boldText}>기본정보</Text>
         <View style={styles.infoRow}>
           <Text>이름</Text>
           {userInfo?
             (<Text>{userInfo.name}</Text>)
-            :(<Text>정예진</Text>)
+            :(<Text>박포도</Text>)
           }
           
         </View>
@@ -84,7 +100,7 @@ export default function MyPageScreen({ navigation }) {
           <Text>생년월일</Text>
           {userInfo?
             (<Text>{userInfo.birthdate}</Text>)
-            :(<Text>1999.05.08</Text>)
+            :(<Text>1999.12.12</Text>)
           }
         </View>
         <View style={styles.infoRow}>
@@ -98,11 +114,11 @@ export default function MyPageScreen({ navigation }) {
 
       <View style={styles.divider} />
 
-      {/* Password Change and Logout */}
+      {/* 비밀번호 변경 및 로그아웃 */}
       <TouchableOpacity
         style={styles.actionRow}
         onPress={()=>{
-          navigation.navigate('ChangePasswordScreen')
+          navigation.navigate('ChangePasswordScreen', {userEmail:userInfo.email})
         }}
       >
         <Text>비밀번호 변경</Text>
@@ -112,13 +128,24 @@ export default function MyPageScreen({ navigation }) {
         //accessToken지우자
         style={styles.logoutButton}
         onPress={() => {
-          // handleUserLogout()
-          navigation.navigate("LoginScreen");
+          handleUserLogout()
+          // navigation.navigate("LoginScreen");
         }}
       >
         <Text style={styles.logoutButtonText}>로그아웃</Text>
       </TouchableOpacity>
 
+      
+
+      <TouchableOpacity
+        onPress={()=>{
+          setUserWithdrawalModalVisible(true)
+        }}
+      >
+        <Text style={styles.grayText}>
+          포도은행을 탈퇴하시려면 여기를 눌러주세요
+        </Text>
+      </TouchableOpacity>
       {/* 회원탈퇴 모달창 */}
       <Modal
         animationType="none"//slide, fade가 있음
@@ -156,20 +183,11 @@ export default function MyPageScreen({ navigation }) {
           </View>
         </View>
       </Modal>
-
-      <TouchableOpacity
-        onPress={()=>{
-          setUserWithdrawalModalVisible(true)
-        }}
-      >
-        <Text style={styles.grayText}>
-          포도은행을 탈퇴하시려면 여기를 눌러주세요
-        </Text>
-      </TouchableOpacity>
-
+      
       <View style={styles.footer}>
         <FooterScreen navigation={navigation} />
       </View>
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }
@@ -179,6 +197,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     padding: 20,
+    paddingBottom: 0,
   },
 
   boldText: {
@@ -228,7 +247,7 @@ const styles = StyleSheet.create({
   footer: {
     justifyContent: "flex-start",
     alignItems: "center",
-    marginTop: 220,
+    marginTop: 'auto',
   },
   // 모달부분
   centeredView: {
