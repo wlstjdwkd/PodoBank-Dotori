@@ -73,7 +73,7 @@ export default function MyPageScreen({ navigation }) {
       <HeaderComponent
         title="마이페이지"
         navigation={navigation}
-        showHome={false}
+        showHome={true}
       />
 
       

@@ -34,7 +34,7 @@ export default function AccessTokenRefreshModalScreen({ navigation }) {
       dispatch(inputAccessToken(response.data.accessToken))
       dispatch(inputRefreshToken(response.data.refreshToken))
       dispatch(setUserTokenRefreshModalVisible(false))      
-      dispatch(setAccessTokenExpiration(30))
+      dispatch(setAccessTokenExpiration(600))
     }else if(response.status === 400){
       console.log('토큰 재발급 실패')
     }else{

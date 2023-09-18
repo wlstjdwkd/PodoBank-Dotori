@@ -41,14 +41,16 @@ export const userRegister = async (userData) => {
 // refresh토큰을 이용해 access token을 받음
 export const userRefresh = async (refreshToken) => {
   try {
-    const response = await axios.post(apiAddress+'/api/v1/user/refresh', {refreshToken:refreshToken});
+    console.log('리프레시토큰',refreshToken)
+    const response = await axios.post(apiAddress+`/api/v1/user/refresh?refreshToken=${refreshToken}`);
     // const response = await axios.post(apiAddress+'/api/v1/user/refresh', null, {
     //   headers: {
     //     Authorization: `Bearer ${refreshToken}`,
     //   },
     // });
     console.log('토큰 재발급 성공:', response.data);
-    return response.data;
+    console.log(response.status)
+    return response;
   } catch (error) {
     console.error('토큰 재발급 실패:', error);
     const response = error.response

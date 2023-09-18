@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
 
-export default function OpenAccountCompleteScreen({ navigation }) {
+export default function OpenAccountCompleteScreen({ navigation, route }) {
+  const [accountInfo, setAccountNumber] = useState(route.params.accountInfo)
+
   return (
     <View style={styles.container}>
       <HeaderComponent navigation={navigation} title="계좌개설 완료" />
@@ -15,7 +17,10 @@ export default function OpenAccountCompleteScreen({ navigation }) {
         <Text style={styles.boldText}>계좌 개설</Text>
         <Text style={styles.boldText}>완료</Text>
         <View style={styles.bankInfoContainer}>
-          <Text style={styles.bankInfoText}>포도은행 1568-4153-5564</Text>
+          { accountInfo
+            ?<Text style={styles.bankInfoText}>포도은행 {accountInfo.accountNumber.slice(0,4)}-{accountInfo.accountNumber.slice(4,6)}-{accountInfo.accountNumber.slice(6)}</Text>
+            :<Text style={styles.bankInfoText}>포도은행 1234-12-1234567</Text>
+          }
         </View>
 
         <TouchableOpacity

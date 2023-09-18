@@ -1,7 +1,8 @@
 import React,{useEffect, useState} from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { AntDesign, Octicons  } from "@expo/vector-icons"; // AntDesign과 Entypo 아이콘 라이브러리 추가
 import FooterScreen from "../Header/FooterScreen";
+import HeaderComponent from "../Header/HeaderScreen";
 import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { userInformationInquiry, } from '../../apis/userapi'
@@ -37,7 +38,7 @@ export default function HomeScreen({ navigation }) {
   const handleAccountListInquiry = async()=>{
     const response = await accountListInquiry(accessToken)
     if(response.status===200){
-      console.log(userInfo.name,'님의 계좌 목록을 받아왔습니다.')
+      console.log('계좌 목록을 받아왔습니다.')
       setAccountList(response.data)
     }else if(response.status===400){
       console.log('bad400 조회실패로 계좌 목록을 받아올 수 없습니다.')
@@ -46,6 +47,11 @@ export default function HomeScreen({ navigation }) {
     }else{
       console.log('오류발생: 계좌 목록을 받아올 수 없습니다.')
     }
+  }
+
+  // 계좌 상세페이지로 이동하기
+  const gotoAccountDetail = (account) => {
+    navigation.navigate("AccountDetailScreen", {account:account});
   }
 
   // 페이지가 로드될 때 hanldeUserInformationInquiry() 함수 실행
@@ -57,107 +63,101 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {/* <HeaderComponent
+        title="홈"
+        navigation={navigation}
+        showHome={false}
+      /> */}
+      <View style={{ justifyContent: 'center', alignItems: 'center', marginVertical: 20, }}>
+        <Image
+          source={require("../../assets/images/podo_bank_name.png")}
+          style={{ height: 25, resizeMode: 'contain' }}
+        />
+      </View>
+      
       {/* 사용자 이름 */}
-      <View style={styles.nameContainer}>
+      <View style={[styles.nameContainer,{flex:0.05,}]}>
         {userInfo?
             (<Text style={styles.userNameBold}>{userInfo.name}</Text>)
             :(<Text style={styles.userNameBold}>정예진</Text>)
           }
         <Text style={styles.userName}>님</Text>
       </View>
-
-      {/* 대표 계좌 */}
-      <View style={styles.accountBox}>
-        <TouchableOpacity
-          style={styles.touchableOpacity}
-          onPress={() => {
-            navigation.navigate("AccountDetailScreen");
-          }}
-        >
-          <View style={styles.bankInfo}>
-            <View style={styles.bankLogoContainer}>
-              <Image
-                source={require("../../assets/images/logo_podo.png")}
-                style={styles.bankLogo}
-              />
-            </View>
-            <Text style={styles.bankName}>포도은행 통장</Text>
-          </View>
-
-          <Text style={styles.accountNumber}>1235-4568-4532</Text>
-          <Text style={styles.balance}>1,000,000,000원</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.transferButton}
-          onPress={() => navigation.navigate("TransferScreen")}
-        >
-          <Text style={styles.buttonText}>이체</Text>
-        </TouchableOpacity>
-      </View>
       
       {/* 보유 계좌 목록 */}
-      {accountList.map((account, index) => (
-        <View key={index} style={styles.accountBox}>
-          <TouchableOpacity
-            style={styles.touchableOpacity}
-            onPress={() => {
-              navigation.navigate("AccountDetailScreen");
-            }}
-          >
-            <View style={styles.bankInfo}>
-              <View style={styles.bankLogoContainer}>
-                <Image
-                  source={require("../../assets/images/logo_podo.png")}
-                  style={styles.bankLogo}
-                />
+      <ScrollView style={[styles.scrollViewContainer,{flex:0.85}]}>
+        {accountList.map((account, index) => (
+          <View key={index} style={styles.accountBox}>
+            <TouchableOpacity
+              style={styles.touchableOpacity}
+              onPress={() => {
+                gotoAccountDetail(account)
+              }}
+            >
+              <View style={styles.bankInfo}>
+                <View style={styles.bankLogoContainer}>
+                  <Image
+                    source={require("../../assets/images/logo_podo.png")}
+                    style={styles.bankLogo}
+                  />
+                </View>
+                <Text style={styles.bankName}>포도은행 통장</Text>
               </View>
-              <Text style={styles.bankName}>포도은행 통장</Text>
-            </View>
 
-            <Text style={styles.accountNumber}>{account.accountNumber}</Text>
-            <Text style={styles.balance}>{account.balance}원</Text>
-          </TouchableOpacity>
+              {/* <Text style={styles.accountNumber}>{account.accountNumber}</Text> */}
+              <Text style={styles.accountNumber}>{account.accountNumber.slice(0,4)}-{account.accountNumber.slice(4,6)}-{account.accountNumber.slice(6)}</Text>
+              <Text style={styles.balance}>{(Math.floor(account.balance)).toLocaleString()}원</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.transferButton}
-            onPress={() => navigation.navigate("TransferScreen")}
-          >
-            <Text style={styles.buttonText}>이체</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.transferButton}
+              onPress={() => navigation.navigate("TransferScreen")}
+            >
+              <Text style={styles.buttonText}>이체</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+        
+        {/* 계좌 추가 버튼 */}
+        <TouchableOpacity
+          style={styles.addAccountBox}
+          onPress={() => {
+            navigation.navigate("AccountWhatMakeScreen");
+          }}
+        >
+          <AntDesign name="pluscircleo" size={25} color="black" />
+        </TouchableOpacity>
+
+        {/* 설정 버튼 */}
+        <View style={styles.settingsContainer}>
+          <Octicons name="gear" size={16} color="black" />
+          <Text style={styles.settingsText}>  대표계좌 설정</Text>
         </View>
-      ))}
-
-
-      {/* 계좌 추가 버튼 */}
-      <TouchableOpacity
-        style={styles.addAccountBox}
-        onPress={() => {
-          navigation.navigate("AccountConfigurationScreen");
-        }}
-      >
-        <AntDesign name="pluscircleo" size={25} color="black" />
-      </TouchableOpacity>
-
-      {/* 설정 버튼 */}
-      <View style={styles.settingsContainer}>
-        <Octicons name="gear" size={16} color="black" />
-        <Text style={styles.settingsText}>  대표계좌 설정</Text>
+      </ScrollView>
+      <View style={{flex:0.1,}}>
+        {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
       </View>
       <FooterScreen navigation={navigation} />
-      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  // container: {
+  //   flex: 1,
+  //   alignItems: "center",
+  //   justifyContent: "flex-start",
+  //   paddingHorizontal: 20,
+  //   // paddingTop: 100,
+  //   paddingTop: 50,
+  //   backgroundColor: "white",
+  // },
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "flex-start",
-    paddingHorizontal: 20,
-    paddingTop: 100,
     backgroundColor: "white",
+    padding: 20,
+    paddingBottom: 0,
+    
   },
   accountNumber: {
     fontSize: 15,
@@ -165,6 +165,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignSelf: "flex-start",
   },
+  scrollViewContainer: {
+    flexGrow: 1,
+    width: "100%", // ScrollView의 가로 너비를 화면 가로 너비로 설정
+  },  
   balance: {
     fontSize: 25,
     marginTop: 20,
@@ -182,7 +186,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     width: "100%",
-    marginBottom: 20,
+    marginBottom: 0,
   },
   userNameBold: {
     fontSize: 24,
@@ -191,8 +195,20 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 24,
   },
+  // accountBox: {
+  //   width: "100%",
+  //   borderRadius: 10,
+  //   padding: 20,
+  //   backgroundColor: "white",
+  //   marginBottom: 20,
+  //   borderColor: "#757575",
+  //   borderWidth: 1,
+  //   // 그림자 스타일 추가
+  //   elevation: 10,
+  //   backgroundColor: "white",
+  // },
   accountBox: {
-    width: "100%",
+    // width: "100%",
     borderRadius: 10,
     padding: 20,
     backgroundColor: "white",
@@ -255,6 +271,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
+    marginBottom: 20,
   },
   settingsIcon: {
     marginRight: 10,

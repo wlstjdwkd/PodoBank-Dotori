@@ -29,11 +29,12 @@ export default function AccountRestrictionScreen({ navigation, route }) {
   const handleAccountCreate = async () =>{
     console.log(createInfo)
     const response = await accountCreate(createInfo, accessToken)
+    console.log(response.data)
     if(response.status===200){
       navigation.reset({
         index: 0,
         // routes: [{ name: 'OpenAccountCompleteScreen', params: { name: userInfo.name },}],
-        routes: [{ name: 'OpenAccountCompleteScreen', }],
+        routes: [{ name: 'OpenAccountCompleteScreen', params: { accountInfo: response.data },}],
       });
       console.log('bad400 계좌 생성에 성공했습니다..')
     }else if(response.status===400){

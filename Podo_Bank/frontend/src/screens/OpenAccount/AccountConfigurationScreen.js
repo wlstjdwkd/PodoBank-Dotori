@@ -11,15 +11,19 @@ import {
 } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
 import { AntDesign } from "@expo/vector-icons";
+import {accountTypeInquiry} from "../../apis/accountapi"
+import { useSelector } from "react-redux";
 
 const { height, width } = Dimensions.get("window");
 
 
-export default function AccountConfigurationScreen({ navigation }) {
-  const [createInfo, setCreateInfo] = useState({
-    accountType:"",
-    password:"",
-  })
+export default function AccountConfigurationScreen({ navigation, route }) {
+  // const [createInfo, setCreateInfo] = useState({
+  //   accountType:"",
+  //   password:"",
+  // })
+  const [createInfo, setCreateInfo] = useState(route.params.createInfo)
+
   const [selectedOption1, setSelectedOption1] = useState(null);
   const [selectedOption2, setSelectedOption2] = useState(null);
   const [password, setPassword] = useState("");
@@ -29,10 +33,11 @@ export default function AccountConfigurationScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false)
   const [checkPasswordModalVisible, setCheckPasswordModalVisible] = useState(false)
   const passwordInputRef = useRef(null);
-  const [isRight1, setIsRight1] = useState(false)
-  const [isRight2, setIsRight2] = useState(false)
+  const accessToken = useSelector((state) => state.user.accessToken)
+
   // 드랍다운 용도
-  const dropdownOptions = ["입출금 계좌", "적금 계좌", "예금 계좌"];
+  // const [dropdownOptions,setDropdownOptions] = ["입출금 계좌", "적금 계좌", "예금 계좌"];
+  const [dropdownOptions,setDropdownOptions] = useState(["급여 및 아르바이트", "생활비 관리", "적금 자동이체", "예금 가입", "대출 신청"])
   const [isAccountTypeDropdownOpen, setIsAccountTypeDropdownOpen] = useState(false)
   const [selectedAccountType, setSelectedAccountType] = useState(null)
 
@@ -68,25 +73,32 @@ export default function AccountConfigurationScreen({ navigation }) {
   const selectAccountTypeOption = (option) => {
     setSelectedAccountType(option);
     setIsAccountTypeDropdownOpen(false);
-    let selectAccountType
-    switch (option) {
-      case "입출금 계좌":
-        selectAccountType = "DEPOSIT_ACCOUNT";
-        break;
-      case "적금 계좌":
-        selectAccountType = "SAVING_ACCOUNT";
-        break;
-      case "예금 계좌":
-        selectAccountType = "CHECKING_ACCOUNT";
-        break;
-      default:
-        selectAccountType = ""; // 옵션이 매칭되지 않을 경우 기본값 설정
-    }
+    console.log(option)
     setCreateInfo((prev) => ({ ...prev, 
-      accountType: selectAccountType
+      accountType: option
     }))
   };
-
+  // const selectAccountTypeOption = (option) => {
+  //   setSelectedAccountType(option);
+  //   setIsAccountTypeDropdownOpen(false);
+  //   let selectAccountType
+  //   switch (option) {
+  //     case "입출금 계좌":
+  //       selectAccountType = "DEPOSIT_ACCOUNT";
+  //       break;
+  //     case "적금 계좌":
+  //       selectAccountType = "SAVING_ACCOUNT";
+  //       break;
+  //     case "예금 계좌":
+  //       selectAccountType = "CHECKING_ACCOUNT";
+  //       break;
+  //     default:
+  //       selectAccountType = ""; // 옵션이 매칭되지 않을 경우 기본값 설정
+  //   }
+  //   setCreateInfo((prev) => ({ ...prev, 
+  //     accountType: selectAccountType
+  //   }))
+  // };
 
   return (
     <View style={styles.container}>
@@ -180,7 +192,7 @@ export default function AccountConfigurationScreen({ navigation }) {
               <TouchableOpacity
                 key={index}
                 style={styles.dropdownOption}
-                onPress={() => selectAccountTypeOption(option)}
+                onPress={() => {selectAccountTypeOption(option)}}
               >
                 <Text>{option}</Text>
               </TouchableOpacity>

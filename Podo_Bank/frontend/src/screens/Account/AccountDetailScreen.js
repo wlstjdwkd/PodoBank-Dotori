@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,46 +6,64 @@ import {
   TouchableOpacity,
   FlatList,
   Modal,
+  ScrollView,
 } from "react-native";
-import { Ionicons, EvilIcons } from "@expo/vector-icons";
-
+import { Ionicons, EvilIcons, Octicons } from "@expo/vector-icons";
 import HeaderScreen from "../Header/HeaderScreen";
+import { accountTransactionDetail, accountTransactionHistory } from "../../apis/accountapi"
+import { useSelector } from "react-redux";
 
-// 더미 데이터 (실제 데이터와 연동 필요)
-const accountDetail = {
-  nickname: "나의 첫번째 계좌",
-  number: "1234-5678-9101",
-  balance: 10000,
-  transactions: [
-    {
-      id: "1",
-      date: "2023.05.30 15:30:00",
-      place: "고용노동부구미시청",
-      type: "출금",
-      amount: 500,
-      afterBalance: 9500,
-    },
-    {
-      id: "2",
-      date: "2023.05.30 15:30:00",
-      place: "용돈",
-      type: "입금",
-      amount: 500,
-      afterBalance: 9500,
-    },
-    {
-      id: "3",
-      date: "2023.05.30 15:30:00",
-      place: "티머니개인택시",
-      type: "출금",
-      amount: 20000,
-      afterBalance: 11500,
-    },
-    // ... 필요하면 더 추가
-  ],
-};
+  // 더미 데이터 (실제 데이터와 연동 필요)
+  const accountDetail = {
+    nickname: "나의 첫번째 계좌",
+    number: "1234-5678-9101",
+    balance: 10000,
+    transactions: [
+      {
+        id: "1",
+        date: "2023.05.30 15:30:00",
+        place: "고용노동부구미시청",
+        type: "출금",
+        amount: 500,
+        afterBalance: 9500,
+      },
+      {
+        id: "2",
+        date: "2023.05.30 15:30:00",
+        place: "용돈",
+        type: "입금",
+        amount: 500,
+        afterBalance: 9500,
+      },
+      {
+        id: "3",
+        date: "2023.05.30 15:30:00",
+        place: "티머니개인택시",
+        type: "출금",
+        amount: 20000,
+        afterBalance: 11500,
+      },
+      // ... 필요하면 더 추가
+    ],
+  };
 
-export default function AccountDetail({ navigation }) {
+export default function AccountDetail({ navigation, route }) {
+  const [account, setAccount] = useState(route.params.account)
+  const accessToken = useSelector((state) => state.user.accessToken)
+  const [historySearchMonth, setHistorySearchMonth] = useState(3)// 1,2,3,4,5,6 등 개월 수로 현재는 6개월 까지만
+  const [historyTransactionType, setHistoryTransactionType] = useState("ALL")// "DEPOSIT", "WITHDRAWAL", "ALL"
+  const [historySortType, setHistorySortType] = useState(0)// 0DES// page는 0부터 시작C최신순 1ASC과거순
+  const [historyPage, setHistoryPage] = useState(0)
+  const [sendHistoryUnits, setSendHistoryUnits] = useState({
+    searchMonth : historySearchMonth,
+    transactionType : historyTransactionType,
+    sortType : historySortType,
+    page : historyPage,
+  })
+  const [accountInfo, setAccountInfo] = useState(null)
+  const [transactionHistory, setTransactionHistory] =  useState([])
+
+
   // 현재 날짜를 가져오기
   const currentDate = new Date();
 
@@ -63,11 +81,61 @@ export default function AccountDetail({ navigation }) {
   const [range, setRange] = useState("전체"); // 범위 선택 상태
   const [order, setOrder] = useState("최신순"); // 정렬 순서 상태
 
+  const formDateTransaction = (dateString) =>{
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const seconds = date.getSeconds().toString().padStart(2, "0");
+    return `${year}.${month}.${day} ${hours}:${minutes}:${seconds}`;
+  }
+
+  // 계좌 상세 조회
+  const getAccountTransactionDetail = async ()=>{
+    const response = await accountTransactionDetail(account.accountNumber, accessToken)
+    if(response.status===200){
+      console.log('계좌 상세조회에 성공했습니다.')
+      setAccountInfo(response.data)
+    }else if(response.status===400){
+      console.log('bad400 계좌 상세조회 실패로 계좌 목록을 받아올 수 없습니다.')
+    }else if(response.status===401){
+      console.log('bad401 권한 없음으로 계좌 상세조회 할 수 없습니다.')
+    }else if(response.status===404){
+      console.log('bad404 계좌가 존재하지 않아 계좌 상세조회 할 수 없습니다.')
+    }else{
+      console.log('오류발생: 계좌 상세내역을 받아올 수 없습니다.')
+    }
+  }
+  // 거래 내역 조회
+  const getAccountTransactionHistory = async ()=>{
+    console.log('sendHistoryUnits',sendHistoryUnits)
+    const response = await accountTransactionHistory(sendHistoryUnits, account.accountNumber, accessToken)
+    if(response.status===200){
+      console.log('계좌 거래내역 조회에 성공했습니다.')
+      setTransactionHistory(response.data)
+    }else if(response.status===400){
+      console.log('bad400 거래내역 조회에 실패했습니다.')
+    }else if(response.status===401){
+      console.log('bad401 권한 없음으로 계좌 거래내역을 조회 할 수 없습니다.')
+    }else if(response.status===404){
+      console.log('bad404 계좌가 존재하지 않아 계좌 거래내역 조회 할 수 없습니다.')
+    }else{
+      console.log('오류발생: 계좌 거래내역을 받아올 수 없습니다.')
+    }
+  }
+
+  useEffect(()=>{
+    getAccountTransactionDetail()
+    getAccountTransactionHistory()
+  },[])
   return (
     <View style={styles.container}>
       <HeaderScreen navigation={navigation} title="거래 내역 조회" />
       <View style={styles.nicknameContainer}>
         <View style={styles.row}>
+          {/* nickname 차후 바꿀것 */}
           <Text style={styles.nickname}>{accountDetail.nickname}</Text>
           <TouchableOpacity>
             <EvilIcons
@@ -85,14 +153,22 @@ export default function AccountDetail({ navigation }) {
             navigation.navigate("AccountManagementScreen");
           }}
         >
-          <EvilIcons name="gear" size={24} color="black" />
+          {/* <EvilIcons name="gear" size={24} color="black" /> */}
+          <Octicons name="gear" size={16} color="black" />
         </TouchableOpacity>
       </View>
-
-      <Text style={styles.accountNumber}>{accountDetail.number}</Text>
-      <Text style={styles.balance}>
-        {accountDetail.balance.toLocaleString()}원
-      </Text>
+      
+      {accountInfo
+        ?(<><Text style={styles.accountNumber}>{accountInfo.accountNumber.slice(0,4)}-{accountInfo.accountNumber.slice(4,6)}-{accountInfo.accountNumber.slice(6)}</Text>
+        <Text style={styles.balance}>
+          {(Math.floor(accountInfo.balance)).toLocaleString()}원
+        </Text></>)
+        :(<><Text style={styles.accountNumber}>1234-12-1234567</Text>
+        <Text style={styles.balance}>
+          2,500,000원
+        </Text></>)
+      }
+      
 
       {/* <View style={styles.transferButtonContainer}>
         <Button
@@ -150,11 +226,13 @@ export default function AccountDetail({ navigation }) {
                 borderColor: "#757575",
               }}
             >
-              <Text onPress={() => setPeriod("오늘")}>오늘</Text>
-              <Text onPress={() => setPeriod("1개월")}>1개월</Text>
-              <Text onPress={() => setPeriod("3개월")}>3개월</Text>
-              <Text onPress={() => setPeriod("6개월")}>6개월</Text>
-              <Text onPress={() => setPeriod("직접입력")}>직접입력</Text>
+              <Text onPress={() => (setPeriod("1개월"), setHistorySearchMonth(1))}>1개월</Text>
+              <Text onPress={() => (setPeriod("3개월"), setHistorySearchMonth(3))}>3개월</Text>
+              <Text onPress={() => (setPeriod("6개월"), setHistorySearchMonth(6))}>6개월</Text>
+              <Text onPress={() => (setPeriod("1년"), setHistorySearchMonth(12))}>1년</Text>
+              <Text onPress={() => (setPeriod("2년"), setHistorySearchMonth(24) )}>2년</Text>
+              {/* 한동안 직접입력은 없는것으로..... */}
+              {/* <Text onPress={() => setPeriod("직접입력")}>직접입력</Text> */}
             </View>
             <Text>거래 유형</Text>
             <View
@@ -166,9 +244,9 @@ export default function AccountDetail({ navigation }) {
                 borderColor: "#757575",
               }}
             >
-              <Text onPress={() => setRange("전체")}>전체</Text>
-              <Text onPress={() => setRange("입금")}>입금</Text>
-              <Text onPress={() => setRange("출금")}>출금</Text>
+              <Text onPress={() => {setRange("전체"), setHistoryTransactionType('ALL')}}>전체</Text>
+              <Text onPress={() => {setRange("입금"), setHistoryTransactionType('DEPOSIT')}}>입금</Text>
+              <Text onPress={() => {setRange("출금"), setHistoryTransactionType('WITHDRAWAL')}}>출금</Text>
             </View>
             <Text>정렬 순</Text>
             <View
@@ -205,8 +283,10 @@ export default function AccountDetail({ navigation }) {
         </Text>
       </View>
       <View style={styles.boldSeparator} />
+      
+      
       <FlatList
-        data={accountDetail.transactions}
+        data={transactionHistory}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.cardContainer}
@@ -214,13 +294,14 @@ export default function AccountDetail({ navigation }) {
               navigation.navigate("TransactionDetailScreen");
             }}
           >
-            <Text style={styles.transactionDate}>{item.date}</Text>
-            <Text style={styles.place}>{item.place}</Text>
+            <Text style={styles.transactionDate}>{formDateTransaction(item.transactionAt)}</Text>
+            <Text style={styles.place}>{item.content}</Text>
+            
             <Text style={styles.transactionInfo}>
-              {item.type + " "}
+              {item.transactionType === "WITHDRAWAL" ? "출금" : "입금"}{" "}
               <Text
                 style={
-                  item.type === "출금"
+                  item.transactionType === "WITHDRAWAL"
                     ? styles.withdrawalAmount
                     : styles.depositAmount
                 }
@@ -228,8 +309,9 @@ export default function AccountDetail({ navigation }) {
                 {item.amount.toLocaleString()}원
               </Text>
             </Text>
+              
             <Text style={styles.afterBalance}>
-              잔액: {item.afterBalance.toLocaleString()}원
+              잔액: {item.balanceAfter.toLocaleString()}원
             </Text>
             <View style={styles.horizontalSeparator} />
             {/* 각 아이템 밑에 수평 구분선 추가 */}
@@ -237,6 +319,8 @@ export default function AccountDetail({ navigation }) {
         )}
         keyExtractor={(item) => item.id}
       />
+
+      
     </View>
   );
 }

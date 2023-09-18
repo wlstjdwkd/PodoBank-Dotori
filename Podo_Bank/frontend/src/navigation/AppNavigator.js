@@ -17,6 +17,7 @@ import AccountSetupScreen from "../screens/OpenAccount/AccountSetupScreen";
 import AccountConfigurationScreen from "../screens/OpenAccount/AccountConfigurationScreen";
 import AccountRestrictionScreen from "../screens/OpenAccount/AccountRestrictionScreen";
 import OpenAccountCompleteScreen from "../screens/OpenAccount/OpenAccountCompleteScreen";
+import AccountWhatMakeScreen from "../screens/OpenAccount/AccountWhatMakeScreen";
 import AccountManagementScreen from "../screens/Account/AccountManagementScreen";
 import TransactionDetailScreen from "../screens/Account/TransactionDetailScreen";
 import MyPageScreen from "../screens/Home/MyPageScreen";
@@ -97,6 +98,10 @@ function AppNavigator() {
       <Stack.Screen
         name="OpenAccountCompleteScreen"
         component={OpenAccountCompleteScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="AccountWhatMakeScreen"
+        component={AccountWhatMakeScreen}
       ></Stack.Screen>
       <Stack.Screen
         name="AccountManagementScreen"

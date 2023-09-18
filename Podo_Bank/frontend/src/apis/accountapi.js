@@ -19,15 +19,11 @@ export const accountRecentTransfer = async (accountNumber, accessToken) => {
     // throw error;
   }
 };
-export const accountTransactionHistory = async (accountNumber, accessToken) => {
+export const accountTransactionHistory = async (sendHistoryUnits, accountNumber, accessToken) => {
   try {
-    const response = await axios.get(apiAddress+`/api/v1/account/${accountNumber}/history`, 
-    {accountNumber:accountNumber,
-      searchMonth:searchMonth,
-      transactionType:transactionType,
-      sortType:sortType,
-      page:page,
-    }, 
+    console.log('어카운트넘버',accountNumber)
+    console.log(accessToken)
+    const response = await axios.get(apiAddress+`/api/v1/account/${accountNumber}/history?searchMonth=${sendHistoryUnits.searchMonth}&transactionType=${sendHistoryUnits.transactionType}&sortType=${sendHistoryUnits.sortType}&page=${sendHistoryUnits.page}`, 
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -42,9 +38,38 @@ export const accountTransactionHistory = async (accountNumber, accessToken) => {
     // throw error;
   }
 };
+// export const accountTransactionHistory = async (sendHistoryUnits, accountNumber, accessToken) => {
+//   try {
+//     console.log(accessToken)
+//     const response = await axios.get(apiAddress+`/api/v1/account/${accountNumber}/history`, 
+//     // {
+//     //   params:sendHistoryUnits,
+//     // },
+//     {
+//       params:{
+//         searchMonth : 1,
+//         transactionType : 'ALL',
+//         sortType: 1,
+//         page: 0,
+//       },
+//     },
+//     {
+//       headers: {
+//         Authorization: `Bearer ${accessToken}`,
+//       },
+//     });
+//     console.log('계좌 거래 내역 조회 성공:', response.data);
+//     return response;
+//   } catch (error) {
+//     console.error('계좌 거래 내역 조회 실패:', error);
+//     const response = error.response
+//     return response
+//     // throw error;
+//   }
+// };
 export const accountTransactionDetail = async (accountNumber, accessToken) => {
   try {
-    const response = await axios.get(apiAddress+`/api/v1/account/${accountNumber}/detail`, null, {
+    const response = await axios.get(apiAddress+`/api/v1/account/${accountNumber}/detail`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -86,9 +111,13 @@ export const accountWithdrawal  = async (withdrawInfo, accessToken) => {
     // throw error;
   }
 };
-export const accountTypeInquiry = async () => {
+export const accountTypeInquiry = async (accessToken) => {
   try {
-    const response = await axios.get(apiAddress+'/api/v1/account/type');
+    const response = await axios.get(apiAddress+'/api/v1/account/type', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
     console.log('계좌 종류 조회 성공:', response.data);
     return response;
   } catch (error) {
@@ -180,10 +209,10 @@ export const accountDelete = async (accessToken) => {
   }
 };
 export const accountCreate = async (createInfo, accessToken) => {
-  console.log(createInfo)
+  console.log(createInfo, 'and', accessToken)
   try {
     const response = await axios.post(apiAddress+'/api/v1/account/create', createInfo, {
-    // const response = await axios.post(apiAddress+'/api/v1/account/create', {accountType:createInfo.accountType, password:createInfo.password}, {
+    // const response = await axios.post(apiAddress+'/api/v1/account/create', {accountCategoryId:createInfo.accountCategoryId, password:createInfo.password}, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -197,6 +226,24 @@ export const accountCreate = async (createInfo, accessToken) => {
     // throw error;
   }
 };
+// export const accountCreate = async (createInfo, accessToken) => {
+//   console.log(createInfo, 'and', accessToken)
+//   try {
+//     const response = await axios.post(apiAddress+'/api/v1/account/create', createInfo, {
+//     // const response = await axios.post(apiAddress+'/api/v1/account/create', {accountType:createInfo.accountType, password:createInfo.password}, {
+//       headers: {
+//         Authorization: `Bearer ${accessToken}`,
+//       },
+//     })
+//     console.log('계좌 생성 성공:', response.data);
+//     return response;
+//   } catch (error) {
+//     console.error('계좌 생성 실패:', error);
+//     const response = error.response
+//     return response
+//     // throw error;
+//   }
+// };
 
 export const accountListInquiry = async (accessToken) => {
   try {
