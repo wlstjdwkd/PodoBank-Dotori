@@ -1,15 +1,13 @@
 package com.yongy.dotori.global.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yongy.dotori.domain.user.entity.Role;
 import com.yongy.dotori.domain.user.entity.User;
-import com.yongy.dotori.global.redis.RedisUtil;
+
 import com.yongy.dotori.global.security.dto.response.MegResDto;
-import com.yongy.dotori.global.security.dto.response.TokenMsgResDto;
 import com.yongy.dotori.global.security.exception.ErrorType;
 import com.yongy.dotori.global.security.provider.JwtTokenProvider;
 import com.yongy.dotori.global.security.service.UserDetailsService;
-import com.yongy.dotori.global.security.dto.JwtToken;
+
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,8 +29,6 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends GenericFilterBean {
 
     private final JwtTokenProvider jwtTokenProvider;
-
-    private final RedisUtil redisUtil;
 
     private final UserDetailsService userDetailsService;
 

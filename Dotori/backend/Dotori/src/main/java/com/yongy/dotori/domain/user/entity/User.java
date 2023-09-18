@@ -5,7 +5,7 @@ import com.yongy.dotori.domain.category.entity.Category;
 import com.yongy.dotori.domain.categoryGroup.entity.CategoryGroup;
 import com.yongy.dotori.domain.payment.entity.Payment;
 import com.yongy.dotori.domain.plan.entity.Plan;
-import com.yongy.dotori.domain.purpose.entity.Purpose;
+//import com.yongy.dotori.domain.purpose.entity.Purpose;
 import com.yongy.dotori.domain.reward.entity.Reward;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -31,7 +31,7 @@ public class User {
     private Long userSeq;
 
     @Enumerated(EnumType.STRING)
-    @ColumnDefault(value="ROLE_USER")
+//    @ColumnDefault(value="ROLE_USER")
     private Role role;
 
     @Column(nullable = false)
@@ -53,8 +53,8 @@ public class User {
     @Column(name="expired_at", nullable = true)
     private LocalDateTime expiredAt;
 
-    @OneToMany(mappedBy = "user")
-    private List<Purpose> purposeList;
+//    @OneToMany(mappedBy = "user")
+//    private List<Purpose> purposeList;
 
     @OneToMany(mappedBy = "user")
     private List<Account> accountList;
