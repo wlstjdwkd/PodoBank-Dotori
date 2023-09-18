@@ -12,6 +12,7 @@ services:
     environment:
       - SPRING_REDIS_HOST=redis
       - ENCRYPT_KEY=${ENCRYPT_KEY_VALUE}
+      - TZ=Asia/Seoul
     depends_on:
       - redis
   redis:
@@ -35,6 +36,7 @@ services:
     environment:
       - SPRING_REDIS_HOST=redis_dotori
       - ENCRYPT_KEY=${ENCRYPT_KEY_VALUE}
+      - TZ=Asia/Seoul
     depends_on:
       - redis_dotori
   redis_dotori:
