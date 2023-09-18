@@ -13,6 +13,8 @@ export default function SignUp1Screen({ navigation }) {
   const [userInfo, setUserInfo] = useState({
     email: "",
   });
+
+  const [email, setEmail] = useState("");
   const [isValidEmail, setIsValidEmail] = useState(""); // 양식에맞게 이메일 작성
   const [isCorrectEmail, setIsCorrectEmail] = useState(""); // 사용가능한 이메일여부 확인
   const [emailMessage, setEmailMessage] = useState(""); // E-mail 사용가능 여부를 나타내는 메시지
@@ -20,6 +22,7 @@ export default function SignUp1Screen({ navigation }) {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     return emailRegex.test(email);
   }
+
   const handleEmailChange = (text) => {
     setEmail(text);
     if (validateEmail(text)) {
@@ -77,21 +80,24 @@ export default function SignUp1Screen({ navigation }) {
           multiline={true}
           keyboardType="email-address"
         />
+        <Text
+          style={{
+            color: isCorrectEmail && isValidEmail ? "blue" : "red",
+            marginLeft: 30,
+            marginTop: 0,
+          }}
+        >
+          {emailMessage}
+        </Text>
       </View>
-      <Text
-        style={{
-          color: isCorrectEmail && isValidEmail ? "blue" : "red",
-          marginLeft: 30,
-          marginTop: -30,
-        }}
-      >
-        {emailMessage}
-      </Text>
+
       <TouchableOpacity
         style={styles.button}
         onPress={() =>
           navigation.navigate("SignUp2Screen", { userInfo: userInfo })
         }
+        //TODO: 풀기
+        // disabled={!isValidEmail}
       >
         <Text style={styles.buttonText}>메일 보내기</Text>
       </TouchableOpacity>
