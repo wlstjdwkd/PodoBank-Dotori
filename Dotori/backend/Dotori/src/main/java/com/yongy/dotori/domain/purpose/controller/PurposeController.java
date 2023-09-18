@@ -20,7 +20,7 @@ public class PurposeController {
     private final PurposeServiceImpl purposeService;
 
     @Operation(summary = "새로운 목표 생성")
-    @PostMapping("/")
+    @PostMapping()
     public ResponseEntity<Void> createPurpose(@RequestBody PurposeDTO purposeDTO){
         // 새로운 목표 생성
         purposeService.createPurpose(purposeDTO);
@@ -28,7 +28,7 @@ public class PurposeController {
     }
 
     @Operation(summary = "전체 목표 리스트 조회")
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<PurposeAllDTO> findAllPurpose(){
         // 전체 목표 리스트 조회
         PurposeAllDTO result = purposeService.findAllPurpose();

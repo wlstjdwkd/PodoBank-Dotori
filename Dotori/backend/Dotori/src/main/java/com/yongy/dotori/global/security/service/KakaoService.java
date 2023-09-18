@@ -1,6 +1,5 @@
 package com.yongy.dotori.global.security.service;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.yongy.dotori.domain.user.entity.Provider;
 import com.yongy.dotori.domain.user.entity.Role;
 import com.yongy.dotori.domain.user.entity.User;
@@ -8,7 +7,6 @@ import com.yongy.dotori.domain.user.repository.UserRepository;
 import com.yongy.dotori.global.common.BaseResponseBody;
 import com.yongy.dotori.global.redis.RedisUtil;
 import jakarta.transaction.Transactional;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -45,7 +43,7 @@ public class KakaoService {
 
     private final long exp = 1000L * 60 * 60;
 
-    // TODO : 인가코드 받기
+    // NOTE : 인가코드 받기
     public String getKakaoLogin() {
         return KAKAO_AUTH_URI + "/oauth/authorize"
                 + "?client_id=" + KAKAO_CLIENT_ID
@@ -53,7 +51,7 @@ public class KakaoService {
                 + "&response_type=code";
     }
 
-    // TODO : 새로운 accessToken, refreshToken을 발급하기
+    // NOTE : 새로운 accessToken, refreshToken을 발급하기
     public ResponseEntity<? extends BaseResponseBody> newTokens(String code){
 
         if (code == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "인증코드가 존재하지 않습니다."));
@@ -111,7 +109,7 @@ public class KakaoService {
         }
     }
 
-    // TODO : accessToken으로 사용자 정보 가져오기
+    // NOTE : accessToken으로 사용자 정보 가져오기
     public ResponseEntity<? extends BaseResponseBody> getUserInfo(String accessToken) throws Exception{
         // 유효한 accessToken인지 검사함
         if(validateToken(accessToken).getStatusCode() == HttpStatus.OK){
@@ -148,8 +146,8 @@ public class KakaoService {
             User user = User.builder()
                     .id(String.valueOf(account.get("email")))
                     .userName(String.valueOf(profile.get("nickname")))
-                    .role(Role.USER)
                     .authProvider(Provider.KAKAO)
+                    .role(Role.ROLE_USER)
                     .build();
 
             return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, user));
@@ -159,7 +157,7 @@ public class KakaoService {
     }
 
 
-    // TODO : 토큰의 유효성 검사
+    // NOTE : 토큰의 유효성 검사
     public ResponseEntity<? extends BaseResponseBody> validateToken(String accessToken){
         // HttpHeader 생성
         HttpHeaders headers = new HttpHeaders();

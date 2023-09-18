@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 
 import java.time.LocalDate;
@@ -30,6 +31,7 @@ public class User {
     private Long userSeq;
 
     @Enumerated(EnumType.STRING)
+    @ColumnDefault(value="ROLE_USER")
     private Role role;
 
     @Column(nullable = false)
