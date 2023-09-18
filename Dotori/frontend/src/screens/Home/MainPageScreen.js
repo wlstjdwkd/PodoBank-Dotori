@@ -6,7 +6,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   FlatList,
+  ScrollView,
 } from "react-native";
+
+import FooterScreen from "../Components/FooterScreen";
 
 const banks = [
   {
@@ -19,35 +22,55 @@ const banks = [
     name: "비상금 통장",
     balance: "20,000원",
   },
+  // {
+  //   id: "3",
+  //   name: "비상금 통장",
+  //   balance: "20,000원",
+  // },
+  // {
+  //   id: "4",
+  //   name: "비상금 통장",
+  //   balance: "20,000원",
+  // },
+  // {
+  //   id: "5",
+  //   name: "비상금 통장",
+  //   balance: "20,000원",
+  // },
   // ... 다른 은행들의 데이터
 ];
 
 export default function MainPageScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View></View>
-        <Image
-          style={styles.logo}
-          source={require("../../assets/images/dotori_logo.png")}
-        />
-        <TouchableOpacity style={styles.helpButton}>
-          <Text style={styles.helpIcon}>?</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.title}>당신의 소비를 계획해보세요!</Text>
-      <Text style={styles.subtitle}>계좌를 등록하고 계획을 만들어 볼까요?</Text>
-
-      <Image
-        style={styles.rightImage}
-        source={require("../../assets/images/Hamster/MainHamster.png")}
-      />
-
       <FlatList
         data={banks}
+        ListHeaderComponent={
+          <>
+            <View style={styles.header}>
+              <View></View>
+              <Image
+                style={styles.logo}
+                source={require("../../assets/images/dotori_logo.png")}
+              />
+              <TouchableOpacity style={styles.helpButton}>
+                <Text style={styles.helpIcon}>?</Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.title}>당신의 소비를 계획해보세요!</Text>
+            <Text style={styles.subtitle}>
+              계좌를 등록하고 계획을 만들어 볼까요?
+            </Text>
+
+            <Image
+              style={styles.rightImage}
+              source={require("../../assets/images/Hamster/MainHamster.png")}
+            />
+          </>
+        }
         renderItem={({ item }) => (
-          <View style={styles.bankContainer}>
+          <TouchableOpacity style={styles.bankContainer}>
             <Image
               style={styles.bankIcon}
               source={require("../../assets/images/logo_podo.png")}
@@ -57,17 +80,24 @@ export default function MainPageScreen({ navigation }) {
               <Text style={styles.bankSubtitle}>잔액</Text>
             </View>
             <Text style={styles.bankBalance}>{item.balance}</Text>
-          </View>
+          </TouchableOpacity>
         )}
+        ListFooterComponent={
+          <>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => navigation.navigate("OneCent1Screen")}
+            >
+              <Text style={styles.addText}>+</Text>
+            </TouchableOpacity>
+            <View style={{ marginTop: 50 }}></View>
+          </>
+        }
         keyExtractor={(item) => item.id}
       />
-
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => navigation.navigate("OneCent1Screen")}
-      >
-        <Text style={styles.addText}>+</Text>
-      </TouchableOpacity>
+      <View style={styles.footer}>
+        <FooterScreen navigation={navigation} />
+      </View>
     </View>
   );
 }
@@ -85,9 +115,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   logo: {
-    width: 50,
-    height: 50,
+    width: 70,
+    height: 70,
     resizeMode: "contain",
+    marginLeft: 30,
   },
   helpButton: {
     width: 30,
@@ -102,8 +133,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   title: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 25,
+    // fontWeight: "bold",
     marginBottom: 5,
   },
   subtitle: {
@@ -113,6 +144,8 @@ const styles = StyleSheet.create({
   },
   rightImage: {
     alignSelf: "flex-end",
+    width: 130,
+    height: 130,
     marginBottom: 20,
   },
   bankContainer: {
@@ -150,10 +183,18 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     height: 50,
     borderStyle: "dashed", // 점선 테두리 추가
+    marginVertical: 10, // 위아래로 여백 추가
   },
   addText: {
     color: "#FCAF17",
     fontSize: 24,
     fontWeight: "bold",
+  },
+  footer: {
+    flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "center",
+    // marginTop: 220,
+    marginBottom: -20,
   },
 });
