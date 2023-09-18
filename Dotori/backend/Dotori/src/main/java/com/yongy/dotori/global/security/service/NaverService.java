@@ -6,8 +6,7 @@ import com.yongy.dotori.domain.user.entity.Provider;
 import com.yongy.dotori.domain.user.entity.Role;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.user.repository.UserRepository;
-import com.yongy.dotori.global.common.BaseResponseBody;
-import com.yongy.dotori.global.redis.RedisUtil;
+
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -36,8 +35,6 @@ public class NaverService {
     @Value("${naver.redirect.url}")
     private String NAVER_REDIRECT_URL;
 
-    @Autowired
-    private RedisUtil redisUtil;
     private final static String NAVER_AUTH_URI = "https://nid.naver.com";
     private final static String NAVER_API_URI = "https://openapi.naver.com";
 
@@ -57,9 +54,7 @@ public class NaverService {
     }
 
     // NOTE : 새로운 accessToken, refreshToken을 발급하기
-    public ResponseEntity<? extends BaseResponseBody> newTokens(String code) throws Exception {
-        if (code == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "인증코드가 존재하지 않습니다."));
-
+    public String getAccessToken(String code) throws Exception {
         try{
             HttpHeaders headers = new HttpHeaders();
             headers.add("Content-type", "application/x-www-form-urlencoded");
@@ -89,30 +84,31 @@ public class NaverService {
             JSONObject jsonObj = (JSONObject) jsonParser.parse(response.getBody());
 
             accessToken = (String)jsonObj.get("access_token");
-            refreshToken = (String)jsonObj.get("refresh_token");
+//            refreshToken = (String)jsonObj.get("refresh_token");
+//
+//            log.info("access_token :  "+ accessToken);
+//            log.info("refresh_token : "+ refreshToken);
 
-            log.info("access_token :  "+ accessToken);
-            log.info("refresh_token : "+ refreshToken);
+//            User user = (User) getUserInfo(accessToken).getBody().getData();
 
-            User user = (User) getUserInfo(accessToken).getBody().getData();
-
-            // RefreshToken이 없는 경우(시간이 만료되었거나, 처음 들어오는 사용자)
-            if(redisUtil.getData(user.getId()) == null){
-                // DB에 사용자의 정보가 없는 경우
-                if(userRepository.findById(user.getId()) == null){
-                    userRepository.save(user); // DB에 사용자 저장
-                }
-            }
-
-            redisUtil.setDataExpire(user.getId(), refreshToken, exp * 24);
-            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, accessToken));
+//            // RefreshToken이 없는 경우(시간이 만료되었거나, 처음 들어오는 사용자)
+//            if(redisUtil.getData(user.getId()) == null){
+//                // DB에 사용자의 정보가 없는 경우
+//                if(userRepository.findById(user.getId()) == null){
+//                    userRepository.save(user); // DB에 사용자 저장
+//                }
+//            }
+//
+//            redisUtil.setDataExpire(user.getId(), refreshToken, exp * 24);
+            return accessToken;
         }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(404, "인증코드가 유효하지 않습니다."));
+            return null;
         }
+
     }
 
     // NOTE : accessToken으로 사용자의 정보 가져오기
-    public ResponseEntity<? extends BaseResponseBody> getUserInfo(String accessToken) throws Exception{
+    public User getUserInfo(String accessToken) throws Exception{
 
         try{
             //HttpHeader 생성
@@ -146,7 +142,7 @@ public class NaverService {
                     .append(String.valueOf(account.get("birthday"))).toString();
 
 
-            User user = User.builder()
+            return User.builder()
                     .id(String.valueOf(id))
                     .userName(name)
                     .phoneNumber(phoneNumber)
@@ -154,9 +150,8 @@ public class NaverService {
                     .role(Role.ROLE_USER)
                     .birthDate(LocalDate.parse(birthDate)).build();
 
-            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, user));
         }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(404, "accessToken이 유효하지 않습니다."));
+            return null;
         }
     }
 }

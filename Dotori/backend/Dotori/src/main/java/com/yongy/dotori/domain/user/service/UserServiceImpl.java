@@ -1,18 +1,16 @@
 package com.yongy.dotori.domain.user.service;
 
 import com.yongy.dotori.domain.user.repository.UserRepository;
-import com.yongy.dotori.global.redis.RedisUtil;
+
+import com.yongy.dotori.global.redis.entity.EmailAuth;
+import com.yongy.dotori.global.redis.repository.EmailAuthRepository;
+import com.yongy.dotori.global.redis.service.EmailAuthService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +26,11 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private final JavaMailSender javaMailSender;
     @Autowired
-    private final RedisUtil redisUtil;
+    private EmailAuthRepository emailAuthRepository;
+
+    @Autowired
+    private EmailAuthService emailAuthService;
+
     public void authEmail(String id){
         // 임의의 authKey 생성
         Random random = new Random();
@@ -55,15 +57,14 @@ public class UserServiceImpl implements UserService{
         }
 
         // 유효 시간(5분)동안 {email, authKey}를 저장한다.
-        redisUtil.setDataExpire(id, authKey, 60 * 5L);
-
+        emailAuthRepository.save(EmailAuth.of(authKey, id));
     }
 
     public String getAuthCode(String id){
-        return redisUtil.getData(id);
+        return emailAuthService.getEmailAuth(id).getAuthCode();
     }
 
     public void deleteAuthCode(String id){
-        redisUtil.deleteData(id);
+        emailAuthRepository.deleteById(id);
     }
 }
