@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ScrollView,
 } from "react-native";
 
 import HeaderComponent from "../Components/HeaderScreen";
@@ -53,54 +54,58 @@ export default function SignUp3Screen({ navigation, route }) {
         cancelNavi="LoginScreen"
         navigation={navigation}
       ></HeaderComponent>
-      <View style={styles.header}>
+      <ScrollView style={styles.header}>
         <Text style={styles.title}>비밀번호 설정하기</Text>
         <Text style={styles.subtitle}>비밀번호</Text>
         <TextInput
           style={styles.input}
           onChangeText={handlePasswordChange}
-          multiline={true}
           secureTextEntry={true}
         />
-        <Text style={styles.inputBehindText}>
-          영문, 숫자, 특수문자 포함 8자 이상
-        </Text>
-        <Text
-          style={{
-            color: isPasswordValid ? "blue" : "red",
-            marginLeft: 30,
-            marginTop: -30,
-          }}
-        >
-          {passwordMessage}
-        </Text>
+        <View style={styles.rowContainer}>
+          <Text style={styles.inputBehindText}>
+            영문, 숫자, 특수문자 포함 8자 이상
+          </Text>
+          <Text
+            style={{
+              color: isPasswordValid ? "blue" : "red",
+              marginLeft: 20,
+              marginTop: 0,
+            }}
+          >
+            {passwordMessage}
+          </Text>
+        </View>
 
         <Text style={styles.subtitle}>비밀번호 확인</Text>
         <TextInput
           style={styles.input}
           onChangeText={handleConfirmPasswordChange}
-          multiline={true}
           secureTextEntry={true}
         />
-        <Text style={styles.inputBehindText}>
-          영문, 숫자, 특수문자 포함 8자 이상
-        </Text>
-        <Text
-          style={{
-            color: isConfirmPasswordValid ? "blue" : "red",
-            marginLeft: 30,
-            marginTop: -30,
-          }}
-        >
-          {confirmPasswordMessage}
-        </Text>
-      </View>
+        <View style={styles.rowContainer}>
+          <Text style={styles.inputBehindText}>
+            영문, 숫자, 특수문자 포함 8자 이상
+          </Text>
+          <Text
+            style={{
+              color: isConfirmPasswordValid ? "blue" : "red",
+              marginLeft: 20,
+              marginTop: 0,
+            }}
+          >
+            {confirmPasswordMessage}
+          </Text>
+        </View>
+      </ScrollView>
 
       <TouchableOpacity
         style={styles.button}
         onPress={() =>
-          navigation.navigate("SignUp2Screen", { userInfo: userInfo })
+          navigation.navigate("SignUp4Screen", { userInfo: userInfo })
         }
+        //TODO: 나중에 ! 붙이셈
+        disabled={isPasswordValid && isConfirmPasswordValid}
       >
         <Text style={styles.buttonText}>다음</Text>
       </TouchableOpacity>
@@ -156,5 +161,8 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     fontSize: 12,
     marginLeft: 10,
+  },
+  rowContainer: {
+    flexDirection: "row",
   },
 });
