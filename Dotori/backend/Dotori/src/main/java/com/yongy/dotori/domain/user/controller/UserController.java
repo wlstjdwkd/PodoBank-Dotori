@@ -1,6 +1,7 @@
 package com.yongy.dotori.domain.user.controller;
 
 import com.yongy.dotori.domain.user.dto.request.UserInfoDto;
+import com.yongy.dotori.domain.user.dto.request.UserLoginDto;
 import com.yongy.dotori.domain.user.entity.Provider;
 import com.yongy.dotori.domain.user.entity.Role;
 import com.yongy.dotori.domain.user.entity.User;
@@ -105,16 +106,16 @@ public class UserController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<? extends BaseResponseBody> dotoriLogin(@RequestBody Map<String, String> loginForm) {
+    public ResponseEntity<? extends BaseResponseBody> dotoriLogin(@RequestBody UserLoginDto userLoginDto) {
 
-        User user = userRepository.findById(loginForm.get("id"));
+        User user = userRepository.findById(userLoginDto.getId());
 
         if(user == null || user.getExpiredAt() != null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "아이디를 확인해주세요."));
         }
 
         if(user.getAuthProvider().equals(Provider.DOTORI)){
-            if(!passwordEncoder.matches(loginForm.get("password"), user.getPassword())){
+            if(!passwordEncoder.matches(userLoginDto.getPassword(), user.getPassword())){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "비밀번호를 확인해주세요."));
             }
         }
