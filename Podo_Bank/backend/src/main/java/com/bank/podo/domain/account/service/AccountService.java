@@ -89,7 +89,7 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
-    public List<TransactionHistoryDTO> getAccountHistory(String accountNumber, int searchMonth, String transactionType, int sortType, int page) {
+    public List<TransactionHistoryDTO> getAccountHistory(String accountNumber, SearchTypeDTO searchTypeDTO) {
         Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
@@ -98,12 +98,12 @@ public class AccountService {
         }
 
         // 페이지 번호와 정렬 유형에 따라 페이지 요청 생성
-        PageRequest pageRequest = PageRequest.of(page, 2,
-                sortType == 0 ? Sort.by("createdAt").descending() : Sort.by("createdAt").ascending());
+        PageRequest pageRequest = PageRequest.of(searchTypeDTO.getPage(), 10,
+                searchTypeDTO.getSortType() == 0 ? Sort.by("createdAt").descending() : Sort.by("createdAt").ascending());
 
-        LocalDateTime startDate = LocalDateTime.now().minusDays(searchMonth);
+        LocalDateTime startDate = LocalDateTime.now().minusDays(searchTypeDTO.getSearchMonth());
 
-        List<TransactionHistory> transactionHistoryList = switch (transactionType) {
+        List<TransactionHistory> transactionHistoryList = switch (searchTypeDTO.getTransactionType()) {
             case "DEPOSIT" ->
                     transactionHistoryRepository.findAllByAccountAndTransactionTypeAndCreatedAtGreaterThanEqual(account, TransactionType.DEPOSIT, startDate, pageRequest);
             case "WITHDRAWAL" ->
