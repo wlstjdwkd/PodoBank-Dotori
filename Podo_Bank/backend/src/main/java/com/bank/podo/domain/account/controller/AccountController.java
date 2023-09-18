@@ -3,7 +3,6 @@ package com.bank.podo.domain.account.controller;
 import com.bank.podo.domain.account.dto.*;
 import com.bank.podo.domain.account.enums.AccountType;
 import com.bank.podo.domain.account.service.AccountService;
-import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -17,7 +16,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/account")
-@Api(tags = "계좌관리")
 public class AccountController {
 
     private final PasswordEncoder passwordEncoder;
@@ -36,7 +34,7 @@ public class AccountController {
         return ResponseEntity.ok(accountTypeList);
     }
 
-    @Operation(summary = "계좌 생성")
+    @Operation(summary = "계좌 생성", description = "USER")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "계좌 생성 성공"),
             @ApiResponse(responseCode = "400", description = "계좌 생성 실패"),
@@ -49,7 +47,7 @@ public class AccountController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "계좌 목록 조회")
+    @Operation(summary = "계좌 목록 조회", description = "USER")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "계좌 목록 조회 성공"),
             @ApiResponse(responseCode = "400", description = "계좌 목록 조회 실패"),
@@ -74,7 +72,7 @@ public class AccountController {
         return ResponseEntity.ok(name);
     }
 
-    @Operation(summary = "계좌 상세 조회")
+    @Operation(summary = "계좌 상세 조회", description = "USER")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "계좌 상세 조회 성공"),
             @ApiResponse(responseCode = "400", description = "계좌 상세 조회 실패"),
@@ -87,7 +85,7 @@ public class AccountController {
         return ResponseEntity.ok(account);
     }
 
-    @Operation(summary = "계좌 거래 내역 조회")
+    @Operation(summary = "계좌 거래 내역 조회", description = "USER")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "계좌 거래 내역 조회 성공"),
             @ApiResponse(responseCode = "400", description = "계좌 거래 내역 조회 실패"),
@@ -103,7 +101,7 @@ public class AccountController {
         return ResponseEntity.ok(accountHistoryList);
     }
 
-    @Operation(summary = "계좌 비밀번호 변경")
+    @Operation(summary = "계좌 비밀번호 변경", description = "USER")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "계좌 비밀번호 변경 성공"),
             @ApiResponse(responseCode = "400", description = "계좌 비밀번호 변경 실패"),
@@ -117,7 +115,7 @@ public class AccountController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "계좌 비밀번호 초기화")
+    @Operation(summary = "계좌 비밀번호 초기화", description = "USER")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "계좌 비밀번호 초기화 성공"),
             @ApiResponse(responseCode = "400", description = "계좌 비밀번호 초기화 실패"),
@@ -131,7 +129,7 @@ public class AccountController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "계좌 입금")
+    @Operation(summary = "계좌 입금", description = "USER")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "계좌 입금 성공"),
             @ApiResponse(responseCode = "400", description = "계좌 입금 실패"),
@@ -145,7 +143,7 @@ public class AccountController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "계좌 출금")
+    @Operation(summary = "계좌 출금", description = "USER")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "계좌 출금 성공"),
             @ApiResponse(responseCode = "400", description = "계좌 출금 실패"),
@@ -160,7 +158,7 @@ public class AccountController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "계좌 이체")
+    @Operation(summary = "계좌 이체", description = "USER")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "계좌 이체 성공"),
             @ApiResponse(responseCode = "400", description = "계좌 이체 실패"),
@@ -175,7 +173,7 @@ public class AccountController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "계좌 삭제")
+    @Operation(summary = "계좌 삭제", description = "USER")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "계좌 삭제 성공"),
             @ApiResponse(responseCode = "400", description = "계좌 삭제 실패"),
@@ -188,7 +186,7 @@ public class AccountController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "최근 송금 계좌 조회")
+    @Operation(summary = "최근 송금 계좌 조회", description = "USER")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "최근 송금 계좌 조회 성공"),
             @ApiResponse(responseCode = "400", description = "최근 송금 계좌 조회 실패"),

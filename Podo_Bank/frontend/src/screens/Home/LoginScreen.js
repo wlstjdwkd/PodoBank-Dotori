@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {
   View,
   Text,
@@ -6,21 +6,55 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-// import { useSelector, useDispatch } from 'react-redux';
-// import { decrement, increment, incrementByAmount,changeNameNum } from '../../redux/slices/auth/user'
+import { useSelector, useDispatch } from 'react-redux';
+import { inputAccessToken, inputRefreshToken } from '../../redux/slices/auth/user'
 
 import {userLogin} from '../../apis/userapi'
 
 export default function LoginScreen({ navigation }) {
-  // const count = useSelector((state) => state.counter.count);
-  // const name = useSelector((state) => state.counter.nametmp);
-  // const count2 = useSelector((state) => state.whole.count2);
-  // const name2 = useSelector((state) => state.whole.nameTmp2);
-  // const dispatch = useDispatch();
+  // const accessToken = useSelector((state) => state.user.accessToken)
+  // const refreshToken = useSelector((state) => state.user.refreshToken)
+  const dispatch = useDispatch();
+  
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [isSucceed, setIsSucceed] = useState(false)
+  const [loginMessage, setLoginMessage] = useState("")
 
+  const handleLoginSuccess = () => {
+    // 로그인 성공 시 처리
+    navigation.navigate("HomeScreen");
+  };
 
+  const handleLoginFailure = (statusCode) => {
+    // 로그인 실패 시 처리
+    if(statusCode===400){
+      setLoginMessage("아이디 또는 비밀번호를 다시 확인해주세요.");
+    }else{
+      setLoginMessage("오류가 발생했습니다. 잠시 후 시도해주세요.");
+    }
+  };
+
+  const handleUserLogin = async () => {
+    if (!email || !password) {
+      setLoginMessage("아이디와 비밀번호를 입력해주세요.");
+      return;
+    }
+
+    const response = await userLogin(email, password);
+    if (response.status === 200) {
+      console.log("로그인 성공");
+      dispatch(inputAccessToken(response.data.accessToken))
+      dispatch(inputRefreshToken(response.data.refreshToken))
+      handleLoginSuccess();
+    } else {
+      console.log("로그인 실패");
+      handleLoginFailure(response.status);
+    }
+  };
   return (
     <View style={styles.container}>
       {/* Logo */}
@@ -32,10 +66,23 @@ export default function LoginScreen({ navigation }) {
         {/* 로고 이미지 로드 */}
       </View>
 
+      {/* 로그인 실패 메시지 */}
+      <View>
+      {loginMessage ? (
+        <Text style={styles.errorText}>{loginMessage}</Text>
+      ) : <Text></Text>}
+      </View>
       {/* ID, PW 입력창 */}
       <View style={styles.inputContainer}>
         <AntDesign name="user" size={20} style={styles.iconStyle} />
-        <TextInput placeholder="아이디" style={styles.input} />
+        <TextInput
+          placeholder="아이디"
+          style={styles.input}
+          onChangeText={(text)=>{
+            setEmail(text)
+          }}
+          keyboardType="email-address"
+        />
       </View>
       <View style={styles.inputContainer}>
         <AntDesign name="lock" size={20} style={styles.iconStyle} />
@@ -43,6 +90,9 @@ export default function LoginScreen({ navigation }) {
           placeholder="비밀번호"
           style={styles.input}
           secureTextEntry={true}
+          onChangeText={(text)=>{
+            setPassword(text)
+          }}
         />
       </View>
 
@@ -50,7 +100,9 @@ export default function LoginScreen({ navigation }) {
       {/* 로그인 back 연동해야함 */}
       <TouchableOpacity
         style={styles.customButton}
-        onPress={() => navigation.navigate("HomeScreen")}
+        onPress={() => {
+          handleUserLogin()
+        }}
       >
         <Text style={styles.buttonText}>로그인</Text>
       </TouchableOpacity>
@@ -62,9 +114,9 @@ export default function LoginScreen({ navigation }) {
         </TouchableOpacity>
         <Text style={styles.separator}> | </Text>
         <TouchableOpacity
-          onPress={() => navigation.navigate("FindPasswordScreen")}
+          onPress={() => navigation.navigate("ResetPasswordOneScreen")}
         >
-          <Text style={styles.linkText}>비밀번호 찾기</Text>
+          <Text style={styles.linkText}>비밀번호 초기화</Text>
         </TouchableOpacity>
         <Text style={styles.separator}> | </Text>
         <TouchableOpacity
@@ -92,7 +144,8 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: "center",
-    marginBottom: 80,
+    // marginBottom: 80,
+    marginBottom: 65,
   },
   customButton: {
     backgroundColor: "#A175FD",
@@ -136,4 +189,9 @@ const styles = StyleSheet.create({
   separator: {
     marginHorizontal: 10,
   },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+  },
+
 });

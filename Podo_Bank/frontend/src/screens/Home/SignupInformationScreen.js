@@ -14,17 +14,20 @@ import {
 
 export default function SignupInformationScreen({ navigation, route }) {
   const [userInfo, setUserInfo] = useState(route.params.userInfo);
+  console.log(userInfo)
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMessage, setPasswordMessage] = useState("");
   const [confirmPasswordMessage, setConfirmPasswordMessage] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(false);
+  const [isSucceed, setIsSucceed] = useState(false);              // 회원가입 성공여부
+  const [registeredMessage, setRegisteredMessage] = useState(""); // 회원가입 버튼 클릭시 메시지
 
-  const validatePassword = (pass) => {
+  const validatePassword = (password) => {
     const regex =
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,16}$/;
-    return regex.test(pass);
+    return regex.test(password);
   };
 
   const handlePasswordChange = (text) => {
@@ -52,19 +55,50 @@ export default function SignupInformationScreen({ navigation, route }) {
 
   // 회원가입
   const handleUserRegister = async()=>{
-    const response = await userRegister()
+    const updatedUserInfo = handleFixBirthdate()
+    // handleFixBirthdate()
+    const response = await userRegister(updatedUserInfo)
     if(response.status === 200){
       console.log('회원가입 성공')
+      setIsSucceed(true)
+      setRegisteredMessage('회원가입 성공')
     }else if(response.status === 400){
       console.log('회원가입 실패')
+      setRegisteredMessage('회원가입 실패')
     }else if(response.status === 409){
       console.log('이미 사용중인 아이디')
+      setRegisteredMessage('이미 사용중인 아이디')
     }else if(response.status === 422){
       console.log('이메일 형식 오류')
+      setRegisteredMessage('이메일 형식 오류')
     }else{
       console.log('오류 발생')
+      setRegisteredMessage('오류 발생')
     }
   }
+
+  const handleFixBirthdate = () => {
+    if (userInfo.birthdate && userInfo.birthdate.length === 8) {
+      const year = userInfo.birthdate.substring(0, 4);
+      const month = userInfo.birthdate.substring(4, 6);
+      const day = userInfo.birthdate.substring(6, 8);
+  
+      // YYYY-MM-DD 형식으로 변환
+      const formattedBirthdate = `${year}-${month}-${day}`;
+  
+      // 변경된 형식으로 userInfo의 birthdate를 업데이트
+      // setUserInfo((prev) => ({
+      //   ...prev,
+      //   birthdate: formattedBirthdate,
+      // }));
+      return {
+        ...userInfo,
+        birthDate: formattedBirthdate,
+      };
+    }
+    console.log(userInfo)
+    return userInfo
+  };
 
   return (
     <View style={styles.container}>
@@ -111,6 +145,7 @@ export default function SignupInformationScreen({ navigation, route }) {
           placeholder="비밀번호를 한번 더 입력해 주세요."
         />
       </View>
+      
       <Text
         style={{
           color: isConfirmPasswordValid ? "blue" : "red",
@@ -120,6 +155,17 @@ export default function SignupInformationScreen({ navigation, route }) {
       >
         {confirmPasswordMessage}
       </Text>
+      <View>
+        <Text
+          style={{
+            color: isSucceed ? "blue" : "red",
+            alignSelf: 'center',
+          }}
+        >
+          {registeredMessage}
+        </Text>
+      </View>
+      
 
       <TouchableOpacity
         style={[
@@ -130,13 +176,17 @@ export default function SignupInformationScreen({ navigation, route }) {
         ]}
         // back에 회원가입 정보 보내야함
         onPress={() =>{
-          navigation.navigate("SignupCompleteScreen", {
-            name: userInfo.name,
-          })
+          handleUserRegister()
+          // handleConfirmButton()
+          if(isSucceed){
+            navigation.navigate("SignupCompleteScreen", {
+              name: userInfo.name,
+            })
+          }
         }}
         disabled={!(isPasswordValid && isConfirmPasswordValid)}
       >
-        <Text style={styles.linkText}>확인</Text>
+        <Text style={styles.linkText}>회원가입</Text>
       </TouchableOpacity>
     </View>
   );

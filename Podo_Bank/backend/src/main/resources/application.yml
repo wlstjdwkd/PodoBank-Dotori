@@ -1,0 +1,13 @@
+server:
+  port: 9000
+
+spring:
+  config:
+    import: "optional:configserver:http://j9d107.p.ssafy.io:9900/"
+  cloud:
+    config:
+      name: podobank
+      profile: default
+
+encrypt:
+  key: ${ENCRYPT_KEY}

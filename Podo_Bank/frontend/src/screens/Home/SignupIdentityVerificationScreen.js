@@ -11,9 +11,57 @@ import HeaderComponent from "../Header/HeaderScreen";
 export default function SignupIdentityVerificationScreen({ navigation }) {
   const [userInfo, setUserInfo] = useState({
     name: "",
-    birthDate: "",
+    birthdate: "",
     phoneNumber: "",
   });
+  const [nameMessage, setNameMessage] = useState("")
+  const [birthdateMessage, setBirthdateMessage] = useState("")
+  const [phoneNumberMessage, setPhoneNumberMessage] = useState("")
+  const [isValid, setIsValid] = useState({
+    isNameValid: false,
+    isBirthdateValid: false,
+    isPhoneNumberValid: false,
+  })
+
+  const validateName = (text) => {
+    const regex = /^[A-Za-z가-힣]{2,}$/
+    return regex.test(text);
+  };
+  const validateBirthdate = (text) => {
+    const regex = /^\d{8}$/;
+    return regex.test(text);
+  };
+  const validatePhoneNumber = (text) => {
+    const regex = /^01\d{9}$/;
+    return regex.test(text);
+  };
+  const handleNameChange = (text) => {
+    if (validateName(text)) {
+      setNameMessage("이름 작성 완료");
+      setIsValid((prev) => ({ ...prev, isNameValid: true }))
+    } else {
+      setNameMessage("이름은 2글자 이상이어야합니다.");
+      setIsValid((prev) => ({ ...prev, isNameValid: false }))
+    }
+  };
+  const handleBirthdateChange = (text) => {
+    if (validateBirthdate(text)) {
+      setBirthdateMessage("생년월일 작성 완료");
+      setIsValid((prev) => ({ ...prev, isBirthdateValid: true }))
+    } else {
+      setBirthdateMessage('8자리 숫자로 작성해야 합니다.');
+      setIsValid((prev) => ({ ...prev, isBirthdateValid: false }))
+    }
+  };
+  const handlePhoneNumberMessageChange = (text) => {
+    if (validatePhoneNumber(text)) {
+      setPhoneNumberMessage("휴대폰번호 작성 완료");
+      setIsValid((prev) => ({ ...prev, isPhoneNumberValid: true }))
+    } else {
+      setPhoneNumberMessage('01X로 시작하는 11자리 숫자로 작성해야 합니다.');
+      setIsValid((prev) => ({ ...prev, isPhoneNumberValid: false }))
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -30,40 +78,85 @@ export default function SignupIdentityVerificationScreen({ navigation }) {
       <View style={styles.inputContainer}>
         <Text style={styles.inputText}>이름</Text>
         <TextInput
+          placeholder="박보검"
           style={styles.input}
-          onChangeText={(text) => setUserInfo({ ...userInfo, name: text })}
+          onChangeText={(text) =>{
+            handleNameChange(text)
+            setUserInfo((prev) => ({ ...prev, name: text }))
+          }}
           value={userInfo.name}
         />
       </View>
+      <Text
+        style={{
+          color: (isValid.isNameValid) ? "blue" : "red",
+          marginLeft: 30,
+          marginTop: -30,
+        }}
+      >
+        {nameMessage}
+      </Text>
+      {/* 생년월일 입력 */}
       <View style={styles.inputContainer}>
-        <Text
-          style={styles.inputText}
-          onChangeText={(text) => setUserInfo({ ...userInfo, birthDate: text })}
-          value={userInfo.birthDate}
-        >
-          생년월일 8자리
-        </Text>
-        <TextInput style={styles.input} />
+        <Text style={styles.inputText}>생년월일 8자리</Text>
+        <TextInput
+          placeholder="19991212"
+          style={styles.input}
+          keyboardType="number-pad"
+          maxLength={8}
+          onChangeText={(text) => {
+            handleBirthdateChange(text)
+            setUserInfo({ ...userInfo, birthdate: text })
+          }}
+          value={userInfo.birthdate}
+        />
       </View>
+      <Text
+        style={{
+          color: (isValid.isBirthdateValid) ? "blue" : "red",
+          marginLeft: 30,
+          marginTop: -30,
+        }}
+      >
+        {birthdateMessage}
+      </Text>
+      {/* 휴대폰번호입력 */}
       <View style={styles.inputContainer}>
-        <Text
-          style={styles.inputText}
-          onChangeText={(text) =>
-            setUserInfo({ ...userInfo, phoneNumber: text })
-          }
+        <Text style={styles.inputText}>휴대폰번호</Text>
+        <TextInput
+          placeholder="01012341234"
+          style={styles.input}
+          maxLength={11}
+          keyboardType="number-pad"
+          onChangeText={(text) =>{
+            handlePhoneNumberMessageChange(text)
+            setUserInfo({ ...userInfo, phoneNumber: text,})
+          }}
           value={userInfo.phoneNumber}
-        >
-          휴대폰번호
-        </Text>
-        <TextInput style={styles.input} />
+        />
       </View>
+      <Text
+        style={{
+          color: (isValid.isPhoneNumberValid) ? "blue" : "red",
+          marginLeft: 30,
+          marginTop: -30,
+        }}
+      >
+        {phoneNumberMessage}
+      </Text>
       <TouchableOpacity
-        style={styles.customButton}
-        onPress={() =>
-          navigation.navigate("SignupInformationScreenEmail", {
+        style={[
+          styles.customButton,
+          (!isValid.isNameValid || !isValid.isBirthdateValid || !isValid.isPhoneNumberValid) && {
+            backgroundColor: "grey",
+          },
+        ]}
+        onPress={() =>{
+          navigation.navigate("SignupInformationEmailScreen", {
             userInfo: userInfo,
           })
-        }
+        }}
+        disabled={!isValid.isNameValid || !isValid.isBirthdateValid || !isValid.isPhoneNumberValid}
       >
         <Text style={styles.linkText}>확인</Text>
       </TouchableOpacity>

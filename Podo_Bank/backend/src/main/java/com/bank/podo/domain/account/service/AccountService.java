@@ -2,10 +2,12 @@ package com.bank.podo.domain.account.service;
 
 import com.bank.podo.domain.account.dto.*;
 import com.bank.podo.domain.account.entity.Account;
+import com.bank.podo.domain.account.entity.AccountCategory;
 import com.bank.podo.domain.account.enums.AccountType;
 import com.bank.podo.domain.account.entity.TransactionHistory;
 import com.bank.podo.domain.account.enums.TransactionType;
 import com.bank.podo.domain.account.exception.*;
+import com.bank.podo.domain.account.repository.AccountCategoryRepository;
 import com.bank.podo.domain.account.repository.AccountRepository;
 import com.bank.podo.domain.account.repository.TransactionHistoryRepository;
 import com.bank.podo.domain.user.entity.User;
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
 public class AccountService {
 
     private final AccountRepository accountRepository;
+    private final AccountCategoryRepository accountCategoryRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
 
     public List<AccountType> getAccountTypeList() {
@@ -44,6 +47,9 @@ public class AccountService {
 
         checkAccountPasswordFormat(createAccountDTO.getPassword());
 
+        AccountCategory accountCategory = accountCategoryRepository.findById(createAccountDTO.getAccountCategoryId())
+                .orElseThrow(() -> new AccountNotFoundException("계좌 종류를 찾을 수 없습니다."));
+
         // TODO: 이지율 설정
         Account account = Account.builder()
                 .accountNumber(generateAccountNumber())
@@ -51,6 +57,7 @@ public class AccountService {
                 .accountType(createAccountDTO.getAccountType())
                 .balance(BigDecimal.ZERO)
                 .password(passwordEncoder.encode(createAccountDTO.getPassword()))
+                .accountCategory(accountCategory)
                 .build();
         accountRepository.save(account);
     }
@@ -87,18 +94,19 @@ public class AccountService {
 
         // 페이지 번호와 정렬 유형에 따라 페이지 요청 생성
         PageRequest pageRequest = PageRequest.of(page, 2,
-                sortType == 0 ? Sort.by("transactionAt").descending() : Sort.by("transactionAt").ascending());
+                sortType == 0 ? Sort.by("createdAt").descending() : Sort.by("createdAt").ascending());
 
         LocalDateTime startDate = LocalDateTime.now().minusDays(searchMonth);
 
-        List<TransactionHistory> transactionHistoryList = new ArrayList<>();
-        if(transactionType.equals("DEPOSIT")) {
-            transactionHistoryList = transactionHistoryRepository.findAllByAccountAndTransactionTypeAndTransactionAtGreaterThanEqual(account, TransactionType.DEPOSIT, startDate, pageRequest);
-        } else if(transactionType.equals("WITHDRAWAL")) {
-            transactionHistoryList = transactionHistoryRepository.findAllByAccountAndTransactionTypeAndTransactionAtGreaterThanEqual(account, TransactionType.WITHDRAWAL, startDate, pageRequest);
-        } else if(transactionType.equals("ALL")) {
-            transactionHistoryList = transactionHistoryRepository.findAllByAccountAndTransactionAtGreaterThanEqual(account, startDate, pageRequest);
-        }
+        List<TransactionHistory> transactionHistoryList = switch (transactionType) {
+            case "DEPOSIT" ->
+                    transactionHistoryRepository.findAllByAccountAndTransactionTypeAndCreatedAtGreaterThanEqual(account, TransactionType.DEPOSIT, startDate, pageRequest);
+            case "WITHDRAWAL" ->
+                    transactionHistoryRepository.findAllByAccountAndTransactionTypeAndCreatedAtGreaterThanEqual(account, TransactionType.WITHDRAWAL, startDate, pageRequest);
+            case "ALL" ->
+                    transactionHistoryRepository.findAllByAccountAndCreatedAtGreaterThanEqual(account, startDate, pageRequest);
+            default -> new ArrayList<>();
+        };
 
 
         return toTransactionHistoryDTOList(transactionHistoryList);
@@ -225,7 +233,7 @@ public class AccountService {
                 .content(transferDTO.getSenderContent())
                 .build();
         TransactionHistory receiverAccountHistory = TransactionHistory.builder()
-                .transactionType(TransactionType.TRANSFER)
+                .transactionType(TransactionType.DEPOSIT)
                 .amount(transferAmount)
                 .balanceAfter(receiverAccount.getBalance())
                 .counterAccount(senderAccount)
@@ -249,7 +257,7 @@ public class AccountService {
             throw new AccountUserNotMatchException("계좌의 소유자가 아닙니다.");
         }
 
-        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("transactionAt").descending());
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("createdAt").descending());
 
         List<TransactionHistory> accountList = transactionHistoryRepository.findAllByAccountAndTransactionType(account, TransactionType.TRANSFER, pageRequest);
 
@@ -339,8 +347,7 @@ public class AccountService {
                 .accountNumber(account.getAccountNumber())
                 .accountType(account.getAccountType())
                 .balance(account.getBalance().toString())
-                .createAt(account.getCreateAt().toString())
-                .interestRate(account.getInterestRate())
+                .interestRate(account.getAccountCategory().getInterestRate())
                 .build();
     }
 
@@ -353,7 +360,7 @@ public class AccountService {
     private TransactionHistoryDTO toTransactionHistoryDTO(TransactionHistory transactionHistory) {
         TransactionHistoryDTO.TransactionHistoryDTOBuilder builder = TransactionHistoryDTO.builder()
                 .transactionType(transactionHistory.getTransactionType())
-                .transactionAt(transactionHistory.getTransactionAt())
+                .transactionAt(transactionHistory.getCreatedAt())
                 .amount(transactionHistory.getAmount())
                 .balanceAfter(transactionHistory.getBalanceAfter())
                 .content(transactionHistory.getContent());

@@ -2,6 +2,7 @@ package com.bank.podo.domain.account.entity;
 
 import com.bank.podo.domain.account.enums.AccountType;
 import com.bank.podo.domain.user.entity.User;
+import com.bank.podo.global.others.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @ToString
 @NoArgsConstructor
-public class Account {
+public class Account extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountId;
@@ -35,16 +36,13 @@ public class Account {
     @ColumnDefault("0")
     private BigDecimal balance;
 
-    @Column
-    private LocalDateTime createAt;
-
     // 만기일
     @Column
     private LocalDateTime maturityAt;
 
     @ManyToOne
-    @JoinColumn(name = "interest_id")
-    private InterestRate interestRate;
+    @JoinColumn(name = "account_category_id")
+    private AccountCategory accountCategory;
 
     @Column
     private String loanInfo;
@@ -59,14 +57,13 @@ public class Account {
     private boolean locked;
 
     @Builder
-    public Account(String accountNumber, User user, AccountType accountType, BigDecimal balance, LocalDateTime maturityAt, InterestRate interestRate, String loanInfo, String password, int passwordRetryCount, boolean locked) {
+    public Account(String accountNumber, User user, AccountType accountType, BigDecimal balance, LocalDateTime maturityAt, AccountCategory accountCategory, String loanInfo, String password, int passwordRetryCount, boolean locked) {
         this.accountNumber = accountNumber;
         this.user = user;
         this.accountType = accountType;
         this.balance = balance;
-        this.createAt = LocalDateTime.now();
         this.maturityAt = maturityAt;
-        this.interestRate = interestRate;
+        this.accountCategory = accountCategory;
         this.loanInfo = loanInfo;
         this.password = password;
         this.passwordRetryCount = passwordRetryCount;
@@ -89,9 +86,6 @@ public class Account {
         if(account.getLoanInfo() != null) {
             this.loanInfo = account.getLoanInfo();
         }
-        if(account.getInterestRate() != null) {
-            this.interestRate = account.getInterestRate();
-        }
 
         return this;
     }
@@ -112,12 +106,11 @@ public class Account {
         this.locked = false;
     }
 
-    public Account increasePasswordRetryCount() {
+    public void increasePasswordRetryCount() {
         this.passwordRetryCount++;
         if (this.passwordRetryCount >= 3) {
             this.lock();
         }
 
-        return this;
     }
 }

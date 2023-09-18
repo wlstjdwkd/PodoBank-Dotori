@@ -3,7 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import LoginScreen from "../screens/Home/LoginScreen";
 import SignupIdentityVerificationScreen from "../screens/Home/SignupIdentityVerificationScreen";
 import SignupInformationScreen from "../screens/Home/SignupInformationScreen";
-import SignupInformationScreenEmail from "../screens/Home/SignupInformationScreenEmail";
+import SignupInformationEmailScreen from "../screens/Home/SignupInformationEmailScreen";
 
 import SignupCompleteScreen from "../screens/Home/SignupCompleteScreen";
 import HomeScreen from "../screens/Home/HomeScreen";
@@ -20,6 +20,15 @@ import OpenAccountCompleteScreen from "../screens/OpenAccount/OpenAccountComplet
 import AccountManagementScreen from "../screens/Account/AccountManagementScreen";
 import TransactionDetailScreen from "../screens/Account/TransactionDetailScreen";
 import MyPageScreen from "../screens/Home/MyPageScreen";
+import FindIDScreen from "../screens/Home/FindIDScreen";
+import ResetPasswordOneScreen from "../screens/Home/ResetPasswordOneScreen";
+import ResetPasswordTwoScreen from "../screens/Home/ResetPasswordTwoScreen";
+import FindIDSucceessScreen from "../screens/Home/FindIDSucceessScreen";
+import ResetPasswordSucceessScreen from "../screens/Home/ResetPasswordSucceessScreen";
+import ChangePasswordSucceessScreen from "../screens/Home/ChangePasswordSucceessScreen";
+import ExamScreen from "../screens/Home/ExamScreen";
+import ChangePasswordScreen from "../screens/Home/ChangePasswordScreen";
+import WithdrawalScreen from "../screens/Home/WithdrawalScreen";
 
 const Stack = createStackNavigator();
 
@@ -39,8 +48,8 @@ function AppNavigator() {
         component={SignupInformationScreen}
       />
       <Stack.Screen
-        name="SignupInformationScreenEmail"
-        component={SignupInformationScreenEmail}
+        name="SignupInformationEmailScreen"
+        component={SignupInformationEmailScreen}
       />
 
       <Stack.Screen
@@ -95,6 +104,42 @@ function AppNavigator() {
       <Stack.Screen
         name="TransactionDetailScreen"
         component={TransactionDetailScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="FindIDScreen"
+        component={FindIDScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="ResetPasswordOneScreen"
+        component={ResetPasswordOneScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="ResetPasswordTwoScreen"
+        component={ResetPasswordTwoScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="FindIDSucceessScreen"
+        component={FindIDSucceessScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="ResetPasswordSucceessScreen"
+        component={ResetPasswordSucceessScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="ChangePasswordSucceessScreen"
+        component={ChangePasswordSucceessScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="ChangePasswordScreen"
+        component={ChangePasswordScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="WithdrawalScreen"
+        component={WithdrawalScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="ExamScreen"
+        component={ExamScreen}
       ></Stack.Screen>
       <Stack.Screen name="MyPageScreen" component={MyPageScreen}></Stack.Screen>
     </Stack.Navigator>

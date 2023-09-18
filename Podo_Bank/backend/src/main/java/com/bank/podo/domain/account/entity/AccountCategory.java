@@ -1,40 +1,39 @@
 package com.bank.podo.domain.account.entity;
 
 import com.bank.podo.domain.account.enums.AccountType;
+import com.bank.podo.global.others.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Entity
 @Getter
 @NoArgsConstructor
-public class InterestRate {
+public class AccountCategory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long interestId;
+    private Long accountCategoryId;
 
-    @Enumerated(EnumType.STRING)
     @Column(unique = true)
     private AccountType accountType;
 
     @Column
-    private LocalDate validFrom;
+    private String accountName;
 
     @Column
-    private LocalDate validUntil;
+    private String accountDescription;
 
     @Column
     private BigDecimal interestRate;
 
     @Builder
-    public InterestRate(AccountType accountType, LocalDate validFrom, LocalDate validUntil, BigDecimal interestRate) {
+    public AccountCategory(AccountType accountType, String accountName, String accountDescription, BigDecimal interestRate) {
         this.accountType = accountType;
-        this.validFrom = validFrom;
-        this.validUntil = validUntil;
+        this.accountName = accountName;
+        this.accountDescription = accountDescription;
         this.interestRate = interestRate;
     }
 }
