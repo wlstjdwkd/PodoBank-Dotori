@@ -56,7 +56,7 @@ public class NaverService {
                 + "&response_type=code";
     }
 
-    // TODO : 새로운 accessToken, refreshToken을 발급하기
+    // NOTE : 새로운 accessToken, refreshToken을 발급하기
     public ResponseEntity<? extends BaseResponseBody> newTokens(String code) throws Exception {
         if (code == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "인증코드가 존재하지 않습니다."));
 
@@ -111,7 +111,7 @@ public class NaverService {
         }
     }
 
-    // TODO : accessToken으로 사용자의 정보 가져오기
+    // NOTE : accessToken으로 사용자의 정보 가져오기
     public ResponseEntity<? extends BaseResponseBody> getUserInfo(String accessToken) throws Exception{
 
         try{
@@ -150,8 +150,8 @@ public class NaverService {
                     .id(String.valueOf(id))
                     .userName(name)
                     .phoneNumber(phoneNumber)
-                    .role(Role.USER)
                     .authProvider(Provider.NAVER)
+                    .role(Role.ROLE_USER)
                     .birthDate(LocalDate.parse(birthDate)).build();
 
             return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, user));
