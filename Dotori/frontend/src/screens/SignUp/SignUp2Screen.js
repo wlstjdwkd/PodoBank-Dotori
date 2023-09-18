@@ -11,6 +11,7 @@ import HeaderComponent from "../Components/HeaderScreen";
 
 export default function SignUp2Screen({ navigation, route }) {
   const [userInfo, setUserInfo] = useState(route.params.userInfo);
+  const [isValidEmail, setIsValidEmail] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -40,6 +41,8 @@ export default function SignUp2Screen({ navigation, route }) {
         onPress={() => {
           navigation.navigate("SignUp3Screen", { userInfo: userInfo });
         }}
+        //TODO: 풀기
+        // disabled={!isValidEmail}
       >
         <Text style={styles.buttonText}>다음</Text>
       </TouchableOpacity>

@@ -31,14 +31,14 @@ export default function AppNavigator() {
         name="SignUp3Screen"
         component={SignUp3Screen}
       ></Stack.Screen>
-      {/* <Stack.Screen
+      <Stack.Screen
         name="SignUp4Screen"
         component={SignUp4Screen}
       ></Stack.Screen>
       <Stack.Screen
         name="SignUpCompleteScreen"
         component={SignUpCompleteScreen}
-      ></Stack.Screen> */}
+      ></Stack.Screen>
       <Stack.Screen
         name="MainPageScreen"
         component={MainPageScreen}
