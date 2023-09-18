@@ -1,7 +1,6 @@
 package com.bank.podo.domain.account.controller;
 
 import com.bank.podo.domain.account.dto.*;
-import com.bank.podo.domain.account.enums.AccountType;
 import com.bank.podo.domain.account.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,9 +28,9 @@ public class AccountController {
             @ApiResponse(responseCode = "401", description = "권한 없음")
     })
     @GetMapping("/type")
-    public ResponseEntity<List<AccountType>> getAccountTypeList() {
-        List<AccountType> accountTypeList = accountService.getAccountTypeList();
-        return ResponseEntity.ok(accountTypeList);
+    public ResponseEntity<List<AccountCategoryDTO>> getAccountTypeList() {
+        List<AccountCategoryDTO> accountCategoryList = accountService.getAccountTypeList();
+        return ResponseEntity.ok(accountCategoryList);
     }
 
     @Operation(summary = "계좌 생성", description = "USER")
