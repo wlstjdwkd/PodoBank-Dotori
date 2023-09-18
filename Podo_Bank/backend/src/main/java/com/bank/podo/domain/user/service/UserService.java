@@ -186,7 +186,7 @@ public class UserService {
     }
 
     private void checkPasswordFormat(String password) {
-        String passwordPattern = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$";
+        String passwordPattern = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[@$!%*#?&])(?=\\S+$).{8,}$";
 
         if(!Pattern.compile(passwordPattern).matcher(password).matches()) {
             throw new FromatException("비밀번호는 영문, 숫자, 특수문자를 포함하여 8자리 이상이어야 합니다.");

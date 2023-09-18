@@ -13,6 +13,9 @@ import PurposeCreate1Screen from "../screens/Purpose/PurposeCreate1Screen";
 import PurposeCreate2Screen from "../screens/Purpose/PurposeCreate2Screen";
 import OneCent1Screen from "../screens/OneCent/OneCent1Screen";
 
+import MyPageScreen from "../screens/MyPage/MyPageScreen"
+import PasswordChangeScreen from "../screens/MyPage/PasswordChangeScreen"
+
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
@@ -61,6 +64,14 @@ export default function AppNavigator() {
       <Stack.Screen
         name="OneCent1Screen"
         component={OneCent1Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+      name="MyPageScreen"
+      component={MyPageScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+      name="PasswordChangeScreen"
+      component={PasswordChangeScreen}
       ></Stack.Screen>
     </Stack.Navigator>
   );
