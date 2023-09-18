@@ -24,7 +24,10 @@ export default function LoginScreen({ navigation }) {
         <Text>아이디저장</Text>
       </View>
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("MainPageScreen")}
+      >
         <Text style={styles.buttonText}>로그인</Text>
       </TouchableOpacity>
 
