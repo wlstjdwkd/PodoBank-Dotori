@@ -9,6 +9,9 @@ import SignUp4Screen from "../screens/SignUp/SignUp4Screen";
 import SignUpCompleteScreen from "../screens/SignUp/SignUpCompleteScreen";
 import MainPageScreen from "../screens/Home/MainPageScreen";
 import OneCent1Screen from "../screens/OneCent/OneCent1Screen";
+import OneCent2Screen from "../screens/OneCent/OneCent2Screen";
+import OneCent3Screen from "../screens/OneCent/OneCent3Screen";
+import OneCent4Screen from "../screens/OneCent/OneCent4Screen";
 
 const Stack = createStackNavigator();
 
@@ -46,6 +49,18 @@ export default function AppNavigator() {
       <Stack.Screen
         name="OneCent1Screen"
         component={OneCent1Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="OneCent2Screen"
+        component={OneCent2Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="OneCent3Screen"
+        component={OneCent3Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="OneCent4Screen"
+        component={OneCent4Screen}
       ></Stack.Screen>
     </Stack.Navigator>
   );
