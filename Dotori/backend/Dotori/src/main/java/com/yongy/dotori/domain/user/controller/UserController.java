@@ -9,18 +9,12 @@ import com.yongy.dotori.domain.user.exception.ExceptionEnum;
 import com.yongy.dotori.domain.user.repository.UserRepository;
 import com.yongy.dotori.domain.user.service.UserService;
 import com.yongy.dotori.global.common.BaseResponseBody;
-import com.yongy.dotori.global.redis.RedisUtil;
-import com.yongy.dotori.global.security.exception.ErrorType;
+import com.yongy.dotori.global.redis.repository.RefreshTokenRepository;
+
+import com.yongy.dotori.global.redis.entity.RefreshToken;
 import com.yongy.dotori.global.security.provider.JwtTokenProvider;
 import com.yongy.dotori.global.security.dto.JwtToken;
 
-//import io.swagger.v3.oas.annotations.Operation;
-//import io.swagger.v3.oas.annotations.media.Content;
-//import io.swagger.v3.oas.annotations.media.Schema;
-//import io.swagger.v3.oas.annotations.responses.ApiResponse;
-//import io.swagger.v3.oas.annotations.responses.ApiResponses;
-
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +24,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -51,7 +44,7 @@ public class UserController {
     private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    private RedisUtil redisUtil;
+    private RefreshTokenRepository refreshTokenRepository;
 
     private final long exp = 1000L * 60 * 60;
 
@@ -72,12 +65,14 @@ public class UserController {
     public ResponseEntity<? extends BaseResponseBody> validCodeCheck(
             @RequestParam(name="id") String id,
             @RequestParam(name="code") String code){
+
         String authCode = userService.getAuthCode(id); // 인증번호 검증
+
         if(authCode == null) { // 인증번호의 시간이 만료됨
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4002, ExceptionEnum.EXPIRED_AUTHCODE));
         }else if(authCode.equals(code)){
             userService.deleteAuthCode(id); // 인증번호 삭제
-            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "유효한 코드입니다."));
+            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "인증 완료"));
         }else{ // 인증번호가 틀림
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4003, ExceptionEnum.INVALID_AUTHCODE));
         }
@@ -93,6 +88,7 @@ public class UserController {
                     .birthDate(LocalDate.parse(userInfoDto.getBirthDate()))
                     .phoneNumber(userInfoDto.getPhoneNumber())
                     .authProvider(Provider.DOTORI)
+                    .role(Role.ROLE_USER)
                     .build();
 
             // 비밀번호 암호화해서 저장하기
@@ -124,7 +120,11 @@ public class UserController {
         JwtToken jwtToken = jwtTokenProvider.createToken(user.getId(), Role.ROLE_USER);
 
         // refreshToken 저장
-        redisUtil.setDataExpire(user.getId(), jwtToken.getRefreshToken(), exp*24);
+        refreshTokenRepository.save(RefreshToken.of(userLoginDto.getId(), jwtToken.getRefreshToken()));
+
+        log.info("----------");
+
+        // redisUtil.setDataExpire(user.getId(), jwtToken.getRefreshToken(), exp*24);
 
         // accessToken 전달
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, jwtToken));
@@ -135,16 +135,14 @@ public class UserController {
     @PostMapping("/new-token")
     public ResponseEntity<? extends BaseResponseBody> generateNewToken(String refreshToken){
 
-
-        String id = jwtTokenProvider.getUserId(refreshToken);
-
-        String db_refreshToken = redisUtil.getData(id);
-
         // refreshToken이 유효하면
-        if(db_refreshToken != null){
-            JwtToken jwtToken = jwtTokenProvider.createToken(id, Role.ROLE_USER);
+        if(refreshTokenRepository.findById(refreshToken) != null){
+
+            String id = jwtTokenProvider.getUserId(refreshToken);
+            JwtToken jwtToken = jwtTokenProvider.createToken(id , Role.ROLE_USER);
+
             // refreshToken 저장하기
-            redisUtil.setDataExpire(id, jwtToken.getRefreshToken(), exp * 24);
+            refreshTokenRepository.save(RefreshToken.of(jwtToken.getRefreshToken(), id));
 
             return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, jwtToken));
         }

@@ -1,6 +1,6 @@
 package com.yongy.dotori.global.security.config;
 
-import com.yongy.dotori.global.redis.RedisUtil;
+
 import com.yongy.dotori.global.security.filter.JwtAuthenticationFilter;
 import com.yongy.dotori.global.security.provider.JwtTokenProvider;
 import com.yongy.dotori.global.security.service.UserDetailsService;
@@ -26,9 +26,6 @@ public class SecurityConfig{
     private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    private final RedisUtil redisUtil;
-
-    @Autowired
     private final UserDetailsService userDetailsService;
 
     @Bean
@@ -48,7 +45,7 @@ public class SecurityConfig{
                 .requestMatchers("/v1/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().permitAll()
                 .and()
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, redisUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .logout().disable();
