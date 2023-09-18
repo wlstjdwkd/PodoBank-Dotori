@@ -41,9 +41,9 @@ public class AccountController {
             @ApiResponse(responseCode = "429", description = "계좌 비밀번호 형식 오류")
     })
     @PostMapping("/create")
-    public ResponseEntity<Void> createAccount(@RequestBody CreateAccountDTO createAccountDTO) {
-        accountService.createAccount(createAccountDTO, passwordEncoder);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<AccountDTO> createAccount(@RequestBody CreateAccountDTO createAccountDTO) {
+        AccountDTO accountDTO = accountService.createAccount(createAccountDTO, passwordEncoder);
+        return ResponseEntity.ok(accountDTO);
     }
 
     @Operation(summary = "계좌 목록 조회", description = "USER")

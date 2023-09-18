@@ -41,7 +41,7 @@ public class AccountService {
         return toAccountCategoryDTOList(accountCategories);
     }
 
-    public void createAccount(CreateAccountDTO createAccountDTO, PasswordEncoder passwordEncoder) {
+    public AccountDTO createAccount(CreateAccountDTO createAccountDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
 
         checkAccountPasswordFormat(createAccountDTO.getPassword());
@@ -49,7 +49,6 @@ public class AccountService {
         AccountCategory accountCategory = accountCategoryRepository.findById(createAccountDTO.getAccountCategoryId())
                 .orElseThrow(() -> new AccountNotFoundException("계좌 종류를 찾을 수 없습니다."));
 
-        // TODO: 이지율 설정
         Account account = Account.builder()
                 .accountNumber(generateAccountNumber())
                 .user(user)
@@ -59,6 +58,13 @@ public class AccountService {
                 .accountCategory(accountCategory)
                 .build();
         accountRepository.save(account);
+
+        return AccountDTO.builder()
+                .accountNumber(account.getAccountNumber())
+                .accountType(account.getAccountType())
+                .balance(account.getBalance().toString())
+                .interestRate(account.getAccountCategory().getInterestRate())
+                .build();
     }
 
     @Transactional(readOnly = true)
