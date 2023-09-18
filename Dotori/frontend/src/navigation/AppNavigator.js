@@ -8,6 +8,9 @@ import SignUp3Screen from "../screens/SignUp/SignUp3Screen";
 import SignUp4Screen from "../screens/SignUp/SignUp4Screen";
 import SignUpCompleteScreen from "../screens/SignUp/SignUpCompleteScreen";
 import MainPageScreen from "../screens/Home/MainPageScreen";
+import PurposeScreen from "../screens/Purpose/PurposeScreen";
+import PurposeCreate1Screen from "../screens/Purpose/PurposeCreate1Screen";
+import PurposeCreate2Screen from "../screens/Purpose/PurposeCreate2Screen";
 import OneCent1Screen from "../screens/OneCent/OneCent1Screen";
 
 const Stack = createStackNavigator();
@@ -42,6 +45,18 @@ export default function AppNavigator() {
       <Stack.Screen
         name="MainPageScreen"
         component={MainPageScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PurposeScreen"
+        component={PurposeScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PurposeCreate1Screen"
+        component={PurposeCreate1Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PurposeCreate2Screen"
+        component={PurposeCreate2Screen}
       ></Stack.Screen>
       <Stack.Screen
         name="OneCent1Screen"
