@@ -7,14 +7,15 @@ import com.yongy.dotori.domain.payment.entity.Payment;
 import com.yongy.dotori.domain.plan.entity.Plan;
 import com.yongy.dotori.domain.purpose.entity.Purpose;
 import com.yongy.dotori.domain.reward.entity.Reward;
-// import jakarta.persistence.*;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -34,21 +35,21 @@ public class User {
     @Column(nullable = false)
     private String id;
 
-    @Column(nullable = false)
     private String password;
 
-    @Column(name="birth_date", nullable = false)
     private LocalDate birthDate;
 
     @Column(name="user_name", nullable = false)
     private String userName;
 
-    @Column(name="phone_number", nullable = false)
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(name="auth_provider", nullable = false)
     private Provider authProvider;
+
+    @Column(name="expired_at", nullable = true)
+    private LocalDateTime expiredAt;
 
     @OneToMany(mappedBy = "user")
     private List<Purpose> purposeList;
@@ -71,8 +72,9 @@ public class User {
     @OneToOne(mappedBy = "user")
     private Reward reward;
 
+
     @Builder
-    public User(Long userSeq, Role role, String id, String password, LocalDate birthDate, String userName, String phoneNumber, Provider authProvider) {
+    public User(Long userSeq,Role role, String id, String password, LocalDate birthDate, String userName, String phoneNumber, Provider authProvider, LocalDateTime expiredAt) {
         this.userSeq = userSeq;
         this.role = role;
         this.id = id;
@@ -81,5 +83,6 @@ public class User {
         this.userName = userName;
         this.phoneNumber = phoneNumber;
         this.authProvider = authProvider;
+        this.expiredAt = expiredAt;
     }
 }

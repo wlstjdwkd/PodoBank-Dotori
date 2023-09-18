@@ -1,10 +1,9 @@
 package com.yongy.dotori.domain.user.service;
 
-import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.user.repository.UserRepository;
 import com.yongy.dotori.global.redis.RedisUtil;
-import com.yongy.dotori.global.security.jwt.JwtTokenProvider;
-import com.yongy.dotori.global.security.jwtDto.JwtToken;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -17,22 +16,19 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+
 import java.util.Random;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
-
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
     private final JavaMailSender javaMailSender;
-
+    @Autowired
     private final RedisUtil redisUtil;
-
     public void authEmail(String id){
         // 임의의 authKey 생성
         Random random = new Random();
@@ -59,7 +55,8 @@ public class UserServiceImpl implements UserService{
         }
 
         // 유효 시간(5분)동안 {email, authKey}를 저장한다.
-        redisUtil.setDataExpire(authKey, id, 60 * 5L);
+        redisUtil.setDataExpire(id, authKey, 60 * 5L);
+
     }
 
     public String getAuthCode(String id){

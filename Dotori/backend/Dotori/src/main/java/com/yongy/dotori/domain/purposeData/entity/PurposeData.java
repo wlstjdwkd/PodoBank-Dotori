@@ -2,11 +2,11 @@ package com.yongy.dotori.domain.purposeData.entity;
 
 import com.yongy.dotori.domain.account.entity.Account;
 import com.yongy.dotori.domain.purpose.entity.Purpose;
-// import jakarta.persistence.*;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 

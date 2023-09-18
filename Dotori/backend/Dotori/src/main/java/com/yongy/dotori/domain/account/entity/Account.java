@@ -4,11 +4,11 @@ import com.yongy.dotori.domain.bank.entity.Bank;
 import com.yongy.dotori.domain.plan.entity.Plan;
 import com.yongy.dotori.domain.purposeData.entity.PurposeData;
 import com.yongy.dotori.domain.user.entity.User;
-// import jakarta.persistence.*;
+
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.yongy.dotori.global.security.jwtDto;
+package com.yongy.dotori.global.security.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

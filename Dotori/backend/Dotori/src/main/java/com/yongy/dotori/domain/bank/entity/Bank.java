@@ -1,11 +1,11 @@
 package com.yongy.dotori.domain.bank.entity;
 
 import com.yongy.dotori.domain.account.entity.Account;
-//import jakarta.persistence.*;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+
 import java.util.List;
 
 @NoArgsConstructor
