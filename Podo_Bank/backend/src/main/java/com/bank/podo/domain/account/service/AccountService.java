@@ -10,6 +10,10 @@ import com.bank.podo.domain.account.repository.AccountCategoryRepository;
 import com.bank.podo.domain.account.repository.AccountRepository;
 import com.bank.podo.domain.account.repository.TransactionHistoryRepository;
 import com.bank.podo.domain.user.entity.User;
+import com.bank.podo.global.email.entity.VerificationSuccess;
+import com.bank.podo.global.email.enums.VerificationType;
+import com.bank.podo.global.email.exception.EmailVerificationException;
+import com.bank.podo.global.email.repository.VerificationSuccessRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +39,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final AccountCategoryRepository accountCategoryRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
+    private final VerificationSuccessRepository verificationSuccessRepository;
 
     public List<AccountCategoryDTO> getAccountTypeList() {
         List<AccountCategory> accountCategories = accountCategoryRepository.findAll();
@@ -130,7 +135,6 @@ public class AccountService {
         account.unlock();
         accountRepository.save(account.update(Account.builder()
                 .password(passwordEncoder.encode(changePasswordDTO.getNewPassword()))
-                .passwordRetryCount(0)
                 .build()));
     }
 
@@ -144,12 +148,19 @@ public class AccountService {
             throw new AccountUserNotMatchException("계좌의 소유자가 아닙니다.");
         }
 
+        VerificationSuccess verificationSuccess = verificationSuccessRepository.findById(user.getEmail())
+                .orElseThrow(() -> new EmailVerificationException("이메일 인증이 만료되었습니다."));
+
+        if(!verificationSuccess.getSuccessCode().equals(resetPasswordDTO.getSuccessCode())
+                || !verificationSuccess.getType().equals(VerificationType.RESET_ACCOUNT_PASSWORD)) {
+            throw new EmailVerificationException("이메일 인증이 만료되었습니다.");
+        }
+
         checkAccountPasswordFormat(resetPasswordDTO.getNewPassword());
 
         account.unlock();
         accountRepository.save(account.update(Account.builder()
                 .password(passwordEncoder.encode(resetPasswordDTO.getNewPassword()))
-                .passwordRetryCount(0)
                 .build()));
 
     }

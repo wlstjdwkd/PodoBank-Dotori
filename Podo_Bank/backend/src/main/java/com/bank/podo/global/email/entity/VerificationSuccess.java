@@ -1,5 +1,6 @@
 package com.bank.podo.global.email.entity;
 
+import com.bank.podo.global.email.enums.VerificationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +21,8 @@ public class VerificationSuccess {
     String email;
 
     String successCode;
+
+    VerificationType type;
 
     LocalDateTime successAt;
 }

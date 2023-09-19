@@ -103,6 +103,7 @@ public class Account extends BaseEntity {
     }
 
     public void unlock() {
+        this.passwordRetryCount = 0;
         this.locked = false;
     }
 
