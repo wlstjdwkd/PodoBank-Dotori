@@ -231,7 +231,7 @@ public class AccountService {
 
         TransactionHistory senderAccountHistory = TransactionHistory.builder()
                 .transactionType(TransactionType.TRANSFER)
-                .amount(transferAmount.negate())
+                .amount(transferAmount)
                 .balanceAfter(senderAccount.getBalance())
                 .counterAccount(receiverAccount)
                 .account(senderAccount)
@@ -290,7 +290,7 @@ public class AccountService {
 
         if(!passwordEncoder.matches(password, account.getPassword())) {
             increasePasswordRetryCount(account);
-            throw new PasswordRetryCountExceededException("비밀번호가 일치하지 않습니다.");
+            throw new PasswordRetryCountExceededException("비밀번호가 일치하지 않습니다.", account.getPasswordRetryCount());
         }
 
         // 비밀번호 일치 시, 비밀번호 재시도 횟수 초기화
