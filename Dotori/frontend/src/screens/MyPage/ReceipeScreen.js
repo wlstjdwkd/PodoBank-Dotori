@@ -72,7 +72,7 @@ export default function ReceipeScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 1,  
         backgroundColor: 'white',
         padding: 16,
     },
