@@ -63,7 +63,7 @@ public class UserController {
     })
     @PostMapping("/emailVerification/check")
     public ResponseEntity<EmailVerificationSuccessDTO> checkVerificationCode(@RequestBody EmailVerificationCheckDTO emailVerificationCheckDTO) {
-        EmailVerificationSuccessDTO successCode = emailService.checkVerificationCode(emailVerificationCheckDTO.getEmail(), emailVerificationCheckDTO.getCode());
+        EmailVerificationSuccessDTO successCode = emailService.checkVerificationCode(emailVerificationCheckDTO.getEmail(), emailVerificationCheckDTO.getCode(), emailVerificationCheckDTO.getType());
 
         return ResponseEntity.ok(successCode);
     }

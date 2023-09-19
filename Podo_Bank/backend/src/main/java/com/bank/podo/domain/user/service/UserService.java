@@ -1,5 +1,6 @@
 package com.bank.podo.domain.user.service;
 
+import com.bank.podo.domain.account.repository.AccountRepository;
 import com.bank.podo.domain.user.dto.*;
 import com.bank.podo.domain.user.entity.User;
 import com.bank.podo.domain.user.enums.Role;
@@ -8,6 +9,7 @@ import com.bank.podo.domain.user.exception.FromatException;
 import com.bank.podo.domain.user.exception.PasswordNotMatchException;
 import com.bank.podo.domain.user.repository.UserRepository;
 import com.bank.podo.global.email.entity.VerificationSuccess;
+import com.bank.podo.global.email.enums.VerificationType;
 import com.bank.podo.global.email.repository.VerificationSuccessRepository;
 import com.bank.podo.global.others.service.RequestHelper;
 import com.bank.podo.global.security.entity.RefreshToken;
@@ -40,12 +42,15 @@ public class UserService {
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
     private final VerificationSuccessRepository verificationSuccessRepository;
 
+    private final AccountRepository accountRepository;
+
     @Transactional
     public void register(RegisterDTO registerDTO, PasswordEncoder passwordEncoder) {
         VerificationSuccess verificationSuccess = verificationSuccessRepository.findById(registerDTO.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("이메일 인증이 만료되었습니다."));
 
-        if(!verificationSuccess.getSuccessCode().equals(registerDTO.getSuccessCode())) {
+        if(!verificationSuccess.getSuccessCode().equals(registerDTO.getSuccessCode())
+            || !verificationSuccess.getType().equals(VerificationType.REGISTER)) {
             throw new IllegalArgumentException("이메일 인증이 만료되었습니다.");
         }
 
@@ -147,7 +152,8 @@ public class UserService {
         VerificationSuccess verificationSuccess = verificationSuccessRepository.findById(resetPasswordDTO.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("이메일 인증이 만료되었습니다."));
 
-        if(!verificationSuccess.getSuccessCode().equals(resetPasswordDTO.getSuccessCode())) {
+        if(!verificationSuccess.getSuccessCode().equals(resetPasswordDTO.getSuccessCode())
+            || !verificationSuccess.getType().equals(VerificationType.RESET_PASSWORD)) {
             throw new IllegalArgumentException("이메일 인증이 만료되었습니다.");
         }
 
@@ -167,6 +173,10 @@ public class UserService {
 
         if(!passwordEncoder.matches(userDeleteDTO.getPassword(), user.getPassword())) {
             throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
+        }
+
+        if(accountRepository.countByUserAndDeletedFalse(user) > 0) {
+            throw new IllegalArgumentException("계좌가 존재합니다.");
         }
 
         userRepository.save(user.delete());
