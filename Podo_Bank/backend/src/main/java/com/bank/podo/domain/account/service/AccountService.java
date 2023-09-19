@@ -10,6 +10,10 @@ import com.bank.podo.domain.account.repository.AccountCategoryRepository;
 import com.bank.podo.domain.account.repository.AccountRepository;
 import com.bank.podo.domain.account.repository.TransactionHistoryRepository;
 import com.bank.podo.domain.user.entity.User;
+import com.bank.podo.global.email.entity.VerificationSuccess;
+import com.bank.podo.global.email.enums.VerificationType;
+import com.bank.podo.global.email.exception.EmailVerificationException;
+import com.bank.podo.global.email.repository.VerificationSuccessRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +39,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final AccountCategoryRepository accountCategoryRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
+    private final VerificationSuccessRepository verificationSuccessRepository;
 
     public List<AccountCategoryDTO> getAccountTypeList() {
         List<AccountCategory> accountCategories = accountCategoryRepository.findAll();
@@ -70,27 +75,27 @@ public class AccountService {
     @Transactional(readOnly = true)
     public List<AccountDTO> getAccountList() {
         User user = getLoginUser();
-        List<Account> accountList = accountRepository.findAllByUser(user);
+        List<Account> accountList = accountRepository.findAllByUserAndDeletedFalse(user);
         return toAccountDTOList(accountList);
     }
 
     @Transactional(readOnly = true)
     public String getAccountOwnerName(String accountNumber) {
-        Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(accountNumber)
+        Account account = accountRepository.findByAccountNumberAndDeletedFalse(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
         return account.getUser().getName();
     }
 
     @Transactional(readOnly = true)
     public AccountDTO getAccountDetail(String accountNumber) {
-        Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(accountNumber)
+        Account account = accountRepository.findByAccountNumberAndDeletedFalse(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
         return toAccountDTO(account);
     }
 
     @Transactional(readOnly = true)
     public List<TransactionHistoryDTO> getAccountHistory(String accountNumber, int searchMonth, String transactionType, int sortType, int page) {
-        Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(accountNumber)
+        Account account = accountRepository.findByAccountNumberAndDeletedFalse(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
         if(!account.getUser().getUserId().equals(getLoginUser().getUserId())) {
@@ -98,7 +103,7 @@ public class AccountService {
         }
 
         // 페이지 번호와 정렬 유형에 따라 페이지 요청 생성
-        PageRequest pageRequest = PageRequest.of(page, 2,
+        PageRequest pageRequest = PageRequest.of(page, 10,
                 sortType == 0 ? Sort.by("createdAt").descending() : Sort.by("createdAt").ascending());
 
         LocalDateTime startDate = LocalDateTime.now().minusDays(searchMonth);
@@ -120,7 +125,7 @@ public class AccountService {
     @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
     public void changePassword(ChangePasswordDTO changePasswordDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
-        Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(changePasswordDTO.getAccountNumber())
+        Account account = accountRepository.findByAccountNumberAndDeletedFalse(changePasswordDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
         checkAccountUserAndPassword(account, user, changePasswordDTO.getOldPassword(), passwordEncoder);
@@ -130,18 +135,25 @@ public class AccountService {
         account.unlock();
         accountRepository.save(account.update(Account.builder()
                 .password(passwordEncoder.encode(changePasswordDTO.getNewPassword()))
-                .passwordRetryCount(0)
                 .build()));
     }
 
     @Transactional
-    public void resetPassword(ResetPasswordDTO resetPasswordDTO, PasswordEncoder passwordEncoder) {
+    public void resetPassword(ResetAccountPasswordDTO resetPasswordDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
-        Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(resetPasswordDTO.getAccountNumber())
+        Account account = accountRepository.findByAccountNumberAndDeletedFalse(resetPasswordDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
         if(!account.getUser().getUserId().equals(user.getUserId())) {
             throw new AccountUserNotMatchException("계좌의 소유자가 아닙니다.");
+        }
+
+        VerificationSuccess verificationSuccess = verificationSuccessRepository.findById(user.getEmail())
+                .orElseThrow(() -> new EmailVerificationException("이메일 인증이 만료되었습니다."));
+
+        if(!verificationSuccess.getSuccessCode().equals(resetPasswordDTO.getSuccessCode())
+                || !verificationSuccess.getType().equals(VerificationType.RESET_ACCOUNT_PASSWORD)) {
+            throw new EmailVerificationException("이메일 인증이 만료되었습니다.");
         }
 
         checkAccountPasswordFormat(resetPasswordDTO.getNewPassword());
@@ -149,7 +161,6 @@ public class AccountService {
         account.unlock();
         accountRepository.save(account.update(Account.builder()
                 .password(passwordEncoder.encode(resetPasswordDTO.getNewPassword()))
-                .passwordRetryCount(0)
                 .build()));
 
     }
@@ -157,7 +168,7 @@ public class AccountService {
     @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
     public void deposit(DepositDTO depositDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
-        Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(depositDTO.getAccountNumber())
+        Account account = accountRepository.findByAccountNumberAndDeletedFalse(depositDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
         checkAccountUserAndPassword(account, user, depositDTO.getPassword(), passwordEncoder);
@@ -182,7 +193,7 @@ public class AccountService {
     @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
     public void withdraw(WithdrawDTO withdrawDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
-        Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(withdrawDTO.getAccountNumber())
+        Account account = accountRepository.findByAccountNumberAndDeletedFalse(withdrawDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
         checkAccountUserAndPassword(account, user, withdrawDTO.getPassword(), passwordEncoder);
@@ -210,9 +221,9 @@ public class AccountService {
     @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
     public void transfer(TransferDTO transferDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
-        Account senderAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(transferDTO.getSenderAccountNumber())
+        Account senderAccount = accountRepository.findByAccountNumberAndDeletedFalse(transferDTO.getSenderAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
-        Account receiverAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(transferDTO.getReceiverAccountNumber())
+        Account receiverAccount = accountRepository.findByAccountNumberAndDeletedFalse(transferDTO.getReceiverAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
         checkAccountUserAndPassword(senderAccount, user, transferDTO.getPassword(), passwordEncoder);
@@ -231,7 +242,7 @@ public class AccountService {
 
         TransactionHistory senderAccountHistory = TransactionHistory.builder()
                 .transactionType(TransactionType.TRANSFER)
-                .amount(transferAmount.negate())
+                .amount(transferAmount)
                 .balanceAfter(senderAccount.getBalance())
                 .counterAccount(receiverAccount)
                 .account(senderAccount)
@@ -249,13 +260,25 @@ public class AccountService {
         transactionHistoryRepository.save(receiverAccountHistory);
     }
 
-    public void deleteAccount() {
+    public void deleteAccount(DeleteAccountDTO deleteAccountDTO, PasswordEncoder passwordEncoder) {
+        User user = getLoginUser();
+        Account account = accountRepository.findByAccountNumberAndDeletedFalse(deleteAccountDTO.getAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
+
+        checkAccountUserAndPassword(account, user, deleteAccountDTO.getPassword(), passwordEncoder);
+
+        if(account.getBalance().compareTo(BigDecimal.ZERO) != 0) {
+            log.info(account.getBalance().toString());
+            throw new AccountBalanceNotZeroException("잔액이 남아있습니다.");
+        }
+
+        accountRepository.save(account.delete());
     }
 
     @Transactional(readOnly = true)
     public List<RecentAccountDTO> getRecentTransferAccountList(String accountNumber) {
         User user = getLoginUser();
-        Account account = accountRepository.findByAccountNumberAndMaturityAtIsNull(accountNumber)
+        Account account = accountRepository.findByAccountNumberAndDeletedFalse(accountNumber)
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
 
         if(!account.getUser().getUserId().equals(user.getUserId())) {
@@ -290,7 +313,7 @@ public class AccountService {
 
         if(!passwordEncoder.matches(password, account.getPassword())) {
             increasePasswordRetryCount(account);
-            throw new PasswordRetryCountExceededException("비밀번호가 일치하지 않습니다.");
+            throw new PasswordRetryCountExceededException("비밀번호가 일치하지 않습니다.", account.getPasswordRetryCount());
         }
 
         // 비밀번호 일치 시, 비밀번호 재시도 횟수 초기화
@@ -320,7 +343,7 @@ public class AccountService {
         }
 
         // 중복 체크
-        while (accountRepository.existsByAccountNumber(sb.toString())) {
+        while (accountRepository.existsByAccountNumberAndDeletedFalse(sb.toString())) {
             sb = new StringBuilder();
             sb.append("9775");
 

@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
-    boolean existsByAccountNumber(String generatedNumber);
+    boolean existsByAccountNumberAndDeletedFalse(String generatedNumber);
 
-    List<Account> findAllByUser(User user);
+    List<Account> findAllByUserAndDeletedFalse(User user);
 
-    Optional<Account> findByAccountNumberAndMaturityAtIsNull(String accountNumber);
+    Optional<Account> findByAccountNumberAndDeletedFalse(String accountNumber);
+
+    int countByUserAndDeletedFalse(User user);
 }

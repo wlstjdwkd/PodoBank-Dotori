@@ -56,6 +56,9 @@ public class Account extends BaseEntity {
     @Column
     private boolean locked;
 
+    @Column
+    private boolean deleted;
+
     @Builder
     public Account(String accountNumber, User user, AccountType accountType, BigDecimal balance, LocalDateTime maturityAt, AccountCategory accountCategory, String loanInfo, String password, int passwordRetryCount, boolean locked) {
         this.accountNumber = accountNumber;
@@ -103,6 +106,7 @@ public class Account extends BaseEntity {
     }
 
     public void unlock() {
+        this.passwordRetryCount = 0;
         this.locked = false;
     }
 
@@ -112,5 +116,12 @@ public class Account extends BaseEntity {
             this.lock();
         }
 
+    }
+
+    public Account delete() {
+        this.lock();
+        this.deleted = true;
+
+        return this;
     }
 }

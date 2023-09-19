@@ -44,10 +44,10 @@ public class OpenBankingService {
         com.bank.podo.domain.openbank.entity.FintechService FintechService = serviceRepository.findByServiceCode(fintechOneCentVerificationDTO.getFintechServiceCode())
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
 
-        Account userAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(fintechOneCentVerificationDTO.getAccount())
+        Account userAccount = accountRepository.findByAccountNumberAndDeletedFalse(fintechOneCentVerificationDTO.getAccount())
                 .orElseThrow(() -> new AccountNotFoundException("존재하지 않는 계좌입니다."));
 
-        Account ftAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(FintechService.getAccount().getAccountNumber())
+        Account ftAccount = accountRepository.findByAccountNumberAndDeletedFalse(FintechService.getAccount().getAccountNumber())
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 계좌입니다."));
 
         BigDecimal transferAmount = BigDecimal.ONE;
@@ -96,7 +96,7 @@ public class OpenBankingService {
         com.bank.podo.domain.openbank.entity.FintechService fintechService = serviceRepository.findByServiceCodeAndUser(fintechOneCentVerificationCheckDTO.getFintechServiceCode(), user)
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
 
-        Account userAccount = accountRepository.findByAccountNumberAndMaturityAtIsNull(fintechOneCentVerificationCheckDTO.getAccountNumber())
+        Account userAccount = accountRepository.findByAccountNumberAndDeletedFalse(fintechOneCentVerificationCheckDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("존재하지 않는 계좌입니다."));
 
         AccountVerificationCode accountVerificationCode = accountVerificationCodeRepository.findById(userAccount.getAccountNumber())
