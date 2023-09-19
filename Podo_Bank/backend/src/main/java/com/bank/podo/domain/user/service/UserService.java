@@ -1,5 +1,6 @@
 package com.bank.podo.domain.user.service;
 
+import com.bank.podo.domain.account.repository.AccountRepository;
 import com.bank.podo.domain.user.dto.*;
 import com.bank.podo.domain.user.entity.User;
 import com.bank.podo.domain.user.enums.Role;
@@ -40,6 +41,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
     private final VerificationSuccessRepository verificationSuccessRepository;
+
+    private final AccountRepository accountRepository;
 
     @Transactional
     public void register(RegisterDTO registerDTO, PasswordEncoder passwordEncoder) {
@@ -170,6 +173,10 @@ public class UserService {
 
         if(!passwordEncoder.matches(userDeleteDTO.getPassword(), user.getPassword())) {
             throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
+        }
+
+        if(accountRepository.countByUser(user) > 0) {
+            throw new IllegalArgumentException("계좌가 존재합니다.");
         }
 
         userRepository.save(user.delete());
