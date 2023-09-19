@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Modal,
   Pressable,
-  Alert,
 } from "react-native";
 
 import HeaderComponent from "../Header/HeaderScreen";
@@ -15,10 +14,13 @@ import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScree
 import {
   userWithdrawal,
 } from '../../apis/userapi'
+import { accountDelete } from '../../apis/accountapi'
 import { useSelector, useDispatch } from 'react-redux';
 import { inputAccessToken, inputRefreshToken } from '../../redux/slices/auth/user'
 
 export default function WithdrawalScreen({ navigation, route }) {
+  const [account, setAccount] = useState(route.params.account)
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMessage, setPasswordMessage] = useState("");
@@ -31,12 +33,15 @@ export default function WithdrawalScreen({ navigation, route }) {
   const accessToken = useSelector((state) => state.user.accessToken)
   const refreshToken = useSelector((state) => state.user.refreshToken)
   const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
-  const totalBalance = useSelector((state)=> state.account.totalBalance)  // 총 잔액
   const dispatch = useDispatch();
 
+  // const validatePassword = (password) => {
+  //   const regex =
+  //     /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,16}$/;
+  //   return regex.test(password);
+  // };
   const validatePassword = (password) => {
-    const regex =
-      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,16}$/;
+    const regex = /^\d{4}$/;
     return regex.test(password);
   };
 
@@ -64,35 +69,43 @@ export default function WithdrawalScreen({ navigation, route }) {
   };
 
   // 회원탈퇴
-  const handleUserWithdrawal = async()=>{
+  const handleAccountDelete = async()=>{
     setIsClickWithdrawalBtn(true)
-    console.log('되냐?', clickWithdrawalBtn)
-    const response = await userWithdrawal(accessToken,confirmPassword)
-    console.log('안되냐?', clickWithdrawalBtn)
+    const deleteInfo = {
+      accountNumber: account.accountNumber,
+      password: confirmPassword
+    }
+    const response = await accountDelete(deleteInfo, accessToken)
     if(response.status==200){
-      console.log('회원탈퇴 성공')
+      console.log('계좌 해지 성공')
       // user Token null값으로 변경
       dispatch(inputAccessToken(null))
       dispatch(inputRefreshToken(null))
-      setRegisteredMessage('회원 탈퇴가 완료되었습니다.')
+      setRegisteredMessage('계좌 해지가 완료되었습니다.')
       navigation.reset({
         index: 0,
-        routes: [{ name: 'LoginScreen', params: {},}],
+        routes: [{ name: 'HomeScreen', params: {},}],
       });
     }else if(response.status===400){
-      console.log('회원탈퇴 실패')
-      setRegisteredMessage('회원 탈퇴에 실패하셨습니다.')
+      console.log('계좌 해지 실패')
+      setRegisteredMessage('계좌 해지에 실패하셨습니다.')
     }else if(response.status===401){
-      console.log('인증 실패')
-      setRegisteredMessage('인증 실패')
+      console.log('권한없음으로 인증 실패')
+      setRegisteredMessage('계좌 해지 권한이 없습니다.')
     }else if(response.status===403){
-      console.log('토큰 없음')
-      setRegisteredMessage('토큰 없음')
+      console.log('계좌 소유주가 아니므로 계좌 해지 실패')
+      setRegisteredMessage('계좌 소유주가 아닙니다.')
     }else if(response.status===404){
-      console.log('존재하지 않는 회원')
-      setRegisteredMessage('존재하지 않는 회원입니다.')
+      console.log('존재하지 않는 계좌입니다.')
+      setRegisteredMessage('존재하지 않는 계좌입니다.')
+    }else if(response.status===409){
+      console.log('잔액이 남아 있는 계좌입니다.')
+      setRegisteredMessage('잔액이 남아 있는 계좌입니다.')
+    }else if(response.status===429){
+      console.log(response.data)
+      setRegisteredMessage(response.data)
     }else{
-      console.log('오류발생 회원탈퇴 실패')
+      console.log('오류발생 계좌 해지 실패')
       setRegisteredMessage('진행 중 오류가 발생했습니다.')
     }
   }
@@ -102,11 +115,11 @@ export default function WithdrawalScreen({ navigation, route }) {
       {/* Header */}
       <HeaderComponent
         navigation={navigation}
-        title="회원탈퇴"
+        title="계좌 해지"
       ></HeaderComponent>
 
       {/* 본인 인증 안내 */}
-      <Text style={styles.boldText}>비밀번호를 입력해주세요</Text>
+      <Text style={styles.boldText}>계좌 비밀번호를 입력해주세요</Text>
 
       <View style={styles.inputContainer}>
         <View style={styles.textRow}>
@@ -121,6 +134,8 @@ export default function WithdrawalScreen({ navigation, route }) {
           onChangeText={handlePasswordChange}
           secureTextEntry={true}
           placeholder="비밀번호를 입력해 주세요."
+          keyboardType="number-pad"
+          maxLength={4}
         />
       </View>
       <Text
@@ -139,7 +154,9 @@ export default function WithdrawalScreen({ navigation, route }) {
           style={styles.input}
           onChangeText={handleConfirmPasswordChange}
           secureTextEntry={true}
-          placeholder="비밀번호를 한번 더 입력해 주세요."
+          placeholder="비밀번호를 한 번 더 입력해 주세요."
+          keyboardType="number-pad"
+          maxLength={4}
         />
       </View>
       
@@ -169,7 +186,7 @@ export default function WithdrawalScreen({ navigation, route }) {
         style={[
           styles.customButton,
           !(isPasswordValid && isConfirmPasswordValid) && {
-            backgroundColor: "grey",
+            backgroundColor: "grey"
           },
         ]}
         // back에 회원가입 정보 보내야함
@@ -178,7 +195,7 @@ export default function WithdrawalScreen({ navigation, route }) {
         }}
         disabled={!(isPasswordValid && isConfirmPasswordValid)}
       >
-        <Text style={styles.linkText}>회원 탈퇴</Text>
+        <Text style={[styles.linkText,{}]}>계좌 해지</Text>
       </TouchableOpacity>
       {/* 회원탈퇴 마지막 확인창 */}
       <View style={styles.centeredView}>
@@ -187,13 +204,12 @@ export default function WithdrawalScreen({ navigation, route }) {
           transparent={true}
           visible={userWithdrawalModalVisible}
           onRequestClose={() => {
-            // Alert.alert('Modal has been closed.');
-            console.log('Modal has been closed.');
+            Alert.alert('Modal has been closed.');
             setUserWithdrawalModalVisible(!userWithdrawalModalVisible);
           }}>
           <View style={styles.centeredView}>
             <View style={[styles.modalView]}>
-              <Text style={styles.modalText}>정말로 탈퇴하시겠습니까?</Text>
+              <Text style={styles.modalText}>정말로 해지하시겠습니까?</Text>
               <View style={{
                 flexDirection: 'row', 
                 justifyContent: 'space-between',
@@ -203,7 +219,7 @@ export default function WithdrawalScreen({ navigation, route }) {
                 <TouchableOpacity
                   style={[styles.button, styles.buttonClose, {flex: 1, marginRight: 5 }]}
                   onPress={() => {
-                    {!totalBalance?handleUserWithdrawal():Alert.alert('잔액 보유','잔액이 있어 탈퇴할 수 없습니다.')}
+                    handleAccountDelete()
                     setUserWithdrawalModalVisible(!userWithdrawalModalVisible)
                   }}>
                   <Text style={[styles.textStyle,]}>예</Text>
