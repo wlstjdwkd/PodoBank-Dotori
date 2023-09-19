@@ -8,6 +8,7 @@ import com.bank.podo.domain.user.exception.FromatException;
 import com.bank.podo.domain.user.exception.PasswordNotMatchException;
 import com.bank.podo.domain.user.repository.UserRepository;
 import com.bank.podo.global.email.entity.VerificationSuccess;
+import com.bank.podo.global.email.enums.VerificationType;
 import com.bank.podo.global.email.repository.VerificationSuccessRepository;
 import com.bank.podo.global.others.service.RequestHelper;
 import com.bank.podo.global.security.entity.RefreshToken;
@@ -45,7 +46,8 @@ public class UserService {
         VerificationSuccess verificationSuccess = verificationSuccessRepository.findById(registerDTO.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("이메일 인증이 만료되었습니다."));
 
-        if(!verificationSuccess.getSuccessCode().equals(registerDTO.getSuccessCode())) {
+        if(!verificationSuccess.getSuccessCode().equals(registerDTO.getSuccessCode())
+            || !verificationSuccess.getType().equals(VerificationType.REGISTER)) {
             throw new IllegalArgumentException("이메일 인증이 만료되었습니다.");
         }
 
@@ -147,7 +149,8 @@ public class UserService {
         VerificationSuccess verificationSuccess = verificationSuccessRepository.findById(resetPasswordDTO.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("이메일 인증이 만료되었습니다."));
 
-        if(!verificationSuccess.getSuccessCode().equals(resetPasswordDTO.getSuccessCode())) {
+        if(!verificationSuccess.getSuccessCode().equals(resetPasswordDTO.getSuccessCode())
+            || !verificationSuccess.getType().equals(VerificationType.RESET_PASSWORD)) {
             throw new IllegalArgumentException("이메일 인증이 만료되었습니다.");
         }
 
