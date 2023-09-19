@@ -98,7 +98,7 @@ public class AccountService {
         }
 
         // 페이지 번호와 정렬 유형에 따라 페이지 요청 생성
-        PageRequest pageRequest = PageRequest.of(page, 2,
+        PageRequest pageRequest = PageRequest.of(page, 10,
                 sortType == 0 ? Sort.by("createdAt").descending() : Sort.by("createdAt").ascending());
 
         LocalDateTime startDate = LocalDateTime.now().minusDays(searchMonth);
