@@ -5,7 +5,7 @@ const apiAddress ="http://j9d107.p.ssafy.io:9000"
 // 계좌가 최근에 보낸 계좌 3개를 받음
 export const accountRecentTransfer = async (accountNumber, accessToken) => {
   try {
-    const response = await axios.get(apiAddress+`/api/v1/account/${accountNumber}/recent`, null, {
+    const response = await axios.get(apiAddress+`/api/v1/account/${accountNumber}/recent`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -83,9 +83,14 @@ export const accountTransactionDetail = async (accountNumber, accessToken) => {
     // throw error;
   }
 };
-export const accountOwnerInquiry = async (accountNumber) => {
+export const accountOwnerInquiry = async (accountNumber, accessToken) => {
   try {
-    const response = await axios.get(apiAddress+`/api/v1/account/${accountNumber}`);
+    console.log(accountNumber)
+    const response = await axios.get(apiAddress+`/api/v1/account/${accountNumber}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
     console.log('계좌 소유주 조회 성공:', response.data);
     return response;
   } catch (error) {

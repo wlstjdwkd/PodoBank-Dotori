@@ -12,11 +12,18 @@ import HeaderScreen from "../Header/HeaderScreen";
 
 const { width } = Dimensions.get("window");
 
-export default function TransferAmountScreen({ route, navigation }) {
+export default function TransferAmountScreen({ navigation, route }) {
+  
+  // const { receiverBank, accountInput } = route.params;
+  const [receiverName, setReceiverName] = useState(route.params.receiverName) ;
+  const [receiverBank, setReceiverBank] = useState(route.params.receiverBank) ;
+  const [receiverAccount, setReceiverAccount] = useState(route.params.receiverAccount) ;
+  const [accountInfo, setAccountInfo] = useState(route.params.accountInfo)
+  console.log(accountInfo, receiverBank, receiverAccount)
+  
   const [amount, setAmount] = useState(0);
-  const accountBalance = 10000; // 이 값은 실제 계좌 잔액에 따라 바뀌어야 합니다.
+  const [accountBalance] = useState(Math.floor(accountInfo.balance)); // 이 값은 실제 계좌 잔액에 따라 바뀌어야 합니다.
 
-  const { receiverBank, accountInput } = route.params;
   const appendAmount = (value) => {
     setAmount((prevAmount) => {
       const newAmount = prevAmount * 10 + parseInt(value);
@@ -55,9 +62,9 @@ export default function TransferAmountScreen({ route, navigation }) {
   //   }
   // };
 
-  const formatCurrency = (value) => {
-    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "원";
-  };
+  // const formatCurrency = (value) => {
+  //   return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "원";
+  // };
 
   // const appendAmount = (value) => {
   //   setAmount((prevAmount) => prevAmount * 10 + parseInt(value));
@@ -68,65 +75,71 @@ export default function TransferAmountScreen({ route, navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <HeaderScreen navigation={navigation} title="이체" />
+    <View style={{flex:1, backgroundColor:'white'}}>
+      <View style={styles.container}>
+        <HeaderScreen navigation={navigation} title="계좌이체(2/4)" />
 
-      <Text style={styles.amountText}>{formatCurrency(amount)}</Text>
-      <Text style={styles.balanceText}>
-        출금 가능 금액: {formatCurrency(accountBalance)}
-      </Text>
+        {/* <Text style={styles.amountText}>{formatCurrency(amount)}</Text> */}
+        <Text style={styles.amountText}>{amount.toLocaleString()}원</Text>
+        <Text style={styles.balanceText}>
+          {/* 출금 가능 금액: {formatCurrency(accountBalance)} */}
+          출금 가능 금액: {accountBalance.toLocaleString()}원
+        </Text>
 
-      <View style={styles.quickSelect}>
-        {["100만", "10만", "5만", "1만", "전액"].map((quickAmount) => (
-          <TouchableOpacity
-            key={quickAmount}
-            style={styles.quickSelectButton}
-            onPress={() => setQuickAmount(quickAmount)}
-          >
-            <Text>{quickAmount}</Text>
-          </TouchableOpacity>
-        ))}
+        <View style={styles.quickSelect}>
+          {["100만", "10만", "5만", "1만", "전액"].map((quickAmount) => (
+            <TouchableOpacity
+              key={quickAmount}
+              style={styles.quickSelectButton}
+              onPress={() => setQuickAmount(quickAmount)}
+            >
+              <Text>{quickAmount}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <View style={styles.numPad}>
+          {[
+            ["1", "2", "3"],
+            ["4", "5", "6"],
+            ["7", "8", "9"],
+            ["", "0", "←"],
+          ].map((row, rowIndex) => (
+            <View key={rowIndex} style={styles.numRow}>
+              {row.map((num) => (
+                <TouchableOpacity
+                  key={num}
+                  style={styles.numButton}
+                  onPress={() => {
+                    if (num === "←") {
+                      removeLast();
+                    } else if (num !== "") {
+                      appendAmount(num);
+                    }
+                  }}
+                >
+                  <Text style={styles.numText}>{num}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ))}
+        </View>
+
       </View>
-
-      <View style={styles.numPad}>
-        {[
-          ["1", "2", "3"],
-          ["4", "5", "6"],
-          ["7", "8", "9"],
-          ["", "0", "<-"],
-        ].map((row, rowIndex) => (
-          <View key={rowIndex} style={styles.numRow}>
-            {row.map((num) => (
-              <TouchableOpacity
-                key={num}
-                style={styles.numButton}
-                onPress={() => {
-                  if (num === "<-") {
-                    removeLast();
-                  } else if (num !== "") {
-                    appendAmount(num);
-                  }
-                }}
-              >
-                <Text style={styles.numText}>{num}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        ))}
-      </View>
-
-      <TouchableOpacity
-        style={styles.confirmButton}
-        onPress={() => {
-          navigation.navigate("TransferDetailScreen", {
-            amount: amount,
-            receiverBank: receiverBank,
-            receiverAccount: accountInput,
-          });
-        }}
-      >
-        <Text style={styles.confirmText}>확인</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.confirmButton}
+          onPress={() => {
+            navigation.navigate("TransferDetailScreen", {
+              amount: amount,
+              receiverName: receiverName,
+              receiverBank: receiverBank,
+              receiverAccount: receiverAccount,
+              accountInfo: accountInfo,
+            });
+          }}
+        >
+          <Text style={styles.confirmText}>확인</Text>
+        </TouchableOpacity>
     </View>
   );
 }
@@ -177,8 +190,9 @@ const styles = StyleSheet.create({
     fontSize: 40,
   },
   confirmButton: {
-    marginLeft: -30,
-    marginRight: -30,
+    // marginLeft: -30,
+    // marginRight: -30,
+    width:'100%',
     backgroundColor: "purple",
     padding: 15,
     alignItems: "center",

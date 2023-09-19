@@ -13,18 +13,29 @@ import {
 } from "react-native";
 
 import HeaderScreen from "../Header/HeaderScreen";
+import { useSelector } from "react-redux";
+import {accountTransfer} from "../../apis/accountapi"
 
 const { width } = Dimensions.get("window");
 
-export default function TransferDetailScreen({ route, navigation }) {
-  const [receiverMemo, setReceiverMemo] = useState("");
-  const [senderMemo, setSenderMemo] = useState("");
+export default function TransferDetailScreen({ navigation, route }) {
+  // const { amount, receiverBank, receiverAccount } = route.params;
+  const accessToken = useSelector((state) => state.user.accessToken)
+  const userInfo = useSelector((state) => state.user.userInfo)
+  // console.log(userInfo)
+  const [amount, setAmount] = useState(route.params.amount)
+  const [receiverName, setReceiverName] = useState(route.params.receiverName)
+  const [receiverBank, setReceiverBank] = useState(route.params.receiverBank)
+  const [receiverAccount, setReceiverAccount] = useState(route.params.receiverAccount)
+  const [accountInfo, setAccountInfo] = useState(route.params.accountInfo)
+  // console.log(accountInfo)
+
+  const [receiverMemo, setReceiverMemo] = useState(userInfo.name);
+  const [senderMemo, setSenderMemo] = useState(receiverName);
   const [modalVisible, setModalVisible] = useState(false);
   const [password, setPassword] = useState("");
-  const [receiverName, setReceiverName] = useState("");
-  const [transferAmount, setTransferAmount] = useState(0);
+  // const [receiverName, setReceiverName] = useState("");
 
-  const { amount, receiverBank, receiverAccount } = route.params;
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
   const [activeArrow, setActiveArrow] = useState(0);
 
@@ -65,14 +76,55 @@ export default function TransferDetailScreen({ route, navigation }) {
   const onBackspacePress = () => {
     setPassword(password.slice(0, -1));
   };
-  const formatCurrency = (value) => {
-    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "원";
-  };
+
+  const doAccountTransfer = async() =>{
+    const transferInfo = {
+      senderAccountNumber:accountInfo.accountNumber,
+      receiverAccountNumber:receiverAccount,
+      password:password,
+      amount:amount,
+      // senderContent:userInfo.name,  // 이 부분 확인 필요
+      // receiverContent:receiverName, // 이 부분 확인 필요
+      senderContent:senderMemo,        // 이렇게 보내야함
+      receiverContent:receiverMemo,    // 이렇게 보내야함
+    }
+    const response = await accountTransfer(transferInfo, accessToken)
+    if(response.status === 200){
+      console.log("계좌 이체 성공")
+      // navigation.navigate("AccountDetailScreen", {
+      //   transferAmount: amount,
+      //   receiverName: receiverName,
+      // });
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'TransferCompleteScreen', params: {
+          accountInfo: accountInfo,
+          transferAmount: amount,
+          receiverName: receiverName,
+          senderAccountNumber:accountInfo.accountNumber,
+          receiverAccountNumber:receiverAccount,
+        } }],
+      });
+    }else if(response.status === 400){
+      console.log("계좌 이체 실패")
+    }else if(response.status === 401){
+      console.log("권한 없음으로 계좌 이체 실패")
+    }else if(response.status === 402){
+      console.log("잔액 부족으로 계좌 이체 실패")
+    }else if(response.status === 403){
+      console.log("계좌 소유주 불일치로 계좌 이체 실패")
+    }else if(response.status === 429){
+      console.log("계좌 비밀번호 형식 오류로 계좌 이체 실패")
+    }else{
+      console.log("오류 발생: 계좌 이체 실패")
+    }
+  }
 
   return (
+    <View style={{flex:1, backgroundColor:'white'}}>
     <View style={styles.container}>
-      <HeaderScreen navigation={navigation} title="이체" />
-      <Text style={styles.amountText}>{formatCurrency(amount)}</Text>
+      <HeaderScreen navigation={navigation} title="계좌이체(3/4)" />
+      <Text style={[styles.amountValueText,{}]}>{amount.toLocaleString()}원</Text>
 
       <Text style={styles.label}>받는분</Text>
       <Text style={styles.accountInfo}>
@@ -100,15 +152,7 @@ export default function TransferDetailScreen({ route, navigation }) {
       />
       <View style={styles.separator} />
 
-      {/* <View style={styles.bottomContainer}> */}
-      <TouchableOpacity
-        style={styles.touchableOpacity}
-        color="purple"
-        onPress={() => setConfirmModalVisible(true)}
-      >
-        <Text style={styles.confirmText}>다음</Text>
-      </TouchableOpacity>
-      {/* </View> */}
+      
 
       <Modal
         animationType="slide"
@@ -154,9 +198,9 @@ export default function TransferDetailScreen({ route, navigation }) {
               />
             </View>
 
-            <Text style={styles.transferText}>김삼성 님께</Text>
+            <Text style={styles.transferText}>{receiverName} 님께</Text>
             <Text style={styles.amountText}>
-              <Text style={styles.boldText}>5,000</Text>원을 이체합니다.
+              <Text style={styles.boldText}>{amount.toLocaleString()}</Text>원을 이체합니다.
             </Text>
             <Text style={styles.bankInfoText}>포도은행 1588-4153</Text>
 
@@ -221,10 +265,11 @@ export default function TransferDetailScreen({ route, navigation }) {
               style={styles.confirmButton}
               onPress={() => {
                 setModalVisible(false);
-                navigation.navigate("TransferCompleteScreen", {
-                  transferAmount: transferAmount,
-                  receiverName: receiverName,
-                });
+                doAccountTransfer()
+                // navigation.navigate("TransferCompleteScreen", {
+                //   transferAmount: transferAmount,
+                //   receiverName: receiverName,
+                // });
               }}
             >
               <Text style={styles.confirmButtonText}>확인</Text>
@@ -232,6 +277,16 @@ export default function TransferDetailScreen({ route, navigation }) {
           </View>
         </View>
       </Modal>
+    </View>
+    {/* <View style={styles.bottomContainer}> */}
+    <TouchableOpacity
+        style={styles.nextButton}
+        color="purple"
+        onPress={() => setConfirmModalVisible(true)}
+      >
+        <Text style={styles.confirmText}>다음</Text>
+      </TouchableOpacity>
+      {/* </View> */}
     </View>
   );
 }
@@ -266,12 +321,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  amountText: {
+  amountValueText: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
-    marginTop: 100,
-    marginBottom: 50,
+    marginVertical: 20
+    // marginTop: 100,
+    // marginBottom: 50,
   },
   receiveAccountLabel: {
     fontSize: 16,
@@ -348,9 +404,10 @@ const styles = StyleSheet.create({
   numText: {
     fontSize: 40,
   },
-  touchableOpacity: {
-    marginLeft: -30,
-    marginRight: -30,
+  nextButton: {
+    // marginLeft: -30,
+    // marginRight: -30,
+    width:"100%",
     backgroundColor: "purple",
     padding: 15,
     alignItems: "center",

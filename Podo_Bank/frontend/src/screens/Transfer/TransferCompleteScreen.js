@@ -1,46 +1,72 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
 
 export default function TransferCompleteScreen({ navigation, route }) {
-  const { receiverName, transferAmount } = route.params; // 넘겨받은 파라미터를 추출합니다.
+  // const { receiverName, transferAmount } = route.params
+  const [accountInfo] = useState(route.params.accountInfo)
+  const [receiverName] = useState(route.params.receiverName)
+  const [transferAmount] = useState(route.params.transferAmount)
+  const [senderAccountNumber] = useState(route.params.senderAccountNumber)
+  const [receiverAccountNumber] = useState(route.params.receiverAccountNumber)
 
+
+  // 계좌 번호 형식 맞추는 함수
+  const settingAccountNumber = (accountNumber) =>{
+    return `${accountNumber.slice(0,4)}-${accountNumber.slice(4,6)}-${accountNumber.slice(6)}`
+  }
   return (
-    <View style={styles.container}>
-      <HeaderComponent navigation={navigation} title="이체" />
+    <View style={{flex:1, backgroundColor:'white'}}>
+      <View style={styles.container}>
+        <HeaderComponent navigation={navigation} title="이체" />
 
-      <View style={styles.imageContainer}>
-        <Image
-          source={require("../../assets/images/double_podo.png")}
-          style={styles.image}
-        />
-      </View>
-      <View style={styles.textContainer}>
-        <Text style={styles.largeText}>{receiverName}님께</Text>
-        <Text style={styles.largeText}>{transferAmount}원</Text>
-        <Text style={styles.normalText}>이체가 완료되었습니다.</Text>
-        <View style={styles.bankInfoContainer}>
-          <Text style={styles.bankInfoText}>포도은행 1568-4153-5564</Text>
+        <View style={styles.imageContainer}>
+          <Image
+            source={require("../../assets/images/double_podo.png")}
+            style={styles.image}
+          />
         </View>
+        <View style={styles.textContainer}>
+          <Text style={styles.largeText}>{receiverName}님께</Text>
+          <Text style={styles.largeText}>{transferAmount.toLocaleString()}원</Text>
+          <Text style={styles.normalText}>이체가 완료되었습니다.</Text>
+          <View style={styles.bankInfoContainer}>
+            {/* 어느부분?에 대해서 송금 받는곳? 아님 송금 하는 계좌? 우선 송금하는 계좌 번호*/}
+            <Text style={styles.bankInfoText}>포도은행 {settingAccountNumber(senderAccountNumber)}</Text>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity
+            style={[styles.button, styles.shadow]}
+            onPress={()=>{
+              navigation.navigate("TransferScreen", {
+                account: accountInfo,
+              });
+            }}
+          >
+            <Text style={[styles.buttonText, styles.blackText]}>추가이체</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.shadow, styles.transactionButton]}
+            onPress={()=>{
+              navigation.navigate("AccountDetailScreen", {
+                account: accountInfo,
+              });
+            }}
+          >
+            <Text style={[styles.buttonText, styles.blackText]}>
+              거래내역조회
+            </Text>
+          </TouchableOpacity>
+        </View>
+
       </View>
-
-      <View style={styles.divider} />
-
-      <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={[styles.button, styles.shadow]}>
-          <Text style={[styles.buttonText, styles.blackText]}>추가이체</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, styles.shadow, styles.transactionButton]}
-        >
-          <Text style={[styles.buttonText, styles.blackText]}>
-            거래내역조회
-          </Text>
-        </TouchableOpacity>
-      </View>
-
       <TouchableOpacity
-        style={[styles.confirmButton, styles.bottom]}
+        // style={[styles.confirmButton, styles.bottom]}
+        style={[styles.confirmButton]}
         onPress={() => navigation.navigate("HomeScreen")}
       >
         <Text style={styles.buttonText}>확인</Text>
@@ -147,10 +173,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  bottom: {
-    position: "absolute",
-    bottom: 0,
-  },
+  // bottom: {
+  //   position: "absolute",
+  //   bottom: 0,
+  // },
   bankInfoContainer: {
     width: "70%",
     borderWidth: 1,
@@ -164,4 +190,16 @@ const styles = StyleSheet.create({
     alignSelf: "center", // 이 스타일을 추가하여 중앙에 위치하게 합니다.
   },
   
+  
+  nextButton: {
+    // marginLeft: -30,
+    // marginRight: -30,
+    width:"100%",
+    backgroundColor: "purple",
+    padding: 15,
+    alignItems: "center",
+
+    borderRadius: 5,
+    // marginTop: 300,
+  },
 });

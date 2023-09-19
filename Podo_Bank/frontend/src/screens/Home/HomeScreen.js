@@ -54,11 +54,21 @@ export default function HomeScreen({ navigation }) {
     navigation.navigate("AccountDetailScreen", {account:account});
   }
 
+  // 계좌 번호 형식 맞추는 함수
+  const settingAccountNumber = (accountNumber) =>{
+    return `${accountNumber.slice(0,4)}-${accountNumber.slice(4,6)}-${accountNumber.slice(6)}`
+  }
+
   // 페이지가 로드될 때 hanldeUserInformationInquiry() 함수 실행
   useEffect(() => {
     hanldeUserInformationInquiry()
     handleAccountListInquiry()
   }, []);
+
+  const totalBalance = accountList.reduce((acc, account) => {
+    const balance = parseFloat(account.balance); // 문자열로 된 balance 값을 숫자로 변환
+    return acc + balance;
+  }, 0); // 초기값 0으로 설정
 
 
   return (
@@ -76,16 +86,22 @@ export default function HomeScreen({ navigation }) {
       </View>
       
       {/* 사용자 이름 */}
-      <View style={[styles.nameContainer,{flex:0.05,}]}>
-        {userInfo?
-            (<Text style={styles.userNameBold}>{userInfo.name}</Text>)
-            :(<Text style={styles.userNameBold}>정예진</Text>)
-          }
-        <Text style={styles.userName}>님</Text>
+      <View style={{flex:0.15}}>
+        <View style={[styles.nameContainer,]}>
+          {userInfo?
+              (<Text style={styles.userNameBold}>{userInfo.name}</Text>)
+              :(<Text style={styles.userNameBold}>정예진</Text>)
+            }
+          <Text style={styles.userName}>님</Text>
+        </View>
+        <Text style={styles.totalBalanceBold}>총액 {totalBalance.toLocaleString()}원</Text>
       </View>
       
       {/* 보유 계좌 목록 */}
-      <ScrollView style={[styles.scrollViewContainer,{flex:0.85}]}>
+      <ScrollView
+        style={[styles.scrollViewContainer,{flex:0.85}]}
+        showsVerticalScrollIndicator={false}
+      >
         {accountList.map((account, index) => (
           <View key={index} style={styles.accountBox}>
             <TouchableOpacity
@@ -103,15 +119,14 @@ export default function HomeScreen({ navigation }) {
                 </View>
                 <Text style={styles.bankName}>포도은행 통장</Text>
               </View>
-
-              {/* <Text style={styles.accountNumber}>{account.accountNumber}</Text> */}
-              <Text style={styles.accountNumber}>{account.accountNumber.slice(0,4)}-{account.accountNumber.slice(4,6)}-{account.accountNumber.slice(6)}</Text>
+              <Text style={styles.accountNumber}>{settingAccountNumber(account.accountNumber)}</Text>
               <Text style={styles.balance}>{(Math.floor(account.balance)).toLocaleString()}원</Text>
             </TouchableOpacity>
-
+            
+            {/* 계좌 이체 버튼 */}
             <TouchableOpacity
               style={styles.transferButton}
-              onPress={() => navigation.navigate("TransferScreen")}
+              onPress={() => navigation.navigate("TransferScreen", {account:account})}
             >
               <Text style={styles.buttonText}>이체</Text>
             </TouchableOpacity>
@@ -129,15 +144,18 @@ export default function HomeScreen({ navigation }) {
         </TouchableOpacity>
 
         {/* 설정 버튼 */}
-        <View style={styles.settingsContainer}>
+        <TouchableOpacity style={styles.settingsContainer}
+          onPress={()=>{}}
+        >
           <Octicons name="gear" size={16} color="black" />
           <Text style={styles.settingsText}>  대표계좌 설정</Text>
-        </View>
+        </TouchableOpacity>
       </ScrollView>
       <View style={{flex:0.1,}}>
         {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
+        <FooterScreen navigation={navigation} />
       </View>
-      <FooterScreen navigation={navigation} />
+      
     </View>
   );
 }
@@ -191,6 +209,11 @@ const styles = StyleSheet.create({
   userNameBold: {
     fontSize: 24,
     fontWeight: "bold",
+  },
+  totalBalanceBold: {
+    fontSize: 20,
+    fontWeight: "500",
+    alignSelf:'flex-end'
   },
   userName: {
     fontSize: 24,

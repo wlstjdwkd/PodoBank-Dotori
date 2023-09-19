@@ -54,12 +54,12 @@ export default function AccountDetail({ navigation, route }) {
   const [historyTransactionType, setHistoryTransactionType] = useState("ALL")// "DEPOSIT", "WITHDRAWAL", "ALL"
   const [historySortType, setHistorySortType] = useState(0)// 0DES// page는 0부터 시작C최신순 1ASC과거순
   const [historyPage, setHistoryPage] = useState(0)
-  const [sendHistoryUnits, setSendHistoryUnits] = useState({
-    searchMonth : historySearchMonth,
-    transactionType : historyTransactionType,
-    sortType : historySortType,
-    page : historyPage,
-  })
+  // const [sendHistoryUnits, setSendHistoryUnits] = useState({
+  //   searchMonth : historySearchMonth,
+  //   transactionType : historyTransactionType,
+  //   sortType : historySortType,
+  //   page : historyPage,
+  // })
   const [accountInfo, setAccountInfo] = useState(null)
   const [transactionHistory, setTransactionHistory] =  useState([])
 
@@ -68,8 +68,8 @@ export default function AccountDetail({ navigation, route }) {
   const currentDate = new Date();
 
   // 3개월 전 날짜를 계산
-  let threeMonthsAgo = new Date(currentDate);
-  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+  let selectMonthsAgo = new Date(currentDate);
+  selectMonthsAgo.setMonth(selectMonthsAgo.getMonth() - historySearchMonth);
 
   // 날짜를 "YYYY.MM.DD" 형식으로 변환하는 함수
   const formatDate = (date) => {
@@ -110,6 +110,12 @@ export default function AccountDetail({ navigation, route }) {
   }
   // 거래 내역 조회
   const getAccountTransactionHistory = async ()=>{
+    const sendHistoryUnits = {
+      searchMonth : historySearchMonth,
+      transactionType : historyTransactionType,
+      sortType : historySortType,
+      page : historyPage,
+    }
     console.log('sendHistoryUnits',sendHistoryUnits)
     const response = await accountTransactionHistory(sendHistoryUnits, account.accountNumber, accessToken)
     if(response.status===200){
@@ -126,6 +132,24 @@ export default function AccountDetail({ navigation, route }) {
     }
   }
 
+  // FlatList onEndReached prop 이용 스크롤이 끝에 도달하면 getMoreTransactionHistory 함수 호출
+  const getMoreTransactionHistory = () => {
+    const nextPage = historyPage + 1;
+    // 새 데이터를 가져오기
+    getAccountTransactionHistory(nextPage).then((response) => {
+      const newData = response.data
+      if (newData.length > 0) {
+        // 기존 transactionHistory 배열에 새 데이터를 덧붙입니다.
+        setTransactionHistory((prevData) => [...prevData, ...newData]);
+        setHistoryPage(nextPage);
+      }
+    });
+  };
+
+  const settingAccountNumber = (accountNumber) =>{
+    return `${accountNumber.slice(0,4)}-${accountNumber.slice(4,6)}-${accountNumber.slice(6)}`
+  }
+
   useEffect(()=>{
     getAccountTransactionDetail()
     getAccountTransactionHistory()
@@ -137,7 +161,9 @@ export default function AccountDetail({ navigation, route }) {
         <View style={styles.row}>
           {/* nickname 차후 바꿀것 */}
           <Text style={styles.nickname}>{accountDetail.nickname}</Text>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={()=>{}}
+          >
             <EvilIcons
               name="pencil"
               size={20}
@@ -150,7 +176,7 @@ export default function AccountDetail({ navigation, route }) {
         <TouchableOpacity
           style={styles.setting}
           onPress={() => {
-            navigation.navigate("AccountManagementScreen");
+            navigation.navigate("AccountManagementScreen", {account:account});
           }}
         >
           {/* <EvilIcons name="gear" size={24} color="black" /> */}
@@ -159,7 +185,8 @@ export default function AccountDetail({ navigation, route }) {
       </View>
       
       {accountInfo
-        ?(<><Text style={styles.accountNumber}>{accountInfo.accountNumber.slice(0,4)}-{accountInfo.accountNumber.slice(4,6)}-{accountInfo.accountNumber.slice(6)}</Text>
+        // ?(<><Text style={styles.accountNumber}>{accountInfo.accountNumber.slice(0,4)}-{accountInfo.accountNumber.slice(4,6)}-{accountInfo.accountNumber.slice(6)}</Text>
+        ?(<><Text style={styles.accountNumber}>{settingAccountNumber(accountInfo.accountNumber)}</Text>
         <Text style={styles.balance}>
           {(Math.floor(accountInfo.balance)).toLocaleString()}원
         </Text></>)
@@ -226,11 +253,11 @@ export default function AccountDetail({ navigation, route }) {
                 borderColor: "#757575",
               }}
             >
-              <Text onPress={() => (setPeriod("1개월"), setHistorySearchMonth(1))}>1개월</Text>
-              <Text onPress={() => (setPeriod("3개월"), setHistorySearchMonth(3))}>3개월</Text>
-              <Text onPress={() => (setPeriod("6개월"), setHistorySearchMonth(6))}>6개월</Text>
-              <Text onPress={() => (setPeriod("1년"), setHistorySearchMonth(12))}>1년</Text>
-              <Text onPress={() => (setPeriod("2년"), setHistorySearchMonth(24) )}>2년</Text>
+              <Text style={{color: historySearchMonth === 1 ? "red" :"black"}} onPress={() => (setPeriod("1개월"), setHistorySearchMonth(1))}>1개월</Text>
+              <Text style={{color: historySearchMonth === 3 ? "red" :"black"}} onPress={() => (setPeriod("3개월"), setHistorySearchMonth(3))}>3개월</Text>
+              <Text style={{color: historySearchMonth === 6 ? "red" :"black"}} onPress={() => (setPeriod("6개월"), setHistorySearchMonth(6))}>6개월</Text>
+              <Text style={{color: historySearchMonth === 12 ? "red" :"black"}} onPress={() => (setPeriod("1년"), setHistorySearchMonth(12))}>1년</Text>
+              <Text style={{color: historySearchMonth === 24 ? "red" :"black"}} onPress={() => (setPeriod("2년"), setHistorySearchMonth(24) )}>2년</Text>
               {/* 한동안 직접입력은 없는것으로..... */}
               {/* <Text onPress={() => setPeriod("직접입력")}>직접입력</Text> */}
             </View>
@@ -244,9 +271,9 @@ export default function AccountDetail({ navigation, route }) {
                 borderColor: "#757575",
               }}
             >
-              <Text onPress={() => {setRange("전체"), setHistoryTransactionType('ALL')}}>전체</Text>
-              <Text onPress={() => {setRange("입금"), setHistoryTransactionType('DEPOSIT')}}>입금</Text>
-              <Text onPress={() => {setRange("출금"), setHistoryTransactionType('WITHDRAWAL')}}>출금</Text>
+              <Text style={{color: historyTransactionType === "ALL" ? "red":"black"}} onPress={() => {setRange("전체"), setHistoryTransactionType('ALL')}}>전체</Text>
+              <Text style={{color: historyTransactionType === "DEPOSIT" ? "red":"black"}} onPress={() => {setRange("입금"), setHistoryTransactionType('DEPOSIT')}}>입금</Text>
+              <Text style={{color: historyTransactionType === "WITHDRAWAL" ? "red":"black"}} onPress={() => {setRange("출금"), setHistoryTransactionType('WITHDRAWAL')}}>출금</Text>
             </View>
             <Text>정렬 순</Text>
             <View
@@ -258,8 +285,8 @@ export default function AccountDetail({ navigation, route }) {
                 borderColor: "#757575",
               }}
             >
-              <Text onPress={() => setOrder("최신순")}>최신순</Text>
-              <Text onPress={() => setOrder("과거순")}>과거순</Text>
+              <Text style={{color: historySortType===0?"red":"black"}} onPress={() => {setOrder("최신순"), setHistorySortType(0)}}>최신순</Text>
+              <Text style={{color: historySortType===1?"red":"black"}} onPress={() => {setOrder("과거순"), setHistorySortType(1)}}>과거순</Text>
             </View>
             <TouchableOpacity
               style={{
@@ -267,6 +294,9 @@ export default function AccountDetail({ navigation, route }) {
                 padding: 10,
                 borderRadius: 5,
                 alignItems: "center",
+              }}
+              onPress={()=>{
+                getAccountTransactionHistory()
               }}
             >
               <Text style={{ color: "white" }}>조회</Text>
@@ -279,7 +309,7 @@ export default function AccountDetail({ navigation, route }) {
       {/* 여기부터는 계좌 내역 관련 UI */}
       <View style={styles.dateContainer}>
         <Text style={styles.dateText}>
-          {formatDate(threeMonthsAgo)} ~ {formatDate(currentDate)}
+          {formatDate(selectMonthsAgo)} ~ {formatDate(currentDate)}
         </Text>
       </View>
       <View style={styles.boldSeparator} />
@@ -287,11 +317,11 @@ export default function AccountDetail({ navigation, route }) {
       
       <FlatList
         data={transactionHistory}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <TouchableOpacity
             style={styles.cardContainer}
             onPress={() => {
-              navigation.navigate("TransactionDetailScreen");
+              navigation.navigate("TransactionDetailScreen", {transactionInfo:item});
             }}
           >
             <Text style={styles.transactionDate}>{formDateTransaction(item.transactionAt)}</Text>
@@ -317,7 +347,9 @@ export default function AccountDetail({ navigation, route }) {
             {/* 각 아이템 밑에 수평 구분선 추가 */}
           </TouchableOpacity>
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => `${item.transactionAt}-${item.content}-${item.amount}`}
+        onEndReached={getMoreTransactionHistory}  // 스크롤의 끝에 도달했을 때 작동
+        onEndReachedThreshold={0.1} // 스크롤을 얼마나 내려야만 onEndReached가 작동할지를 정함
       />
 
       
@@ -467,7 +499,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   cardContainer: {
-    width: 360,
+    width: '100%',
     height: 100,
     borderRadius: 23,
     marginBottom: 15, // 카드 간격
