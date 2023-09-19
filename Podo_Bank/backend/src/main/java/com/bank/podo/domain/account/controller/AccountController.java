@@ -177,11 +177,13 @@ public class AccountController {
             @ApiResponse(responseCode = "200", description = "계좌 삭제 성공"),
             @ApiResponse(responseCode = "400", description = "계좌 삭제 실패"),
             @ApiResponse(responseCode = "401", description = "권한 없음"),
-            @ApiResponse(responseCode = "403", description = "계좌 소유주 불일치")
+            @ApiResponse(responseCode = "403", description = "계좌 소유주 불일치"),
+            @ApiResponse(responseCode = "404", description = "계좌 없음"),
+            @ApiResponse(responseCode = "409", description = "잔액이 남아있음")
     })
     @PostMapping("/delete")
-    public ResponseEntity<Void> deleteAccount() {
-        accountService.deleteAccount();
+    public ResponseEntity<Void> deleteAccount(@RequestBody DeleteAccountDTO deleteAccountDTO) {
+        accountService.deleteAccount(deleteAccountDTO, passwordEncoder);
         return ResponseEntity.ok().build();
     }
 

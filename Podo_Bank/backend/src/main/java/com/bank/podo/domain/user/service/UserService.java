@@ -175,7 +175,7 @@ public class UserService {
             throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
         }
 
-        if(accountRepository.countByUser(user) > 0) {
+        if(accountRepository.countByUserAndDeletedFalse(user) > 0) {
             throw new IllegalArgumentException("계좌가 존재합니다.");
         }
 
