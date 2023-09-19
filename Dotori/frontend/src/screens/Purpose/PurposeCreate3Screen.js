@@ -10,14 +10,12 @@ import {
 
 import HeaderComponent from "../Components/HeaderScreen";
 
-export default function PurposeCreate1Screen({ navigation }) {
-  const [purposeInfo, setPurposeInfo] = useState({
-    purposeName: "",
-  });
+export default function PurposeCreate3Screen({ navigation, route }) {
+  const [purposeInfo, setPurposeInfo] = useState(route.params.purposeInfo);
   const [isValid, setIsValid] = useState(false);
-  const handleNameChange = (text) => {
-    setPurposeInfo((prev) => ({ ...prev, purposeName: text }));
-    if (text.length > 0 && text.length <= 10) {
+  const handleMoneyChange = (text) => {
+    setPurposeInfo((prev) => ({ ...prev, purposeMoney: text }));
+    if (text.length > 0) {
       setIsValid(true);
     } else {
       setIsValid(false);
@@ -26,44 +24,38 @@ export default function PurposeCreate1Screen({ navigation }) {
   return (
     <View style={styles.container}>
       <HeaderComponent
-        title="목표생성(1/3)"
+        title="목표생성(3/3)"
         cancelNavi="PurposeScreen"
         navigation={navigation}
       ></HeaderComponent>
       <View style={styles.innerContainer}>
         <View style={styles.header}>
-          <Text style={styles.title}>목표 설정하기</Text>
-          <Text style={styles.subtitle}>달성할 목표를 입력해주세요.</Text>
-          <View style={styles.imageView}>
-            <Image
-              style={styles.middleImage}
-              source={require("../../assets/images/Hamster/PurposeCreateHamster.png")}
-            ></Image>
-          </View>
+          <Text style={styles.title}>목표 금액 설정하기</Text>
+          <Text style={styles.subtitle}>목표 금액을 숫자로 적어주세요.</Text>
 
           <TextInput
             style={styles.input}
-            onChangeText={handleNameChange}
+            onChangeText={handleMoneyChange}
             multiline={true}
+            placeholder="예시) 10000"
+            keyboardType="numeric"
           />
           <View style={styles.textRight}>
-            <Text style={styles.instructionText}>
-              10자 이내로 작성해주세요.
-            </Text>
+            <Text style={styles.instructionText}>숫자만 적어주세요.</Text>
           </View>
         </View>
 
         <TouchableOpacity
           style={styles.button}
           onPress={() =>
-            navigation.navigate("PurposeCreate2Screen", {
-              purposeInfo: purposeInfo,
+            navigation.navigate("PurposeCompleteScreen", {
+              name: purposeInfo.purposeName,
             })
           }
           //TODO: 풀기
           // disabled={!isValid}
         >
-          <Text style={styles.buttonText}>다음</Text>
+          <Text style={styles.buttonText}>목표 생성하기</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -106,6 +98,8 @@ const styles = StyleSheet.create({
     borderColor: "#BAC0CA",
     borderRadius: 10,
     padding: 10,
+    marginBottom: 10,
+    marginTop: 20,
     // textAlign: "center",
   },
   button: {
@@ -133,10 +127,8 @@ const styles = StyleSheet.create({
   },
   textRight: {
     alignItems: "flex-end",
-    marginTop: 10,
   },
   instructionText: {
     color: "#A9A9A9",
-    fontSize: 12,
   },
 });

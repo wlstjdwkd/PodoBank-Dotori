@@ -11,6 +11,8 @@ import MainPageScreen from "../screens/Home/MainPageScreen";
 import PurposeScreen from "../screens/Purpose/PurposeScreen";
 import PurposeCreate1Screen from "../screens/Purpose/PurposeCreate1Screen";
 import PurposeCreate2Screen from "../screens/Purpose/PurposeCreate2Screen";
+import PurposeCreate3Screen from "../screens/Purpose/PurposeCreate3Screen";
+import PurposeCompleteScreen from "../screens/Purpose/PurposeCompleteScreen";
 import OneCent1Screen from "../screens/OneCent/OneCent1Screen";
 import OneCent2Screen from "../screens/OneCent/OneCent2Screen";
 import OneCent3Screen from "../screens/OneCent/OneCent3Screen";
@@ -60,6 +62,14 @@ export default function AppNavigator() {
       <Stack.Screen
         name="PurposeCreate2Screen"
         component={PurposeCreate2Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PurposeCreate3Screen"
+        component={PurposeCreate3Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PurposeCompleteScreen"
+        component={PurposeCompleteScreen}
       ></Stack.Screen>
       <Stack.Screen
         name="OneCent1Screen"

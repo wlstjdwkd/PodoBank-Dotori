@@ -7,18 +7,87 @@ import {
   StyleSheet,
   Image,
   TouchableWithoutFeedback,
+  Modal,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-// import { Calendar } from "react-native-calendars";
+import { Calendar, markedDates } from "react-native-calendars";
 import HeaderComponent from "../Components/HeaderScreen";
 
-export default function PurposeCreate2Screen({ navigation }) {
-  const [purposeInfo, setPurposeInfo] = useState({
-    purposeName: "",
+export default function PurposeCreate2Screen({ navigation, route }) {
+  const [purposeInfo, setPurposeInfo] = useState(route.params.purposeInfo);
+  const [selectedDates, setSelectedDates] = useState({
+    startDate: null,
+    endDate: null,
   });
+  const [isCalendarVisible, setCalendarVisible] = useState(false);
+  const [settingDateType, setSettingDateType] = useState(""); // "start" 또는 "end"
   const [isValid, setIsValid] = useState(false);
-  const handleNameChange = (text) => {
-    setPurposeInfo((prev) => ({ ...prev, purposeName: text }));
+  const handleDateChange = (day) => {
+    if (!selectedDates.startDate) {
+      setSelectedDates({
+        ...selectedDates,
+        startDate: day.dateString,
+      });
+    } else if (!selectedDates.endDate) {
+      setSelectedDates({
+        startDate: selectedDates.startDate,
+        endDate: day.dateString,
+      });
+      setIsValid(true);
+    }
+  };
+  const getDatesBetweenDates = (startDate, endDate) => {
+    let dates = [];
+    const currDate = new Date(startDate);
+    const lastDate = new Date(endDate);
+    while (currDate <= lastDate) {
+      dates.push(currDate.toISOString().split("T")[0]);
+      currDate.setDate(currDate.getDate() + 1);
+    }
+    return dates;
+  };
+  const markedDates = {
+    ...(selectedDates.startDate
+      ? {
+          [selectedDates.startDate]: { selected: true, color: "blue" },
+        }
+      : {}),
+    ...(selectedDates.endDate
+      ? {
+          [selectedDates.endDate]: { selected: true, color: "red" },
+        }
+      : {}),
+    ...(purposeInfo.startDate
+      ? {
+          [purposeInfo.startDate]: { selected: true, color: "blue" },
+        }
+      : {}),
+    ...getDatesBetweenDates(
+      selectedDates.startDate,
+      selectedDates.endDate
+    ).reduce((acc, date) => {
+      acc[date] = { selected: true, color: "green" };
+      return acc;
+    }, {}),
+    ...getDatesBetweenDates(purposeInfo.startDate, purposeInfo.endDate).reduce(
+      (acc, date) => {
+        acc[date] = { selected: true, color: "green" };
+        return acc;
+      },
+      {}
+    ),
+  };
+  const handleConfirmDates = () => {
+    setPurposeInfo({
+      ...purposeInfo,
+      startDate: selectedDates.startDate,
+      endDate: selectedDates.endDate,
+    });
+    setSelectedDates({
+      startDate: null,
+      endDate: null,
+    });
+    setCalendarVisible(false);
   };
   return (
     <View style={styles.container}>
@@ -27,45 +96,104 @@ export default function PurposeCreate2Screen({ navigation }) {
         cancelNavi="PurposeScreen"
         navigation={navigation}
       ></HeaderComponent>
-      <View style={styles.header}>
-        <Text style={styles.title}>목표 기간 설정하기</Text>
-        <Text style={styles.subtitle}>
-          목표 시작 날짜와 종료 날짜를 선택해주세요.
-        </Text>
+      <View style={styles.innerContainer}>
+        <View style={styles.header}>
+          <Text style={styles.title}>목표 기간 설정하기</Text>
+          <Text style={styles.subtitle}>
+            목표 시작 날짜와 종료 날짜를 선택해주세요.
+          </Text>
 
-        <Text style={styles.dateText}>시작 날짜</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={handleNameChange}
-          multiline={true}
-        />
+          <Text style={styles.dateText}>시작 날짜</Text>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              setSettingDateType("start");
+              setSelectedDates({
+                startDate: null,
+                endDate: null,
+              });
+              setCalendarVisible(true);
+            }}
+          >
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                value={purposeInfo.startDate}
+                multiline={true}
+              />
+              <AntDesign name="calendar" size={24} color="black" />
+            </View>
+          </TouchableWithoutFeedback>
 
-        <Text style={styles.dateText}>종료 날짜</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={handleNameChange}
-          multiline={true}
-        />
+          <Text style={styles.dateText}>종료 날짜</Text>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              setSettingDateType("end");
+              setSelectedDates({
+                startDate: null,
+                endDate: null,
+              });
+              setCalendarVisible(true);
+            }}
+          >
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                value={purposeInfo.endDate}
+                multiline={true}
+              />
+              <AntDesign name="calendar" size={24} color="black" />
+            </View>
+          </TouchableWithoutFeedback>
+          {isCalendarVisible && (
+            <Modal
+              animationType="slide"
+              transparent={false}
+              visible={isCalendarVisible}
+              onRequestClose={() => {
+                setCalendarVisible(false);
+              }}
+            >
+              <View style={{ flex: 1, justifyContent: "center" }}>
+                <Calendar
+                  onDayPress={(day) => handleDateChange(day)}
+                  markedDates={markedDates}
+                />
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={handleConfirmDates}
+                >
+                  <Text style={styles.buttonText}>다음</Text>
+                </TouchableOpacity>
+              </View>
+            </Modal>
+          )}
+        </View>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            navigation.navigate("PurposeCreate3Screen", {
+              purposeInfo: purposeInfo,
+            })
+          }
+          //TODO: 풀기
+          // disabled={!isValid}
+        >
+          <Text style={styles.buttonText}>다음</Text>
+        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          navigation.navigate("PurposeCreate2Screen", {
-            purposeInfo: purposeInfo,
-          })
-        }
-        //TODO: 풀기
-        // disabled={!isValid}
-      >
-        <Text style={styles.buttonText}>다음</Text>
-      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    justifyContent: "space-between",
+    padding: 20,
+    backgroundColor: "white",
+  },
+  innerContainer: {
     flex: 1,
     justifyContent: "space-between",
     padding: 20,
@@ -84,18 +212,25 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: "#7B7B7B",
-    marginBottom: 30,
+    marginBottom: 60,
   },
-  input: {
-    width: "100%",
-    height: 50,
-    backgroundColor: "#D9D9D920",
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: "#BAC0CA",
     borderRadius: 10,
     padding: 10,
     marginTop: 10,
     marginBottom: 40,
+    backgroundColor: "#D9D9D920",
+    position: "relative",
+  },
+  input: {
+    flex: 1,
+    height: 20,
+    padding: 0, // remove padding to avoid overlap
+    fontSize: 16,
     // textAlign: "center",
   },
   button: {
