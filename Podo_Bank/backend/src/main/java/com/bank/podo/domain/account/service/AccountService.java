@@ -241,7 +241,7 @@ public class AccountService {
         accountRepository.save(receiverAccount);
 
         TransactionHistory senderAccountHistory = TransactionHistory.builder()
-                .transactionType(TransactionType.TRANSFER)
+                .transactionType(TransactionType.WITHDRAWAL)
                 .amount(transferAmount)
                 .balanceAfter(senderAccount.getBalance())
                 .counterAccount(receiverAccount)
