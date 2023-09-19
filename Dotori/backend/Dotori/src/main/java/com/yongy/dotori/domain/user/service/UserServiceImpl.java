@@ -1,14 +1,21 @@
 package com.yongy.dotori.domain.user.service;
 
+//import com.yongy.dotori.domain.user.SmsUtil;
 import com.yongy.dotori.domain.user.repository.UserRepository;
 
 import com.yongy.dotori.global.redis.entity.EmailAuth;
+import com.yongy.dotori.global.redis.entity.SmsAuth;
 import com.yongy.dotori.global.redis.repository.EmailAuthRepository;
+import com.yongy.dotori.global.redis.repository.SmsAuthRepository;
 import com.yongy.dotori.global.redis.service.EmailAuthService;
+
+import com.yongy.dotori.global.redis.service.SmsAuthService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -21,6 +28,13 @@ import java.util.Random;
 @Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
+
+    @Value("${coolsms.api.key}")
+    private String apiKey;
+
+    @Value("${coolsms.api.secret}")
+    private String apiSecret;
+
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -29,7 +43,17 @@ public class UserServiceImpl implements UserService{
     private EmailAuthRepository emailAuthRepository;
 
     @Autowired
+    private SmsAuthService smsAuthService;
+
+    @Autowired
     private EmailAuthService emailAuthService;
+
+    @Autowired
+    private SmsAuthRepository smsAuthRepository;
+
+
+//    @Autowired
+//    private SmsUtil smsUtil;
 
     public void authEmail(String id){
         // 임의의 authKey 생성
@@ -67,4 +91,14 @@ public class UserServiceImpl implements UserService{
     public void deleteAuthCode(String id){
         emailAuthRepository.deleteById(id);
     }
+
+//    public void sendMsgAuthCode(String phoneNumber){
+//        Random random = new Random();
+//        String authCode = String.valueOf(random.nextInt(888888) + 111111); // 11111 ~ 99999의 랜덤한 숫자
+//
+//        // Redis에 저장
+//        smsAuthRepository.save(SmsAuth.of(authCode, phoneNumber));
+//
+//        smsUtil.sendMsgAuthCode(phoneNumber, authCode);
+//    }
 }
