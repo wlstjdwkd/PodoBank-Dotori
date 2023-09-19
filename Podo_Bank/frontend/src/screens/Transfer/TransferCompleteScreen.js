@@ -18,7 +18,7 @@ export default function TransferCompleteScreen({ navigation, route }) {
   return (
     <View style={{flex:1, backgroundColor:'white'}}>
       <View style={styles.container}>
-        <HeaderComponent navigation={navigation} title="이체" />
+        <HeaderComponent navigation={navigation} title="계좌이체" />
 
         <View style={styles.imageContainer}>
           <Image

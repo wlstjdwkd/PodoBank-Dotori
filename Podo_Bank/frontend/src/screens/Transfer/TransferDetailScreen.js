@@ -89,6 +89,7 @@ export default function TransferDetailScreen({ navigation, route }) {
       receiverContent:receiverMemo,    // 이렇게 보내야함
     }
     const response = await accountTransfer(transferInfo, accessToken)
+    setPassword("")
     if(response.status === 200){
       console.log("계좌 이체 성공")
       // navigation.navigate("AccountDetailScreen", {
@@ -113,8 +114,13 @@ export default function TransferDetailScreen({ navigation, route }) {
       console.log("잔액 부족으로 계좌 이체 실패")
     }else if(response.status === 403){
       console.log("계좌 소유주 불일치로 계좌 이체 실패")
+    }else if(response.status === 423){
+      console.log("계좌 비밀번호 잠김으로 계좌 이체 실패")
+      Alert.alert("비밀번호 잠김", "계좌 비밀번호 잠김으로 계좌 이체에 실패하셨습니다.")
     }else if(response.status === 429){
       console.log("계좌 비밀번호 형식 오류로 계좌 이체 실패")
+      console.log('비밀번호틀림',response.data)
+      Alert.alert("비밀번호 미일치",response.data)
     }else{
       console.log("오류 발생: 계좌 이체 실패")
     }
@@ -123,7 +129,7 @@ export default function TransferDetailScreen({ navigation, route }) {
   return (
     <View style={{flex:1, backgroundColor:'white'}}>
     <View style={styles.container}>
-      <HeaderScreen navigation={navigation} title="계좌이체(3/4)" />
+      <HeaderScreen navigation={navigation} title="계좌이체(3/3)" />
       <Text style={[styles.amountValueText,{}]}>{amount.toLocaleString()}원</Text>
 
       <Text style={styles.label}>받는분</Text>
@@ -239,7 +245,7 @@ export default function TransferDetailScreen({ navigation, route }) {
                 ["1", "2", "3"],
                 ["4", "5", "6"],
                 ["7", "8", "9"],
-                ["", "0", "<-"],
+                ["", "0", "←"],
               ].map((row, rowIndex) => (
                 <View key={rowIndex} style={styles.numRow}>
                   {row.map((num) => (
@@ -247,7 +253,7 @@ export default function TransferDetailScreen({ navigation, route }) {
                       key={num}
                       style={styles.numButton}
                       onPress={() => {
-                        if (num === "<-") {
+                        if (num === "←") {
                           removeLast();
                         } else if (num !== "") {
                           appendAmount(num);

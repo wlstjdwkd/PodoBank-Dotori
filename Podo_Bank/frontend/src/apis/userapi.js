@@ -106,10 +106,10 @@ export const userLogin = async (email, password) => {
     // throw error;
   }
 };
-export const userEmailVerificationCheck = async (code, email) => {
+export const userEmailVerificationCheck = async (code, email, type) => {
   console.log('코드인증1',code,'and', email)
   try {
-    const response = await axios.post(apiAddress+'/api/v1/user/emailVerification/check', {code:code, email:email});
+    const response = await axios.post(apiAddress+'/api/v1/user/emailVerification/check', {code:code, email:email, type:type});
     console.log('이메일 인증 코드 확인 성공:', response.data)
     return response;
   } catch (error) {

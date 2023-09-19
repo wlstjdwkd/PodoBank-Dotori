@@ -8,12 +8,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { userInformationInquiry, } from '../../apis/userapi'
 import { accountListInquiry, } from '../../apis/accountapi'
 import { setUserInfo } from '../../redux/slices/auth/user'
+import { changeTotalBalance } from '../../redux/slices/accounts/account'
 
 export default function HomeScreen({ navigation }) {
   const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   const accessToken = useSelector((state) => state.user.accessToken)
   const userInfo = useSelector((state) => state.user.userInfo)
   const [accountList, setAccountList] = useState([])
+  const [totalBalance, setTotalBalance] = useState(0)
+  // const totalBalanceRedux = useSelector((state)=> state.account.totalBalance)
 
   const dispatch = useDispatch()
   //대표계좌 axios로 가져와야함
@@ -65,11 +68,15 @@ export default function HomeScreen({ navigation }) {
     handleAccountListInquiry()
   }, []);
 
-  const totalBalance = accountList.reduce((acc, account) => {
-    const balance = parseFloat(account.balance); // 문자열로 된 balance 값을 숫자로 변환
-    return acc + balance;
-  }, 0); // 초기값 0으로 설정
+  useEffect(()=>{
+    const tmpTotalBalance = accountList.reduce((acc, account) => {
+      const balance = parseFloat(account.balance); // 문자열로 된 balance 값을 숫자로 변환
+      return acc + balance;
+    }, 0); // 초기값 0으로 설정
 
+    setTotalBalance(tmpTotalBalance)
+    dispatch(changeTotalBalance(tmpTotalBalance))
+  }, [accountList])
 
   return (
     <View style={styles.container}>
@@ -191,8 +198,10 @@ const styles = StyleSheet.create({
     fontSize: 25,
     marginTop: 20,
     marginBottom: 30,
-    marginLeft: 25,
-    alignSelf: "flex-start",
+    // marginLeft: 25,
+    // marginRight: 25,
+    // alignSelf: "flex-start",
+    alignSelf: "flex-end",
   },
   buttonText: {
     color: "black",
@@ -273,8 +282,8 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 3,
     alignItems: "center",
-    marginLeft: 25,
-    marginRight: 25,
+    // marginLeft: 25,
+    // marginRight: 25,
   },
   addAccountBox: {
     width: "100%",

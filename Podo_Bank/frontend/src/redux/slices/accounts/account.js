@@ -8,6 +8,7 @@ const accountSlice = createSlice({
     count: 0,
     nameorigin: null,
     nametmp:null,
+    totalBalance:0,
   },
   reducers: {
     increment(state) {
@@ -29,10 +30,13 @@ const accountSlice = createSlice({
       const randomNum = Math.floor(Math.random() * 100) +1;
       state.nametmp = `${state.nameorigin}${randomNum}`;
     },
+    changeTotalBalance(state, action){
+      state.totalBalance = action.payload
+    }
   },
 });
 
-export const { increment, decrement, incrementByAmount, changeNameNum } =
+export const { increment, decrement, incrementByAmount, changeNameNum, changeTotalBalance } =
 accountSlice.actions;
 
 export default accountSlice.reducer;
