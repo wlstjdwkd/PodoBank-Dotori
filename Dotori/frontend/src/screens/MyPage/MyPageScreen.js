@@ -67,21 +67,24 @@ export default function MyPageScreen({ navigation }) {
 
             {/* 기능 항목 */}
             <Text style={styles.boldText}>기능</Text>
-            <TouchableOpacity style={styles.featureItem} onPress={() => navigation.navigate("PasswordChangeScreen")}>
+            <TouchableOpacity style={styles.featureItem}
+                 onPress={() => navigation.navigate("PasswordChangeScreen")}>
                 <Text style={styles.infoText}>비밀번호 변경</Text>
                 <Image
                     style={styles.arrowIcon}
                     source={require('../../assets/icon/forward_arrow.png')} // 화살표 아이콘 이미지 경로
                 />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.featureItem}>
+            <TouchableOpacity style={styles.featureItem}
+                 onPress={() => navigation.navigate("CategoryScreen")}>
                 <Text style={styles.infoText}>카테고리 보기</Text>
                 <Image
                     style={styles.arrowIcon}
                     source={require('../../assets/icon/forward_arrow.png')} // 화살표 아이콘 이미지 경로
                 />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.featureItem}>
+            <TouchableOpacity style={styles.featureItem}
+                 onPress={() => navigation.navigate("ReceipeSelectScreen")}>
                 <Text style={styles.infoText}>명세서 보기</Text>
                 <Image
                     style={styles.arrowIcon}

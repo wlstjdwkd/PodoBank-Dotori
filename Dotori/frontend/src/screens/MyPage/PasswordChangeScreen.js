@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     },
     iconContainer: {
         alignItems: 'center',
-        marginTop: 20,
+        marginTop: 50,
     },
     lockIcon: {
         width: 100,
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     },
     passwordInfoContainer: {
         alignItems: 'center',
-        marginBottom: 16,
+        marginBottom: 40,
     },
     passwordChangeInfoText: {
         fontSize: 24,
