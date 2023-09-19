@@ -5,4 +5,6 @@ public interface UserService {
     void sendAuthEmail(String id, String authKey);
     String getAuthCode(String id);
     void deleteAuthCode(String id);
+
+//    void sendMsgAuthCode(String phoneNumber);
 }
