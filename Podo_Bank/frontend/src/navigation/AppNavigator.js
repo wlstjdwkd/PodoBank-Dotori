@@ -9,6 +9,9 @@ import SignupCompleteScreen from "../screens/Home/SignupCompleteScreen";
 import HomeScreen from "../screens/Home/HomeScreen";
 import AccountDetailScreen from "../screens/Account/AccountDetailScreen";
 import AccountOverviewScreen from "../screens/Account/AccountOverviewScreen";
+import AccountResetPasswordOneScreen from "../screens/Account/AccountResetPasswordOneScreen";
+import AccountResetPasswordTwoScreen from "../screens/Account/AccountResetPasswordTwoScreen";
+import AccountResetPasswordSucceessScreen from "../screens/Account/AccountResetPasswordSucceessScreen";
 import TransferScreen from "../screens/Transfer/TransferScreen";
 import TransferAmountScreen from "../screens/Transfer/TransferAmountScreen";
 import TransferDetailScreen from "../screens/Transfer/TransferDetailScreen";
@@ -19,6 +22,7 @@ import AccountRestrictionScreen from "../screens/OpenAccount/AccountRestrictionS
 import OpenAccountCompleteScreen from "../screens/OpenAccount/OpenAccountCompleteScreen";
 import AccountWhatMakeScreen from "../screens/OpenAccount/AccountWhatMakeScreen";
 import AccountManagementScreen from "../screens/Account/AccountManagementScreen";
+import AccountWithdrawalScreen from "../screens/CloseAccount/AccountWithdrawalScreen";
 import TransactionDetailScreen from "../screens/Account/TransactionDetailScreen";
 import MyPageScreen from "../screens/Home/MyPageScreen";
 import FindIDScreen from "../screens/Home/FindIDScreen";
@@ -142,6 +146,22 @@ function AppNavigator() {
       <Stack.Screen
         name="WithdrawalScreen"
         component={WithdrawalScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="AccountResetPasswordOneScreen"
+        component={AccountResetPasswordOneScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="AccountResetPasswordTwoScreen"
+        component={AccountResetPasswordTwoScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="AccountResetPasswordSucceessScreen"
+        component={AccountResetPasswordSucceessScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="AccountWithdrawalScreen"
+        component={AccountWithdrawalScreen}
       ></Stack.Screen>
       {/* <Stack.Screen
         name="AccessTokenRefreshModalScreen"

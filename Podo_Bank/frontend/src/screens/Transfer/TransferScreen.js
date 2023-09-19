@@ -145,7 +145,7 @@ export default function TransferScreen({ navigation, route }) {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <HeaderScreen navigation={navigation} title="계좌이체(1/4)"></HeaderScreen>
+        <HeaderScreen navigation={navigation} title="계좌이체(1/3)"></HeaderScreen>
       </View>
       <View style={{flexDirection:"row"}}>
         <Image

@@ -9,118 +9,101 @@ import {
 
 import HeaderComponent from "../Header/HeaderScreen";
 import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
-import {
-  userRegister,
-} from '../../apis/userapi'
+import { accountPasswordInitialization } from "../../apis/accountapi"
 import { useSelector } from "react-redux";
 
-export default function SignupInformationScreen({ navigation, route }) {
+export default function AccountResetPasswordTwoScreen({ navigation, route }) {
+  const accessToken = useSelector((state) => state.user.accessToken)
   const [userInfo, setUserInfo] = useState(route.params.userInfo);
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  // const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMessage, setPasswordMessage] = useState("");
   const [confirmPasswordMessage, setConfirmPasswordMessage] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
   const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(false);
-  const [isSucceed, setIsSucceed] = useState(false);              // 회원가입 성공여부
-  const [registeredMessage, setRegisteredMessage] = useState(""); // 회원가입 버튼 클릭시 메시지
-  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
+  const [isSucceed, setIsSucceed] = useState(false);              // 비밀번호 초기화 성공여부
+  const [registeredMessage, setRegisteredMessage] = useState(""); // 비밀번호 초기화 버튼 클릭시 메시지
+  console.log(userInfo)
+  // const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
 
+  // const validatePassword = (password) => {
+  //   const regex =
+  //     /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,16}$/;
+  //   return regex.test(password);
+  // };
   const validatePassword = (password) => {
-    const regex =
-      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,16}$/;
+    const regex = /^\d{4}$/;
     return regex.test(password);
   };
 
   const handlePasswordChange = (text) => {
     setPassword(text);
     if (validatePassword(text)) {
-      setPasswordMessage("완벽합니당");
+      setPasswordMessage("완벽합니다");
       setIsPasswordValid(true);
     } else {
-      setPasswordMessage("양식을 맞춰주세요!");
+      setPasswordMessage("계좌 비밀번호 양식은 4자리 숫자입니다.!");
       setIsPasswordValid(false);
     }
   };
 
   const handleConfirmPasswordChange = (text) => {
-    setConfirmPassword(text);
+    // setConfirmPassword(text);
     if (text === password && isPasswordValid) {
       setConfirmPasswordMessage("완벽합니당");
       setIsConfirmPasswordValid(true);
-      setUserInfo((prev) => ({ ...prev, password: text }));
+      // setUserInfo((prev) => ({ ...prev, password: text, newPassword: text }));
+      setUserInfo((prev) => ({ ...prev, newPassword: text }));
     } else {
       setConfirmPasswordMessage("비밀번호가 일치하지 않습니다");
       setIsConfirmPasswordValid(false);
     }
   };
 
-  // 회원가입
-  const handleUserRegister = async()=>{
-    const updatedUserInfo = handleFixBirthdate()
-    // handleFixBirthdate()
-    const response = await userRegister(updatedUserInfo)
+  // 비밀번호 초기화
+  const hanldeAccountPasswordInitialization = async()=>{
+    const response = await accountPasswordInitialization(userInfo, accessToken)
     if(response.status === 200){
-      console.log('회원가입 성공')
+      console.log('계좌 비밀번호 초기화 성공')
       setIsSucceed(true)
-      setRegisteredMessage('회원가입 성공')
-      // navigation.navigate("SignupCompleteScreen", {name: userInfo.name,})
+      setRegisteredMessage('계좌 비밀번호 초기화에 성공했습니다.')
+      
       navigation.reset({
         index: 0,
-        routes: [{ name: 'SignupCompleteScreen', params: { name: userInfo.name },}],
+        routes: [{ name: 'AccountResetPasswordSucceessScreen', params: { email: userInfo.email, accountNumber: userInfo.accountNumber },}],
       });
     }else if(response.status === 400){
-      console.log('회원가입 실패')
-      setRegisteredMessage('회원가입 실패')
-    }else if(response.status === 409){
-      console.log('이미 사용중인 아이디')
-      setRegisteredMessage('이미 사용중인 아이디')
-    }else if(response.status === 422){
-      console.log('이메일 형식 오류')
-      setRegisteredMessage('이메일 형식 오류')
+      console.log('계좌 비밀번호 초기화 실패')
+      setRegisteredMessage('계좌 비밀번호 초기화에 실패했습니다.')
+    }else if(response.status === 401){
+      console.log('권한 없음으로 계좌 비밀번호 초기화 실패')
+      setRegisteredMessage('로그인 여부를 다시 확인해주세요.')
+    }else if(response.status === 403){
+      console.log('계좌 소유주 불일치로 비밀번호 초기화 실패')
+      setRegisteredMessage('계좌 소유주가 아닙니다.')
+    }else if(response.status === 429){
+      console.log('계좌 비밀번호 형식 오류')
+      setRegisteredMessage('계좌 비밀번호 형식 오류가 발생했습니다.')
     }else{
       console.log('오류 발생')
       setRegisteredMessage('오류 발생')
     }
   }
 
-  const handleFixBirthdate = () => {
-    if (userInfo.birthdate && userInfo.birthdate.length === 8) {
-      const year = userInfo.birthdate.substring(0, 4);
-      const month = userInfo.birthdate.substring(4, 6);
-      const day = userInfo.birthdate.substring(6, 8);
-  
-      // YYYY-MM-DD 형식으로 변환
-      const formattedBirthdate = `${year}-${month}-${day}`;
-  
-      // 변경된 형식으로 userInfo의 birthdate를 업데이트
-      // setUserInfo((prev) => ({
-      //   ...prev,
-      //   birthdate: formattedBirthdate,
-      // }));
-      return {
-        ...userInfo,
-        birthdate: formattedBirthdate,
-      };
-    }
-    console.log(userInfo)
-    return userInfo
-  };
-
   return (
     <View style={styles.container}>
       {/* Header */}
       <HeaderComponent
         navigation={navigation}
-        title="회원가입(3/3)"
+        title="계좌 비밀번호 초기화(2/2)"
       ></HeaderComponent>
 
       {/* 본인 인증 안내 */}
-      <Text style={styles.boldText}>비밀번호를 입력해주세요</Text>
+      <Text style={styles.boldText}>본인 인증을 진행해주세요</Text>
 
       <View style={styles.inputContainer}>
         <View style={styles.textRow}>
-          <Text style={styles.inputText}>비밀번호</Text>
+          <Text style={styles.inputText}>새 비밀번호</Text>
           <Text style={styles.descriptionText}>
             영문, 숫자, 특수문자가 모두 들어간 8~16글자
           </Text>
@@ -131,6 +114,8 @@ export default function SignupInformationScreen({ navigation, route }) {
           onChangeText={handlePasswordChange}
           secureTextEntry={true}
           placeholder="비밀번호를 입력해 주세요."
+          keyboardType="number-pad"
+          maxLength={4}
         />
       </View>
       <Text
@@ -150,6 +135,8 @@ export default function SignupInformationScreen({ navigation, route }) {
           onChangeText={handleConfirmPasswordChange}
           secureTextEntry={true}
           placeholder="비밀번호를 한번 더 입력해 주세요."
+          keyboardType="number-pad"
+          maxLength={4}
         />
       </View>
       
@@ -183,15 +170,11 @@ export default function SignupInformationScreen({ navigation, route }) {
         ]}
         // back에 회원가입 정보 보내야함
         onPress={() =>{
-          handleUserRegister()
-          // handleConfirmButton()
-          // if(isSucceed){
-          //   navigation.navigate("SignupCompleteScreen", {name: userInfo.name,})
-          // }
+          hanldeAccountPasswordInitialization()
         }}
         disabled={!(isPasswordValid && isConfirmPasswordValid)}
       >
-        <Text style={styles.linkText}>회원가입</Text>
+        <Text style={styles.linkText}>비밀번호 등록</Text>
       </TouchableOpacity>
       {/* {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />} */}
     </View>

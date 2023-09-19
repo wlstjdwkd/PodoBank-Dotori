@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Modal,Pressable, } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Modal,Pressable,Alert } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
 import FooterScreen from "../Header/FooterScreen";
 import {
@@ -17,6 +17,7 @@ export default function MyPageScreen({ navigation }) {
   const accessToken = useSelector((state) => state.user.accessToken)
   const refreshToken = useSelector((state) => state.user.refreshToken)
   const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
+  const totalBalance = useSelector((state)=> state.account.totalBalance)
 
   const dispatch = useDispatch();
 
@@ -152,7 +153,7 @@ export default function MyPageScreen({ navigation }) {
         transparent={true}
         visible={userWithdrawalModalVisible}
         onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
+          // Alert.alert('Modal has been closed.');
           setUserWithdrawalModalVisible(!userWithdrawalModalVisible);
         }}>
         <View style={styles.centeredView}>

@@ -197,9 +197,10 @@ export const accountDeposit = async (sendInfo, accessToken) => {
   }
 };
 // 계좌 삭제하는데 다른거 안보내줘도 된다고??????????????
-export const accountDelete = async (accessToken) => {
+export const accountDelete = async (deleteInfo, accessToken) => {
   try {
-    const response = await axios.delete(apiAddress+'/api/v1/account/delete', null, {
+    console.log(deleteInfo, accessToken)
+    const response = await axios.post(apiAddress+'/api/v1/account/delete', deleteInfo, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -207,7 +208,7 @@ export const accountDelete = async (accessToken) => {
     console.log('계좌 삭제 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('계좌 삭제 실패:', error);
+    console.error('계좌 삭제 실패:', error.response.data, error.response.status);
     const response = error.response
     return response
     // throw error;
@@ -226,6 +227,34 @@ export const accountCreate = async (createInfo, accessToken) => {
     return response;
   } catch (error) {
     console.error('계좌 생성 실패:', error);
+    const response = error.response
+    return response
+    // throw error;
+  }
+};
+
+// 계좌 비밀번호 초기화시 이메일 인증 코드 확인
+export const userAccountPwEmailVerificationCheck = async (code, email) => {
+  try {
+    const response = await axios.post(apiAddress+'/api/v1/user/emailVerification/check', {code:code, email:email, type:"RESET_ACCOUNT_PASSWORD"});
+    console.log('이메일 인증 코드 확인 성공:', response.data)
+    return response;
+  } catch (error) {
+    console.error('이메일 인증 코드 확인 실패:', error.response.status);
+    const response = error.response
+    return response
+    // throw error;
+  }
+};
+
+// 계좌 비밀번호 초기화시 이메일 인증 코드 전송
+export const userAccountPwEmailVerificationSend = async (email) => {
+  try {
+    const response = await axios.post(apiAddress+'/api/v1/user/emailVerification', {email:email, type:"RESET_ACCOUNT_PASSWORD"});
+    console.log('이메일 인증 코드 전송 성공:',response.status)
+    return response;
+  } catch (error) {
+    console.error('이메일 인증 코드 전송 실패:', error);
     const response = error.response
     return response
     // throw error;

@@ -96,7 +96,7 @@ export default function SignupInformationEmailScreen({ navigation, route }) {
   }
   // 이메일 인증번호 확인
   const handleUserEmailVerificationCheck = async()=>{
-    const response = await userEmailVerificationCheck(emailCode, email)
+    const response = await userEmailVerificationCheck(emailCode, email, "REGISTER")
     if (response.status===400) {
       setCodeMessage("잘못된 인증번호입니다.");
       SetIsAuthenEmail(false);
