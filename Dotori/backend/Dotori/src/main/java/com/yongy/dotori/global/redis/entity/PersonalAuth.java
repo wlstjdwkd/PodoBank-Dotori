@@ -5,20 +5,20 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 @Getter
-@RedisHash(value="smsAuth", timeToLive = 1000L * 60 * 3)
-public class SmsAuth {
+@RedisHash(value="PersonalAuth", timeToLive = 1000L * 60 * 3)
+public class PersonalAuth {
     @Id
     private String authCode;
 
     private String id;
 
-    public SmsAuth(String authCode, String id) {
+    public PersonalAuth(String authCode, String id) {
         this.authCode = authCode;
         this.id = id;
     }
 
 
-    public static SmsAuth of(String authCode, String id){
-        return new SmsAuth(authCode, id);
+    public static PersonalAuth of(String authCode, String id){
+        return new PersonalAuth(authCode, id);
     }
 }
