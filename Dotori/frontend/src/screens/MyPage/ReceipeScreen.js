@@ -7,14 +7,20 @@ export default function ReceipeScreen({ route, navigation }) {
 
     // 가상 데이터 - 명세서 항목들
     const receipeItems = [
-        { category: '식비', expense: '50,000원', savings: '20,000원' },
-        { category: '주거', expense: '30,000원', savings: '10,000원' },
+        { category: '식비', expense: 50000, savings: 20000 },
+        { category: '주거', expense: 30000, savings: 10000 },
+
+
         // 다른 항목들 추가
     ];
 
+    // 추가 저축 항목
+    const additionalSavings = { category: '추가 저축', savings: 15000 };
+
     // 총계 계산
-    const totalExpense = receipeItems.reduce((acc, item) => acc + parseInt(item.expense.replace(',', '')), 0);
-    const totalSavings = receipeItems.reduce((acc, item) => acc + parseInt(item.savings.replace(',', '')), 0);
+    const totalExpense = receipeItems.reduce((acc, item) => acc + item.expense, 0);
+    const totalSavings = receipeItems.reduce((acc, item) => acc + item.savings, 0);
+    const totalAdditionalSavings = additionalSavings.savings;
 
     return (
         <View style={styles.container}>
@@ -31,8 +37,8 @@ export default function ReceipeScreen({ route, navigation }) {
             {/* 선택한 명세서를 화면에 표시 */}
             <ScrollView contentContainerStyle={styles.contentContainer}>
                 {/* 시민주의 통장 */}
-                <Text style={styles.label}>시민주의 통장</Text>
-                <Text style={styles.amount}>70,000원</Text>
+                <Text style={styles.label}>{selectedAccount}</Text>
+                <Text style={styles.amount}>{(totalSavings + additionalSavings.savings).toLocaleString()}원</Text>
 
                 {/* 명세서 표 */}
                 <View style={styles.receipeTable}>
@@ -49,20 +55,39 @@ export default function ReceipeScreen({ route, navigation }) {
                         <View style={styles.tableRow} key={index}>
                             <Text style={styles.tableCell}>{index + 1}</Text>
                             <Text style={styles.tableCell}>{item.category}</Text>
-                            <Text style={styles.tableCell}>{item.expense}</Text>
-                            <Text style={styles.tableCell}>{item.savings}</Text>
+                            <Text style={styles.tableCell}>{item.expense.toLocaleString()}</Text>
+                            <Text style={styles.tableCell}>{item.savings.toLocaleString()}</Text>
                         </View>
                     ))}
 
                     {/* 구분선 */}
                     <View style={styles.tableSeparator} />
 
+                    {/* 사용 합계 */}
+                    <View style={styles.tableRow}>
+                        <Text style={styles.tableCell}></Text>
+                        <Text style={styles.tableCell}></Text>
+                        <Text style={styles.tableCell}>{totalExpense.toLocaleString()}</Text>
+                        <Text style={styles.tableCell}>{totalSavings.toLocaleString()}</Text>
+                    </View>
+
+                    {/* 추가 저축 항목 */}
+                    <View style={styles.tableRow}>
+                        <Text style={styles.tableCell}></Text>
+                        <Text style={styles.tableCell}>{additionalSavings.category}</Text>
+                        <Text style={styles.tableCell}></Text>
+                        <Text style={styles.tableCell}>{additionalSavings.savings.toLocaleString()}</Text>
+                    </View>
+
+                    {/* 구분선 */}
+                    <View style={styles.tableSeparator} />
+
                     {/* 총계 행 */}
                     <View style={styles.tableRow}>
-                        <Text style={[styles.tableCell, styles.totalCell]}>-</Text>
+                        <Text style={[styles.tableCell, styles.totalCell]}></Text>
                         <Text style={[styles.tableCell, styles.totalCell]}>총계</Text>
-                        <Text style={[styles.tableCell, styles.totalCell]}>{totalExpense}원</Text>
-                        <Text style={[styles.tableCell, styles.totalCell]}>{totalSavings}원</Text>
+                        <Text style={[styles.tableCell, styles.totalCell]}>{totalExpense.toLocaleString()}원</Text>
+                        <Text style={[styles.tableCell, styles.totalCell]}>{(totalSavings + additionalSavings.savings).toLocaleString()}원</Text>
                     </View>
                 </View>
             </ScrollView>
@@ -130,7 +155,7 @@ const styles = StyleSheet.create({
     },
     tableRow: {
         flexDirection: 'row',
-        borderBottomWidth: 1,
+        borderBottomWidth: 0,
         borderColor: '#DDD',
     },
     tableCell: {
