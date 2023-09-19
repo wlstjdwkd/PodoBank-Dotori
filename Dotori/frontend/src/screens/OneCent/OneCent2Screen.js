@@ -1,52 +1,78 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
+import FooterScreen from "../Components/FooterScreen";
 
-export default function OneCent1Screen({ navigation }) {
-  const [accountNumber, setAccountNumber] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+export default function OneCent1Screen({ navigation, route }) {
+  const [accountInfo, setAccountInfo] = useState({
+    bankName: route.params.bankName,
+    bankImage: route.params.bankImage,
+    accountNumber: "",
+  });
+  // const [accountNumber, setAccountNumber] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isValid, setIsValid] = useState(false);
 
   const handleConfirm = () => {
-    if (accountNumber.length !== 13) {
-      setErrorMessage('계좌 번호를 13자리로 입력해주세요.');
+    if (accountInfo.accountNumber.length !== 13) {
+      setErrorMessage("계좌 번호를 13자리로 입력해주세요.");
     } else {
-      setErrorMessage('');
-      navigation.navigate('OneCent3Screen', { accountNumber, navigation  }); // 계좌 번호를 다음 페이지로 전달
+      setErrorMessage("");
+      // console.log(accountInfo);
+      navigation.navigate("OneCent3Screen", {
+        accountInfo: accountInfo,
+      }); // 계좌 번호를 다음 페이지로 전달
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.boldTextLeft}>계좌 번호를 입력해주세요.</Text>
+      <View style={styles.innerContainer}>
+        <Text style={styles.boldTextLeft}>계좌 번호를 입력해주세요.</Text>
 
-      {/* 텍스트 입력 박스 */}
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="계좌 번호를 입력하세요."
-          placeholderTextColor="#A9A9A9"
-          underlineColorAndroid="transparent" // 하단 선 숨기기
-          keyboardType="numeric" // 숫자 키패드 표시
-          maxLength={13} // 최대 13자리로 제한
-          textAlign="center" // 가운데 정렬
-          value={accountNumber}
-          onChangeText={(text) => {
-            setAccountNumber(text);
-            if (text.length !== 13) {
-              setErrorMessage('계좌 번호를 13자리로 입력해주세요.');
-            } else {
-              setErrorMessage('');
-            }
-          }}
-        />
+        {/* 텍스트 입력 박스 */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="계좌 번호를 입력하세요."
+            placeholderTextColor="#A9A9A9"
+            underlineColorAndroid="transparent" // 하단 선 숨기기
+            keyboardType="numeric" // 숫자 키패드 표시
+            maxLength={13} // 최대 13자리로 제한
+            textAlign="center" // 가운데 정렬
+            value={accountInfo.accountNumber}
+            onChangeText={(text) => {
+              setAccountInfo({ ...accountInfo, accountNumber: text });
+
+              // setAccountNumber(text);
+              if (text.length !== 13) {
+                setErrorMessage("계좌 번호를 13자리로 입력해주세요.");
+              } else {
+                setErrorMessage("");
+              }
+            }}
+          />
+        </View>
+
+        {/* 오류 메시지 */}
+        {errorMessage !== "" && (
+          <Text style={styles.errorMessage}>{errorMessage}</Text>
+        )}
+
+        {/* 버튼 */}
+        <TouchableOpacity style={styles.button} onPress={handleConfirm}>
+          <Text style={styles.buttonText}>확인</Text>
+        </TouchableOpacity>
       </View>
-
-      {/* 오류 메시지 */}
-      {errorMessage !== '' && <Text style={styles.errorMessage}>{errorMessage}</Text>}
-
-      {/* 버튼 */}
-      <TouchableOpacity style={styles.button} onPress={handleConfirm}>
-        <Text style={styles.buttonText}>확인</Text>
-      </TouchableOpacity>
+      <View style={styles.footer}>
+        <FooterScreen navigation={navigation} />
+      </View>
     </ScrollView>
   );
 }
@@ -54,45 +80,60 @@ export default function OneCent1Screen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    backgroundColor: 'white',
+    // alignItems: "flex-start",
+    // justifyContent: "center",
+    backgroundColor: "white",
+    padding: 16,
+  },
+  innerContainer: {
+    flex: 1,
+    // alignItems: "flex-start",
+    // justifyContent: "center",
+    backgroundColor: "white",
     padding: 16,
   },
   boldTextLeft: {
-    fontWeight: 'bold',
-    fontSize: 18,
-    marginBottom: 8,
-    textAlign: 'left',
+    fontWeight: "bold",
+    fontSize: 24,
+    marginBottom: 120,
+    textAlign: "left",
+    marginTop: 150,
   },
   inputContainer: {
-    width: '100%',
+    width: "100%",
     borderBottomWidth: 1, // 하단 선 추가
-    borderColor: '#FF965C', // 선 색상 설정
-    marginBottom: 50,
+    borderColor: "#FF965C", // 선 색상 설정
+    marginBottom: 10,
   },
   input: {
-    width: '100%',
+    width: "100%",
     fontSize: 16,
     paddingVertical: 8,
-    color: '#000000',
+    color: "#000000",
   },
   button: {
-    backgroundColor: '#FF965C',
+    backgroundColor: "#FF965C",
     borderRadius: 8,
-    width: '100%',
-    padding: 16,
-    alignItems: 'center',
+    width: "100%",
+    padding: 10,
+    alignItems: "center",
+    marginTop: 35,
   },
   buttonText: {
-    fontSize: 18,
-    color: 'white',
-    fontWeight: 'bold',
+    fontSize: 15,
+    color: "white",
+    fontWeight: "bold",
   },
   errorMessage: {
-    color: 'red',
+    color: "red",
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 8,
+  },
+  footer: {
+    flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "center",
+    marginBottom: -20,
   },
 });

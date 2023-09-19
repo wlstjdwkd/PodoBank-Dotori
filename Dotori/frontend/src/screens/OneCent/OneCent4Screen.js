@@ -1,8 +1,16 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import React, { useState, useRef } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
+import FooterScreen from "../Components/FooterScreen";
 
-export default function OneCent2Screen() {
-  const [numbers, setNumbers] = useState(['', '', '', '']);
+export default function OneCent2Screen({ navigation, route }) {
+  const [accountInfo, setAccountInfo] = useState(route.params.accountInfo);
+  const [numbers, setNumbers] = useState(["", "", "", ""]);
   const inputRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
 
   const handleBoxPress = (index) => {
@@ -24,8 +32,11 @@ export default function OneCent2Screen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.innerContainer}></View>
       <Text style={styles.centeredText}>1원을 보냈습니다.</Text>
-      <Text style={styles.smallGrayText}>입금내역에 표시된 숫자 4자리를 입력해주세요.</Text>
+      <Text style={styles.smallGrayText}>
+        입금내역에 표시된 숫자 4자리를 입력해주세요.
+      </Text>
 
       <View style={styles.boxContainer}>
         {numbers.map((value, index) => (
@@ -52,9 +63,15 @@ export default function OneCent2Screen() {
         ))}
       </View>
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("MainPageScreen")}
+      >
         <Text style={styles.buttonText}>확인</Text>
       </TouchableOpacity>
+      <View style={styles.footer}>
+        <FooterScreen navigation={navigation} />
+      </View>
     </View>
   );
 }
@@ -62,63 +79,72 @@ export default function OneCent2Screen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'white',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "white",
     padding: 16,
   },
   centeredText: {
     fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 16,
+    marginTop: 160,
   },
   smallGrayText: {
-    color: '#A9A9A9',
+    color: "#A9A9A9",
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 32,
   },
   boxContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '80%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "80%",
     marginBottom: 32,
   },
   numberBox: {
     width: 64,
     height: 64,
     borderWidth: 2,
-    borderColor: '#FF965C',
+    borderColor: "#FF965C",
     borderRadius: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   numberText: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#000000',
+    fontWeight: "bold",
+    color: "#000000",
   },
   input: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    textAlign: 'center',
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    textAlign: "center",
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#000000',
-    backgroundColor: 'transparent',
+    fontWeight: "bold",
+    color: "#000000",
+    backgroundColor: "transparent",
   },
   button: {
-    backgroundColor: '#FF965C',
+    backgroundColor: "#FF965C",
     borderRadius: 8,
-    width: '80%',
+    width: "90%",
     padding: 16,
+    marginTop: 300,
+    marginBottom: -100,
   },
   buttonText: {
-    fontSize: 18,
-    color: 'white',
-    textAlign: 'center',
-    fontWeight: 'bold',
+    fontSize: 15,
+    color: "white",
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  footer: {
+    flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "center",
+    marginBottom: -20,
   },
 });
