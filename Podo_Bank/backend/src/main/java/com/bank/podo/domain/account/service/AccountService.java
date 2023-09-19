@@ -139,7 +139,7 @@ public class AccountService {
     }
 
     @Transactional
-    public void resetPassword(ResetPasswordDTO resetPasswordDTO, PasswordEncoder passwordEncoder) {
+    public void resetPassword(ResetAccountPasswordDTO resetPasswordDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
         Account account = accountRepository.findByAccountNumberAndDeletedFalse(resetPasswordDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));

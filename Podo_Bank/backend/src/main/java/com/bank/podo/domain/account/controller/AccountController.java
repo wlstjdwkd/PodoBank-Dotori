@@ -123,7 +123,7 @@ public class AccountController {
             @ApiResponse(responseCode = "429", description = "계좌 비밀번호 형식 오류")
     })
     @PatchMapping("/password/reset")
-    public ResponseEntity<AccountDTO> resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO) {
+    public ResponseEntity<AccountDTO> resetPassword(@RequestBody ResetAccountPasswordDTO resetPasswordDTO) {
         accountService.resetPassword(resetPasswordDTO, passwordEncoder);
         return ResponseEntity.ok().build();
     }
