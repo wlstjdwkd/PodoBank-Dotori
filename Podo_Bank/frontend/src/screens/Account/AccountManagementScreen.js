@@ -13,7 +13,9 @@ import HeaderComponent from "../Header/HeaderScreen";
 
 const { width } = Dimensions.get("window");
 
-export default function AccountManagementScreen({ navigation }) {
+export default function AccountManagementScreen({ navigation, route }) {
+  const [account, setAccount] = useState(route.params.account)
+
   const copyAccountNumber = () => {
     // 클립보드로 복사하는 로직 추가 필요
   };
@@ -55,6 +57,10 @@ export default function AccountManagementScreen({ navigation }) {
     }
   };
 
+  const settingAccountNumber = (accountNumber) =>{
+    return `${accountNumber.slice(0,4)}-${accountNumber.slice(4,6)}-${accountNumber.slice(6)}`
+  }
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -62,7 +68,7 @@ export default function AccountManagementScreen({ navigation }) {
 
       <Text style={styles.bankName}>포도은행 통장</Text>
       <View style={styles.accountRow}>
-        <Text style={styles.boldText}>1235-4568-4532</Text>
+        <Text style={styles.boldText}>{settingAccountNumber(account.accountNumber)}</Text>
         <TouchableOpacity
           onPress={copyAccountNumber}
           style={{ marginLeft: 10 }}
@@ -74,7 +80,7 @@ export default function AccountManagementScreen({ navigation }) {
       <View style={styles.frontText}>
         <View style={styles.row}>
           <Text style={styles.grayText}>잔액</Text>
-          <Text>1,000,000,000원</Text>
+          <Text>{account.balance.toLocaleString()}원</Text>
         </View>
 
         <View style={styles.row}>

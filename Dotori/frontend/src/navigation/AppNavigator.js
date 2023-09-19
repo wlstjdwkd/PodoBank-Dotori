@@ -12,6 +12,9 @@ import PurposeScreen from "../screens/Purpose/PurposeScreen";
 import PurposeCreate1Screen from "../screens/Purpose/PurposeCreate1Screen";
 import PurposeCreate2Screen from "../screens/Purpose/PurposeCreate2Screen";
 import OneCent1Screen from "../screens/OneCent/OneCent1Screen";
+import OneCent2Screen from "../screens/OneCent/OneCent2Screen";
+import OneCent3Screen from "../screens/OneCent/OneCent3Screen";
+import OneCent4Screen from "../screens/OneCent/OneCent4Screen";
 
 import MyPageScreen from "../screens/MyPage/MyPageScreen"
 import PasswordChangeScreen from "../screens/MyPage/PasswordChangeScreen"
@@ -64,6 +67,18 @@ export default function AppNavigator() {
       <Stack.Screen
         name="OneCent1Screen"
         component={OneCent1Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="OneCent2Screen"
+        component={OneCent2Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="OneCent3Screen"
+        component={OneCent3Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="OneCent4Screen"
+        component={OneCent4Screen}
       ></Stack.Screen>
       <Stack.Screen
       name="MyPageScreen"

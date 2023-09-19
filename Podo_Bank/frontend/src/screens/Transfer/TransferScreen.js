@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,10 +10,14 @@ import {
   Animated,
   Dimensions,
   Image,
+  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import HeaderScreen from "../Header/HeaderScreen";
+import {accountOwnerInquiry} from "../../apis/accountapi"
+import { useSelector } from "react-redux";
+import {accountRecentTransfer} from "../../apis/accountapi"
 
 const { height, width } = Dimensions.get("window");
 
@@ -34,29 +38,35 @@ const recentAccounts = [
   // ... 필요하면 더 추가
 ];
 
-export default function TransferScreen({ navigation }) {
+export default function TransferScreen({ navigation, route }) {
+  const accessToken = useSelector((state) => state.user.accessToken)
+  const [accountInfo, setAccountInfo] = useState(route.params.account)
+  // console.log(account)
+
   const [modalVisible, setModalVisible] = useState(false);
   // const translateY = useRef(new Animated.Value(height)).current;
-  const [accountInput, setAccountInput] = useState("");
+  const [receiverAccount, setReceiverAccount] = useState("");
 
   const [receiverBank, setReceiverBank] = useState("포도은행");
-  const [availableAmount, setAvailableAmount] = useState(0); // 출금 가능 금액 state 추가
+  const [availableAmount, setAvailableAmount] = useState((Math.floor(accountInfo.balance)).toLocaleString()); // 출금 가능 금액 state 추가
+  const [recentWithdrawAccount, setRecentWithdrawAccount] = useState([])
 
+  // 제작 키보드 관련 내용
   const removeLast = () => {
-    setAccountInput((prevAccount) => prevAccount.slice(0, -1));
+    setReceiverAccount((prevAccount) => prevAccount.slice(0, -1));
   };
 
   const appendAccount = (num) => {
     // if (password.length < 4) {
-    setAccountInput((prevAccount) => prevAccount + num);
+    setReceiverAccount((prevAccount) => prevAccount + num);
     // }
   };
 
   const handleKeyPress = (key) => {
-    if (key === "<-") {
-      setAccountInput((prev) => prev.slice(0, -1));
+    if (key === "←") {
+      setReceiverAccount((prev) => prev.slice(0, -1));
     } else {
-      setAccountInput((prev) => prev + key);
+      setReceiverAccount((prev) => prev + key);
     }
   };
 
@@ -78,14 +88,74 @@ export default function TransferScreen({ navigation }) {
   //     setModalVisible(false);
   //   });
   // };
+  // 계좌 번호 형식 맞추는 함수
+  const settingAccountNumber = (accountNumber) =>{
+    return `${accountNumber.slice(0,4)}-${accountNumber.slice(4,6)}-${accountNumber.slice(6)}`
+  }
+
+  // 계좌 소유주 존재 여부 확인\
+  const checkAccountOwnerInquiry = async () => {
+    const response = await accountOwnerInquiry(receiverAccount, accessToken)
+    if(response.status===200){
+      console.log('계좌 소유주 조회 성공')
+      navigation.navigate("TransferAmountScreen", {
+        receiverName: response.data,
+        receiverBank: receiverBank,
+        receiverAccount: receiverAccount,
+        accountInfo: accountInfo,
+      });
+    }else if(response.status===400){
+      console.log('계좌 소유주 조회 실패')
+      Alert.alert('계좌 조회 실패', '해당 계좌 유무 조회에 실패했습니다.')
+    }else if(response.status===401){
+      console.log('권한 없음으로 계좌 소유주 조회 실패')
+      Alert.alert('계좌 조회 실패', '권한이 없어 해당 계좌 유무 조회에 실패했습니다.')
+    }else if(response.status===404){
+      console.log('일치 계좌 없음으로 계좌 소유주 조회 실패')
+      Alert.alert('계좌 조회 실패', '권한이 없어 해당 계좌 유무 조회에 실패했습니다.')
+    }else{
+      console.log('오류 발생: 계좌 소유주 조회 실패')
+      Alert.alert('계좌 조회 실패', '오류 발생으로 계좌 유무 조회 실패했습니다.')
+    }
+  }
+
+  // 최근 송금 계좌 조회
+  const getAccountRecentTransfer = async ()=>{
+    const response = await accountRecentTransfer(accountInfo.accountNumber, accessToken)
+    if(response.status===200){
+      console.log('최근 송금 계좌 조회 성공')
+      setRecentWithdrawAccount(response.data)
+    }else if(response.status===400){
+      console.log('최근 송금 계좌 조회 실패')
+    }else if(response.status===401){
+      console.log('권한없음으로 최근 송금 계좌 조회 실패')
+    }else if(response.status===403){
+      console.log('계좌 소유주 불일치로 최근 송금 계좌 조회 실패')
+    }else if(response.status===404){
+      console.log('계좌없음으로 최근 송금 계좌 조회 실패')
+    }else{
+      console.log('오류발생: 최근 송금 계좌 조회 실패')
+    }
+  }
+
+  useEffect(()=>{
+    getAccountRecentTransfer()
+  },[])
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <HeaderScreen navigation={navigation} title="이체"></HeaderScreen>
+        <HeaderScreen navigation={navigation} title="계좌이체(1/4)"></HeaderScreen>
       </View>
-      <Text style={styles.leftAlignLabel}>포도은행</Text>
-      <Text style={styles.boldLeftAlignLabel}>1235-4568-4532</Text>
+      <View style={{flexDirection:"row"}}>
+        <Image
+          source={require("../../assets/images/normal_podo.png")}
+          style={styles.bankLogo}
+        />
+        <Text style={styles.leftAlignLabel}>포도은행</Text>
+      </View>
+      {/* <Text style={styles.boldLeftAlignLabel}>1235-4568-4532</Text> */}
+      <Text style={styles.boldLeftAlignLabel}>{settingAccountNumber(accountInfo.accountNumber)}</Text>
       <Text style={styles.leftAlignLabel}>
         출금가능금액 {availableAmount}원
       </Text>
@@ -99,18 +169,40 @@ export default function TransferScreen({ navigation }) {
         style={styles.row}
         onPress={() => setModalVisible(true)}
       >
-        <Text style={styles.backGrayText}>계좌번호</Text>
+        <Text style={[styles.backGrayText, { color: receiverAccount ? 'black' : 'gray'}]}>{receiverAccount?receiverAccount:"계좌번호"}</Text>
       </TouchableOpacity>
 
+      {/* 최근보낸 계좌 부분 */}
       <View style={styles.line} />
       <Text style={styles.centerLabel}>최근 보낸 계좌</Text>
       <View style={styles.line} />
-      {recentAccounts.map((account, index) => (
+      {recentWithdrawAccount.map((account, index) => (
+        <TouchableOpacity
+          key={index}
+          onPress={() => {
+            // setReceiverBank(account.bankName);
+            setReceiverBank("포도은행");
+            setReceiverAccount(account.accountNumber);
+          }}
+        >
+          <View style={styles.accountItem}>
+            <Image source={require("../../assets/images/normal_podo.png")} style={styles.profileImage} />
+            <Text style={styles.accountName}>{account.accountName}</Text>
+          </View>
+          <View style={styles.accountItem}>
+            {/* <Text style={styles.accountDetail}>{account.bankName}</Text> */}
+            <Text style={styles.accountDetail}>포도은행</Text>
+            <Text style={styles.accountNumber}>{account.accountNumber}</Text>
+          </View>
+          <View style={styles.line} />
+        </TouchableOpacity>
+      ))}
+      {/* {recentAccounts.map((account, index) => (
         <TouchableOpacity
           key={index}
           onPress={() => {
             setReceiverBank(account.bankName);
-            setAccountInput(account.accountNumber);
+            setReceiverAccount(account.accountNumber);
           }}
         >
           <View style={styles.accountItem}>
@@ -123,21 +215,21 @@ export default function TransferScreen({ navigation }) {
           </View>
           <View style={styles.line} />
         </TouchableOpacity>
-      ))}
+      ))} */}
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.centeredView}>
           <View style={styles.modalContainer}>
             <View style={styles.passwordHeader}>
               <Text style={styles.passwordLabelText}>계좌번호</Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <TouchableOpacity onPress={() => {setModalVisible(false), setReceiverAccount("")}}>
                 <Text style={styles.closeButtonText}>X</Text>
               </TouchableOpacity>
             </View>
             <TextInput
               style={styles.passwordInput}
               placeholder="계좌번호 입력"
-              value={accountInput}
-              onChangeText={setAccountInput}
+              value={receiverAccount}
+              onChangeText={setReceiverAccount}
             />
 
             <View style={styles.numPad}>
@@ -145,7 +237,7 @@ export default function TransferScreen({ navigation }) {
                 ["1", "2", "3"],
                 ["4", "5", "6"],
                 ["7", "8", "9"],
-                ["", "0", "<-"],
+                ["", "0", "←"],
               ].map((row, rowIndex) => (
                 <View key={rowIndex} style={styles.numRow}>
                   {row.map((num) => (
@@ -153,7 +245,7 @@ export default function TransferScreen({ navigation }) {
                       key={num}
                       style={styles.numButton}
                       onPress={() => {
-                        if (num === "<-") {
+                        if (num === "←") {
                           removeLast();
                         } else if (num !== "") {
                           appendAccount(num);
@@ -171,10 +263,12 @@ export default function TransferScreen({ navigation }) {
               style={styles.confirmButton}
               onPress={() => {
                 setModalVisible(false);
-                navigation.navigate("TransferAmountScreen", {
-                  receiverBank: receiverBank,
-                  accountInput: accountInput,
-                });
+                checkAccountOwnerInquiry()
+                // navigation.navigate("TransferAmountScreen", {
+                //   receiverBank: receiverBank,
+                //   receiverAccount: receiverAccount,
+                //   accountInfo: accountInfo,
+                // });
               }}
             >
               <Text style={styles.confirmButtonText}>확인</Text>
@@ -346,5 +440,9 @@ const styles = StyleSheet.create({
   confirmButtonText: {
     color: "white",
     fontSize: 18,
+  },
+  bankLogo: {
+    width: 20,
+    height: 20,
   },
 });
