@@ -267,7 +267,8 @@ public class AccountService {
 
         checkAccountUserAndPassword(account, user, deleteAccountDTO.getPassword(), passwordEncoder);
 
-        if(account.getBalance() != BigDecimal.ZERO) {
+        if(account.getBalance().compareTo(BigDecimal.ZERO) != 0) {
+            log.info(account.getBalance().toString());
             throw new AccountBalanceNotZeroException("잔액이 남아있습니다.");
         }
 
