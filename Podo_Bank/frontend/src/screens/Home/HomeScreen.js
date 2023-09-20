@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { AntDesign, Octicons  } from "@expo/vector-icons"; // AntDesign과 Entypo 아이콘 라이브러리 추가
 import FooterScreen from "../Header/FooterScreen";
 import HeaderComponent from "../Header/HeaderScreen";
@@ -133,7 +133,8 @@ export default function HomeScreen({ navigation }) {
             {/* 계좌 이체 버튼 */}
             <TouchableOpacity
               style={styles.transferButton}
-              onPress={() => navigation.navigate("TransferScreen", {account:account})}
+              // onPress={() => navigation.navigate("TransferScreen", {account:account})}
+              onPress={() => navigation.navigate("TransferScreen", {accountNumber:account.accountNumber})}
             >
               <Text style={styles.buttonText}>이체</Text>
             </TouchableOpacity>
@@ -152,7 +153,9 @@ export default function HomeScreen({ navigation }) {
 
         {/* 설정 버튼 */}
         <TouchableOpacity style={styles.settingsContainer}
-          onPress={()=>{}}
+          onPress={()=>{
+            Alert.alert('', '차후 기능을 추가할 예정입니다. 기대해주세요❤')
+          }}
         >
           <Octicons name="gear" size={16} color="black" />
           <Text style={styles.settingsText}>  대표계좌 설정</Text>

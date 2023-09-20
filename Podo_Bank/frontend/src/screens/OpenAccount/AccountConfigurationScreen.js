@@ -261,7 +261,12 @@ export default function AccountConfigurationScreen({ navigation, route }) {
       </View>
 
       {/* 제작 키보드 */}
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(false)
+          setPassword("")
+        }}
+      >
         <View style={styles.centeredView}>
           <View style={styles.modalContainer}>
             <View style={styles.passwordHeader}>
@@ -321,7 +326,13 @@ export default function AccountConfigurationScreen({ navigation, route }) {
       </Modal>
 
       {/* 제작 키보드 비밀번호 확인용 */}
-      <Modal animationType="slide" transparent={true} visible={checkPasswordModalVisible}>
+      <Modal animationType="slide" transparent={true} visible={checkPasswordModalVisible}
+        onRequestClose={() => {
+          setCheckPasswordModalVisible(false)
+          setPassword("")
+          setCheckPassword("")
+        }}
+      >
         <View style={styles.centeredView}>
           <View style={styles.modalContainer}>
             <View style={styles.passwordHeader}>
