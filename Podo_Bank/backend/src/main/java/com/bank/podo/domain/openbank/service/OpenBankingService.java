@@ -45,7 +45,7 @@ public class OpenBankingService {
                 serviceRepository.findByServiceCode(fintechOneCentVerificationDTO.getServiceCode())
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
 
-        Account userAccount = accountRepository.findByAccountNumberAndDeletedFalse(fintechOneCentVerificationDTO.getAccount())
+        Account userAccount = accountRepository.findByAccountNumberAndDeletedFalse(fintechOneCentVerificationDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("존재하지 않는 계좌입니다."));
 
         Account ftAccount = accountRepository.findByAccountNumberAndDeletedFalse(FintechService.getAccount().getAccountNumber())
