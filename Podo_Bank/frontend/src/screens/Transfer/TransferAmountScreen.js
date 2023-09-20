@@ -77,7 +77,7 @@ export default function TransferAmountScreen({ navigation, route }) {
   return (
     <View style={{flex:1, backgroundColor:'white'}}>
       <View style={styles.container}>
-        <HeaderScreen navigation={navigation} title="계좌이체(2/4)" />
+        <HeaderScreen navigation={navigation} title="계좌이체(2/3)" />
 
         {/* <Text style={styles.amountText}>{formatCurrency(amount)}</Text> */}
         <Text style={styles.amountText}>{amount.toLocaleString()}원</Text>

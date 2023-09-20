@@ -1,5 +1,6 @@
 package com.yongy.dotori.domain.user.controller;
 
+//import com.yongy.dotori.domain.user.SmsUtil;
 import com.yongy.dotori.domain.user.dto.request.UserInfoDto;
 import com.yongy.dotori.domain.user.dto.request.UserLoginDto;
 import com.yongy.dotori.domain.user.entity.Provider;
@@ -20,10 +21,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Random;
 
 @Slf4j
 @RestController
@@ -46,9 +50,10 @@ public class UserController {
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
 
+
     private final long exp = 1000L * 60 * 60;
 
-    @PostMapping("/check-id")
+    @PostMapping("/email/check-id")
     public ResponseEntity<? extends BaseResponseBody> validIdCheck(@RequestParam(name="id") String id){
         User user = userRepository.findById(id);
         if(user == null){
@@ -61,7 +66,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/check-code")
+    @PostMapping("/email/check-code")
     public ResponseEntity<? extends BaseResponseBody> validCodeCheck(
             @RequestParam(name="id") String id,
             @RequestParam(name="code") String code){
@@ -122,10 +127,6 @@ public class UserController {
         // refreshToken 저장
         refreshTokenRepository.save(RefreshToken.of(userLoginDto.getId(), jwtToken.getRefreshToken()));
 
-        log.info("----------");
-
-        // redisUtil.setDataExpire(user.getId(), jwtToken.getRefreshToken(), exp*24);
-
         // accessToken 전달
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, jwtToken));
     }
@@ -149,4 +150,24 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(404, "다시 로그인하세요"));
     }
+
+    // NOTE : 사용자 문자 인증
+//    @PostMapping("/sms/new-code")
+//    public ResponseEntity<? extends BaseResponseBody>sendMsgAuthCode(String phoneNumber){
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        User authUser = (User)auth.getPrincipal();
+//        if(authUser.getPhoneNumber() == null){
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "플랫폼에 사용자의 핸드폰 번호가 존재하지 않습니다."));
+//        }else if(authUser.getPhoneNumber().equals(phoneNumber)){
+//            // 문자 보내기
+//            userService.sendMsgAuthCode(phoneNumber);
+//
+//            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "인증코드 전송 완료"));
+//        }else{
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "사용자의 정보와 핸드폰 번호가 일치하지 않습니다."));
+//        }
+//    }
+
+//    @PostMapping("/sms/check-code")
+//    public ResponseEntity
 }

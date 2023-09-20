@@ -50,6 +50,7 @@ public class EmailService {
             verificationCodeRepository.save(VerificationCode.builder()
                     .email(email)
                     .code(code)
+                    .type(type)
                     .sendAt(LocalDateTime.now())
                     .build());
         }
@@ -57,10 +58,14 @@ public class EmailService {
         return messageSendSuccess;
     }
 
-    public EmailVerificationSuccessDTO checkVerificationCode(String email, String code) {
+    public EmailVerificationSuccessDTO checkVerificationCode(String email, String code, VerificationType type) {
         VerificationCode verificationCode = verificationCodeRepository.findById(email).orElse(null);
 
         if(verificationCode == null) {
+            throw new EmailVerificationException("인증 코드를 재발송 해주세요.");
+        }
+
+        if(!verificationCode.getType().equals(type)) {
             throw new EmailVerificationException("인증 코드를 재발송 해주세요.");
         }
 
@@ -75,6 +80,7 @@ public class EmailService {
                         .email(email)
                         .successAt(LocalDateTime.now())
                         .successCode(successCode)
+                        .type(type)
                         .build());
         // 인증 코드 삭제
         verificationCodeRepository.deleteById(email);
@@ -100,6 +106,8 @@ public class EmailService {
             return emailMessage.generateRegisterMessage(code);
         } else if(type.equals(VerificationType.RESET_PASSWORD)) {
             return emailMessage.generatePasswordResetMessage(code);
+        } else if(type.equals(VerificationType.RESET_ACCOUNT_PASSWORD)){
+            return emailMessage.generateAccountPasswordResetMessage(code);
         } else {
             return null;
         }
@@ -107,7 +115,7 @@ public class EmailService {
     }
 
     private boolean isResendTimeNotExpired(VerificationCode verificationCode) {
-        // TODO: 수정 필요
+        //TODO: 수정 필요
         return verificationCode.getSendAt().plusSeconds(10).isAfter(LocalDateTime.now());
 //        return verificationCode.getSendAt().plusMinutes(1).isAfter(LocalDateTime.now());
     }

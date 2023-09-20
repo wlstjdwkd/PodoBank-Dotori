@@ -15,6 +15,7 @@ const { width } = Dimensions.get("window");
 
 export default function AccountManagementScreen({ navigation, route }) {
   const [account, setAccount] = useState(route.params.account)
+  console.log(account)
 
   const copyAccountNumber = () => {
     // 클립보드로 복사하는 로직 추가 필요
@@ -80,17 +81,18 @@ export default function AccountManagementScreen({ navigation, route }) {
       <View style={styles.frontText}>
         <View style={styles.row}>
           <Text style={styles.grayText}>잔액</Text>
-          <Text>{account.balance.toLocaleString()}원</Text>
+          {account.balance?(<Text>{(Math.floor(account.balance)).toLocaleString()}원</Text>):(<Text>0원</Text>)}
         </View>
 
         <View style={styles.row}>
           <Text style={styles.grayText}>출금가능금액</Text>
-          <Text>1,000,000,000원</Text>
+          {account.balance?(<Text>{(Math.floor(account.balance)).toLocaleString()}원</Text>):(<Text>0원</Text>)}
         </View>
 
         <View style={styles.row}>
           <Text style={styles.grayText}>개설일</Text>
-          <Text>2017.08.04</Text>
+          {/* <Text>2017.08.04</Text> */}
+          {account.createAt?(<Text>{account.createAt}</Text>):(<Text>0000.00.00</Text>)}
         </View>
       </View>
 
@@ -126,13 +128,28 @@ export default function AccountManagementScreen({ navigation, route }) {
 
       <TouchableOpacity
         style={styles.row}
+        onPress={()=>{
+          navigation.navigate("AccountResetPasswordOneScreen", {accountNumber:account.accountNumber});
+        }}
+      >
+        <Text style={styles.backGrayText}>계좌 비밀번호 초기화</Text>
+        <Ionicons name="chevron-forward" size={24} color="black" />
+      </TouchableOpacity>
+      <View style={styles.separator} />
+
+      <TouchableOpacity
+        style={styles.row}
         // onPress={""}
       >
         <Text style={styles.backGrayText}>계좌 오류 해제</Text>
         <Ionicons name="chevron-forward" size={24} color="black" />
       </TouchableOpacity>
 
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={()=>{
+          navigation.navigate("AccountWithdrawalScreen", {account:account})
+        }}
+      >
         <Text style={styles.deleteAccountText}>
           계좌를 해지하시려면 여기를 눌러주세요.
         </Text>

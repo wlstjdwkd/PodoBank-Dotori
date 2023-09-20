@@ -37,5 +37,10 @@ public class AccountControllerAdvice {
     public ResponseEntity<String> handleAccountLockedException(AccountLockedException e) {
         return ResponseEntity.status(423).body(e.getMessage());
     }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleAccountBalanceNotZeroException(AccountBalanceNotZeroException e) {
+        return ResponseEntity.status(409).body(e.getMessage());
+    }
 }
 

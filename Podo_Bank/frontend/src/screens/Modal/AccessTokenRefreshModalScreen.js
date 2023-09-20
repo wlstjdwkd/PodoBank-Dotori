@@ -90,11 +90,12 @@ export default function AccessTokenRefreshModalScreen({ navigation }) {
           animationType="none"//slide, fade가 있음
           transparent={true}
           visible={userTokenRefreshModalVisible}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-            // dispatch(setUserTokenRefreshModalVisible(!userTokenRefreshModalVisible));
-            dispatch(setUserTokenRefreshModalVisible(false));
-          }}>
+          // onRequestClose={() => {
+          //   Alert.alert('Modal has been closed.');
+          //   // dispatch(setUserTokenRefreshModalVisible(!userTokenRefreshModalVisible));
+          //   dispatch(setUserTokenRefreshModalVisible(false));
+          // }}
+        >
           <View style={styles.centeredView}>
             <View style={[styles.modalView]}>
               <Text style={styles.modalText}>로그인을 유지하시겠습니까?</Text>

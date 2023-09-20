@@ -11,11 +11,15 @@ import {
 import HeaderComponent from "../Header/HeaderScreen";
 import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 import {
-  userEmailVerificationCheck, userPWEmailVerificationSend, userEmailDuplicationCheck,
+  userEmailDuplicationCheck,
 } from '../../apis/userapi'
+import {
+  userAccountPwEmailVerificationSend, userAccountPwEmailVerificationCheck
+} from '../../apis/accountapi'
 import { useSelector } from "react-redux";
 
-export default function ResetPasswordOneScreen({ navigation, route }) {
+export default function AccountResetPasswordOneScreen({ navigation, route }) {
+  const [accountNumber, setAccountNumber] = useState(route.params.accountNumber)
   const [authenEmail, SetAuthenEmail] = useState(false);      // 이메일 인증버튼 활성화하는 변수
   const [emailCode, SetEmailCode] = useState("");   // 8자리의 인증번호
   const [isAuthenEmail, SetIsAuthenEmail] = useState(false);  // E-mail 인증 완료 여부를 나타내는 변수
@@ -26,6 +30,7 @@ export default function ResetPasswordOneScreen({ navigation, route }) {
   const [emailMessage, setEmailMessage] = useState("");     // E-mail 사용가능 여부를 나타내는 메시지
   const [isDuplicated, setIsDuplicated] = useState(false)// E-mail 중복 여부를 나타내는 변수 true일때 사용 가능
   const [userInfo, setUserInfo] = useState({
+    accountNumber:accountNumber,
     email: "",
     newPassword: "",
     successCode: "",
@@ -75,11 +80,11 @@ export default function ResetPasswordOneScreen({ navigation, route }) {
   
 
   // 이메일 전송
-  const handleUserPWEmailVerificationSend = async()=>{
+  const handleUserAccountPwEmailVerificationSend = async()=>{
     const responseDuplicated = await handleUserEmailDuplicationCheck()
     if(responseDuplicated.status===409){
     // if(isDuplicated===false){
-      const response = await userPWEmailVerificationSend(email)
+      const response = await userAccountPwEmailVerificationSend(email)
       if(response.status===200){
         console.log('이메일 전송 성공')
         setCountdown(300)
@@ -94,8 +99,8 @@ export default function ResetPasswordOneScreen({ navigation, route }) {
     }
   }
   // 이메일 인증번호 확인
-  const handleUserEmailVerificationCheck = async()=>{
-    const response = await userEmailVerificationCheck(emailCode, email, "RESET_ACCOUNT_PASSWORD")
+  const handleUserAccountPwEmailVerificationCheck = async()=>{
+    const response = await userAccountPwEmailVerificationCheck(emailCode, email)
     if (response.status===400) {
       setCodeMessage("잘못된 인증번호입니다.");
       SetIsAuthenEmail(false);
@@ -131,7 +136,7 @@ export default function ResetPasswordOneScreen({ navigation, route }) {
       {/* Header */}
       <HeaderComponent
         navigation={navigation}
-        title="비밀번호 초기화(1/2)"
+        title="계좌 비밀번호 초기화(1/2)"
       ></HeaderComponent>
 
       {/* 본인 인증 안내 */}
@@ -149,7 +154,7 @@ export default function ResetPasswordOneScreen({ navigation, route }) {
               setUserInfo((prev) => ({ ...prev, email: text }))
             }}
             multiline={true}
-            placeholder="ID로 사용할 이메일을 입력해주세요."
+            placeholder="본인 ID를 입력해주세요."
             keyboardType="email-address"
             editable={!isAuthenEmail} // 인증이 완료되면 수정불가
           />
@@ -161,7 +166,7 @@ export default function ResetPasswordOneScreen({ navigation, route }) {
             
             onPress={() => {
               SetAuthenEmail(true);
-              handleUserPWEmailVerificationSend()
+              handleUserAccountPwEmailVerificationSend()
             }}
             disabled={isAuthenEmail}
           >
@@ -202,7 +207,7 @@ export default function ResetPasswordOneScreen({ navigation, route }) {
               ]}
               disabled={(!(emailCode.length == 8)) || isAuthenEmail}
               onPress={()=>{
-                handleUserEmailVerificationCheck()
+                handleUserAccountPwEmailVerificationCheck()
                 // compareAuthenNum()
               }}
             >
@@ -250,7 +255,7 @@ export default function ResetPasswordOneScreen({ navigation, route }) {
         ]}
         // back에 회원가입 정보 보내야함
         onPress={() =>{
-          navigation.navigate("ResetPasswordTwoScreen", { userInfo: userInfo })
+          navigation.navigate("AccountResetPasswordTwoScreen", { userInfo: userInfo })
         }}
         disabled={!isAuthenEmail || (countdown<=0)}
       >
