@@ -24,6 +24,13 @@ import OneCent2Screen from "../screens/OneCent/OneCent2Screen";
 import OneCent3Screen from "../screens/OneCent/OneCent3Screen";
 import OneCent4Screen from "../screens/OneCent/OneCent4Screen";
 
+import MyPageScreen from "../screens/MyPage/MyPageScreen"
+import PasswordChangeScreen from "../screens/MyPage/PasswordChangeScreen"
+import CategoryScreen from "../screens/MyPage/CategoryScreen"
+import CategorySettingScreen from "../screens/MyPage/CategorySettingScreen";
+import ReceipeSelectScreen from "../screens/MyPage/ReceipeSelectScreen";
+import ReceipeScreen from "../screens/MyPage/ReceipeScreen";
+
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
@@ -116,6 +123,30 @@ export default function AppNavigator() {
       <Stack.Screen
         name="OneCent4Screen"
         component={OneCent4Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+      name="MyPageScreen"
+      component={MyPageScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+      name="PasswordChangeScreen"
+      component={PasswordChangeScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+      name="CategoryScreen"
+      component={CategoryScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+      name="CategorySettingScreen"
+      component={CategorySettingScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+      name="ReceipeSelectScreen"
+      component={ReceipeSelectScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+      name="ReceipeScreen"
+      component={ReceipeScreen}
       ></Stack.Screen>
     </Stack.Navigator>
   );
