@@ -19,6 +19,7 @@ import {
 import { useSelector } from "react-redux";
 
 export default function AccountResetPasswordOneScreen({ navigation, route }) {
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   const [accountNumber, setAccountNumber] = useState(route.params.accountNumber)
   const [authenEmail, SetAuthenEmail] = useState(false);      // 이메일 인증버튼 활성화하는 변수
   const [emailCode, SetEmailCode] = useState("");   // 8자리의 인증번호
@@ -261,7 +262,7 @@ export default function AccountResetPasswordOneScreen({ navigation, route }) {
       >
         <Text style={styles.linkText}>다음</Text>
       </TouchableOpacity>
-      {/* {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />} */}
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }
