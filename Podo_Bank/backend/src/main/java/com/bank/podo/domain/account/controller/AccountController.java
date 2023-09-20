@@ -109,7 +109,7 @@ public class AccountController {
             @ApiResponse(responseCode = "429", description = "계좌 비밀번호 형식 오류")
     })
     @PatchMapping("/password/change")
-    public ResponseEntity<AccountDTO> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+    public ResponseEntity<AccountDTO> changePassword(@RequestBody ChangeAccountPasswordDTO changePasswordDTO) {
         accountService.changePassword(changePasswordDTO, passwordEncoder);
         return ResponseEntity.ok().build();
     }
