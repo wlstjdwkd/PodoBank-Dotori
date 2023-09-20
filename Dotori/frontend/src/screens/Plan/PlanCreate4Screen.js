@@ -51,6 +51,7 @@ export default function PlanCreate4Screen({ navigation, route }) {
   //   ];
   const [data, setData] = useState(categoryData);
 
+  //드래그앤 드롭.. 대실패 일단 보류
   const renderItem = ({ item, index, drag, isActive }) => {
     return (
       <TouchableOpacity
@@ -130,7 +131,7 @@ export default function PlanCreate4Screen({ navigation, route }) {
           <Text style={styles.moveText}>카테고리를 눌러서 옮겨보세요!</Text>
         </View>
 
-        {/* {categoryData.map((group, index) => (
+        {categoryData.map((group, index) => (
           <View key={index} style={styles.categoryGroup}>
             <Text style={styles.inputText}>{group.categoryGroupName}</Text>
             <View style={styles.categoriesContainer}>
@@ -143,13 +144,13 @@ export default function PlanCreate4Screen({ navigation, route }) {
               ))}
             </View>
           </View>
-        ))} */}
-        <DraggableFlatList
+        ))}
+        {/* <DraggableFlatList
           data={data}
           renderItem={renderItem}
           keyExtractor={(item, index) => `draggable-item-${index}`}
           onDragEnd={({ data }) => setCategoryData(data)}
-        />
+        /> */}
 
         {/* <Text style={styles.inputText}>등록된 카테고리 그룹</Text>
         <View style={styles.categoriesContainer}>
