@@ -63,19 +63,11 @@ public class UserAuthController {
         }
     }
 
-
-    // 은행의 모든 정보 가져오기
-
-
-
-    // NOTE : 포도은행에서 계좌의 존재 여부 확인하기
-    //  토큰이 있으면 1원인증
-    //  토큰이 없으면 포도은행에 로그인하고 accessToken, refreshToken 받아온 후 1원 인증을 요청함
+    // NOTE : 포도은행에서 계좌의 존재 여부 확인하기(토큰 O : 1원인증, 토큰 X : 포도은행에 로그인하고 accessToken, refreshToken 받아온 후 1원인증
     @PostMapping("/podoBank/check-account")
     public ResponseEntity<? extends BaseResponseBody> sendAccountAuthCode(@RequestBody UserAccountDto userAccountDto) throws ParseException {
         return userAuthService.sendAccountInfo(userAccountDto);
     }
-
 
     // NOTE : 인증번호 전송
     @PostMapping("/podoBank/check-code")
