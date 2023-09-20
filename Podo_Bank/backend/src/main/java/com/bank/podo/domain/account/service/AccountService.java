@@ -123,7 +123,7 @@ public class AccountService {
     }
 
     @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
-    public void changePassword(ChangePasswordDTO changePasswordDTO, PasswordEncoder passwordEncoder) {
+    public void changePassword(ChangeAccountPasswordDTO changePasswordDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
         Account account = accountRepository.findByAccountNumberAndDeletedFalse(changePasswordDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
