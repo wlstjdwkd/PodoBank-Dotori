@@ -287,12 +287,12 @@ public class AccountService {
 
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("createdAt").descending());
 
-        List<TransactionHistory> accountList = transactionHistoryRepository.findAllByAccountAndTransactionType(account, TransactionType.TRANSFER, pageRequest);
+        List<Account> accountList = transactionHistoryRepository.findThreeMostRecentUniqueAccounts(account);
 
         return accountList.stream()
-                .map(transactionHistory -> RecentAccountDTO.builder()
-                        .accountNumber(transactionHistory.getCounterAccount().getAccountNumber())
-                        .accountName(transactionHistory.getCounterAccount().getUser().getName())
+                .map(counterAccount -> RecentAccountDTO.builder()
+                        .accountNumber(counterAccount.getAccountNumber())
+                        .accountName(counterAccount.getUser().getName())
                         .build())
                 .collect(Collectors.toList());
     }
