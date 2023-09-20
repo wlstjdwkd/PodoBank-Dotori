@@ -12,6 +12,13 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(name = "transaction_history",
+    indexes = {
+            @Index(name = "idx_account_seq", columnList = "account_seq"),
+            @Index(name = "idx_counter_account_seq", columnList = "counter_account_seq"),
+            @Index(name = "idx_create_at", columnList = "created_at")
+    }
+)
 public class TransactionHistory extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
