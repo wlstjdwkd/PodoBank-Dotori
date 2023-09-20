@@ -61,6 +61,7 @@ public class AccountService {
                 .balance(BigDecimal.ZERO)
                 .password(passwordEncoder.encode(createAccountDTO.getPassword()))
                 .accountCategory(accountCategory)
+                .nickname(user.getName()+"님의 "+accountCategory.getAccountName())
                 .build();
         accountRepository.save(account);
 
@@ -69,7 +70,8 @@ public class AccountService {
                 .accountType(account.getAccountType())
                 .balance(account.getBalance().toString())
                 .interestRate(account.getAccountCategory().getInterestRate())
-                .nickname(user.getName()+"님의 "+accountCategory.getAccountName())
+                .createAt(account.getCreatedAt())
+                .nickname(account.getName())
                 .build();
     }
 

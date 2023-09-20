@@ -95,6 +95,9 @@ public class Account extends BaseEntity {
         if(account.getLoanInfo() != null) {
             this.loanInfo = account.getLoanInfo();
         }
+        if(account.getName() != null) {
+            this.name = account.getName();
+        }
 
         return this;
     }
