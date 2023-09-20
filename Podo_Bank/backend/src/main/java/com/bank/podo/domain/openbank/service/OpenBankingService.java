@@ -67,7 +67,7 @@ public class OpenBankingService {
 
         TransactionHistory senderAccountHistory = TransactionHistory.builder()
                 .transactionType(TransactionType.TRANSFER)
-                .amount(transferAmount.negate())
+                .amount(transferAmount)
                 .balanceAfter(ftAccount.getBalance())
                 .counterAccount(userAccount)
                 .account(ftAccount)
