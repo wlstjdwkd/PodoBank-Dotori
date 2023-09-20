@@ -82,7 +82,6 @@ public class UserAuthService {
 
     // NOTE: 사용자의 access, refreshToken 가져오기 headers.add("Content-Type", "application/json;charset=utf-8");
     public void podoBankLogin(Bank bankInfo){
-
         try{
 
             HttpHeaders headers = new HttpHeaders();
@@ -91,14 +90,11 @@ public class UserAuthService {
             Map<String, String> bodyData = new HashMap<>();
             bodyData.put("email", bankInfo.getBankId());
             bodyData.put("password", bankInfo.getBankPwd());
-            System.out.println("email : "+ bodyData.get("email")+", password : "+bodyData.get("password"));
-            HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, headers);
 
-            log.info("-------(1)podoBankLogin-------");
+            HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, headers);
 
             RestTemplate restTemplate = new RestTemplate();
 
-            log.info("-------(2)podoBankLogin-------");
             ResponseEntity<String> response = restTemplate.exchange(
                     bankInfo.getBankUrl()+"/api/v1/user/login",
                     HttpMethod.POST,
@@ -114,7 +110,6 @@ public class UserAuthService {
             String refreshToken = (String) jsonObject.get("refreshToken");
 
             dotoriAccessTokenRepository.save(PodoBankAccessToken.of("accessToken", accessToken));
-
             dotoriRefreshTokenRepository.save(PodoBankRefreshToken.of("refreshToken", refreshToken));
         } catch (ParseException e) {
             throw new RuntimeException(e);
@@ -127,8 +122,6 @@ public class UserAuthService {
         Optional<PodoBankRefreshToken> dotoriRefreshToken = dotoriRefreshTokenRepository.findById("refreshToken");
 
         Bank bankInfo = null;
-
-        log.info("log : "+dotoriAccessToken+"////"+dotoriRefreshToken);
 
         if(dotoriAccessToken.isEmpty()){
             if(dotoriRefreshToken.isEmpty()){
@@ -149,8 +142,6 @@ public class UserAuthService {
     public ResponseEntity<? extends BaseResponseBody>sendAccountInfo(UserAccountDto userAccountDto) throws ParseException {
         Bank bankInfo = this.getConnectionToken(userAccountDto.getBankSeq());
 
-        System.out.println("useToken : "+ useToken);
-
         // 은행의 정보
         if(bankInfo == null)
             bankInfo = bankRepository.findByBankSeq(userAccountDto.getBankSeq());
@@ -168,16 +159,12 @@ public class UserAuthService {
 
         RestTemplate restTemplate = new RestTemplate();
 
-        log.info(bodyData.get("serviceCode")+"/"+bodyData.get("accountNumber"));
-
         ResponseEntity<String> response = restTemplate.exchange(
                     bankInfo.getBankUrl() + "/api/v1/fintech/oneCentVerification",
                     HttpMethod.POST,
                     httpEntity,
                     String.class
         );
-
-        log.info(response.getStatusCode().toString());
 
         String responseCode = response.getStatusCode().toString().split(" ")[0];
 
@@ -189,8 +176,6 @@ public class UserAuthService {
     // NOTE : 1원 인증의 인증코드를 전송함
     public ResponseEntity<? extends BaseResponseBody>checkAccountAuthCode(UserAccountCodeDto userAccountCodeDto) throws ParseException {
         Bank bankInfo = this.getConnectionToken(userAccountCodeDto.getBankSeq());
-
-        System.out.println("useToken : "+ useToken);
 
         // 은행의 정보
         if(bankInfo == null)
@@ -205,7 +190,6 @@ public class UserAuthService {
         bodyData.put("accountNumber", userAccountCodeDto.getAccountNumber());
         bodyData.put("verificationCode", "도토리"+userAccountCodeDto.getVerificationCode());
 
-
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, headers);
 
         RestTemplate restTemplate = new RestTemplate();
@@ -216,8 +200,6 @@ public class UserAuthService {
                 httpEntity,
                 String.class
         );
-
-        log.info(response.getStatusCode().toString());
 
         String responseCode = response.getStatusCode().toString().split(" ")[0];
 
