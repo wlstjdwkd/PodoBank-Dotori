@@ -13,11 +13,13 @@ import HeaderComponent from "../Header/HeaderScreen";
 import { AntDesign } from "@expo/vector-icons";
 import {accountTypeInquiry} from "../../apis/accountapi"
 import { useSelector } from "react-redux";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 
 const { height, width } = Dimensions.get("window");
 
 
 export default function AccountConfigurationScreen({ navigation }) {
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   const [createInfo, setCreateInfo] = useState({
     accountCategoryId:null,
     password:"",
@@ -118,6 +120,7 @@ export default function AccountConfigurationScreen({ navigation }) {
       >
         <Text style={styles.confirmText}>다음</Text>
       </TouchableOpacity>
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }

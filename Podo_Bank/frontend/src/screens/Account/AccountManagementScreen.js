@@ -22,6 +22,7 @@ const { width } = Dimensions.get("window");
 export default function AccountManagementScreen({ navigation, route }) {
   const accessToken = useSelector((state) => state.user.accessToken)
   const [account, setAccount] = useState(route.params.account)
+  const [nickname, setNickname] = useState(route.params.nickname)
   console.log(account)
 
   // 비밀번호 숫자 4자리 맞는지 확인
@@ -185,7 +186,7 @@ export default function AccountManagementScreen({ navigation, route }) {
       {/* Header */}
       <HeaderComponent title="거래내역조회" navigation={navigation} />
 
-      <Text style={styles.bankName}>포도은행 통장</Text>
+      <Text style={styles.bankName}>포도은행 - {nickname}</Text>
       <View style={styles.accountRow}>
         <Text style={styles.boldText}>{settingAccountNumber(account.accountNumber)}</Text>
         <TouchableOpacity

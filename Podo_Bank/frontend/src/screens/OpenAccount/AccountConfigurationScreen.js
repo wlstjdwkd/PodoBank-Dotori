@@ -13,11 +13,13 @@ import HeaderComponent from "../Header/HeaderScreen";
 import { AntDesign } from "@expo/vector-icons";
 import {accountTypeInquiry} from "../../apis/accountapi"
 import { useSelector } from "react-redux";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 
 const { height, width } = Dimensions.get("window");
 
 
 export default function AccountConfigurationScreen({ navigation, route }) {
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   // const [createInfo, setCreateInfo] = useState({
   //   accountType:"",
   //   password:"",
@@ -282,6 +284,7 @@ export default function AccountConfigurationScreen({ navigation, route }) {
               onChangeText={setPassword}
               editable={false}  // textInput이 가진 keyboard열기 방지
               maxLength={4}
+              secureTextEntry={true}
             />
 
             <View style={styles.numPad}>
@@ -348,6 +351,7 @@ export default function AccountConfigurationScreen({ navigation, route }) {
               onChangeText={setCheckPassword}
               editable={false}  // textInput이 가진 keyboard열기 방지
               maxLength={4}
+              secureTextEntry={true}
             />
 
             <View style={styles.numPad}>
@@ -435,6 +439,7 @@ export default function AccountConfigurationScreen({ navigation, route }) {
       >
         <Text style={styles.confirmText}>다음</Text>
       </TouchableOpacity>
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }

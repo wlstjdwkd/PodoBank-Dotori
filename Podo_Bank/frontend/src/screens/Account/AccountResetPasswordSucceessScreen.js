@@ -15,7 +15,7 @@ import { useSelector } from "react-redux";
 export default function AccountResetPasswordSucceessScreen({ navigation, route }) {
   const [email] = useState(route.params.email)
   const [accountNumber] = useState(route.params.accountNumber)
-  // const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
 
   // 계좌 번호 형식 맞추는 함수
   const settingAccountNumber = (accountNumber) =>{
@@ -54,7 +54,7 @@ export default function AccountResetPasswordSucceessScreen({ navigation, route }
         {/* <View style={{flex:0.2}}>
         </View> */}
       </View>
-      {/* {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />} */}
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }

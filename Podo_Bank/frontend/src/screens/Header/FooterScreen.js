@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from "react-native";
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 
 export default function FooterScreen({ navigation }) {
@@ -14,7 +14,10 @@ export default function FooterScreen({ navigation }) {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.iconContainer}
-        onPress={() => navigation.navigate("HomeScreen")}
+        onPress={() => {
+          Alert.alert('', '차후 기능을 추가할 예정입니다. 기대해주세요❤')
+          navigation.navigate("HomeScreen")
+        }}
       >
         <Image
           style={{ width: 24, height: 24 }}

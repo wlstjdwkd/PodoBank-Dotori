@@ -15,10 +15,12 @@ import {
 import HeaderScreen from "../Header/HeaderScreen";
 import { useSelector } from "react-redux";
 import {accountTransfer} from "../../apis/accountapi"
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 
 const { width } = Dimensions.get("window");
 
 export default function TransferDetailScreen({ navigation, route }) {
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   // const { amount, receiverBank, receiverAccount } = route.params;
   const accessToken = useSelector((state) => state.user.accessToken)
   const userInfo = useSelector((state) => state.user.userInfo)
@@ -342,6 +344,7 @@ export default function TransferDetailScreen({ navigation, route }) {
         <Text style={styles.confirmText}>다음</Text>
       </TouchableOpacity>
       {/* </View> */}
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }

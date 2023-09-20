@@ -11,8 +11,10 @@ import {
 import HeaderComponent from "../Header/HeaderScreen";
 import { accountCreate, } from '../../apis/accountapi'
 import { useDispatch, useSelector } from "react-redux";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 
 export default function AccountRestrictionScreen({ navigation, route }) {
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   const [createInfo, setCreateInfo] = useState(route.params.createInfo)
   const [isChecked, setChecked] = useState(false);
   const accessToken = useSelector((state) => state.user.accessToken)
@@ -148,6 +150,7 @@ export default function AccountRestrictionScreen({ navigation, route }) {
       >
         <Text style={styles.applyText}>신청하기</Text>
       </TouchableOpacity>
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </ScrollView>
   );
 }

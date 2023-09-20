@@ -10,11 +10,12 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 import HeaderScreen from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 
 const { width } = Dimensions.get("window");
 
 export default function TransferAmountScreen({ navigation, route }) {
-  
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   // const { receiverBank, accountInput } = route.params;
   const [receiverName, setReceiverName] = useState(route.params.receiverName) ;
   const [receiverBank, setReceiverBank] = useState(route.params.receiverBank) ;
@@ -166,6 +167,7 @@ export default function TransferAmountScreen({ navigation, route }) {
         >
           <Text style={styles.confirmText}>확인</Text>
         </TouchableOpacity>
+        {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }

@@ -8,8 +8,10 @@ import {
   Image,
 } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen"; // 경로는 실제 HeaderComponent의 위치에 따라 변경해주세요.
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 
 export default function AccountSetupScreen({ navigation }) {
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   const initialOpacity = 0;
   const [fadeAnim] = useState(new Animated.Value(initialOpacity));
   const [slideUpAnim1] = useState(new Animated.Value(50));
@@ -134,6 +136,7 @@ export default function AccountSetupScreen({ navigation }) {
           <Text style={styles.buttonText}>신청하기</Text>
         </TouchableOpacity>
       </View>
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }

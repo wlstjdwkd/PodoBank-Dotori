@@ -24,34 +24,6 @@ export default function AccessTokenRefreshModalScreen({ navigation }) {
   const refreshToken = useSelector((state) => state.user.refreshToken)
   const dispatch = useDispatch();
   const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible);
-  // dispatch(setUserTokenRefreshModalVisible(false))  // 모달창 닫기에 사용됨
-  // dispatch(setUserTokenRefreshModalVisible(!userTokenRefreshModalVisible))  // 모달창 닫기에 사용됨
-
-  // const handleUserRefresh = async()=>{
-  //   const response = await userRefresh(refreshToken)
-  //   if(response.status === 200){
-  //     console.log('토큰 재발급 성공')
-  //     dispatch(inputAccessToken(response.data.accessToken))
-  //     dispatch(inputRefreshToken(response.data.refreshToken))
-  //     dispatch(setUserTokenRefreshModalVisible(false))      
-  //     dispatch(setAccessTokenExpiration(600))
-  //   }else if(response.status === 400){
-  //     console.log('토큰 재발급 실패')
-  //     Alert.alert('','로그인 연장에 실패해서 로그인 화면으로 돌아갑니다.')
-  //     navigation.reset({
-  //       index: 0,
-  //       routes: [{ name: 'LoginScreen', params: {},}],
-  //     });
-  //   }else{
-  //     console.log('오류 발생: 토큰 재발급')
-  //     Alert.alert('','로그인 연장에 실패해서 로그인 화면으로 돌아갑니다.')
-  //     navigation.reset({
-  //       index: 0,
-  //       routes: [{ name: 'LoginScreen', params: {},}],
-  //     });
-  //   }
-  // }
-  
 
   const handleUserRefresh = async () => {
     const response = await userRefresh(refreshToken);

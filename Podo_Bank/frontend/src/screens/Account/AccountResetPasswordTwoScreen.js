@@ -24,7 +24,7 @@ export default function AccountResetPasswordTwoScreen({ navigation, route }) {
   const [isSucceed, setIsSucceed] = useState(false);              // 비밀번호 초기화 성공여부
   const [registeredMessage, setRegisteredMessage] = useState(""); // 비밀번호 초기화 버튼 클릭시 메시지
   console.log(userInfo)
-  // const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
 
   // const validatePassword = (password) => {
   //   const regex =
@@ -176,7 +176,7 @@ export default function AccountResetPasswordTwoScreen({ navigation, route }) {
       >
         <Text style={styles.linkText}>비밀번호 등록</Text>
       </TouchableOpacity>
-      {/* {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />} */}
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }

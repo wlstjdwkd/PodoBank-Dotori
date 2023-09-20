@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
+import { useSelector } from "react-redux";
 
 export default function TransferCompleteScreen({ navigation, route }) {
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   // const { receiverName, transferAmount } = route.params
   const [accountInfo] = useState(route.params.accountInfo)
   const [receiverName] = useState(route.params.receiverName)
@@ -72,6 +75,7 @@ export default function TransferCompleteScreen({ navigation, route }) {
       >
         <Text style={styles.buttonText}>확인</Text>
       </TouchableOpacity>
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }
