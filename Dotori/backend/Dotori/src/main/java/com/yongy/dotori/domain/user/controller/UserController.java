@@ -1,6 +1,5 @@
 package com.yongy.dotori.domain.user.controller;
 
-//import com.yongy.dotori.domain.user.SmsUtil;
 import com.yongy.dotori.domain.user.dto.request.UserInfoDto;
 import com.yongy.dotori.domain.user.dto.request.UserLoginDto;
 import com.yongy.dotori.domain.user.entity.Provider;
@@ -21,13 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.Random;
 
 @Slf4j
 @RestController
@@ -50,33 +47,29 @@ public class UserController {
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
 
-
-    private final long exp = 1000L * 60 * 60;
-
     @PostMapping("/email/check-id")
     public ResponseEntity<? extends BaseResponseBody> validIdCheck(@RequestParam(name="id") String id){
         User user = userRepository.findById(id);
         if(user == null){
             // 이메일 인증을 한다.
-            userService.authEmail(id);
-            log.info("come!");
-            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "이메일 인증을 끝냈습니다."));
+            userService.emailCert(id);
+            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "이메일 인증 번호를 전송했습니다."));
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4001, ExceptionEnum.ALREADY_EXIST_ID));
         }
     }
 
     @PostMapping("/email/check-code")
-    public ResponseEntity<? extends BaseResponseBody> validCodeCheck(
-            @RequestParam(name="id") String id,
-            @RequestParam(name="code") String code){
+    public ResponseEntity<? extends BaseResponseBody> validEmailCodeCheck(@RequestParam(name="code") String code){
 
-        String authCode = userService.getAuthCode(id); // 인증번호 검증
+        String authId = userService.getEmailAuthId(code); // 인증번호 검증
 
-        if(authCode == null) { // 인증번호의 시간이 만료됨
+        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if(authId == null) { // 인증번호의 시간이 만료됨
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4002, ExceptionEnum.EXPIRED_AUTHCODE));
-        }else if(authCode.equals(code)){
-            userService.deleteAuthCode(id); // 인증번호 삭제
+        }else if(authId.equals(user.getId())){
+            userService.deleteEmailAuthCode(code); // 인증번호 삭제
             return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "인증 완료"));
         }else{ // 인증번호가 틀림
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4003, ExceptionEnum.INVALID_AUTHCODE));
@@ -88,7 +81,7 @@ public class UserController {
         try{
             User user = User.builder()
                     .id(userInfoDto.getId())
-                    .password(passwordEncoder.encode(userInfoDto.getPassword())) // 사용자의 비밀번호를 암호화하기
+                    .password(passwordEncoder.encode(userInfoDto.getPassword()))
                     .userName(userInfoDto.getUserName())
                     .birthDate(LocalDate.parse(userInfoDto.getBirthDate()))
                     .phoneNumber(userInfoDto.getPhoneNumber())
@@ -150,24 +143,4 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(404, "다시 로그인하세요"));
     }
-
-    // NOTE : 사용자 문자 인증
-//    @PostMapping("/sms/new-code")
-//    public ResponseEntity<? extends BaseResponseBody>sendMsgAuthCode(String phoneNumber){
-//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        User authUser = (User)auth.getPrincipal();
-//        if(authUser.getPhoneNumber() == null){
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "플랫폼에 사용자의 핸드폰 번호가 존재하지 않습니다."));
-//        }else if(authUser.getPhoneNumber().equals(phoneNumber)){
-//            // 문자 보내기
-//            userService.sendMsgAuthCode(phoneNumber);
-//
-//            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "인증코드 전송 완료"));
-//        }else{
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "사용자의 정보와 핸드폰 번호가 일치하지 않습니다."));
-//        }
-//    }
-
-//    @PostMapping("/sms/check-code")
-//    public ResponseEntity
 }

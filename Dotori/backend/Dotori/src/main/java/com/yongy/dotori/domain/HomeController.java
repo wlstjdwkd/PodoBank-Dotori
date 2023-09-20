@@ -1,7 +1,7 @@
 package com.yongy.dotori.domain;
 
-import com.yongy.dotori.global.security.service.KakaoService;
-import com.yongy.dotori.global.security.service.NaverService;
+import com.yongy.dotori.domain.user.service.KakaoService;
+import com.yongy.dotori.domain.user.service.NaverService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

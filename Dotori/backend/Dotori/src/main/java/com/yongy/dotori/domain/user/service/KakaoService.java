@@ -1,4 +1,4 @@
-package com.yongy.dotori.global.security.service;
+package com.yongy.dotori.domain.user.service;
 
 import com.yongy.dotori.domain.user.entity.Provider;
 import com.yongy.dotori.domain.user.entity.Role;

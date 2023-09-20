@@ -2,6 +2,7 @@ package com.yongy.dotori.global.security.provider;
 
 import com.yongy.dotori.domain.user.entity.Role;
 import com.yongy.dotori.domain.user.entity.User;
+import com.yongy.dotori.global.security.dto.ErrorMessage;
 import com.yongy.dotori.global.security.dto.JwtToken;
 import com.yongy.dotori.global.security.service.UserDetailsService;
 import io.jsonwebtoken.*;
@@ -77,8 +78,22 @@ public class JwtTokenProvider {
     }
 
     public String getUserId(String token){
-        return Jwts.parserBuilder().setSigningKey(secretKey).build()
-                .parseClaimsJws(token).getBody().getSubject();
+        try{
+            return Jwts.parserBuilder().setSigningKey(secretKey).build()
+                    .parseClaimsJws(token).getBody().getSubject();
+        }catch (SignatureException e) {
+            log.info("SignatureException");
+            throw new JwtException(ErrorMessage.WRONG_TYPE_TOKEN.getMessage());
+        } catch (MalformedJwtException e) {
+            log.info("MalformedJwtException");
+            throw new JwtException(ErrorMessage.UNSUPPORTED_TOKEN.getMessage());
+        } catch (ExpiredJwtException e) {
+            log.info("ExpiredJwtException");
+            throw new JwtException(ErrorMessage.EXPIRED_TOKEN.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.info("IllegalArgumentException");
+            throw new JwtException(ErrorMessage.UNKNOWN_ERROR.getMessage());
+        }
     }
 
 

@@ -5,7 +5,7 @@ import lombok.Getter;
 import org.springframework.data.redis.core.RedisHash;
 
 @Getter
-@RedisHash(value="emailAuth", timeToLive = 1000L * 60 * 5)
+@RedisHash(value="EmailAuth", timeToLive = 1000L * 60 * 5)
 public class EmailAuth {
 
     @Id
