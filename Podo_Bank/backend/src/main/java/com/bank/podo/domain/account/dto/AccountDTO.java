@@ -16,13 +16,15 @@ public class AccountDTO {
     private String balance;
     private LocalDateTime createAt;
     private BigDecimal interestRate;
+    private String nickname;
 
     @Builder
-    public AccountDTO(String accountNumber, AccountType accountType, String balance, LocalDateTime createAt, BigDecimal interestRate) {
+    public AccountDTO(String accountNumber, AccountType accountType, String balance, LocalDateTime createAt, BigDecimal interestRate, String nickname) {
         this.accountNumber = accountNumber;
         this.accountType = accountType;
         this.balance = balance;
         this.createAt = createAt;
         this.interestRate = interestRate;
+        this.nickname = nickname;
     }
 }

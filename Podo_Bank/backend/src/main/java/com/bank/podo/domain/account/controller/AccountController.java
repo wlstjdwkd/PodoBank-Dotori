@@ -203,4 +203,18 @@ public class AccountController {
         List<RecentAccountDTO> recentAccountList = accountService.getRecentTransferAccountList(accountNumber);
         return ResponseEntity.ok(recentAccountList);
     }
+
+    @Operation(summary = "계좌 별칭 수정", description = "USER")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "계좌 별칭 수정 성공"),
+            @ApiResponse(responseCode = "400", description = "계좌 별칭 수정 실패"),
+            @ApiResponse(responseCode = "401", description = "권한 없음"),
+            @ApiResponse(responseCode = "403", description = "계좌 소유주 불일치"),
+            @ApiResponse(responseCode = "404", description = "계좌 없음")
+    })
+    @PatchMapping("/nickname")
+    public ResponseEntity<Void> updateAccountNickname(@RequestBody UpdateAccountNicknameDTO updateAccountNicknameDTO) {
+        accountService.updateAccountNickname(updateAccountNicknameDTO);
+        return ResponseEntity.ok().build();
+    }
 }
