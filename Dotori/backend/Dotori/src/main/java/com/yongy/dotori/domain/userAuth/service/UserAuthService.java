@@ -6,12 +6,12 @@ import com.yongy.dotori.domain.userAuth.dto.request.UserAccountCodeDto;
 import com.yongy.dotori.domain.userAuth.dto.request.UserAccountDto;
 import com.yongy.dotori.global.common.BaseResponseBody;
 import com.yongy.dotori.global.email.EmailUtil;
-import com.yongy.dotori.global.redis.entity.PodoBankAccessToken;
-import com.yongy.dotori.global.redis.entity.PodoBankRefreshToken;
+import com.yongy.dotori.global.redis.entity.BankAccessToken;
+import com.yongy.dotori.global.redis.entity.BankRefreshToken;
 import com.yongy.dotori.global.redis.entity.FintechToken;
 import com.yongy.dotori.global.redis.entity.PersonalAuth;
-import com.yongy.dotori.global.redis.repository.DotoriAccessTokenRepository;
-import com.yongy.dotori.global.redis.repository.DotoriRefreshTokenRepository;
+import com.yongy.dotori.global.redis.repository.BankAccessTokenRepository;
+import com.yongy.dotori.global.redis.repository.BankRefreshTokenRepository;
 import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
 import com.yongy.dotori.global.redis.repository.PersonalAuthRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,10 +46,10 @@ public class UserAuthService {
     private PersonalAuthRepository personalAuthRepository;
 
     @Autowired
-    private DotoriAccessTokenRepository dotoriAccessTokenRepository;
+    private BankAccessTokenRepository bankAccessTokenRepository;
 
     @Autowired
-    private DotoriRefreshTokenRepository dotoriRefreshTokenRepository;
+    private BankRefreshTokenRepository bankRefreshTokenRepository;
 
     @Autowired
     private FintechTokenRepository fintechTokenRepository;
@@ -109,8 +109,8 @@ public class UserAuthService {
             String accessToken = (String) jsonObject.get("accessToken");
             String refreshToken = (String) jsonObject.get("refreshToken");
 
-            dotoriAccessTokenRepository.save(PodoBankAccessToken.of("accessToken", accessToken));
-            dotoriRefreshTokenRepository.save(PodoBankRefreshToken.of("refreshToken", refreshToken));
+            bankAccessTokenRepository.save(BankAccessToken.of("accessToken", accessToken));
+            bankRefreshTokenRepository.save(BankRefreshToken.of("refreshToken", refreshToken));
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -118,8 +118,8 @@ public class UserAuthService {
 
     // NOTE : accessToken이나 refreshToken을 세팅한다.(없으면 podoBankLogin을 호출해서 새로 발급해서 세팅함)
     public Bank getConnectionToken(Long bankSeq){
-        Optional<PodoBankAccessToken> dotoriAccessToken = dotoriAccessTokenRepository.findById("accessToken");
-        Optional<PodoBankRefreshToken> dotoriRefreshToken = dotoriRefreshTokenRepository.findById("refreshToken");
+        Optional<BankAccessToken> dotoriAccessToken = bankAccessTokenRepository.findById("accessToken");
+        Optional<BankRefreshToken> dotoriRefreshToken = bankRefreshTokenRepository.findById("refreshToken");
 
         Bank bankInfo = null;
 
@@ -127,7 +127,7 @@ public class UserAuthService {
             if(dotoriRefreshToken.isEmpty()){
                 bankInfo = bankRepository.findByBankSeq(bankSeq);
                 this.podoBankLogin(bankInfo); // accessToken, refreshToken 재발급
-                useToken = dotoriAccessTokenRepository.findById("accessToken").get().getToken();
+                useToken = bankAccessTokenRepository.findById("accessToken").get().getToken();
             }else{
                 useToken = dotoriRefreshToken.get().getToken();
             }

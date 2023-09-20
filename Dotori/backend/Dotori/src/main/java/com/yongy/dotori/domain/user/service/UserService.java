@@ -1,14 +1,17 @@
 package com.yongy.dotori.domain.user.service;
 
+import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.global.email.EmailUtil;
 
 import com.yongy.dotori.global.redis.entity.EmailAuth;
 import com.yongy.dotori.global.redis.repository.EmailAuthRepository;
 import com.yongy.dotori.global.redis.repository.PersonalAuthRepository;
 
+import com.yongy.dotori.global.redis.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +30,9 @@ public class UserService {
     private PersonalAuthRepository personalAuthRepository;
     @Autowired
     private EmailUtil emailUtil;
+
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
 
     public void emailCert(String id){
         Random random = new Random();
@@ -52,5 +58,4 @@ public class UserService {
     public void deleteEmailAuthCode(String authCode){
         emailAuthRepository.deleteById(authCode);
     }
-
 }

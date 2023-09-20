@@ -6,7 +6,7 @@ import com.yongy.dotori.domain.userAuth.dto.request.UserAccountCodeDto;
 import com.yongy.dotori.domain.userAuth.dto.request.UserAccountDto;
 import com.yongy.dotori.domain.userAuth.service.UserAuthService;
 import com.yongy.dotori.global.common.BaseResponseBody;
-import com.yongy.dotori.global.redis.repository.DotoriAccessTokenRepository;
+import com.yongy.dotori.global.redis.repository.BankAccessTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
@@ -27,7 +27,7 @@ public class UserAuthController {
     private UserAuthService userAuthService;
 
     @Autowired
-    private DotoriAccessTokenRepository dotoriAccessTokenRepository;
+    private BankAccessTokenRepository bankAccessTokenRepository;
 
     // NOTE : 1원인증 사용자 이메일 인증번호 보내기
     @PostMapping("/own/check-id")

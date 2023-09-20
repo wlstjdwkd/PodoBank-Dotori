@@ -1,4 +1,12 @@
 package com.yongy.dotori.domain.payment.repository;
 
-public interface PlanRepository {
+import com.yongy.dotori.domain.payment.entity.Payment;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface PlanRepository extends JpaRepository<Payment, Long> {
+    List<Payment> findAllByPlanDetailSeq(String planDetailSeq);
 }

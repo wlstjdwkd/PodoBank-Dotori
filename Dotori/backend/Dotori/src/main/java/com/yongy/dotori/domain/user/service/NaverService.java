@@ -94,7 +94,7 @@ public class NaverService {
 //            // RefreshToken이 없는 경우(시간이 만료되었거나, 처음 들어오는 사용자)
 //            if(redisUtil.getData(user.getId()) == null){
 //                // DB에 사용자의 정보가 없는 경우
-//                if(userRepository.findById(user.getId()) == null){
+//                if(userRepository.findByIdAndExpiredAtIsNull(user.getId()) == null){
 //                    userRepository.save(user); // DB에 사용자 저장
 //                }
 //            }

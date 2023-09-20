@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
             // NOTE : DB에 사용자가 없는 경우 or 정보는 있지만 탈퇴한 경우
             User user = userDetailsService.getUserInfo(tokenId);
-            if(user == null || user.getExpiredAt() != null){
+            if(user == null){
                 generalJwtExceptionHandler((HttpServletResponse)response, ErrorType.NOT_FOUND_USER);
                 return;
             }
