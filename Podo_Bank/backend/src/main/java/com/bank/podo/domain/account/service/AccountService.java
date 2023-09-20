@@ -69,6 +69,7 @@ public class AccountService {
                 .accountType(account.getAccountType())
                 .balance(account.getBalance().toString())
                 .interestRate(account.getAccountCategory().getInterestRate())
+                .nickname(user.getName()+"님의 "+accountCategory.getAccountName())
                 .build();
     }
 
@@ -285,8 +286,6 @@ public class AccountService {
             throw new AccountUserNotMatchException("계좌의 소유자가 아닙니다.");
         }
 
-        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by("createdAt").descending());
-
         List<Account> accountList = transactionHistoryRepository.findThreeMostRecentUniqueAccounts(account);
 
         return accountList.stream()
@@ -295,6 +294,24 @@ public class AccountService {
                         .accountName(counterAccount.getUser().getName())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updateAccountNickname(UpdateAccountNicknameDTO updateAccountNicknameDTO) {
+        User user = getLoginUser();
+
+        Account account = accountRepository.findByAccountNumberAndDeletedFalse(updateAccountNicknameDTO.getAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
+
+        if(!account.getUser().getUserId().equals(user.getUserId())) {
+            throw new AccountUserNotMatchException("계좌의 소유자가 아닙니다.");
+        }
+
+        account.update(Account.builder()
+                .nickname(updateAccountNicknameDTO.getNickname())
+                .build());
+
+        accountRepository.save(account);
     }
 
     private User getLoginUser() {
@@ -377,6 +394,7 @@ public class AccountService {
                 .balance(account.getBalance().toString())
                 .interestRate(account.getAccountCategory().getInterestRate())
                 .createAt(account.getCreatedAt())
+                .nickname(account.getName())
                 .build();
     }
 
@@ -416,4 +434,5 @@ public class AccountService {
                 .interestRate(accountCategory.getInterestRate())
                 .build();
     }
+
 }

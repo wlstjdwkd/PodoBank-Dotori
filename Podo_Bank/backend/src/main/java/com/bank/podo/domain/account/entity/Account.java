@@ -25,6 +25,9 @@ public class Account extends BaseEntity {
     @Column(nullable = false)
     private String accountNumber;
 
+    @Column
+    private String name;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -60,7 +63,9 @@ public class Account extends BaseEntity {
     private boolean deleted;
 
     @Builder
-    public Account(String accountNumber, User user, AccountType accountType, BigDecimal balance, LocalDateTime maturityAt, AccountCategory accountCategory, String loanInfo, String password, int passwordRetryCount, boolean locked) {
+    public Account(String accountNumber, User user, AccountType accountType, BigDecimal balance,
+                   LocalDateTime maturityAt, AccountCategory accountCategory, String loanInfo,
+                   String password, int passwordRetryCount, boolean locked, String nickname) {
         this.accountNumber = accountNumber;
         this.user = user;
         this.accountType = accountType;
@@ -71,6 +76,7 @@ public class Account extends BaseEntity {
         this.password = password;
         this.passwordRetryCount = passwordRetryCount;
         this.locked = locked;
+        this.name = nickname;
     }
 
     public Account update(Account account) {
