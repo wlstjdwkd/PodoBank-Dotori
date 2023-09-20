@@ -19,6 +19,8 @@ import PlanCreate2Screen from "../screens/Plan/PlanCreate2Screen";
 import PlanCreate3Screen from "../screens/Plan/PlanCreate3Screen";
 import PlanCreate4Screen from "../screens/Plan/PlanCreate4Screen";
 import PlanCreate5Screen from "../screens/Plan/PlanCreate5Screen";
+import PlanCategoryScreen from "../screens/Plan/PlanCategoryScreen";
+import PlanNotClassifyScreen from "../screens/Plan/PlanNotClassifyScreen";
 import OneCent1Screen from "../screens/OneCent/OneCent1Screen";
 import OneCent2Screen from "../screens/OneCent/OneCent2Screen";
 import OneCent3Screen from "../screens/OneCent/OneCent3Screen";
@@ -107,6 +109,14 @@ export default function AppNavigator() {
       <Stack.Screen
         name="PlanCreate5Screen"
         component={PlanCreate5Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PlanCategoryScreen"
+        component={PlanCategoryScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PlanNotClassifyScreen"
+        component={PlanNotClassifyScreen}
       ></Stack.Screen>
       <Stack.Screen
         name="OneCent1Screen"
