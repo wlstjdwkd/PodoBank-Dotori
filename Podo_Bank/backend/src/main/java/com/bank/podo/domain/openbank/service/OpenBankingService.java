@@ -40,8 +40,9 @@ public class OpenBankingService {
 
     @Transactional
     public void oneCentVerification(FintechOneCentVerificationDTO fintechOneCentVerificationDTO) {
-        System.out.println(fintechOneCentVerificationDTO.getFintechServiceCode());
-        com.bank.podo.domain.openbank.entity.FintechService FintechService = serviceRepository.findByServiceCode(fintechOneCentVerificationDTO.getFintechServiceCode())
+        System.out.println(fintechOneCentVerificationDTO.getServiceCode());
+        com.bank.podo.domain.openbank.entity.FintechService FintechService =
+                serviceRepository.findByServiceCode(fintechOneCentVerificationDTO.getServiceCode())
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
 
         Account userAccount = accountRepository.findByAccountNumberAndDeletedFalse(fintechOneCentVerificationDTO.getAccount())
@@ -93,7 +94,8 @@ public class OpenBankingService {
     public UserAccountFintechCodeDTO oneCentVerificationCheck(FintechOneCentVerificationCheckDTO fintechOneCentVerificationCheckDTO) {
         User user = getLoginUser();
 
-        com.bank.podo.domain.openbank.entity.FintechService fintechService = serviceRepository.findByServiceCodeAndUser(fintechOneCentVerificationCheckDTO.getFintechServiceCode(), user)
+        com.bank.podo.domain.openbank.entity.FintechService fintechService =
+                serviceRepository.findByServiceCodeAndUser(fintechOneCentVerificationCheckDTO.getServiceCode(), user)
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
 
         Account userAccount = accountRepository.findByAccountNumberAndDeletedFalse(fintechOneCentVerificationCheckDTO.getAccountNumber())

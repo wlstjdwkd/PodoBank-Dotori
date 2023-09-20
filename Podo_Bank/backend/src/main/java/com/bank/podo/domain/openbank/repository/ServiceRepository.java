@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface ServiceRepository extends JpaRepository<FintechService, Long> {
-    Optional<FintechService> findByServiceCode(String fintechServiceCode);
+    Optional<FintechService> findByServiceCode(String serviceCode);
 
     Optional<FintechService> findByServiceCodeAndUser(String serviceCode, User user);
 

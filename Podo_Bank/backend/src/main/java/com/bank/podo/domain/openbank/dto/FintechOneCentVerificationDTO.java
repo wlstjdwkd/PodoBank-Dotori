@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class FintechOneCentVerificationDTO {
-    private String fintechServiceCode;
+    private String serviceCode;
     private String account;
 }
