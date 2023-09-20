@@ -376,7 +376,7 @@ public class AccountService {
                 .accountType(account.getAccountType())
                 .balance(account.getBalance().toString())
                 .interestRate(account.getAccountCategory().getInterestRate())
-                .createAt(account.getCreatedAt().toString())
+                .createAt(account.getCreatedAt())
                 .build();
     }
 
