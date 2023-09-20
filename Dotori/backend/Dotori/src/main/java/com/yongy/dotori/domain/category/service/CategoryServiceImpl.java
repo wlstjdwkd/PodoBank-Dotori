@@ -24,7 +24,7 @@ public class CategoryServiceImpl implements CategoryService{
     public List<CategoryDetailDTO> findAllCategory(){
         // 카테고리 리스트 반환
         // User user = getLoginUser();
-        User loginUser = userRepository.findById("1");
+        User loginUser = userRepository.findByIdAndExpiredAtIsNull("1");
         // TODO 테스트 후 로그인된 유저정보로 조회하도록 고칠것~
         List<Category> categories = categoryRepository.findAllByUserUserSeq(loginUser.getUserSeq());
         List<CategoryDetailDTO> result = new ArrayList<>();

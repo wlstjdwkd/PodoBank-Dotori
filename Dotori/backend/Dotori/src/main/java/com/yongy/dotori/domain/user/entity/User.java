@@ -5,14 +5,12 @@ import com.yongy.dotori.domain.category.entity.Category;
 import com.yongy.dotori.domain.categoryGroup.entity.CategoryGroup;
 import com.yongy.dotori.domain.payment.entity.Payment;
 import com.yongy.dotori.domain.plan.entity.Plan;
-//import com.yongy.dotori.domain.purpose.entity.Purpose;
 import com.yongy.dotori.domain.reward.entity.Reward;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 
 
 import java.time.LocalDate;

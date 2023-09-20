@@ -23,7 +23,7 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
     @Override
     public List<CategoryGroupDTO> findAllCategoryGroup() {
         // 사용자에게 등록되어 있는 카데고리 그룹 리스트(Seq, 이름) 가져오기
-        User loginUser = userRepository.findById("1");
+        User loginUser = userRepository.findByIdAndExpiredAtIsNull("1");
         List<CategoryGroup> list = categoryGroupRepository.findAllByUserUserSeq(loginUser.getUserSeq());
         List<CategoryGroupDTO> result = new ArrayList<>();
 

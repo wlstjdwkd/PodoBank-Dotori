@@ -59,7 +59,7 @@ public class NaverController {
         }else{
 
             // NOTE : 회원가입
-            if(userRepository.findById(user.getId()) == null){
+            if(userRepository.findByIdAndExpiredAtIsNull(user.getId()) == null){
                 userRepository.save(user); // DB에 사용자 저장
                 return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "회원가입에 성공하였습니다."));
             }

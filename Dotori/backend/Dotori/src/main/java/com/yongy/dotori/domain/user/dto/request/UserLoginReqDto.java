@@ -6,12 +6,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserLoginDto {
+public class UserLoginReqDto {
     private String id;
     private String password;
 
     @Builder
-    public UserLoginDto(String id, String password) {
+    public UserLoginReqDto(String id, String password) {
         this.id = id;
         this.password = password;
     }
