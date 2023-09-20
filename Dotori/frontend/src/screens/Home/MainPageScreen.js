@@ -15,12 +15,12 @@ const banks = [
   {
     id: "1",
     name: "월급 통장",
-    balance: "10,000원",
+    balance: 10000,
   },
   {
     id: "2",
     name: "비상금 통장",
-    balance: "20,000원",
+    balance: 20000,
   },
   // {
   //   id: "3",
@@ -39,6 +39,9 @@ const banks = [
   // },
   // ... 다른 은행들의 데이터
 ];
+const formatNumber = (num) => {
+  return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+};
 
 export default function MainPageScreen({ navigation }) {
   return (
@@ -70,7 +73,10 @@ export default function MainPageScreen({ navigation }) {
           </>
         }
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.bankContainer}>
+          <TouchableOpacity
+            style={styles.bankContainer}
+            onPress={() => navigation.navigate("PlanMainScreen")}
+          >
             <Image
               style={styles.bankIcon}
               source={require("../../assets/images/logo_podo.png")}
@@ -79,7 +85,9 @@ export default function MainPageScreen({ navigation }) {
               <Text style={styles.bankName}>{item.name}</Text>
               <Text style={styles.bankSubtitle}>잔액</Text>
             </View>
-            <Text style={styles.bankBalance}>{item.balance}</Text>
+            <Text style={styles.bankBalance}>
+              {formatNumber(item.balance)}원
+            </Text>
           </TouchableOpacity>
         )}
         ListFooterComponent={
