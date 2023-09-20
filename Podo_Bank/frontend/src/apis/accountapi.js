@@ -164,9 +164,9 @@ export const accountPasswordInitialization = async (resetInfo, accessToken) => {
     // throw error;
   }
 };
-export const accountPasswordChange = async (changeInfo, accessToken) => {
+export const accountPasswordChange = async (pwChangeInfo, accessToken) => {
   try {
-    const response = await axios.patch(apiAddress+'/api/v1/account/password/change', changeInfo, {
+    const response = await axios.patch(apiAddress+'/api/v1/account/password/change', pwChangeInfo, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -282,6 +282,24 @@ export const userAccountPwEmailVerificationSend = async (email) => {
 export const accountListInquiry = async (accessToken) => {
   try {
     const response = await axios.get(apiAddress + '/api/v1/account/list', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    console.log('계좌 목록 조회 성공:', response.data)
+    return response;
+  } catch (error) {
+    console.error('계좌 목록 조회 실패:', error);
+    const response = error.response
+    return response
+    
+    // throw error;
+  }
+};
+
+export const accountNicknameChange = async (accountInfo, accessToken) => {
+  try {
+    const response = await axios.get(apiAddress + '/api/v1/account/nickname', accountInfo, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

@@ -17,30 +17,15 @@ import { Ionicons } from "@expo/vector-icons";
 import HeaderScreen from "../Header/HeaderScreen";
 import {accountOwnerInquiry} from "../../apis/accountapi"
 import { useSelector } from "react-redux";
-import {accountRecentTransfer} from "../../apis/accountapi"
+import {accountRecentTransfer, accountTransactionDetail} from "../../apis/accountapi"
 
 const { height, width } = Dimensions.get("window");
 
-// 더미 데이터 (실제 데이터와 연동 필요)
-const recentAccounts = [
-  {
-    profileImage: require("../../assets/images/normal_podo.png"),
-    name: "홍길동",
-    accountNumber: "1234-5678-9101",
-    bankName: "포도은행",
-  },
-  {
-    profileImage: require("../../assets/images/normal_podo.png"),
-    name: "방진성",
-    accountNumber: "1234-5678-3101",
-    bankName: "포도은행",
-  },
-  // ... 필요하면 더 추가
-];
-
 export default function TransferScreen({ navigation, route }) {
   const accessToken = useSelector((state) => state.user.accessToken)
-  const [accountInfo, setAccountInfo] = useState(route.params.account)
+  const [accountNumber, setAccountNumber] = useState(route.params.accountNumber)
+  // const [accountInfo, setAccountInfo] = useState(route.params.accountNumber)
+  const [accountInfo, setAccountInfo] = useState(null)
   // console.log(account)
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -48,7 +33,7 @@ export default function TransferScreen({ navigation, route }) {
   const [receiverAccount, setReceiverAccount] = useState("");
 
   const [receiverBank, setReceiverBank] = useState("포도은행");
-  const [availableAmount, setAvailableAmount] = useState((Math.floor(accountInfo.balance)).toLocaleString()); // 출금 가능 금액 state 추가
+  const [availableAmount, setAvailableAmount] = useState(0); // 출금 가능 금액 state 추가
   const [recentWithdrawAccount, setRecentWithdrawAccount] = useState([])
 
   // 제작 키보드 관련 내용
@@ -93,38 +78,68 @@ export default function TransferScreen({ navigation, route }) {
     return `${accountNumber.slice(0,4)}-${accountNumber.slice(4,6)}-${accountNumber.slice(6)}`
   }
 
-  // 계좌 소유주 존재 여부 확인\
-  const checkAccountOwnerInquiry = async () => {
-    const response = await accountOwnerInquiry(receiverAccount, accessToken)
+  const getAccountTransactionDetail = async()=>{
+    const response = await accountTransactionDetail(accountNumber, accessToken)
     if(response.status===200){
-      console.log('계좌 소유주 조회 성공')
-      navigation.navigate("TransferAmountScreen", {
-        receiverName: response.data,
-        receiverBank: receiverBank,
-        receiverAccount: receiverAccount,
-        accountInfo: accountInfo,
-      });
+      console.log('계좌 상세 조회 성공')
+      setAccountInfo(response.data)
+      setAvailableAmount((Math.floor(response.data.balance)).toLocaleString())
     }else if(response.status===400){
-      console.log('계좌 소유주 조회 실패')
-      Alert.alert('계좌 조회 실패', '해당 계좌 유무 조회에 실패했습니다.')
+      console.log('계좌 상세 조회 실패')
+      // Alert.alert('계좌 조회 실패', '해당 계좌 상세 조회에 실패했습니다.')
     }else if(response.status===401){
-      console.log('권한 없음으로 계좌 소유주 조회 실패')
-      Alert.alert('계좌 조회 실패', '권한이 없어 해당 계좌 유무 조회에 실패했습니다.')
+      console.log('권한 없음으로 계좌 상세 조회 실패')
+      // Alert.alert('계좌 조회 실패', '권한이 없어 해당 계좌 상세 조회에 실패했습니다.')
     }else if(response.status===404){
-      console.log('일치 계좌 없음으로 계좌 소유주 조회 실패')
-      Alert.alert('계좌 조회 실패', '권한이 없어 해당 계좌 유무 조회에 실패했습니다.')
+      console.log('일치 계좌 없음으로 계좌 상세 조회 실패')
+      // Alert.alert('계좌 조회 실패', '계좌가 없어 해당 계좌 상세 조회에 실패했습니다.')
     }else{
-      console.log('오류 발생: 계좌 소유주 조회 실패')
-      Alert.alert('계좌 조회 실패', '오류 발생으로 계좌 유무 조회 실패했습니다.')
+      console.log('오류 발생: 계좌 상세 조회 실패')
+      // Alert.alert('계좌 조회 실패', '오류 발생으로 계좌 상세 조회 실패했습니다.')
     }
   }
 
+  // 계좌 소유주 존재 여부 확인
+  const checkAccountOwnerInquiry = async () => {
+    if(receiverAccount === accountNumber){
+      Alert.alert('동일 계좌', '송금 계좌와 수금 계좌는 동일할 수 없습니다.')
+      setReceiverAccount("")
+    }else if(!availableAmount){
+      Alert.alert('계좌 잔액 부족', '보낼 수 있는 잔액이 없어 게좌 이체가 불가능합니다.')
+    }else{
+      const response = await accountOwnerInquiry(receiverAccount, accessToken)
+      if(response.status===200){
+        console.log('계좌 소유주 조회 성공')
+        navigation.navigate("TransferAmountScreen", {
+          receiverName: response.data,
+          receiverBank: receiverBank,
+          receiverAccount: receiverAccount,
+          accountInfo: accountInfo,
+        });
+      }else if(response.status===400){
+        console.log('계좌 소유주 조회 실패')
+        Alert.alert('계좌 조회 실패', '해당 계좌 유무 조회에 실패했습니다.')
+      }else if(response.status===401){
+        console.log('권한 없음으로 계좌 소유주 조회 실패')
+        Alert.alert('계좌 조회 실패', '권한이 없어 해당 계좌 유무 조회에 실패했습니다.')
+      }else if(response.status===404){
+        console.log('일치 계좌 없음으로 계좌 소유주 조회 실패')
+        Alert.alert('계좌 조회 실패', '계좌가 없어 해당 계좌 유무 조회에 실패했습니다.')
+      }else{
+        console.log('오류 발생: 계좌 소유주 조회 실패')
+        Alert.alert('계좌 조회 실패', '오류 발생으로 계좌 유무 조회 실패했습니다.')
+      }
+    }
+
+    }
+
   // 최근 송금 계좌 조회
   const getAccountRecentTransfer = async ()=>{
-    const response = await accountRecentTransfer(accountInfo.accountNumber, accessToken)
+    const response = await accountRecentTransfer(accountNumber, accessToken)
     if(response.status===200){
       console.log('최근 송금 계좌 조회 성공')
       setRecentWithdrawAccount(response.data)
+      console.log(response.data)
     }else if(response.status===400){
       console.log('최근 송금 계좌 조회 실패')
     }else if(response.status===401){
@@ -139,6 +154,7 @@ export default function TransferScreen({ navigation, route }) {
   }
 
   useEffect(()=>{
+    getAccountTransactionDetail()
     getAccountRecentTransfer()
   },[])
 
@@ -155,7 +171,7 @@ export default function TransferScreen({ navigation, route }) {
         <Text style={styles.leftAlignLabel}>포도은행</Text>
       </View>
       {/* <Text style={styles.boldLeftAlignLabel}>1235-4568-4532</Text> */}
-      <Text style={styles.boldLeftAlignLabel}>{settingAccountNumber(accountInfo.accountNumber)}</Text>
+      <Text style={styles.boldLeftAlignLabel}>{settingAccountNumber(accountNumber)}</Text>
       <Text style={styles.leftAlignLabel}>
         출금가능금액 {availableAmount}원
       </Text>
@@ -216,7 +232,11 @@ export default function TransferScreen({ navigation, route }) {
           <View style={styles.line} />
         </TouchableOpacity>
       ))} */}
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(false), setReceiverAccount("")
+        }}
+      >
         <View style={styles.centeredView}>
           <View style={styles.modalContainer}>
             <View style={styles.passwordHeader}>
@@ -230,6 +250,9 @@ export default function TransferScreen({ navigation, route }) {
               placeholder="계좌번호 입력"
               value={receiverAccount}
               onChangeText={setReceiverAccount}
+              keyboardType="number-pad"
+              showSoftInputOnFocus={false}
+              // editable={false}
             />
 
             <View style={styles.numPad}>
@@ -264,11 +287,6 @@ export default function TransferScreen({ navigation, route }) {
               onPress={() => {
                 setModalVisible(false);
                 checkAccountOwnerInquiry()
-                // navigation.navigate("TransferAmountScreen", {
-                //   receiverBank: receiverBank,
-                //   receiverAccount: receiverAccount,
-                //   accountInfo: accountInfo,
-                // });
               }}
             >
               <Text style={styles.confirmButtonText}>확인</Text>
