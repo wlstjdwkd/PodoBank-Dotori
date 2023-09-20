@@ -12,6 +12,14 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CategoryDTO {
-    private String categoryTitle;
-    private BigDecimal goal_amount;
+    String categoryName;
+    BigDecimal targetAmount;
+
+    @Override
+    public String toString() {
+        return "{" +
+                "categoryName='" + categoryName + '\'' +
+                ", targetAmount=" + targetAmount +
+                '}';
+    }
 }
