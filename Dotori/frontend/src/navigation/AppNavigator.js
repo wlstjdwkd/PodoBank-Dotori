@@ -13,6 +13,12 @@ import PurposeCreate1Screen from "../screens/Purpose/PurposeCreate1Screen";
 import PurposeCreate2Screen from "../screens/Purpose/PurposeCreate2Screen";
 import PurposeCreate3Screen from "../screens/Purpose/PurposeCreate3Screen";
 import PurposeCompleteScreen from "../screens/Purpose/PurposeCompleteScreen";
+import PlanMainScreen from "../screens/Plan/PlanMainScreen";
+import PlanCreate1Screen from "../screens/Plan/PlanCreate1Screen";
+import PlanCreate2Screen from "../screens/Plan/PlanCreate2Screen";
+import PlanCreate3Screen from "../screens/Plan/PlanCreate3Screen";
+import PlanCreate4Screen from "../screens/Plan/PlanCreate4Screen";
+import PlanCreate5Screen from "../screens/Plan/PlanCreate5Screen";
 import OneCent1Screen from "../screens/OneCent/OneCent1Screen";
 import OneCent2Screen from "../screens/OneCent/OneCent2Screen";
 import OneCent3Screen from "../screens/OneCent/OneCent3Screen";
@@ -70,6 +76,30 @@ export default function AppNavigator() {
       <Stack.Screen
         name="PurposeCompleteScreen"
         component={PurposeCompleteScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PlanMainScreen"
+        component={PlanMainScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PlanCreate1Screen"
+        component={PlanCreate1Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PlanCreate2Screen"
+        component={PlanCreate2Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PlanCreate3Screen"
+        component={PlanCreate3Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PlanCreate4Screen"
+        component={PlanCreate4Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PlanCreate5Screen"
+        component={PlanCreate5Screen}
       ></Stack.Screen>
       <Stack.Screen
         name="OneCent1Screen"
