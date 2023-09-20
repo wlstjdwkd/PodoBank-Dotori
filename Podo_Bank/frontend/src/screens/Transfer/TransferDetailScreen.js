@@ -76,6 +76,28 @@ export default function TransferDetailScreen({ navigation, route }) {
   const onBackspacePress = () => {
     setPassword(password.slice(0, -1));
   };
+  // 통장 표시 메모
+  const handleReceiverMemoChange = (text) => {
+    if (text.length <= 16) {
+      setReceiverMemo(text);
+    }
+  };
+  const handleSenderMemoChange = (text) => {
+    if (text.length <= 16) {
+      setSenderMemo(text);
+    }
+  };
+
+  const canAccountTransfer = ()=>{
+    switch (true) {
+      case !amount:
+        Alert.alert('이체불가','이체 금액으로 0원을 이체할 수는 없습니다.')
+        break;
+      default:
+        doAccountTransfer()
+        break;
+    }
+  }
 
   const doAccountTransfer = async() =>{
     const transferInfo = {
@@ -125,6 +147,18 @@ export default function TransferDetailScreen({ navigation, route }) {
       console.log("오류 발생: 계좌 이체 실패")
     }
   }
+  
+  const pressNextButton = () => {
+    if(receiverMemo && senderMemo){
+      setConfirmModalVisible(true)
+    }else if(!receiverMemo && !senderMemo){
+      Alert.alert('', '통장 표시가 입력되어야 합니다.')
+    }else if(!receiverMemo){
+      Alert.alert('', '받는 분 통장 표시가 입력되어야 합니다.')
+    }else if(!senderMemo){
+      Alert.alert('', '내 통장 표시가 입력되어야 합니다.')
+    }
+  }
 
   return (
     <View style={{flex:1, backgroundColor:'white'}}>
@@ -142,17 +176,18 @@ export default function TransferDetailScreen({ navigation, route }) {
       <TextInput
         style={styles.input}
         placeholder="받는 분 통장 표시"
-        onChangeText={setReceiverMemo}
+        // onChangeText={setReceiverMemo}
+        onChangeText={handleReceiverMemoChange}
         value={receiverMemo}
         // textAlign="center"
       />
       <View style={styles.separator} />
 
-      <Text style={styles.label}>내 통장 표시</Text>
+      <Text style={[styles.label, {}]}>내 통장 표시</Text>
       <TextInput
         style={styles.input}
         placeholder="내 통장 표시"
-        onChangeText={setSenderMemo}
+        onChangeText={handleSenderMemoChange}
         value={senderMemo}
         // textAlign="center"
       />
@@ -164,6 +199,10 @@ export default function TransferDetailScreen({ navigation, route }) {
         animationType="slide"
         transparent={true}
         visible={confirmModalVisible}
+        onRequestClose={() => {
+          setConfirmModalVisible(false)
+          setPassword("");
+        }}
       >
         <View style={styles.centeredView}>
           <View style={styles.modalContainer}>
@@ -223,7 +262,12 @@ export default function TransferDetailScreen({ navigation, route }) {
         </View>
       </Modal>
 
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(false)
+          setPassword("");
+        }}
+      >
         <View style={styles.centeredView}>
           <View style={styles.modalContainer}>
             <View style={styles.passwordHeader}>
@@ -238,6 +282,8 @@ export default function TransferDetailScreen({ navigation, route }) {
               secureTextEntry={true}
               value={password}
               onChangeText={setPassword}
+              keyboardType="number-pad"
+              showSoftInputOnFocus={false}
             />
 
             <View style={styles.numPad}>
@@ -271,7 +317,8 @@ export default function TransferDetailScreen({ navigation, route }) {
               style={styles.confirmButton}
               onPress={() => {
                 setModalVisible(false);
-                doAccountTransfer()
+                // doAccountTransfer()
+                canAccountTransfer()
                 // navigation.navigate("TransferCompleteScreen", {
                 //   transferAmount: transferAmount,
                 //   receiverName: receiverName,
@@ -285,10 +332,12 @@ export default function TransferDetailScreen({ navigation, route }) {
       </Modal>
     </View>
     {/* <View style={styles.bottomContainer}> */}
-    <TouchableOpacity
+      <TouchableOpacity
         style={styles.nextButton}
         color="purple"
-        onPress={() => setConfirmModalVisible(true)}
+        onPress={() => {
+          pressNextButton()
+        }}
       >
         <Text style={styles.confirmText}>다음</Text>
       </TouchableOpacity>

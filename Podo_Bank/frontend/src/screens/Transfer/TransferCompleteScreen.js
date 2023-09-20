@@ -43,7 +43,7 @@ export default function TransferCompleteScreen({ navigation, route }) {
             style={[styles.button, styles.shadow]}
             onPress={()=>{
               navigation.navigate("TransferScreen", {
-                account: accountInfo,
+                accountNumber: accountInfo.accountNumber,
               });
             }}
           >
@@ -53,6 +53,7 @@ export default function TransferCompleteScreen({ navigation, route }) {
             style={[styles.button, styles.shadow, styles.transactionButton]}
             onPress={()=>{
               navigation.navigate("AccountDetailScreen", {
+                // account: accountInfo,
                 account: accountInfo,
               });
             }}

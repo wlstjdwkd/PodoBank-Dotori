@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -69,10 +70,34 @@ export default function TransferAmountScreen({ navigation, route }) {
   // const appendAmount = (value) => {
   //   setAmount((prevAmount) => prevAmount * 10 + parseInt(value));
   // };
+  const goTransferDetailScreen = () =>{
+    switch (true) {
+      case !amount:
+        Alert.alert('이체불가','이체 금액으로 0원을 이체할 수는 없습니다.')
+        break;
+      case !accountBalance:
+        Alert.alert('이체불가','출금 가능 금액이 없어 이체할 수 없습니다.')
+        break;
+      case amount > accountBalance:
+        Alert.alert('이체불가','이체 금액이 출금 가능 금액보다 클 수는 없습니다.')
+        break;
+    
+      default:
+        navigation.navigate("TransferDetailScreen", {
+          amount: amount,
+          receiverName: receiverName,
+          receiverBank: receiverBank,
+          receiverAccount: receiverAccount,
+            accountInfo: accountInfo,
+        });
+        break;
+    }
+  }
 
   const removeLast = () => {
     setAmount((prevAmount) => Math.floor(prevAmount / 10));
   };
+
 
   return (
     <View style={{flex:1, backgroundColor:'white'}}>
@@ -129,13 +154,14 @@ export default function TransferAmountScreen({ navigation, route }) {
         <TouchableOpacity
           style={styles.confirmButton}
           onPress={() => {
-            navigation.navigate("TransferDetailScreen", {
-              amount: amount,
-              receiverName: receiverName,
-              receiverBank: receiverBank,
-              receiverAccount: receiverAccount,
-              accountInfo: accountInfo,
-            });
+            goTransferDetailScreen()
+            // navigation.navigate("TransferDetailScreen", {
+            //   amount: amount,
+            //   receiverName: receiverName,
+            //   receiverBank: receiverBank,
+            //   receiverAccount: receiverAccount,
+            //   accountInfo: accountInfo,
+            // });
           }}
         >
           <Text style={styles.confirmText}>확인</Text>

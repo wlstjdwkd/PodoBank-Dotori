@@ -7,19 +7,39 @@ import {
   Modal,
   TextInput,
   Dimensions,
+  Alert,
 } from "react-native";
+import * as Clipboard from 'expo-clipboard';
+// import Clipboard from '@react-native-clipboard/clipboard';
+
 import { Ionicons, Feather } from "@expo/vector-icons";
 import HeaderComponent from "../Header/HeaderScreen";
+import {accountPasswordChange} from "../../apis/accountapi"
+import { useSelector } from "react-redux";
 
 const { width } = Dimensions.get("window");
 
 export default function AccountManagementScreen({ navigation, route }) {
+  const accessToken = useSelector((state) => state.user.accessToken)
   const [account, setAccount] = useState(route.params.account)
   console.log(account)
 
-  const copyAccountNumber = () => {
-    // 클립보드로 복사하는 로직 추가 필요
+  // 비밀번호 숫자 4자리 맞는지 확인
+  const validatePassword = (password) => {
+    const regex = /^\d{4}$/;
+    return regex.test(password);
   };
+
+  const copyAccountNumber = async () => {
+    try {
+      await Clipboard.setStringAsync(account.accountNumber);
+      console.log("계좌번호가 클립보드에 복사되었습니다.");
+    } catch (error) {
+      // 복사 실패 시 에러를 처리할 수 있습니다.
+      console.error("계좌번호 복사 실패:", error);
+    }
+  }
+  
   const [modalVisible, setModalVisible] = useState(false);
   const [secondModalVisible, setSecondModalVisible] = useState(false);
   const [thirdModalVisible, setThirdModalVisible] = useState(false);
@@ -62,6 +82,104 @@ export default function AccountManagementScreen({ navigation, route }) {
     return `${accountNumber.slice(0,4)}-${accountNumber.slice(4,6)}-${accountNumber.slice(6)}`
   }
 
+  // 날짜를 "YYYY.MM.DD" 형식으로 변환하는 함수
+  const formDateTransaction = (dateString) =>{
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const seconds = date.getSeconds().toString().padStart(2, "0");
+    // return `${year}.${month}.${day} ${hours}:${minutes}:${seconds}`;
+    return `${year}.${month}.${day}`;
+  }
+
+
+  const handleFirstPwModal = () =>{
+    if (validatePassword(password)){
+      setModalVisible(false);
+      setSecondModalVisible(true);
+    }else{
+      Alert.alert("비밀번호 양식 오류", '비밀번호는 4자리 숫자입니다.')
+    }
+  }
+  const handleSecondPwModal = () =>{
+    const isValidatePassword = validatePassword(newPassword)
+    switch (isValidatePassword) {
+      case !isValidatePassword:
+        Alert.alert("비밀번호 양식 오류", '비밀번호는 4자리 숫자입니다.')  
+        break;
+      case password === newPassword:
+        Alert.alert("비밀번호 동일", '기존 비밀번호와 동일할 수 없습니다.')  
+        break;
+    
+      default:
+        setSecondModalVisible(false);
+        setThirdModalVisible(true);
+        break;
+    }
+  }
+  
+  const handleThirdPwModal = () =>{
+    const isValidatePassword = validatePassword(confirmPassword)
+    switch (isValidatePassword) {
+      case !isValidatePassword:
+        Alert.alert("비밀번호 양식 오류", '비밀번호는 4자리 숫자입니다.')  
+        break;
+      case newPassword !== confirmPassword:
+        Alert.alert("비밀번호 미일치", '비밀번호가 일치하지 않습니다.')  
+        setConfirmPassword("")
+        break;
+      case password === confirmPassword:
+        Alert.alert("비밀번호 동일", '기존 비밀번호와 동일할 수 없습니다.')  
+        break;
+    
+      default:
+        // setThirdModalVisible(false);
+        handleAccountPasswordChange()
+        break;
+    }
+  }
+
+  const handleAccountPasswordChange = async() => {
+    const pwChangeInfo = {
+      accountNumber:account.accountNumber,
+      oldPassword:password,
+      newPassword: confirmPassword
+    }
+    console.log(pwChangeInfo)
+    const response =  await accountPasswordChange(pwChangeInfo, accessToken)
+    if(response.status === 200){
+      console.log('계좌 비밀번호 변경 성공')
+      setThirdModalVisible(false);
+      setPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+      Alert.alert('비밀번호 변경 성공', '해당 계좌의 비밀번호가 변경 완료되었습니다.')
+    }else if(response.status === 400){
+      console.log('계좌 비밀번호 변경 실패')
+    }else if(response.status === 401){
+      console.log('권한 없음으로 계좌 비밀번호 변경 실패')
+    }else if(response.status === 403){
+      console.log('계좌 소유주 불일치로 계좌 비밀번호 변경 실패')
+    }else if(response.status === 429){
+      console.log('계좌 비밀번호 형식 오류로 계좌 비밀번호 변경 실패')
+      Alert.alert('현재 계좌의 비밀번호를 다시 확인해주세요.')
+    }else{
+      console.log('오류발생: 계좌 비밀번호 변경 실패')
+    }
+  }
+
+  const goToAccountWithdrawalScreen = () =>{
+    const thisBalance =Math.floor(account.balance)
+    console.log(typeof(thisBalance))
+    if(thisBalance){
+      Alert.alert('계좌 잔액 존재',`현재 ${settingAccountNumber(account.accountNumber)} 계좌에 잔액 보유 중으로 해지할 수 없습니다.${'\n'}${'\n'}잔액을 0원으로 만든 후 진행해주세요.`)
+    }else{
+      navigation.navigate("AccountWithdrawalScreen", {account:account})
+    }
+  }
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -71,7 +189,7 @@ export default function AccountManagementScreen({ navigation, route }) {
       <View style={styles.accountRow}>
         <Text style={styles.boldText}>{settingAccountNumber(account.accountNumber)}</Text>
         <TouchableOpacity
-          onPress={copyAccountNumber}
+          onPress={()=>{copyAccountNumber()}}
           style={{ marginLeft: 10 }}
         >
           <Feather name="copy" size={24} color="gray" />
@@ -92,7 +210,7 @@ export default function AccountManagementScreen({ navigation, route }) {
         <View style={styles.row}>
           <Text style={styles.grayText}>개설일</Text>
           {/* <Text>2017.08.04</Text> */}
-          {account.createAt?(<Text>{account.createAt}</Text>):(<Text>0000.00.00</Text>)}
+          {account.createAt?(<Text>{formDateTransaction(account.createAt)}</Text>):(<Text>0000.00.00</Text>)}
         </View>
       </View>
 
@@ -100,14 +218,24 @@ export default function AccountManagementScreen({ navigation, route }) {
 
       <Text style={styles.management}>관리하기</Text>
 
-      <TouchableOpacity style={styles.row}>
+      <TouchableOpacity
+        style={styles.row}
+        onPress={()=>{
+          Alert.alert('', '차후 기능을 추가할 예정입니다. 기대해주세요❤')
+        }}
+      >
         <Text style={styles.backGrayText}>입출금 알림(Push)</Text>
         <Ionicons name="chevron-forward" size={24} color="black" />
       </TouchableOpacity>
 
       <View style={styles.separator} />
 
-      <TouchableOpacity style={styles.row}>
+      <TouchableOpacity 
+        style={styles.row}
+        onPress={()=>{
+          Alert.alert('', '차후 기능을 추가할 예정입니다. 기대해주세요❤')
+        }}
+      >
         <Text style={styles.backGrayText}>자동이체</Text>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Text>0건</Text>
@@ -137,29 +265,34 @@ export default function AccountManagementScreen({ navigation, route }) {
       </TouchableOpacity>
       <View style={styles.separator} />
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.row}
         // onPress={""}
       >
         <Text style={styles.backGrayText}>계좌 오류 해제</Text>
         <Ionicons name="chevron-forward" size={24} color="black" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <TouchableOpacity
         onPress={()=>{
-          navigation.navigate("AccountWithdrawalScreen", {account:account})
+          goToAccountWithdrawalScreen()
+          // navigation.navigate("AccountWithdrawalScreen", {account:account})
         }}
       >
         <Text style={styles.deleteAccountText}>
           계좌를 해지하시려면 여기를 눌러주세요.
         </Text>
       </TouchableOpacity>
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(false), setPassword(""), setNewPassword(""), setConfirmPassword("")
+        }}
+      >
         <View style={styles.centeredView}>
           <View style={styles.modalContainer}>
             <View style={styles.passwordHeader}>
-              <Text style={styles.passwordLabelText}>현재비밀번호</Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <Text style={styles.passwordLabelText}>현재 비밀번호</Text>
+              <TouchableOpacity onPress={() => {setModalVisible(false), setPassword(""), setNewPassword(""), setConfirmPassword("")}}>
                 <Text style={styles.closeButtonText}>X</Text>
               </TouchableOpacity>
             </View>
@@ -169,6 +302,8 @@ export default function AccountManagementScreen({ navigation, route }) {
               secureTextEntry={true}
               value={password}
               onChangeText={setPassword}
+              keyboardType="number-pad"
+              showSoftInputOnFocus={false}
             />
 
             <View style={styles.numPad}>
@@ -176,7 +311,7 @@ export default function AccountManagementScreen({ navigation, route }) {
                 ["1", "2", "3"],
                 ["4", "5", "6"],
                 ["7", "8", "9"],
-                ["", "0", "<-"],
+                ["", "0", "←"],
               ].map((row, rowIndex) => (
                 <View key={rowIndex} style={styles.numRow}>
                   {row.map((num) => (
@@ -184,7 +319,7 @@ export default function AccountManagementScreen({ navigation, route }) {
                       key={num}
                       style={styles.numButton}
                       onPress={() => {
-                        if (num === "<-") {
+                        if (num === "←") {
                           removeLast();
                         } else if (num !== "") {
                           appendAmount(num);
@@ -201,11 +336,13 @@ export default function AccountManagementScreen({ navigation, route }) {
             <TouchableOpacity
               style={styles.confirmButton}
               onPress={() => {
-                setModalVisible(false);
-                setSecondModalVisible(true);
+                handleFirstPwModal()
+                // validatePasswovalidatePassword(password)
+                // setModalVisible(false);
+                // setSecondModalVisible(true);
               }}
             >
-              <Text style={styles.confirmButtonText}>확인</Text>
+              <Text style={styles.confirmButtonText}>다음</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -215,12 +352,15 @@ export default function AccountManagementScreen({ navigation, route }) {
         animationType="slide"
         transparent={true}
         visible={secondModalVisible}
+        onRequestClose={() => {
+          setSecondModalVisible(false), setPassword(""), setNewPassword(""), setConfirmPassword("")
+        }}
       >
         <View style={styles.centeredView}>
           <View style={styles.modalContainer}>
             <View style={styles.passwordHeader}>
-              <Text style={styles.passwordLabelText}>새로운 비밀번호</Text>
-              <TouchableOpacity onPress={() => setSecondModalVisible(false)}>
+              <Text style={styles.passwordLabelText}>변경 비밀번호</Text>
+              <TouchableOpacity onPress={() => {setSecondModalVisible(false), setPassword(""), setNewPassword(""), setConfirmPassword("")}}>
                 <Text style={styles.closeButtonText}>X</Text>
               </TouchableOpacity>
             </View>
@@ -230,6 +370,8 @@ export default function AccountManagementScreen({ navigation, route }) {
               secureTextEntry={true}
               value={newPassword}
               onChangeText={setNewPassword}
+              keyboardType="number-pad"
+              showSoftInputOnFocus={false}
             />
 
             <View style={styles.numPad}>
@@ -237,7 +379,7 @@ export default function AccountManagementScreen({ navigation, route }) {
                 ["1", "2", "3"],
                 ["4", "5", "6"],
                 ["7", "8", "9"],
-                ["", "0", "<-"],
+                ["", "0", "←"],
               ].map((row, rowIndex) => (
                 <View key={rowIndex} style={styles.numRow}>
                   {row.map((num) => (
@@ -245,7 +387,7 @@ export default function AccountManagementScreen({ navigation, route }) {
                       key={num}
                       style={styles.numButton}
                       onPress={() => {
-                        if (num === "<-") {
+                        if (num === "←") {
                           newRemoveLast();
                         } else if (num !== "") {
                           newAppendAmount(num);
@@ -262,11 +404,12 @@ export default function AccountManagementScreen({ navigation, route }) {
             <TouchableOpacity
               style={styles.confirmButton}
               onPress={() => {
-                setSecondModalVisible(false);
-                setThirdModalVisible(true);
+                handleSecondPwModal()
+                // setSecondModalVisible(false);
+                // setThirdModalVisible(true);
               }}
             >
-              <Text style={styles.confirmButtonText}>확인</Text>
+              <Text style={styles.confirmButtonText}>다음</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -276,12 +419,15 @@ export default function AccountManagementScreen({ navigation, route }) {
         animationType="slide"
         transparent={true}
         visible={thirdModalVisible}
+        onRequestClose={() => {
+          setThirdModalVisible(false), setPassword(""), setNewPassword(""), setConfirmPassword("")
+        }}
       >
         <View style={styles.centeredView}>
           <View style={styles.modalContainer}>
             <View style={styles.passwordHeader}>
-              <Text style={styles.passwordLabelText}>비밀번호 확인</Text>
-              <TouchableOpacity onPress={() => setThirdModalVisible(false)}>
+              <Text style={styles.passwordLabelText}>변경 비밀번호 확인</Text>
+              <TouchableOpacity onPress={() => {setThirdModalVisible(false), setPassword(""), setNewPassword(""), setConfirmPassword("")}}>
                 <Text style={styles.closeButtonText}>X</Text>
               </TouchableOpacity>
             </View>
@@ -291,6 +437,8 @@ export default function AccountManagementScreen({ navigation, route }) {
               secureTextEntry={true}
               value={confirmPassword}
               onChangeText={setConfirmPassword}
+              keyboardType="number-pad"
+              showSoftInputOnFocus={false}
             />
 
             <View style={styles.numPad}>
@@ -298,7 +446,7 @@ export default function AccountManagementScreen({ navigation, route }) {
                 ["1", "2", "3"],
                 ["4", "5", "6"],
                 ["7", "8", "9"],
-                ["", "0", "<-"],
+                ["", "0", "←"],
               ].map((row, rowIndex) => (
                 <View key={rowIndex} style={styles.numRow}>
                   {row.map((num) => (
@@ -306,7 +454,7 @@ export default function AccountManagementScreen({ navigation, route }) {
                       key={num}
                       style={styles.numButton}
                       onPress={() => {
-                        if (num === "<-") {
+                        if (num === "←") {
                           confirmRemoveLast();
                         } else if (num !== "") {
                           confirmAppendAmount(num);
@@ -323,10 +471,12 @@ export default function AccountManagementScreen({ navigation, route }) {
             <TouchableOpacity
               style={styles.confirmButton}
               onPress={() => {
-                setThirdModalVisible(false);
+                handleThirdPwModal()
+                // setThirdModalVisible(false);
+                // handleAccountPasswordChange()
               }}
             >
-              <Text style={styles.confirmButtonText}>확인</Text>
+              <Text style={styles.confirmButtonText}>변경</Text>
             </TouchableOpacity>
           </View>
         </View>

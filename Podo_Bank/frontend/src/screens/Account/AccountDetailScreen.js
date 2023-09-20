@@ -7,10 +7,11 @@ import {
   FlatList,
   Modal,
   ScrollView,
+  Alert,
 } from "react-native";
 import { Ionicons, EvilIcons, Octicons } from "@expo/vector-icons";
 import HeaderScreen from "../Header/HeaderScreen";
-import { accountTransactionDetail, accountTransactionHistory } from "../../apis/accountapi"
+import { accountTransactionDetail, accountTransactionHistory, accountNicknameChange } from "../../apis/accountapi"
 import { useSelector } from "react-redux";
 
 export default function AccountDetail({ navigation, route }) {
@@ -22,14 +23,11 @@ export default function AccountDetail({ navigation, route }) {
   const [historyPage, setHistoryPage] = useState(0)
   const [nextPage, setNextPage] = useState(1)
   const [typeChange, setTypeChange] = useState(false)
-  // const [sendHistoryUnits, setSendHistoryUnits] = useState({
-  //   searchMonth : historySearchMonth,
-  //   transactionType : historyTransactionType,
-  //   sortType : historySortType,
-  //   page : historyPage,
-  // })
   const [accountInfo, setAccountInfo] = useState(null)
   const [transactionHistory, setTransactionHistory] =  useState([])
+  // const [nickname, setNickname] = useState("")
+  const [nicknameModal, setNicknameModal] = useState(false)
+
 
   // 현재 날짜를 가져오기
   const currentDate = new Date();
@@ -73,6 +71,32 @@ export default function AccountDetail({ navigation, route }) {
     }else{
       console.log('오류발생: 계좌 상세내역을 받아올 수 없습니다.')
     }
+  }
+
+  // accountNicknameChange
+  const doAccountNicknameChange = async () => {
+    const accountInfo = {
+      accountNumber : accountInfo.accountNumber,
+      nickname : accountInfo.nickname,
+    }
+    const response = await accountNicknameChange(accountInfo, accessToken)
+    if(response.status === 200){
+      console.log('계좌 별칭 수정 성공')
+    }else if(response.status === 400){
+      console.log('계좌 별칭 수정 실패')
+    }else if(response.status === 401){
+      console.log('권한없음으로 계좌 별칭 수정 실패')
+    }else if(response.status === 403){
+      console.log('계좌 소유주 불일치로 계좌 별칭 수정 실패')
+    }else if(response.status === 404){
+      console.log('계좌 없음으로 계좌 별칭 수정 실패')
+    }else{
+      console.log('오류 발생 : 계좌 별칭 수정 실패')
+    }
+  }
+
+  const handleAccountNicknameChange = () => {
+
   }
 
 
@@ -158,31 +182,36 @@ export default function AccountDetail({ navigation, route }) {
   return (
     <View style={styles.container}>
       <HeaderScreen navigation={navigation} title="거래 내역 조회" />
-      <View style={styles.nicknameContainer}>
-        <View style={styles.row}>
+      <View style={[styles.nicknameContainer]}>
+        <View style={[styles.row, {}]}>
           {/* 계좌 nickname 차후 바꿀 수 있게 할 것. */}
-          <Text style={styles.nickname}>나의 첫번째 계좌</Text>
+          <Text style={[styles.nickname, {}]}>나의 계좌
+            <TouchableOpacity
+              onPress={()=>{
+                Alert.alert('', '차후 기능을 추가할 예정입니다. 기대해주세요❤')
+                // setNicknameModal(true)
+              }}
+            >
+              <EvilIcons
+                name="pencil"
+                size={20}
+                color="black"
+                // style={{ marginTop: 20 }}
+              />
+            </TouchableOpacity>
+          </Text>
+
           <TouchableOpacity
-            onPress={()=>{}}
+            style={[styles.setting,{}]}
+            onPress={() => {
+              navigation.navigate("AccountManagementScreen", {account:account});
+            }}
           >
-            <EvilIcons
-              name="pencil"
-              size={20}
-              color="black"
-              style={{ marginTop: 20 }}
-            />
+            {/* <EvilIcons name="gear" size={24} color="black" /> */}
+            <Octicons name="gear" size={16} color="black" />
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={styles.setting}
-          onPress={() => {
-            navigation.navigate("AccountManagementScreen", {account:account});
-          }}
-        >
-          {/* <EvilIcons name="gear" size={24} color="black" /> */}
-          <Octicons name="gear" size={16} color="black" />
-        </TouchableOpacity>
       </View>
       
       {accountInfo
@@ -431,9 +460,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     paddingTop: 30,
   },
-  row: {
-    flexDirection: "row",
-  },
   modalSelectText: {
     fontSize: 18,
   },
@@ -457,8 +483,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginRight: 15,
   },
+  row: {
+    width:"100%",
+    flexDirection: "row",
+    justifyContent:"space-between",
+    alignItems: "center",
+  },
   setting: {
-    alignItems: "flex-end",
+    // alignItems: "flex-end",
   },
 
   nicknameContainer: {
@@ -466,7 +498,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between", // 여기를 수정했습니다.
     marginTop: 20,
-    marginLeft: 20,
+    // marginLeft: 20,
+    paddingHorizontal:20,
     marginBottom: 5,
   },
 
@@ -474,7 +507,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     // fontWeight: "bold",
     textAlign: "left",
-    marginTop: 20,
+    // justifyContent:"flex-start"
   },
   accountNumber: {
     fontSize: 20,

@@ -27,45 +27,77 @@ export default function AccessTokenRefreshModalScreen({ navigation }) {
   // dispatch(setUserTokenRefreshModalVisible(false))  // 모달창 닫기에 사용됨
   // dispatch(setUserTokenRefreshModalVisible(!userTokenRefreshModalVisible))  // 모달창 닫기에 사용됨
 
-  const handleUserRefresh = async()=>{
-    const response = await userRefresh(refreshToken)
-    if(response.status === 200){
-      console.log('토큰 재발급 성공')
-      dispatch(inputAccessToken(response.data.accessToken))
-      dispatch(inputRefreshToken(response.data.refreshToken))
-      dispatch(setUserTokenRefreshModalVisible(false))      
-      dispatch(setAccessTokenExpiration(600))
-    }else if(response.status === 400){
-      console.log('토큰 재발급 실패')
-    }else{
-      console.log('오류 발생: 토큰 재발급')
-    }
-  }
-
-  // const handleUserLogout = async() => {
-  //   const response = await userLogout(accessToken)
-  //   console.log('리스폰스',response.data)
-  //   if(response.status===200){
-  //     console.log('logout 성공')
-  //     dispatch(inputAccessToken(null))
-  //     dispatch(inputRefreshToken(null))
-  //     dispatch(setAccessTokenExpiration(0))
-  //     dispatch(setUserTokenRefreshModalVisible(false))
-  //     dispatch(setIsnotReissuanceToken(false))
+  // const handleUserRefresh = async()=>{
+  //   const response = await userRefresh(refreshToken)
+  //   if(response.status === 200){
+  //     console.log('토큰 재발급 성공')
+  //     dispatch(inputAccessToken(response.data.accessToken))
+  //     dispatch(inputRefreshToken(response.data.refreshToken))
+  //     dispatch(setUserTokenRefreshModalVisible(false))      
+  //     dispatch(setAccessTokenExpiration(600))
+  //   }else if(response.status === 400){
+  //     console.log('토큰 재발급 실패')
+  //     Alert.alert('','로그인 연장에 실패해서 로그인 화면으로 돌아갑니다.')
   //     navigation.reset({
   //       index: 0,
-  //       routes: [{ name: 'LoginScreen',}],
-  //     })
-  //   }else if(response.status===400){
-  //     console.log('logout 실패')
-  //   }else if(response.status===401){
-  //     console.log('logout 인증실패 실패')
-  //   }else if(response.status===403){
-  //     console.log('토큰없음')
+  //       routes: [{ name: 'LoginScreen', params: {},}],
+  //     });
   //   }else{
-  //     console.log('오류발생 로그아웃 실패')
+  //     console.log('오류 발생: 토큰 재발급')
+  //     Alert.alert('','로그인 연장에 실패해서 로그인 화면으로 돌아갑니다.')
+  //     navigation.reset({
+  //       index: 0,
+  //       routes: [{ name: 'LoginScreen', params: {},}],
+  //     });
   //   }
   // }
+  
+
+  const handleUserRefresh = async () => {
+    const response = await userRefresh(refreshToken);
+    if (response.status === 200) {
+      console.log('토큰 재발급 성공');
+      dispatch(inputAccessToken(response.data.accessToken));
+      dispatch(inputRefreshToken(response.data.refreshToken));
+      dispatch(setUserTokenRefreshModalVisible(false));
+      dispatch(setAccessTokenExpiration(600));
+    } else if (response.status === 400) {
+      console.log('토큰 재발급 실패');
+      Alert.alert(
+        '',
+        '로그인 연장에 실패해서 로그인 화면으로 돌아갑니다.',
+        [
+          {
+            text: '확인',
+            onPress: () => {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'LoginScreen', params: {} }],
+              });
+            },
+          },
+        ]
+      );
+    } else {
+      console.log('오류 발생: 토큰 재발급');
+      Alert.alert(
+        '',
+        '로그인 연장에 실패해서 로그인 화면으로 돌아갑니다.',
+        [
+          {
+            text: '확인',
+            onPress: () => {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'LoginScreen', params: {} }],
+              });
+            },
+          },
+        ]
+      );
+    }
+  };
+  
 
   const handleNoButtonPress = () => {
     // handleUserLogout()
@@ -76,10 +108,21 @@ export default function AccessTokenRefreshModalScreen({ navigation }) {
     dispatch(setUserTokenRefreshModalVisible(false))
     dispatch(setIsnotReissuanceToken(true)) // 모달창을 닫고 재발급 안함을 true로 만들기;
     dispatch(setUserInfo(null))
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'LoginScreen',}],
-    })
+    Alert.alert(
+      '',
+      '로그인 연장을 하지 않아 로그인 화면으로 돌아갑니다.',
+      [
+        {
+          text: '확인',
+          onPress: () => {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'LoginScreen', params: {} }],
+            });
+          },
+        },
+      ]
+    );
   }
 
   return (
