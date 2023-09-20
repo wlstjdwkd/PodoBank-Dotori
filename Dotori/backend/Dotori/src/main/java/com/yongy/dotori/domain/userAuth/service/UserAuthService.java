@@ -1,31 +1,32 @@
 package com.yongy.dotori.domain.userAuth.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yongy.dotori.domain.bank.entity.Bank;
 import com.yongy.dotori.domain.bank.repository.BankRepository;
+import com.yongy.dotori.domain.userAuth.dto.request.UserAccountCodeDto;
 import com.yongy.dotori.domain.userAuth.dto.request.UserAccountDto;
 import com.yongy.dotori.global.common.BaseResponseBody;
 import com.yongy.dotori.global.email.EmailUtil;
-import com.yongy.dotori.global.redis.entity.DotoriToken;
+import com.yongy.dotori.global.redis.entity.PodoBankAccessToken;
+import com.yongy.dotori.global.redis.entity.PodoBankRefreshToken;
+import com.yongy.dotori.global.redis.entity.FintechToken;
 import com.yongy.dotori.global.redis.entity.PersonalAuth;
-import com.yongy.dotori.global.redis.repository.DotoriTokenRepository;
+import com.yongy.dotori.global.redis.repository.DotoriAccessTokenRepository;
+import com.yongy.dotori.global.redis.repository.DotoriRefreshTokenRepository;
+import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
 import com.yongy.dotori.global.redis.repository.PersonalAuthRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.ResponseBody;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
@@ -45,12 +46,16 @@ public class UserAuthService {
     private PersonalAuthRepository personalAuthRepository;
 
     @Autowired
-    private DotoriTokenRepository dotoriTokenRepository;
+    private DotoriAccessTokenRepository dotoriAccessTokenRepository;
+
+    @Autowired
+    private DotoriRefreshTokenRepository dotoriRefreshTokenRepository;
+
+    @Autowired
+    private FintechTokenRepository fintechTokenRepository;
 
 
-    private long accessTokenExp = 1000L * 60 * 3; // 3분
-
-    private long refreshTokenExp = 1000L * 60 * 60 * 24 * 6; // 6일
+    private String useToken;
 
 
     // NOTE : 1원인증
@@ -83,18 +88,17 @@ public class UserAuthService {
             HttpHeaders headers = new HttpHeaders();
             headers.add("Content-Type", "application/json;charset=utf-8");
 
-            MultiValueMap<String, String> parameter = new LinkedMultiValueMap<>();
-            parameter.add("email", bankInfo.getBankId());
-            parameter.add("password", bankInfo.getBankPwd());
+            Map<String, String> bodyData = new HashMap<>();
+            bodyData.put("email", bankInfo.getBankId());
+            bodyData.put("password", bankInfo.getBankPwd());
+            System.out.println("email : "+ bodyData.get("email")+", password : "+bodyData.get("password"));
+            HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, headers);
 
-            String jsonRequestBody = "{\"email\":\"dotori@dotori.com\",\"password\":\"qwer1234!\"}";
-
-            HttpEntity<String> httpEntity = new HttpEntity<>(jsonRequestBody, headers);
-            log.info(httpEntity.getBody().toString());
+            log.info("-------(1)podoBankLogin-------");
 
             RestTemplate restTemplate = new RestTemplate();
 
-            log.info("come!!");
+            log.info("-------(2)podoBankLogin-------");
             ResponseEntity<String> response = restTemplate.exchange(
                     bankInfo.getBankUrl()+"/api/v1/user/login",
                     HttpMethod.POST,
@@ -109,31 +113,28 @@ public class UserAuthService {
             String accessToken = (String) jsonObject.get("accessToken");
             String refreshToken = (String) jsonObject.get("refreshToken");
 
-            dotoriTokenRepository.save(DotoriToken.of("accessToken", accessToken,accessTokenExp));
+            dotoriAccessTokenRepository.save(PodoBankAccessToken.of("accessToken", accessToken));
 
-            dotoriTokenRepository.save(DotoriToken.of("refreshToken", refreshToken,refreshTokenExp));
+            dotoriRefreshTokenRepository.save(PodoBankRefreshToken.of("refreshToken", refreshToken));
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public ResponseEntity<? extends BaseResponseBody>sendAccountInfo(UserAccountDto userAccountDto) throws ParseException {
-        Optional<DotoriToken> dotoriAccessToken = dotoriTokenRepository.findById("accessToken");
-        Optional<DotoriToken> dotoriRefreshToken = dotoriTokenRepository.findById("refreshToken");
-
-        String useToken = null;
+    // NOTE : accessToken이나 refreshToken을 세팅한다.(없으면 podoBankLogin을 호출해서 새로 발급해서 세팅함)
+    public Bank getConnectionToken(Long bankSeq){
+        Optional<PodoBankAccessToken> dotoriAccessToken = dotoriAccessTokenRepository.findById("accessToken");
+        Optional<PodoBankRefreshToken> dotoriRefreshToken = dotoriRefreshTokenRepository.findById("refreshToken");
 
         Bank bankInfo = null;
 
         log.info("log : "+dotoriAccessToken+"////"+dotoriRefreshToken);
 
-
         if(dotoriAccessToken.isEmpty()){
             if(dotoriRefreshToken.isEmpty()){
-                bankInfo = bankRepository.findByBankSeq(userAccountDto.getBankSeq());
-
+                bankInfo = bankRepository.findByBankSeq(bankSeq);
                 this.podoBankLogin(bankInfo); // accessToken, refreshToken 재발급
-                useToken = dotoriTokenRepository.findById("refreshToken").get().getToken();
+                useToken = dotoriAccessTokenRepository.findById("accessToken").get().getToken();
             }else{
                 useToken = dotoriRefreshToken.get().getToken();
             }
@@ -141,7 +142,15 @@ public class UserAuthService {
             useToken = dotoriAccessToken.get().getToken();
         }
 
-        // NOTE : 사용자가 선택한 정보를 포도은행에 보낸다.
+        return bankInfo;
+    }
+
+    // NOTE : 1원인증
+    public ResponseEntity<? extends BaseResponseBody>sendAccountInfo(UserAccountDto userAccountDto) throws ParseException {
+        Bank bankInfo = this.getConnectionToken(userAccountDto.getBankSeq());
+
+        System.out.println("useToken : "+ useToken);
+
         // 은행의 정보
         if(bankInfo == null)
             bankInfo = bankRepository.findByBankSeq(userAccountDto.getBankSeq());
@@ -150,37 +159,79 @@ public class UserAuthService {
         headers.add("Authorization", "Bearer " + useToken);
         headers.add("Content-Type", "application/json;charset=utf-8");
 
-        MultiValueMap<String, String> parameter = new LinkedMultiValueMap<>();
-        parameter.add("serviceCode", bankInfo.getServiceCode());
-        parameter.add("account", userAccountDto.getAccountNumber());
+        Map<String, String> bodyData = new HashMap<>();
+        bodyData.put("serviceCode", bankInfo.getServiceCode());
+        bodyData.put("accountNumber", userAccountDto.getAccountNumber()); // accountNumber
 
-        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(parameter, headers);
+
+        HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, headers);
 
         RestTemplate restTemplate = new RestTemplate();
 
+        log.info(bodyData.get("serviceCode")+"/"+bodyData.get("accountNumber"));
+
         ResponseEntity<String> response = restTemplate.exchange(
-                    bankInfo.getBankUrl(),
+                    bankInfo.getBankUrl() + "/api/v1/fintech/oneCentVerification",
                     HttpMethod.POST,
                     httpEntity,
                     String.class
         );
 
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(response.getBody());
+        log.info(response.getStatusCode().toString());
 
-        String responseCode = null;
-        String responseMessage = "";
+        String responseCode = response.getStatusCode().toString().split(" ")[0];
 
-
-        for(Object key : jsonObject.keySet()){
-            responseCode = (String) key;
-            responseMessage = jsonObject.get(responseCode).toString();
-            break;
-        }
 
         if(responseCode.equals("200"))
-            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(Integer.parseInt(responseCode), responseMessage));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(Integer.parseInt(responseCode), responseMessage));
+            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(Integer.parseInt(responseCode), "success"));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(Integer.parseInt(responseCode), "fail"));
+    }
+    // NOTE : 1원 인증의 인증코드를 전송함
+    public ResponseEntity<? extends BaseResponseBody>checkAccountAuthCode(UserAccountCodeDto userAccountCodeDto) throws ParseException {
+        Bank bankInfo = this.getConnectionToken(userAccountCodeDto.getBankSeq());
+
+        System.out.println("useToken : "+ useToken);
+
+        // 은행의 정보
+        if(bankInfo == null)
+            bankInfo = bankRepository.findByBankSeq(userAccountCodeDto.getBankSeq());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + useToken);
+        headers.add("Content-Type", "application/json;charset=utf-8");
+
+        Map<String, String> bodyData = new HashMap<>();
+        bodyData.put("serviceCode", bankInfo.getServiceCode());
+        bodyData.put("accountNumber", userAccountCodeDto.getAccountNumber());
+        bodyData.put("verificationCode", "도토리"+userAccountCodeDto.getVerificationCode());
+
+
+        HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                bankInfo.getBankUrl() + "/api/v1/fintech/oneCentVerification/check",
+                HttpMethod.POST,
+                httpEntity,
+                String.class
+        );
+
+        log.info(response.getStatusCode().toString());
+
+        String responseCode = response.getStatusCode().toString().split(" ")[0];
+
+        if(responseCode.equals("200")){
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObject = (JSONObject)jsonParser.parse(response.getBody());
+
+            String fintechCode = jsonObject.get("fintechCode").toString();
+
+            fintechTokenRepository.save(FintechToken.of(userAccountCodeDto.getAccountNumber(), fintechCode));
+
+            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(Integer.parseInt(responseCode), "success"));
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(Integer.parseInt(responseCode), "fail"));
     }
 
 }
