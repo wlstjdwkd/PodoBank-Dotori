@@ -18,6 +18,7 @@ import java.util.List;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PurposeServiceImpl implements PurposeService{
 
@@ -25,12 +26,12 @@ public class PurposeServiceImpl implements PurposeService{
     private final PurposeDataRepository purposeDataRepository;
     private final UserRepository userRepository;
 
-    @Transactional
+
     @Override
     public void createPurpose(PurposeDTO purposeDTO) {
         // TODO 로그인 된 사용자 Id(or Seq) 가져오는 게 필요
         //User user = User.getLoginUser();
-        User loginUser = userRepository.findById("1");
+        User loginUser = userRepository.findByIdAndExpiredAtIsNull("1");
         // 새로운 목표 DB에 저장
         purposeRepository.save(Purpose.builder()
                         .user(loginUser)
@@ -48,7 +49,7 @@ public class PurposeServiceImpl implements PurposeService{
     public PurposeAllDTO findAllPurpose() {
         //TODO 로그인 된 유저의 Seq 가져오는 걸로 변경 해야됨
         //User user = User.getLoginUser();
-        User loginUser = userRepository.findById("1");
+        User loginUser = userRepository.findByIdAndExpiredAtIsNull("1");
         List<Purpose> purposeList = purposeRepository.findAllByUserUserSeq(loginUser.getUserSeq());
 
         List<PurposeListDTO> list = new ArrayList<>();
@@ -92,7 +93,7 @@ public class PurposeServiceImpl implements PurposeService{
         return detail;
     }
 
-    @Transactional
+
     @Override
     public void terminatePurpose(Long purposeSeq) {
         // 목표 중단

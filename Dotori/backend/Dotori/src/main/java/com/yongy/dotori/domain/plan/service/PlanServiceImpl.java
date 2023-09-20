@@ -39,7 +39,7 @@ public class PlanServiceImpl implements PlanService{
     @Override
     public void createPlan(PlanDTO planDTO) {
         //User user = User.getLoginUser();
-        User loginUser = userRepository.findById("1");
+        User loginUser = userRepository.findByIdAndExpiredAtIsNull("1");
 
         Plan plan = planRepository.save(Plan.builder()
                         .user(loginUser)

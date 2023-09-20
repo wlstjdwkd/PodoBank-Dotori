@@ -3,10 +3,13 @@ package com.yongy.dotori.domain.categoryData.entity;
 import com.yongy.dotori.domain.category.entity.Category;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
-
+@Getter
+@Setter
 @Entity(name = "category_data")
 @NoArgsConstructor
 public class CategoryData {

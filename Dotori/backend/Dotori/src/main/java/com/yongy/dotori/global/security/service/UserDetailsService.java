@@ -15,6 +15,6 @@ public class UserDetailsService {
     private UserRepository userRepository;
 
     public User getUserInfo(String id){
-        return userRepository.findById(id);
+        return userRepository.findByIdAndExpiredAtIsNull(id);
     }
 }
