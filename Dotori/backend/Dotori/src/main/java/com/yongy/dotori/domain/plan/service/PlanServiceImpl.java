@@ -64,14 +64,14 @@ public class PlanServiceImpl implements PlanService{
             for(CategoryDTO data : categorise){
                 Category category = categoryRepository.save(Category.builder()
                                 .user(loginUser)
-                                .categoryTitle(data.getCategoryTitle())
+                                .categoryTitle(data.getCategoryName())
                         .build());
 
                 planDetailRepository.save(PlanDetail.builder()
                                 .plan(plan)
                                 .category(category)
                                 .categoryGroup(categoryGroup)
-                                .detailLimit(data.getGoal_amount())
+                                .detailLimit(data.getTargetAmount())
                                 .detailBalance(BigDecimal.ZERO)
                         .build());
             }
