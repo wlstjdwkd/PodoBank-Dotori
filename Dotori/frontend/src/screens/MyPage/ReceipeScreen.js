@@ -9,6 +9,13 @@ export default function ReceipeScreen({ route, navigation }) {
     const receipeItems = [
         { category: '식비', expense: 50000, savings: 20000 },
         { category: '주거', expense: 30000, savings: 10000 },
+        { category: '주거', expense: 30000, savings: 10000 },
+        { category: '주거', expense: 30000, savings: 10000 },
+        { category: '주거', expense: 30000, savings: 10000 },
+        { category: '주거', expense: 30000, savings: 10000 },
+        { category: '주거', expense: 30000, savings: 10000 },
+        { category: '주거', expense: 30000, savings: 10000 },
+        { category: '주거', expense: 30000, savings: 10000 },
 
 
         // 다른 항목들 추가
@@ -36,24 +43,32 @@ export default function ReceipeScreen({ route, navigation }) {
 
             {/* 선택한 명세서를 화면에 표시 */}
             <ScrollView contentContainerStyle={styles.contentContainer}>
-                {/* 시민주의 통장 */}
-                <Text style={styles.label}>{selectedAccount}</Text>
-                <Text style={styles.amount}>{(totalSavings + additionalSavings.savings).toLocaleString()}원</Text>
+                
 
                 {/* 명세서 표 */}
                 <View style={styles.receipeTable}>
-                    {/* 제목 행 */}
-                    <View style={styles.tableHeader}>
-                        <Text style={styles.columnHeader}></Text>
-                        <Text style={styles.columnHeader}>카테고리</Text>
-                        <Text style={styles.columnHeader}>지출</Text>
-                        <Text style={styles.columnHeader}>저축</Text>
+                    {/* 시민주의 통장 */}
+                    <View style={styles.topContainer}>
+                        <Text style={styles.label}>{selectedAccount}</Text>
+                        <Text style={styles.amount}>{(totalSavings + additionalSavings.savings).toLocaleString()}원</Text>
                     </View>
+
+
+                    {/* 제목 행 */}
+                    <View style={styles.tableRow}>
+                        <Text style={styles.tableIndexCell}></Text>
+                        <Text style={styles.tableCell}>카테고리</Text>
+                        <Text style={styles.tableCell}>지출</Text>
+                        <Text style={styles.tableCell}>저축</Text>
+                    </View>
+
+                    {/* 구분선 */}
+                    <View style={styles.tableLine} />
 
                     {/* 항목들 */}
                     {receipeItems.map((item, index) => (
                         <View style={styles.tableRow} key={index}>
-                            <Text style={styles.tableCell}>{index + 1}</Text>
+                            <Text style={styles.tableIndexCell}>{index + 1}</Text>
                             <Text style={styles.tableCell}>{item.category}</Text>
                             <Text style={styles.tableCell}>{item.expense.toLocaleString()}</Text>
                             <Text style={styles.tableCell}>{item.savings.toLocaleString()}</Text>
@@ -61,11 +76,11 @@ export default function ReceipeScreen({ route, navigation }) {
                     ))}
 
                     {/* 구분선 */}
-                    <View style={styles.tableSeparator} />
+                    <View style={styles.tableLine} />
 
                     {/* 사용 합계 */}
                     <View style={styles.tableRow}>
-                        <Text style={styles.tableCell}></Text>
+                        <Text style={styles.tableIndexCell}></Text>
                         <Text style={styles.tableCell}></Text>
                         <Text style={styles.tableCell}>{totalExpense.toLocaleString()}</Text>
                         <Text style={styles.tableCell}>{totalSavings.toLocaleString()}</Text>
@@ -73,21 +88,21 @@ export default function ReceipeScreen({ route, navigation }) {
 
                     {/* 추가 저축 항목 */}
                     <View style={styles.tableRow}>
-                        <Text style={styles.tableCell}></Text>
+                        <Text style={styles.tableIndexCell}></Text>
                         <Text style={styles.tableCell}>{additionalSavings.category}</Text>
                         <Text style={styles.tableCell}></Text>
                         <Text style={styles.tableCell}>{additionalSavings.savings.toLocaleString()}</Text>
                     </View>
 
                     {/* 구분선 */}
-                    <View style={styles.tableSeparator} />
+                    <View style={styles.tableDotLine} />
 
                     {/* 총계 행 */}
                     <View style={styles.tableRow}>
-                        <Text style={[styles.tableCell, styles.totalCell]}></Text>
-                        <Text style={[styles.tableCell, styles.totalCell]}>총계</Text>
-                        <Text style={[styles.tableCell, styles.totalCell]}>{totalExpense.toLocaleString()}원</Text>
-                        <Text style={[styles.tableCell, styles.totalCell]}>{(totalSavings + additionalSavings.savings).toLocaleString()}원</Text>
+                        <Text style={styles.tableIndexCell}></Text>
+                        <Text style={styles.tableCell}>총계</Text>
+                        <Text style={styles.tableCell}>{totalExpense.toLocaleString()}</Text>
+                        <Text style={styles.tableCell}>{(totalSavings + additionalSavings.savings).toLocaleString()}</Text>
                     </View>
                 </View>
             </ScrollView>
@@ -114,7 +129,8 @@ const styles = StyleSheet.create({
     contentContainer: {
         flexGrow: 1, // 스크롤 가능하도록 설정
         alignItems: 'center',
-        paddingBottom: 20, // 하단 여백
+        paddingTop: 20,
+        paddingBottom: 150, // 하단 여백
     },
     label: {
         fontSize: 24,
@@ -131,15 +147,17 @@ const styles = StyleSheet.create({
         color: '#FF965C',
     },
     receipeTable: {
-        width: '90%', // 화면 비율 90%
+        width: '90%',
         borderWidth: 1,
         borderColor: '#DDD',
-        borderRadius: 8,
-        shadowColor: 'rgba(0, 0, 0, 0.2)',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.5,
-        shadowRadius: 2,
+        shadowColor: 'rgba(0, 0, 0, 0.5)', // 그림자 색상을 어둡게 조정
+        shadowOffset: { width: 0, height: 4 }, // 그림자 오프셋을 크게 조정
+        shadowOpacity: 1, // 그림자 투명도를 최대로 조정
+        shadowRadius: 8, // 그림자 반경을 크게 조정
         backgroundColor: 'white',
+    },
+    topContainer: {
+        margin: 30
     },
     tableHeader: {
         flexDirection: 'row',
@@ -158,14 +176,27 @@ const styles = StyleSheet.create({
         borderBottomWidth: 0,
         borderColor: '#DDD',
     },
+    tableIndexCell: {
+        flex: 0.5,
+        padding: 12,
+        textAlign: 'center',
+    },
     tableCell: {
         flex: 1,
         padding: 12,
         textAlign: 'center',
     },
-    tableSeparator: {
+    tableLine: {
         height: 1,
-        backgroundColor: '#DDD',
+        backgroundColor: '#000000',
+        marginHorizontal: '5%'
+    },
+    tableDotLine: {
+        height: 1,
+        borderTopWidth: 1,
+        borderColor: '#000000',
+        borderStyle: 'dashed',
+        marginHorizontal: '5%'
     },
     totalCell: {
         fontWeight: 'bold',
