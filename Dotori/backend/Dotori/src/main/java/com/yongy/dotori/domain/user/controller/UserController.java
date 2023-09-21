@@ -6,7 +6,7 @@ import com.yongy.dotori.domain.user.dto.response.UserInfoResDto;
 import com.yongy.dotori.domain.user.entity.Provider;
 import com.yongy.dotori.domain.user.entity.Role;
 import com.yongy.dotori.domain.user.entity.User;
-import com.yongy.dotori.domain.user.exception.ExceptionEnum;
+import com.yongy.dotori.domain.user.exception.*;
 import com.yongy.dotori.domain.user.repository.UserRepository;
 import com.yongy.dotori.domain.user.service.UserService;
 import com.yongy.dotori.global.common.BaseResponseBody;
@@ -57,50 +57,49 @@ public class UserController {
 
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "이메일 인증코드 전송"),
-            @ApiResponse(responseCode = "4001", description = "이미 존재하는 사용자입니다.")
+            @ApiResponse(responseCode = "409", description = "이미 존재하는 사용자입니다.")
     })
-    @Operation(summary= "회원가입의 이메일 인증", description = "사용자의 이메일로 인증번호를 전송한다.")
+    @Operation(summary= "회원가입의 이메일 인증", description = "ALL")
     @PostMapping("/email/check-id")
-    public ResponseEntity<? extends BaseResponseBody> validIdCheck(@RequestParam(name="id") String id){
+    public ResponseEntity<Void> validIdCheck(@RequestParam(name="id") String id){
         User user = userRepository.findByIdAndExpiredAtIsNull(id);
         if(user == null){
             userService.emailCert(id);
-            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "이메일 인증코드 전송"));
+            return ResponseEntity.ok().build();
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4001, ExceptionEnum.ALREADY_EXIST_ID));
+        throw new AlreadyExistIdException("이미 존재하는 사용자입니다.");
     }
 
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "이메일 인증 완료"),
-            @ApiResponse(responseCode = "4002", description = "인증번호가 만료되었습니다."),
-            @ApiResponse(responseCode = "4003", description = "인증번호가 올바르지 않습니다."),
+            @ApiResponse(responseCode = "404", description = "인증번호가 만료되었습니다."),
+            @ApiResponse(responseCode = "409", description = "인증번호가 올바르지 않습니다."),
     })
-    @Operation(summary = "회원가입의 이메일 인증코드 확인", description = "사용자 인증코드의 유효성 체크")
+    @Operation(summary = "회원가입의 이메일 인증코드 확인", description = "ALL")
     @PostMapping("/email/check-code")
-    public ResponseEntity<? extends BaseResponseBody> validEmailCodeCheck(@RequestParam(name="code") String code){
+    public ResponseEntity<Void> validEmailCodeCheck(@RequestParam(name="code") String code){
 
         // NOTE : RedisDB에서 인증코드가 존재하면 사용자의 아이디를 가져온다.
         String authId = userService.getEmailAuthId(code);
-
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if(authId == null) { // 인증번호의 시간이 만료됨
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4002, ExceptionEnum.EXPIRED_AUTHCODE));
+            throw new ExpiredAuthCodeException("인증번호가 만료되었습니다.");
         }else if(authId.equals(user.getId())){ // 인증번호 일치
             userService.deleteEmailAuthCode(code); // 인증번호 삭제
-            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "이메일 인증 완료"));
+            return ResponseEntity.ok().build();
         }else{ // 인증번호 불일치
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4003, ExceptionEnum.INVALID_AUTHCODE));
+            throw new InvalidAuthCodeException("인증번호가 올바르지 않습니다.");
         }
     }
 
     @ApiResponses(value= {
             @ApiResponse(responseCode = "200", description = "회원가입을 완료했습니다."),
-            @ApiResponse(responseCode = "4004", description = "회원가입에 실패했습니다."),
+            @ApiResponse(responseCode = "400", description = "회원가입에 실패했습니다."),
     })
-    @Operation(summary = "사용자 회원가입")
+    @Operation(summary = "사용자 회원가입", description = "ALL")
     @PostMapping("/signup")
-    public ResponseEntity<? extends BaseResponseBody> signup(@RequestBody UserInfoReqDto userInfoReqDto){
+    public ResponseEntity<Void> signup(@RequestBody UserInfoReqDto userInfoReqDto){
         try{
             User user = User.builder()
                     .id(userInfoReqDto.getId())
@@ -115,34 +114,34 @@ public class UserController {
             // 비밀번호 암호화해서 저장하기
             userRepository.save(user);
 
-            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "회원가입을 완료했습니다."));
+            return ResponseEntity.ok().build();
         }catch(Exception e){
             log.info("회원가입 오류");
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4004, ExceptionEnum.ERROR_DOTORI_SIGNUP));
+            throw new FailedSignupException("회원가입에 실패했습니다.");
         }
     }
 
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "로그인 성공"),
-            @ApiResponse(responseCode = "4005", description = "아이디를 확인해주세요."),
-            @ApiResponse(responseCode = "4006", description = "비밀번호를 확인해주세요.")
+            @ApiResponse(responseCode = "404", description = "아이디를 확인해주세요."),
+            @ApiResponse(responseCode = "404", description = "비밀번호를 확인해주세요.")
     })
-    @Operation(summary = "도토리 로그인")
+    @Operation(summary = "도토리 로그인", description = "ALL")
     @PostMapping("/signin")
-    public ResponseEntity<? extends BaseResponseBody> dotoriLogin(@RequestBody UserLoginReqDto userLoginReqDto) {
+    public ResponseEntity<JwtToken> dotoriLogin(@RequestBody UserLoginReqDto userLoginReqDto) {
 
         User user = userRepository.findByIdAndExpiredAtIsNull(userLoginReqDto.getId());
 
         // NOTE : 아이디 확인
         if(user == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(4005, ExceptionEnum.INVALID_DOTORI_ID));
+            throw new InvalidIdException("아이디를 확인해주세요.");
         }
 
         // NOTE : 비밀번호 확인
         if(user.getAuthProvider().equals(Provider.DOTORI)){
             if(!passwordEncoder.matches(userLoginReqDto.getPassword(), user.getPassword())){
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(4006, ExceptionEnum.INVALID_DOTORI_PWD));
+                throw new InvalidPwdException("비밀번호를 확인해주세요.");
             }
         }
 
@@ -151,19 +150,19 @@ public class UserController {
         // refreshToken 저장
         refreshTokenRepository.save(RefreshToken.of(userLoginReqDto.getId(), jwtToken.getRefreshToken()));
 
-        // accessToken 전달
-        return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, jwtToken));
+        // accessToken, refreshToken 전달
+        return ResponseEntity.ok().body(jwtToken);
     }
 
 
     // NOTE : RefreshToken이 유효하면 accessToken, refreshToken을 재발급
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "토큰 재발급 성공"),
-            @ApiResponse(responseCode = "4007", description = "다시 로그인 해주세요.")
+            @ApiResponse(responseCode = "404", description = "다시 로그인 해주세요.")
     })
-    @Operation(summary = "새로운 토큰 발급", description = "새로운 토큰을 발급한다.")
+    @Operation(summary = "새로운 토큰 발급", description = "ALL")
     @PostMapping("/new-token")
-    public ResponseEntity<? extends BaseResponseBody> generateNewToken(String refreshToken){
+    public ResponseEntity<JwtToken> generateNewToken(String refreshToken){
 
         // refreshToken이 유효한 경우
         if(refreshTokenRepository.findById(refreshToken) != null){
@@ -174,98 +173,98 @@ public class UserController {
             // refreshToken 저장하기
             refreshTokenRepository.save(RefreshToken.of(jwtToken.getRefreshToken(), id));
 
-            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, jwtToken));
+            return ResponseEntity.ok().body(jwtToken);
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4007, ExceptionEnum.INVALID_REFRESH_TOKEN));
+        throw new ExpiredAuthCodeException("다시 로그인 해주세요.");
     }
 
     // NOTE : 사용자 데이터 가져오기
     @ApiResponse(responseCode = "200", description = "사용자의 데이터를 가져오는데 성공함")
-    @Operation(summary = "사용자 데이터 가져오기")
+    @Operation(summary = "사용자 데이터 가져오기", description = "USER")
     @GetMapping()
-    public ResponseEntity<? extends BaseResponseBody> getUserInfo(){
+    public ResponseEntity<UserInfoResDto> getUserInfo(){
 
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, UserInfoResDto.builder()
+        return ResponseEntity.ok().body(UserInfoResDto.builder()
                 .userSeq(user.getUserSeq())
                 .id(user.getId())
                 .birthDate(user.getBirthDate())
                 .userName(user.getUserName())
                 .phoneNumber(user.getPhoneNumber())
-                .authProvider(user.getAuthProvider()).build()));
+                .authProvider(user.getAuthProvider()).build());
     }
 
 
     // NOTE : 생년월일 수정
     @ApiResponse(responseCode = "200", description = "사용자의 생년월일 업데이트 완료")
-    @Operation(summary = "사용자의 생년월일 업데이트")
+    @Operation(summary = "사용자의 생년월일 업데이트", description = "USER")
     @PatchMapping("/birthDate")
-    public ResponseEntity<? extends BaseResponseBody>updateBirthDate(@RequestParam String birthDate){
+    public ResponseEntity<Void>updateBirthDate(@RequestParam String birthDate){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         user.setBirthDate(LocalDate.parse(birthDate));
         userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "사용자의 생년월일 업데이트 완료"));
+        return ResponseEntity.ok().build();
     }
 
 
     // NOTE : 핸드폰번호 수정
     @ApiResponse(responseCode = "200", description = "사용자의 헨드폰번호 업데이트 완료")
-    @Operation(summary = "사용자의 헨드폰번호 업데이트")
+    @Operation(summary = "사용자의 헨드폰번호 업데이트", description = "USER")
     @PatchMapping("/phoneNumber")
-    public ResponseEntity<? extends BaseResponseBody>updatePhoneNumber(@RequestParam String phoneNumber){
+    public ResponseEntity<?>updatePhoneNumber(@RequestParam String phoneNumber){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         user.setPhoneNumber(phoneNumber);
         userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "사용자의 헨드폰번호 업데이트 완료"));
+        return ResponseEntity.ok().build();
     }
 
     // NOTE : 비밀번호 변경
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "사용자 비밀번호 변경 완료"),
-            @ApiResponse(responseCode = "4008", description = "네이버, 카카오 로그인은 비밀번호를 변경할 수 없습니다."),
-            @ApiResponse(responseCode = "4006", description = "비밀번호를 확인해주세요.")
+            @ApiResponse(responseCode = "403", description = "네이버, 카카오 로그인은 비밀번호를 변경할 수 없습니다."),
+            @ApiResponse(responseCode = "404", description = "비밀번호를 확인해주세요.")
 
     })
-    @Operation(summary = "사용자의 비밀번호 업데이트")
+    @Operation(summary = "사용자의 비밀번호 업데이트", description = "USER")
     @PatchMapping("/password")
-    public ResponseEntity<? extends BaseResponseBody>updatePassword(@RequestParam String beforePassword, @RequestParam String afterPassword){
+    public ResponseEntity<?>updatePassword(@RequestParam String beforePassword, @RequestParam String afterPassword){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if(!user.getAuthProvider().equals(Provider.DOTORI))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(4008, ExceptionEnum.NOT_UPDATE_SOCIAL_LOGIN));
+            throw new AccessDeniedSocialPwdException("네이버, 카카오 로그인은 비밀번호를 변경할 수 없습니다.");
 
         if(passwordEncoder.encode(beforePassword).equals(user.getPassword())){
             user.setPassword(passwordEncoder.encode(afterPassword));
             userRepository.save(user);
-            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "사용자 비밀번호 변경 완료"));
+            return ResponseEntity.ok().build();
         }
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(4006, ExceptionEnum.INVALID_DOTORI_PWD));
+        throw new InvalidPwdException("비밀번호를 확인해주세요.");
     }
 
     // NOTE : 로그아웃
     @ApiResponse(responseCode = "200", description = "사용자 로그아웃 완료")
-    @Operation(summary = "사용자 로그아웃")
+    @Operation(summary = "사용자 로그아웃", description = "USER")
     @PatchMapping("/logout")
-    public ResponseEntity<? extends BaseResponseBody>logout(@RequestParam String refreshToken){
+    public ResponseEntity<String>logout(@RequestParam String refreshToken){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         refreshTokenRepository.deleteById(refreshToken);
-        return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "사용자 로그아웃 완료")); // FE에서 accessToken 삭제함
+        return ResponseEntity.ok().build(); // FE에서 accessToken 삭제함
     }
 
 
     // NOTE : 탈퇴하기
     @ApiResponse(responseCode = "200", description = "사용자 탈퇴 완료")
-    @Operation(summary = "사용자 탈퇴하기")
+    @Operation(summary = "사용자 탈퇴하기", description = "USER")
     @PatchMapping("/retire")
-    public ResponseEntity<? extends BaseResponseBody>retire(String refreshToken){
+    public ResponseEntity<String>retire(String refreshToken){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         user.setExpiredAt(LocalDateTime.now());
         userRepository.save(user);
         refreshTokenRepository.deleteById(refreshToken);
-        return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "사용자 탈퇴 완료")); // FE에서 accessToken 삭제함
+        return ResponseEntity.ok().build(); // FE에서 accessToken 삭제함
     }
 
 
