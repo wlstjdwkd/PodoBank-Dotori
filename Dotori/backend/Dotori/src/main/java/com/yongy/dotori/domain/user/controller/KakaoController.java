@@ -1,6 +1,8 @@
 package com.yongy.dotori.domain.user.controller;
 
 import com.yongy.dotori.domain.user.entity.User;
+import com.yongy.dotori.domain.user.exception.FailedSocialAuthException;
+import com.yongy.dotori.domain.user.exception.UserExceptionEnum;
 import com.yongy.dotori.domain.user.repository.UserRepository;
 import com.yongy.dotori.global.redis.entity.RefreshToken;
 import com.yongy.dotori.global.redis.repository.RefreshTokenRepository;
@@ -8,6 +10,9 @@ import com.yongy.dotori.global.security.dto.JwtToken;
 import com.yongy.dotori.global.security.provider.JwtTokenProvider;
 import com.yongy.dotori.domain.user.service.KakaoService;
 import com.yongy.dotori.global.common.BaseResponseBody;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/kakao")
+@RequestMapping("/v1/kakao")
 public class KakaoController {
 
     @Autowired
@@ -32,34 +37,39 @@ public class KakaoController {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "카카오 회원가입 성공"),
+            @ApiResponse(responseCode = "201", description = "카카오 로그인 성공"),
+            @ApiResponse(responseCode = "5002", description = "카카오 인증에 실패했습니다.")
+    })
+    @Operation(summary = "카카오 회원가입/로그인", description = "ALL")
     // NOTE : 인가코드 받기
     @GetMapping("/callback")
-    public ResponseEntity<? extends BaseResponseBody> callback(HttpServletRequest request) throws Exception {
+    public ResponseEntity<JwtToken> callback(HttpServletRequest request) throws Exception {
         String code = request.getParameter("code");
 
         // NOTE : 인가코드 인증 실패
         if(code == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "인증에 실패했습니다."));
+            throw new FailedSocialAuthException("카카오 인증에 실패했습니다.");
         }
 
         String accessToken = kakaoService.getAccessToken(code);
 
         // NOTE : AccessToken 인증 실패
         if(accessToken == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "인증에 실패했습니다."));
+            throw new FailedSocialAuthException("카카오 인증에 실패했습니다.");
         }
 
         User user = kakaoService.getUserInfo(accessToken);
 
         // NOTE : 사용자 정보 가져오기 실패
         if(user == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponseBody.of(404, "인증에 실패했습니다."));
+            throw new FailedSocialAuthException("카카오 인증에 실패했습니다.");
         }else{
             // NOTE : 회원가입
             if(userRepository.findByIdAndExpiredAtIsNull(user.getId()) == null){
                 userRepository.save(user); // DB에 사용자 저장
-                return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, "회원가입에 성공하였습니다."));
+                return ResponseEntity.ok().build();
             }
 
             // NOTE : 로그인
@@ -67,7 +77,7 @@ public class KakaoController {
 
             refreshTokenRepository.save(RefreshToken.of(jwtToken.getRefreshToken(), user.getId()));
 
-            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(200, jwtToken));
+            return ResponseEntity.ok().body(jwtToken);
         }
     }
 

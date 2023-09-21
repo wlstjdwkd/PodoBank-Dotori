@@ -138,6 +138,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 12,
     paddingLeft: 12,
+    marginHorizontal: 20,
     width: "90%",
     alignSelf: "center",
   },

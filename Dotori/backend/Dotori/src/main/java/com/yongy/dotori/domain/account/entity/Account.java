@@ -30,7 +30,7 @@ public class Account {
     @JoinColumn(name = "bankSeq")
     private Bank bank;
 
-    private Long accountNumber;
+    private String accountNumber;
 
     private String accessToken;
 
@@ -45,7 +45,7 @@ public class Account {
     private Plan plan;
 
     @Builder
-    public Account(Long accountSeq, User user, Bank bank, Long accountNumber,
+    public Account(Long accountSeq, User user, Bank bank, String accountNumber,
                    String accessToken, String accountTitle, LocalDateTime deleteAt) {
         this.accountSeq = accountSeq;
         this.user = user;
