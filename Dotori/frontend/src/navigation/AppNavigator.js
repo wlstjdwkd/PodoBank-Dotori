@@ -13,6 +13,8 @@ import PurposeCreate1Screen from "../screens/Purpose/PurposeCreate1Screen";
 import PurposeCreate2Screen from "../screens/Purpose/PurposeCreate2Screen";
 import PurposeCreate3Screen from "../screens/Purpose/PurposeCreate3Screen";
 import PurposeCompleteScreen from "../screens/Purpose/PurposeCompleteScreen";
+import PurposeDetailScreen from "../screens/Purpose/PurposeDetailScreen";
+import PurposeStopScreen from "../screens/Purpose/PurposeStopScreen";
 import PlanMainScreen from "../screens/Plan/PlanMainScreen";
 import PlanCreate1Screen from "../screens/Plan/PlanCreate1Screen";
 import PlanCreate2Screen from "../screens/Plan/PlanCreate2Screen";
@@ -85,6 +87,14 @@ export default function AppNavigator() {
       <Stack.Screen
         name="PurposeCompleteScreen"
         component={PurposeCompleteScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PurposeDetailScreen"
+        component={PurposeDetailScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PurposeStopScreen"
+        component={PurposeStopScreen}
       ></Stack.Screen>
       <Stack.Screen
         name="PlanMainScreen"

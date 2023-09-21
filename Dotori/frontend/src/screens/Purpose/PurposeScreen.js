@@ -20,7 +20,7 @@ export default function PurposeScreen({ navigation }) {
     },
     {
       id: "2",
-      name: "목표1",
+      name: "목표2",
       currentAmount: 2500,
       targetAmount: 10000,
     },
