@@ -34,7 +34,6 @@ public class AccountServiceImpl implements AccountService{
     private final AccountRepository accountRepository;
     private final FintechTokenRepository fintechTokenRepository;
 
-
     @Override
     public List<AccountDTO> findAllAccount() throws JsonProcessingException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -53,8 +52,8 @@ public class AccountServiceImpl implements AccountService{
     }
 
     public BigDecimal getBalance(Long accountSeq) throws JsonProcessingException {
-        Bank bankInfo = bankRepository.findByAccountAccountSeq(accountSeq);
         Account account = accountRepository.findByAccountSeq(accountSeq);
+        Bank bankInfo = bankRepository.findByBankSeq(account.getBank().getBankSeq());
         String accessToken = userAuthService.getConnectionToken(bankInfo.getBankSeq()); // 은행 accessToken 가져오기
 
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -77,7 +76,7 @@ public class AccountServiceImpl implements AccountService{
         );
 
         String responseCode = response.getStatusCode().toString().split(" ")[0];
-        String responseContent = response.getBody().toString();
+        String responseContent = response.getBody();
 
         if(responseCode.equals("200")){
             ObjectMapper objectMapper = new ObjectMapper();
