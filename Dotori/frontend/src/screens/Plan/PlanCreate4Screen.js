@@ -8,7 +8,7 @@ import {
   ScrollView,
   Image,
 } from "react-native";
-import DraggableFlatList from "volkeno-react-native-drag-drop";
+// import DraggableFlatList from "volkeno-react-native-drag-drop";
 import HeaderComponent from "../Components/HeaderScreen";
 
 export default function PlanCreate4Screen({ navigation, route }) {
