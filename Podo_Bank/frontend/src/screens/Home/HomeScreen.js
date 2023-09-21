@@ -85,7 +85,10 @@ export default function HomeScreen({ navigation }) {
         navigation={navigation}
         showHome={false}
       /> */}
-      <View style={{ justifyContent: 'center', alignItems: 'center', marginVertical: 20, }}>
+      <View style={{ justifyContent: 'center', alignItems: 'center', 
+        // marginVertical: 20, 
+        flex:0.12,
+      }}>
         <Image
           source={require("../../assets/images/podo_bank_name.png")}
           style={{ height: 25, resizeMode: 'contain' }}
@@ -93,11 +96,11 @@ export default function HomeScreen({ navigation }) {
       </View>
       
       {/* 사용자 이름 */}
-      <View style={{flex:0.15}}>
+      <View style={{flex:0.15,}}>
         <View style={[styles.nameContainer,]}>
           {userInfo?
               (<Text style={styles.userNameBold}>{userInfo.name}</Text>)
-              :(<Text style={styles.userNameBold}>정예진</Text>)
+              :(<Text style={styles.userNameBold}>회원</Text>)
             }
           <Text style={styles.userName}>님</Text>
         </View>

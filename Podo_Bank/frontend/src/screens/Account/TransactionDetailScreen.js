@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Button, TouchableOpacity } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
+import { useSelector } from "react-redux";
+
 
 export default function TransactionDetailScreen({ navigation, route }) {
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   const [transactionInfo, setTransactionInfo] = useState(route.params.transactionInfo)
-
   // const isWithdrawal = true; // 예제에서는 출금으로 가정
   const formDateTransaction = (dateString) =>{
     const date = new Date(dateString);
@@ -83,6 +86,8 @@ export default function TransactionDetailScreen({ navigation, route }) {
           <Text style={styles.confirmButtonText}>확인</Text>
         </TouchableOpacity>
       </View>
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
+
     </View>
   );
 }

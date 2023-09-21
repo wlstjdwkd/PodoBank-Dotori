@@ -16,7 +16,6 @@ import {
 } from '../../apis/userapi'
 import { accountDelete } from '../../apis/accountapi'
 import { useSelector, useDispatch } from 'react-redux';
-import { inputAccessToken, inputRefreshToken } from '../../redux/slices/auth/user'
 
 export default function WithdrawalScreen({ navigation, route }) {
   const [account, setAccount] = useState(route.params.account)
@@ -31,7 +30,6 @@ export default function WithdrawalScreen({ navigation, route }) {
   const [registeredMessage, setRegisteredMessage] = useState(""); // 회원탈퇴 버튼 클릭시 메시지
   const [userWithdrawalModalVisible, setUserWithdrawalModalVisible] = useState(false); // 회원탈퇴 마지막 모달창
   const accessToken = useSelector((state) => state.user.accessToken)
-  const refreshToken = useSelector((state) => state.user.refreshToken)
   const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   const dispatch = useDispatch();
 
@@ -79,8 +77,8 @@ export default function WithdrawalScreen({ navigation, route }) {
     if(response.status==200){
       console.log('계좌 해지 성공')
       // user Token null값으로 변경
-      dispatch(inputAccessToken(null))
-      dispatch(inputRefreshToken(null))
+      // dispatch(inputAccessToken(null))
+      // dispatch(inputRefreshToken(null))
       setRegisteredMessage('계좌 해지가 완료되었습니다.')
       navigation.reset({
         index: 0,

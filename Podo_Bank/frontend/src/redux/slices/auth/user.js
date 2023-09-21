@@ -21,7 +21,6 @@ const userSlice = createSlice({
     },
     setUserTokenRefreshModalVisible(state, action){
       state.userTokenRefreshModalVisible = action.payload
-      console.log('모달창 등장!')
     },
     setAccessTokenExpiration(state, action) {
       state.accessTokenExpiration = action.payload; // AccessToken의 만료 시간 설정

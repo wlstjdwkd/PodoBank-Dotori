@@ -5,39 +5,22 @@ import { createSlice } from '@reduxjs/toolkit';
 const accountSlice = createSlice({
   name: 'account',
   initialState: {
-    count: 0,
-    nameorigin: null,
-    nametmp:null,
     totalBalance:0,
+    // changeNicknameModalVisible : false,
   },
   reducers: {
-    increment(state) {
-      state.count += 1;
-      state.nameorigin = 'kim';
-      state.nametmp = state.nameorigin;
-    },
-    decrement(state) {
-      state.count -= 1;
-      state.nameorigin ='no';
-      state.nametmp = state.nameorigin;
-    },
-    incrementByAmount(state, action) {
-      state.count += action.payload;
-      state.nameorigin = 'what';
-      state.nametmp = state.nameorigin;
-    },
-    changeNameNum(state) {
-      const randomNum = Math.floor(Math.random() * 100) +1;
-      state.nametmp = `${state.nameorigin}${randomNum}`;
-    },
     changeTotalBalance(state, action){
       state.totalBalance = action.payload
-    }
+    },
+    // setChangeNicknameModalVisible(state, action){
+    //   state.userTokenRefreshModalVisible = action.payload
+    // },
   },
 });
 
-export const { increment, decrement, incrementByAmount, changeNameNum, changeTotalBalance } =
-accountSlice.actions;
+export const {
+   changeTotalBalance,
+} = accountSlice.actions;
 
 export default accountSlice.reducer;
 

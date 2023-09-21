@@ -6,15 +6,20 @@ import {
   TouchableOpacity,
   FlatList,
   Modal,
-  ScrollView,
   Alert,
+  TextInput,
+  Pressable,
 } from "react-native";
 import { Ionicons, EvilIcons, Octicons } from "@expo/vector-icons";
 import HeaderScreen from "../Header/HeaderScreen";
 import { accountTransactionDetail, accountTransactionHistory, accountNicknameChange } from "../../apis/accountapi"
-import { useSelector } from "react-redux";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
+
+// import { setChangeNicknameModalVisible } from "../../redux/slices/accounts/account"
+import { useDispatch, useSelector } from "react-redux";
 
 export default function AccountDetail({ navigation, route }) {
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   const [account, setAccount] = useState(route.params.account)
   const accessToken = useSelector((state) => state.user.accessToken)
   const [historySearchMonth, setHistorySearchMonth] = useState(3)// 1,2,3,4,5,6 등 개월 수로 현재는 6개월 까지만
@@ -25,8 +30,11 @@ export default function AccountDetail({ navigation, route }) {
   const [typeChange, setTypeChange] = useState(false)
   const [accountInfo, setAccountInfo] = useState(null)
   const [transactionHistory, setTransactionHistory] =  useState([])
-  // const [nickname, setNickname] = useState("")
-  const [nicknameModal, setNicknameModal] = useState(false)
+  const [changeNickname, setChangeNickname] = useState(false) // 닉네임 수정 가능한 상태로 변경
+  const [nickname, setNickname] = useState(route.params.account.nickname)
+  const [tmpNickname, setTmpNickname] = useState(route.params.account.nickname)
+  const [changeNicknameModalVisible, setChangeNicknameModalVisible] = useState(false) // 닉네임 수정 후 변경할 것인지를 묻기 위한 모달창
+  const dispatch = useDispatch()
 
 
   // 현재 날짜를 가져오기
@@ -62,6 +70,7 @@ export default function AccountDetail({ navigation, route }) {
     if(response.status===200){
       console.log('계좌 상세조회에 성공했습니다.')
       setAccountInfo(response.data)
+      setNickname(response.data.nickname)
     }else if(response.status===400){
       console.log('bad400 계좌 상세조회 실패로 계좌 목록을 받아올 수 없습니다.')
     }else if(response.status===401){
@@ -73,15 +82,26 @@ export default function AccountDetail({ navigation, route }) {
     }
   }
 
-  // accountNicknameChange
+  const nicknameValid = (text) => {
+    const filteredText = text.replace(/[^a-zA-Z0-9ㄱ-힣]/g, '');
+    setTmpNickname(filteredText);
+    console.log(filteredText);
+  }
+  
+  // 계좌 별칭 변경 함수
   const doAccountNicknameChange = async () => {
-    const accountInfo = {
+    const accountNickInfo = {
       accountNumber : accountInfo.accountNumber,
-      nickname : accountInfo.nickname,
+      nickname : tmpNickname,
     }
-    const response = await accountNicknameChange(accountInfo, accessToken)
+    console.log('와우',accountNickInfo)
+    const response = await accountNicknameChange(accountNickInfo, accessToken)
+    // const response = await accountNicknameChange(accountInfo.accountNumber,tmpNickname, accessToken)
     if(response.status === 200){
       console.log('계좌 별칭 수정 성공')
+      setNickname(tmpNickname)
+      setChangeNickname(false)
+      setChangeNicknameModalVisible(false)
     }else if(response.status === 400){
       console.log('계좌 별칭 수정 실패')
     }else if(response.status === 401){
@@ -94,11 +114,6 @@ export default function AccountDetail({ navigation, route }) {
       console.log('오류 발생 : 계좌 별칭 수정 실패')
     }
   }
-
-  const handleAccountNicknameChange = () => {
-
-  }
-
 
   // type 변경후 거래 내역 조회 
   const handlegetAccountTransactionHistory = async (searchMonth, transactionType, sortType)=>{
@@ -185,11 +200,38 @@ export default function AccountDetail({ navigation, route }) {
       <View style={[styles.nicknameContainer]}>
         <View style={[styles.row, {}]}>
           {/* 계좌 nickname 차후 바꿀 수 있게 할 것. */}
-          <Text style={[styles.nickname, {}]}>나의 계좌
+          {changeNickname
+          ?(<View style={{flexDirection:"row", alignItems:'center'}}>
+            <TextInput style={[styles.nicknameChange, {}]}
+              onChangeText={(text) => {
+                // setTmpNickname(text)
+                // console.log(text)
+                nicknameValid(text)
+              }}
+              value={tmpNickname}
+              maxLength={16}
+            >
+            </TextInput>
             <TouchableOpacity
               onPress={()=>{
-                Alert.alert('', '차후 기능을 추가할 예정입니다. 기대해주세요❤')
-                // setNicknameModal(true)
+                // setChangeNickname(false)
+                setChangeNicknameModalVisible(true)
+              }}
+            >
+              <EvilIcons
+                name="pencil"
+                size={20}
+                color="black"
+                style={{ justifyContent:'center' }}
+              />
+            </TouchableOpacity>
+            </View>)
+          // :(<Text style={[styles.nickname, {}]}>{accountInfo?accountInfo.nickname:account.nickname}
+          :(<Text style={[styles.nickname, {}]}>{nickname}
+            <TouchableOpacity
+              onPress={()=>{
+                setTmpNickname(nickname)
+                setChangeNickname(true)
               }}
             >
               <EvilIcons
@@ -199,12 +241,12 @@ export default function AccountDetail({ navigation, route }) {
                 // style={{ marginTop: 20 }}
               />
             </TouchableOpacity>
-          </Text>
+          </Text>)}
 
           <TouchableOpacity
             style={[styles.setting,{}]}
             onPress={() => {
-              navigation.navigate("AccountManagementScreen", {account:account});
+              navigation.navigate("AccountManagementScreen", {account:account, nickname:nickname});
             }}
           >
             {/* <EvilIcons name="gear" size={24} color="black" /> */}
@@ -220,9 +262,9 @@ export default function AccountDetail({ navigation, route }) {
         <Text style={styles.balance}>
           {(Math.floor(accountInfo.balance)).toLocaleString()}원
         </Text></>)
-        :(<><Text style={styles.accountNumber}>1234-12-1234567</Text>
+        :(<><Text style={styles.accountNumber}>{settingAccountNumber(account.accountNumber)}</Text>
         <Text style={styles.balance}>
-          2,500,000원
+        {(Math.floor(account.balance)).toLocaleString()}원
         </Text></>)
       }
       
@@ -395,6 +437,7 @@ export default function AccountDetail({ navigation, route }) {
         </View>
       </Modal>
       <View style={styles.horizontalSeparator} />
+      
 
       {/* 여기부터는 계좌 내역 관련 UI */}
       <View style={styles.dateContainer}>
@@ -403,10 +446,16 @@ export default function AccountDetail({ navigation, route }) {
         </Text>
       </View>
       <View style={styles.boldSeparator} />
+      {/* <Modal>
+        <Text>
+          
+        </Text>
+      </Modal> */}
       
       
       <FlatList
         data={transactionHistory}
+        showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.cardContainer}
@@ -442,7 +491,54 @@ export default function AccountDetail({ navigation, route }) {
         onEndReachedThreshold={0.1} // 스크롤을 얼마나 내려야만 onEndReached가 작동할지를 정함
       />
 
+      {/* 닉네임 편집 모달 */}
+      {changeNicknameModalVisible
+        ?(<View style={styles.centeredView}>
+          <Modal
+            animationType="none"
+            transparent={true}
+            visible={changeNicknameModalVisible}
+            onRequestClose={() => {
+              setChangeNicknameModalVisible(false);
+            }}>
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalText}>계좌 별칭을 {"\n"}{tmpNickname}{"\n"}로 변경하시겠습니까?</Text>
+                <View style={{flexDirection:"row", justifyContent: "space-evenly" }}>
+                  <View style={{ flex: 1, marginHorizontal: 10 }}>
+                    <Pressable
+                      style={[styles.button, styles.buttonClose]}
+                      onPress={() => {
+                        // setChangeNicknameModalVisible(false)
+                        doAccountNicknameChange()
+                      }}>
+                      <Text style={styles.textStyle}>예</Text>
+                    </Pressable>
+                  </View>
+                  <View style={{ flex: 1, marginHorizontal: 10 }}>
+                    <Pressable
+                      style={[styles.button, styles.buttonClose]}
+                      onPress={() => {
+                        setChangeNickname(false)
+                        setChangeNicknameModalVisible(false)}
+                      }>
+                      <Text style={styles.textStyle}>아니오</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </Modal>
+          {/* <Pressable
+            style={[styles.button, styles.buttonOpen]}
+            onPress={() => setModalVisible(true)}>
+            <Text style={styles.textStyle}>Show Modal</Text>
+          </Pressable> */}
+        </View>)
+        : null
+      }
       
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }
@@ -508,6 +604,16 @@ const styles = StyleSheet.create({
     // fontWeight: "bold",
     textAlign: "left",
     // justifyContent:"flex-start"
+    marginVertical: 5,
+  },
+  nicknameChange: {
+    fontSize: 16,
+    textAlign: "left",
+    borderWidth: 1,
+    borderColor: 'black',
+    borderRadius: 5,
+    // paddingHorizontal: 50,
+    width: "70%"
   },
   accountNumber: {
     fontSize: 20,
@@ -638,5 +744,52 @@ const styles = StyleSheet.create({
     lineHeight: 15,
     textAlign: "right",
     color: "#858585",
+  },
+
+  // 닉네임 수정 모달 창 관련
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    // padding: "0%",
+    width: "80%",
+    height: "15%",
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    justifyContent: "center"
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 16
   },
 });

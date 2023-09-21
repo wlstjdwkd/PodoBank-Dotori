@@ -196,7 +196,6 @@ export const accountDeposit = async (sendInfo, accessToken) => {
     // throw error;
   }
 };
-// 계좌 삭제하는데 다른거 안보내줘도 된다고??????????????
 export const accountDelete = async (deleteInfo, accessToken) => {
   try {
     console.log(deleteInfo, accessToken)
@@ -298,8 +297,10 @@ export const accountListInquiry = async (accessToken) => {
 };
 
 export const accountNicknameChange = async (accountInfo, accessToken) => {
+// export const accountNicknameChange = async (accountNumber, nickname, accessToken) => {
   try {
-    const response = await axios.get(apiAddress + '/api/v1/account/nickname', accountInfo, {
+    const response = await axios.patch(apiAddress + '/api/v1/account/nickname', accountInfo, {
+    // const response = await axios.patch(apiAddress + '/api/v1/account/nickname', {accountNumber:accountNumber,nickname:nickname}, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

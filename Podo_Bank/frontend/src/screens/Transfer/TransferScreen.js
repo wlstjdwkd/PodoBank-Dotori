@@ -18,10 +18,12 @@ import HeaderScreen from "../Header/HeaderScreen";
 import {accountOwnerInquiry} from "../../apis/accountapi"
 import { useSelector } from "react-redux";
 import {accountRecentTransfer, accountTransactionDetail} from "../../apis/accountapi"
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
 
 const { height, width } = Dimensions.get("window");
 
 export default function TransferScreen({ navigation, route }) {
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   const accessToken = useSelector((state) => state.user.accessToken)
   const [accountNumber, setAccountNumber] = useState(route.params.accountNumber)
   // const [accountInfo, setAccountInfo] = useState(route.params.accountNumber)
@@ -294,6 +296,7 @@ export default function TransferScreen({ navigation, route }) {
           </View>
         </View>
       </Modal>
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }

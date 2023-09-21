@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import HeaderComponent from "../Header/HeaderScreen";
+import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
+import { useSelector } from "react-redux";
 
 export default function OpenAccountCompleteScreen({ navigation, route }) {
+  const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)
   const [accountInfo, setAccountNumber] = useState(route.params.accountInfo)
-
   return (
     <View style={styles.container}>
       <HeaderComponent navigation={navigation} title="계좌개설 완료" />
@@ -30,6 +32,7 @@ export default function OpenAccountCompleteScreen({ navigation, route }) {
           <Text style={styles.homeButtonText}>확인</Text>
         </TouchableOpacity>
       </View>
+      {userTokenRefreshModalVisible && <AccessTokenRefreshModalScreen navigation={navigation} />}
     </View>
   );
 }
