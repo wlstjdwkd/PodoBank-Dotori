@@ -16,6 +16,7 @@ import com.yongy.dotori.global.redis.entity.RefreshToken;
 import com.yongy.dotori.global.security.provider.JwtTokenProvider;
 import com.yongy.dotori.global.security.dto.JwtToken;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,8 @@ public class UserController {
 
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
+
+//    @Operation(summary = "회원가입에서 이메일 인증번호를 전송한다.")
 
     @PostMapping("/email/check-id")
     public ResponseEntity<? extends BaseResponseBody> validIdCheck(@RequestParam(name="id") String id){
