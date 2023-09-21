@@ -5,15 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yongy.dotori.domain.account.dto.AccountDTO;
 import com.yongy.dotori.domain.account.dto.BodyDataDTO;
 import com.yongy.dotori.domain.account.entity.Account;
+import com.yongy.dotori.domain.account.repository.AccountRepository;
 import com.yongy.dotori.domain.bank.entity.Bank;
 import com.yongy.dotori.domain.bank.repository.BankRepository;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.userAuth.service.UserAuthService;
+import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.type.descriptor.java.ObjectJavaType;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -23,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +31,9 @@ import java.util.Map;
 public class AccountServiceImpl implements AccountService{
     private final BankRepository bankRepository;
     private final UserAuthService userAuthService;
+    private final AccountRepository accountRepository;
+    private final FintechTokenRepository fintechTokenRepository;
+
 
     @Override
     public List<AccountDTO> findAllAccount() throws JsonProcessingException {
@@ -54,15 +54,16 @@ public class AccountServiceImpl implements AccountService{
 
     public BigDecimal getBalance(Long accountSeq) throws JsonProcessingException {
         Bank bankInfo = bankRepository.findByAccountAccountSeq(accountSeq);
-        String accessToken = userAuthService.getConnectionToken(bankInfo.getBankSeq());
+        Account account = accountRepository.findByAccountSeq(accountSeq);
+        String accessToken = userAuthService.getConnectionToken(bankInfo.getBankSeq()); // 은행 accessToken 가져오기
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/json;charset=utf-8");
         httpHeaders.add("Authorization","Bearer " + accessToken);
 
         Map<String, String> bodyData = new HashMap<>();
-        bodyData.put("serviceCode", "");
-        bodyData.put("fintechCode", "");
+        bodyData.put("serviceCode", accessToken);
+        bodyData.put("fintechCode", fintechTokenRepository.findByAccountNumber(account.getAccountNumber()).getFintechCode());
 
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, httpHeaders);
 
@@ -81,10 +82,9 @@ public class AccountServiceImpl implements AccountService{
         if(responseCode.equals("200")){
             ObjectMapper objectMapper = new ObjectMapper();
             BodyDataDTO data = objectMapper.readValue(responseContent,BodyDataDTO.class);
-
             return data.getBalance();
         }
 
-        return null;
+        throw new IllegalArgumentException("계좌 정보를 불러오는데 실패했습니다.");
     }
 }

@@ -2,7 +2,6 @@ package com.yongy.dotori.domain.account.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotori.domain.account.dto.AccountDTO;
-import com.yongy.dotori.domain.account.service.AccountService;
 import com.yongy.dotori.domain.account.service.AccountServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
