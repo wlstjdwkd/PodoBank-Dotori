@@ -1,5 +1,6 @@
 package com.yongy.dotori.domain.userAuth.service;
 
+import com.yongy.dotori.domain.account.repository.AccountRepository;
 import com.yongy.dotori.domain.bank.entity.Bank;
 import com.yongy.dotori.domain.bank.repository.BankRepository;
 import com.yongy.dotori.domain.userAuth.dto.request.UserAccountCodeDto;
@@ -40,6 +41,9 @@ public class UserAuthService {
 
     @Autowired
     private BankRepository bankRepository;
+
+    @Autowired
+    private AccountRepository accountRepository;
 
     // NOTE : RedisDB
     @Autowired
@@ -111,7 +115,7 @@ public class UserAuthService {
             bankAccessTokenRepository.save(BankAccessToken.of("accessToken", accessToken));
             bankRefreshTokenRepository.save(BankRefreshToken.of("refreshToken", refreshToken));
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException("포도뱅크에 로그인할 수 없음");
         }
     }
 
@@ -137,7 +141,7 @@ public class UserAuthService {
     }
 
     // NOTE : 1원인증
-    public ResponseEntity<? extends BaseResponseBody>sendAccountInfo(UserAccountDto userAccountDto) throws ParseException {
+    public String sendAccountInfo(UserAccountDto userAccountDto){
         String useToken = this.getConnectionToken(userAccountDto.getBankSeq());
 
         // 은행의 정보
@@ -166,13 +170,11 @@ public class UserAuthService {
 
         String responseCode = response.getStatusCode().toString().split(" ")[0];
 
+        return responseCode;
 
-        if(responseCode.equals("200"))
-            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(Integer.parseInt(responseCode), "success"));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(Integer.parseInt(responseCode), "fail"));
     }
     // NOTE : 1원 인증의 인증코드를 전송함
-    public ResponseEntity<? extends BaseResponseBody>checkAccountAuthCode(UserAccountCodeDto userAccountCodeDto) throws ParseException {
+    public ResponseEntity<Void>checkAccountAuthCode(UserAccountCodeDto userAccountCodeDto) throws ParseException {
         String useToken = this.getConnectionToken(userAccountCodeDto.getBankSeq());
 
         // 은행의 정보
@@ -209,9 +211,13 @@ public class UserAuthService {
 
             fintechTokenRepository.save(FintechToken.of(userAccountCodeDto.getAccountNumber(), fintechCode));
 
-            return ResponseEntity.status(HttpStatus.OK).body(BaseResponseBody.of(Integer.parseInt(responseCode), "success"));
+
+            // TODO : 계좌 이름 받고 계좌 등록
+            // accountRepository.save()
+
+            return ResponseEntity.ok().build();
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponseBody.of(Integer.parseInt(responseCode), "fail"));
+        throw new IllegalArgumentException("1원 인증 실패");
     }
 
 }
