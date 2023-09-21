@@ -140,6 +140,7 @@ const styles = StyleSheet.create({
   groupName: {
     padding: 10,
   },
+
   selectedGroupName: {
     borderBottomWidth: 5,
     borderBottomColor: "#FF965C",
