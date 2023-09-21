@@ -59,6 +59,7 @@ public class PurposeServiceImpl implements PurposeService{
             }
 
             list.add(PurposeListDTO.builder()
+                            .purposeSeq(p.getPurposeSeq())
                             .title(p.getPurposeTitle())
                             .currentBalance(p.getCurrentBalance())
                             .goalAmount(p.getGoalAmount())
