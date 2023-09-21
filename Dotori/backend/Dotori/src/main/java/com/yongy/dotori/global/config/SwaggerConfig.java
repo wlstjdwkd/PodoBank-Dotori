@@ -25,23 +25,23 @@ public class SwaggerConfig {
                 .build();
     }
 
-    @Bean
-    public GroupedOpenApi kakaoApi() {
-        String[] paths = {"/kakao/**"};
-
-        return GroupedOpenApi.builder()
-                .group("카카오 API")
-                .pathsToMatch(paths)
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi naverApi() {
-        String[] paths = {"/naver/**"};
-
-        return GroupedOpenApi.builder()
-                .group("네이버 API")
-                .pathsToMatch(paths)
-                .build();
-    }
+//    @Bean
+//    public GroupedOpenApi kakaoApi() {
+//        String[] paths = {"/kakao/**"};
+//
+//        return GroupedOpenApi.builder()
+//                .group("카카오 API")
+//                .pathsToMatch(paths)
+//                .build();
+//    }
+//
+//    @Bean
+//    public GroupedOpenApi naverApi() {
+//        String[] paths = {"/naver/**"};
+//
+//        return GroupedOpenApi.builder()
+//                .group("네이버 API")
+//                .pathsToMatch(paths)
+//                .build();
+//    }
 }
