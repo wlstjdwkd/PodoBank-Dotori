@@ -32,8 +32,6 @@ public class Account {
 
     private String accountNumber;
 
-    private String accessToken;
-
     private String accountTitle;
 
     private LocalDateTime deleteAt;
@@ -45,13 +43,11 @@ public class Account {
     private Plan plan;
 
     @Builder
-    public Account(Long accountSeq, User user, Bank bank, String accountNumber,
-                   String accessToken, String accountTitle, LocalDateTime deleteAt) {
+    public Account(Long accountSeq, User user, Bank bank, String accountNumber, String accountTitle, LocalDateTime deleteAt) {
         this.accountSeq = accountSeq;
         this.user = user;
         this.bank = bank;
         this.accountNumber = accountNumber;
-        this.accessToken = accessToken;
         this.accountTitle = accountTitle;
         this.deleteAt = deleteAt;
     }
