@@ -8,6 +8,7 @@ import com.yongy.dotori.domain.category.repository.CategoryRepository;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,9 +24,7 @@ public class CategoryServiceImpl implements CategoryService{
     @Override
     public List<CategoryDetailDTO> findAllCategory(){
         // 카테고리 리스트 반환
-        // User user = getLoginUser();
-        User loginUser = userRepository.findByIdAndExpiredAtIsNull("1");
-        // TODO 테스트 후 로그인된 유저정보로 조회하도록 고칠것~
+        User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<Category> categories = categoryRepository.findAllByUserUserSeq(loginUser.getUserSeq());
         List<CategoryDetailDTO> result = new ArrayList<>();
         for(Category c : categories){
@@ -37,8 +36,4 @@ public class CategoryServiceImpl implements CategoryService{
 
         return result;
     }
-
-//    private User getLoginUser() {
-//        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//    }
 }

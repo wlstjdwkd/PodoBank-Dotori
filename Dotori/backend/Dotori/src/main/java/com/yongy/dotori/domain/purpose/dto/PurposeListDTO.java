@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 public class PurposeListDTO {
+    private Long purposeSeq;
     private String title;
     private BigDecimal currentBalance;
     private BigDecimal goalAmount;
