@@ -29,6 +29,7 @@ export default function AccountConfigurationScreen({ navigation }) {
   const accessToken = useSelector((state) => state.user.accessToken)
   const [choiceAccountCategory, setChoiceAccountCategory] = useState(null)
   const [accountTypes, setAccountTypes] = useState([])
+  const [selectIndex, setSelectIndex] = useState(null)
 
   
   const handleAccountTypeInquiry = async () =>{
@@ -84,8 +85,8 @@ export default function AccountConfigurationScreen({ navigation }) {
           <TouchableOpacity
             key={index}
             // style={styles.whiteBox}
-            style={[styles.dropdown, {padding:10}]}
-            onPress={() => {selectAccountTypeOption(option)}}
+            style={selectIndex===index?styles.dropdownSelected:styles.dropdown}
+            onPress={() => {selectAccountTypeOption(option), setSelectIndex(index)}}
           >
             <Text style={{fontWeight:'bold', fontSize:20}}>{option.accountName}</Text>
             <Text style={{color:'grey'}}>년 {option.interestRate}% 이율</Text>
@@ -94,7 +95,7 @@ export default function AccountConfigurationScreen({ navigation }) {
         ))}
         <View
           // style={styles.whiteBox}
-          style={[styles.dropdown, {padding:10}]}
+          style={[styles.dropdown]}
           onPress={() => {selectAccountTypeOption(option)}}
         >
           <Text style={{fontWeight:'bold', fontSize:20}}>차후 추가 예정</Text>
@@ -315,6 +316,17 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginVertical: 5,
     zIndex: 1, // 다른 요소 위에 나타나도록 조절
+    padding: 10,
+  },
+  dropdownSelected: {
+    backgroundColor: "white",
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 5,
+    marginVertical: 5,
+    zIndex: 1, // 다른 요소 위에 나타나도록 조절
+    padding: 10,
+    borderColor: 'black',
   },
   dropdownOption: {
     padding: 10,

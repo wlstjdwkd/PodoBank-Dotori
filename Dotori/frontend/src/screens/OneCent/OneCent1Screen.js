@@ -99,6 +99,7 @@ const styles = StyleSheet.create({
   grayText: {
     color: "#A9A9A9",
     fontSize: 10,
+    marginTop: 10,
     marginBottom: 60,
 
     marginLeft: 5,

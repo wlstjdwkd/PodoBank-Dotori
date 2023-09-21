@@ -66,41 +66,43 @@ export default function SignUp1Screen({ navigation }) {
         cancelNavi="LoginScreen"
         navigation={navigation}
       ></HeaderComponent>
-      <View style={styles.header}>
-        <Text style={styles.title}>이메일 인증하기</Text>
-        <Text style={styles.subtitle}>사용 가능한 이메일을 입력해주세요</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="이메일 예) abc123@naver.com"
-          onChangeText={(text) => {
-            handleEmailChange(text);
-            // {hanldeUserEmailDuplicationCheck(text) && isValidEmail}
-            setUserInfo((prev) => ({ ...prev, email: text }));
-          }}
-          multiline={true}
-          keyboardType="email-address"
-        />
-        <Text
-          style={{
-            color: isCorrectEmail && isValidEmail ? "blue" : "red",
-            marginLeft: 30,
-            marginTop: 0,
-          }}
-        >
-          {emailMessage}
-        </Text>
-      </View>
+      <View style={styles.innerContainer}>
+        <View style={styles.header}>
+          <Text style={styles.title}>이메일 인증하기</Text>
+          <Text style={styles.subtitle}>사용 가능한 이메일을 입력해주세요</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="이메일 예) abc123@naver.com"
+            onChangeText={(text) => {
+              handleEmailChange(text);
+              // {hanldeUserEmailDuplicationCheck(text) && isValidEmail}
+              setUserInfo((prev) => ({ ...prev, email: text }));
+            }}
+            multiline={true}
+            keyboardType="email-address"
+          />
+          <Text
+            style={{
+              color: isCorrectEmail && isValidEmail ? "blue" : "red",
+              marginLeft: 30,
+              marginTop: 0,
+            }}
+          >
+            {emailMessage}
+          </Text>
+        </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          navigation.navigate("SignUp2Screen", { userInfo: userInfo })
-        }
-        //TODO: 풀기
-        // disabled={!isValidEmail}
-      >
-        <Text style={styles.buttonText}>메일 보내기</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            navigation.navigate("SignUp2Screen", { userInfo: userInfo })
+          }
+          //TODO: 풀기
+          // disabled={!isValidEmail}
+        >
+          <Text style={styles.buttonText}>메일 보내기</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -111,6 +113,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 20,
     backgroundColor: "white",
+  },
+  innerContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+    marginTop: 20,
   },
   header: {
     flex: 1,
@@ -138,11 +145,12 @@ const styles = StyleSheet.create({
     // textAlign: "center",
   },
   button: {
-    height: 50,
+    height: 40,
     backgroundColor: "#FF965C",
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 10,
   },
   buttonText: {
     color: "white",
