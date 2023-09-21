@@ -1,5 +1,6 @@
 package com.yongy.dotori.domain.userAuth.service;
 
+import com.yongy.dotori.domain.account.entity.Account;
 import com.yongy.dotori.domain.account.repository.AccountRepository;
 import com.yongy.dotori.domain.bank.entity.Bank;
 import com.yongy.dotori.domain.bank.repository.BankRepository;
@@ -211,9 +212,12 @@ public class UserAuthService {
 
             fintechTokenRepository.save(FintechToken.of(userAccountCodeDto.getAccountNumber(), fintechCode));
 
+            Account account = Account.builder()
+                    .accountNumber(userAccountCodeDto.getAccountNumber()).build();
 
-            // TODO : 계좌 이름 받고 계좌 등록
-            // accountRepository.save()
+            accountRepository.save(account);
+
+            // TODO : 계좌 이름 수정
 
             return ResponseEntity.ok().build();
         }
