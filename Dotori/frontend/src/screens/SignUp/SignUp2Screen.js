@@ -20,32 +20,34 @@ export default function SignUp2Screen({ navigation, route }) {
         cancelNavi="LoginScreen"
         navigation={navigation}
       ></HeaderComponent>
-      <View style={styles.header}>
-        <Text style={styles.title}>인증 코드 입력하기</Text>
-        <View style={styles.subtitle}>
-          <Text style={styles.grayText}>이메일로 인증된 코드를</Text>
-          <Text style={styles.grayText}>하단에 입력해주세요</Text>
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput style={styles.input} />
-          <TouchableOpacity style={styles.verifyButton}>
-            <Text style={styles.verifyButtonText}>인증하기</Text>
+      <View style={styles.innerContainer}>
+        <View style={styles.header}>
+          <Text style={styles.title}>인증 코드 입력하기</Text>
+          <View style={styles.subtitle}>
+            <Text style={styles.grayText}>이메일로 인증된 코드를</Text>
+            <Text style={styles.grayText}>하단에 입력해주세요</Text>
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput style={styles.input} />
+            <TouchableOpacity style={styles.verifyButton}>
+              <Text style={styles.verifyButtonText}>인증하기</Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={styles.resendButton}>
+            <Text style={styles.resendButtonText}>인증 코드 재전송</Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.resendButton}>
-          <Text style={styles.resendButtonText}>인증 코드 재전송</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            navigation.navigate("SignUp3Screen", { userInfo: userInfo });
+          }}
+          //TODO: 풀기
+          // disabled={!isValidEmail}
+        >
+          <Text style={styles.buttonText}>다음</Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          navigation.navigate("SignUp3Screen", { userInfo: userInfo });
-        }}
-        //TODO: 풀기
-        // disabled={!isValidEmail}
-      >
-        <Text style={styles.buttonText}>다음</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -56,6 +58,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 20,
     backgroundColor: "white",
+  },
+  innerContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+    marginTop: 20,
   },
   header: {
     flex: 1,
@@ -70,13 +77,14 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 10,
+    marginTop: 20,
   },
   subtitle: {
     marginBottom: 30,
   },
   input: {
     flex: 1,
-    height: 50,
+    height: 40,
     backgroundColor: "#D9D9D920",
     borderWidth: 1,
     borderColor: "#BAC0CA",
@@ -85,11 +93,12 @@ const styles = StyleSheet.create({
     // textAlign: "center",
   },
   button: {
-    height: 50,
+    height: 40,
     backgroundColor: "#FF965C",
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 10,
   },
   buttonText: {
     color: "white",
@@ -107,9 +116,10 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     paddingHorizontal: 10,
     paddingVertical: 5,
+    width: "30%",
     justifyContent: "center",
     alignItems: "center",
-    height: 50,
+    height: 40,
   },
   verifyButtonText: {
     color: "white",
@@ -117,9 +127,11 @@ const styles = StyleSheet.create({
   },
   resendButton: {
     alignItems: "flex-end",
-    marginTop: 10,
+    marginTop: 20,
+    // borderBottomWidth: 1,
   },
   resendButtonText: {
-    color: "#FF965C",
+    color: "#5A5A5A",
+    borderBottomWidth: 1,
   },
 });

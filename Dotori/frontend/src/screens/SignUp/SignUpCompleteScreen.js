@@ -15,21 +15,23 @@ export default function SignUpCompleteScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.centerContainer}>
-        <Image
-          style={styles.centerImage}
-          source={require("../../assets/images/Hamster/SignUpHamster.png")}
-        />
-        <Text style={styles.boldText}>{name}님</Text>
-        <Text style={styles.regularText}>회원가입을 축하합니다!</Text>
-      </View>
+      <View style={styles.innerContainer}>
+        <View style={styles.centerContainer}>
+          <Image
+            style={styles.centerImage}
+            source={require("../../assets/images/Hamster/SignUpHamster.png")}
+          />
+          <Text style={styles.boldText}>{name}님</Text>
+          <Text style={styles.regularText}>회원가입을 축하합니다!</Text>
+        </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("MainPageScreen")}
-      >
-        <Text style={styles.buttonText}>도토리 시작하기</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("MainPageScreen")}
+        >
+          <Text style={styles.buttonText}>도토리 시작하기</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -40,6 +42,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 20,
     backgroundColor: "white",
+  },
+  innerContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+    marginTop: 20,
   },
   centerContainer: {
     flex: 1,
@@ -61,8 +68,9 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    height: 50,
+    height: 40,
     backgroundColor: "#FF965C",
+    marginBottom: 10,
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",

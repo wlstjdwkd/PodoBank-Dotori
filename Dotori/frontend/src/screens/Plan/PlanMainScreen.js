@@ -327,6 +327,10 @@ const styles = StyleSheet.create({
     padding: 16,
     width: "100%",
     marginBottom: 10,
+
+    elevation: 5,
+    backgroundColor: "white",
+    marginBottom: 20,
   },
   categoryTop: {
     flexDirection: "row",
@@ -344,6 +348,7 @@ const styles = StyleSheet.create({
   },
   categoryGroupName: {
     color: "#7B7B7B",
+    fontSize: 12,
   },
   progressBarContainer: {
     height: 17,

@@ -82,13 +82,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF965C",
     borderRadius: 8,
     width: "80%",
-    padding: 16,
+    // padding: 16,
+    height: 40,
     marginTop: 180,
     marginBottom: -100,
   },
   buttonText: {
     fontSize: 15,
     color: "#FFFFFF",
+    marginTop: 10,
     textAlign: "center",
   },
   footer: {

@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F5F5",
     width: "100%",
     marginVertical: 10,
+    marginBottom: 30,
   },
   itemContainer: {
     flexDirection: "row",
@@ -170,6 +171,9 @@ const styles = StyleSheet.create({
     marginLeft: 20,
 
     width: "90%",
+
+    elevation: 5,
+    backgroundColor: "white",
   },
   itemLeftContainer: {
     flex: 1,
@@ -195,9 +199,11 @@ const styles = StyleSheet.create({
   },
   transactionAt: {
     color: "#7D7D7D",
+    fontSize: 12,
   },
   amount: {
     textAlign: "right",
+    fontWeight: "bold",
   },
   categoryText: {
     fontSize: 10,
