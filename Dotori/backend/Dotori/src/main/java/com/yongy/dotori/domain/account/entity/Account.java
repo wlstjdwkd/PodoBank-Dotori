@@ -7,11 +7,13 @@ import com.yongy.dotori.domain.user.entity.User;
 
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Getter
 @NoArgsConstructor
 @Entity(name="accounts")
 public class Account {
