@@ -41,7 +41,8 @@ public class SecurityConfig{
                 .httpBasic().disable()
                 .formLogin().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/v1/user/email/check-id", "/v1/user/email/check-code", "/v1/user/signup", "/v1/user/signin", "/v1/user/new-token").permitAll()
+                .requestMatchers("/v1/user/email/check-id", "/v1/user/email/check-code",
+                        "/v1/user/signup", "/v1/user/signin", "/v1/user/new-token", "/v1/kakao/callback", "/v1/naver/callback").permitAll()
                 .requestMatchers("/v1/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().permitAll()
                 .and()
