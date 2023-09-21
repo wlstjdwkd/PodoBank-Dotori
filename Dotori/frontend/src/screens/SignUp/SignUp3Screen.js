@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,8 @@ import {
 import HeaderComponent from "../Components/HeaderScreen";
 
 export default function SignUp3Screen({ navigation, route }) {
+  const passwordInputRef = useRef(null)
+  const confirmPasswordInputRef = useRef(null)
   const [userInfo, setUserInfo] = useState(route.params.userInfo);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -27,7 +29,7 @@ export default function SignUp3Screen({ navigation, route }) {
   const handlePasswordChange = (text) => {
     setPassword(text);
     if (validatePassword(text)) {
-      setPasswordMessage("완벽합니당");
+      setPasswordMessage("완벽합니다.");
       setIsPasswordValid(true);
     } else {
       setPasswordMessage("양식을 맞춰주세요!");
@@ -38,14 +40,18 @@ export default function SignUp3Screen({ navigation, route }) {
   const handleConfirmPasswordChange = (text) => {
     setConfirmPassword(text);
     if (text === password && isPasswordValid) {
-      setConfirmPasswordMessage("완벽합니당");
+      setConfirmPasswordMessage("완벽합니다.");
       setIsConfirmPasswordValid(true);
       setUserInfo((prev) => ({ ...prev, password: text }));
     } else {
-      setConfirmPasswordMessage("비밀번호 일치X");
+      setConfirmPasswordMessage("비밀번호가 일치하지 않습니다.");
       setIsConfirmPasswordValid(false);
     }
   };
+
+  const gotoSignUp4Screen = () =>{
+    navigation.navigate("SignUp4Screen", { userInfo: userInfo })
+  }
 
   return (
     <View style={styles.container}>
@@ -59,20 +65,32 @@ export default function SignUp3Screen({ navigation, route }) {
           <Text style={styles.title}>비밀번호 설정하기</Text>
           <Text style={styles.subtitle}>비밀번호</Text>
           <TextInput
-            style={styles.input}
+            // style={styles.input}
+            style={password ?styles.input:[styles.input,{fontSize:12}]}
+            placeholder="영문, 숫자, 특수문자 포함 8자 이상 16자 이내"
+            placeholderTextColor="#7B7B7B"
             onChangeText={handlePasswordChange}
             secureTextEntry={true}
+            value={password}
+            maxLength={16}
+            keyboardType="default"
+            returnKeyType ="next"
+            ref={passwordInputRef}
+            onSubmitEditing={()=>{
+              if(isPasswordValid){
+                confirmPasswordInputRef.current.focus()
+              }
+            }}
           />
           <View style={styles.rowContainer}>
-            <Text style={styles.inputBehindText}>
+            {/* <Text style={styles.inputBehindText}>
               영문, 숫자, 특수문자 포함 8자 이상
-            </Text>
+            </Text> */}
             <Text
-              style={{
-                color: isPasswordValid ? "blue" : "red",
-                marginLeft: 20,
-                marginTop: 0,
-              }}
+              style={ isPasswordValid ? styles.validMessage1 : styles.validMessage2}
+              // style={{
+              //   color: isPasswordValid ? "blue" : "red",
+              // }}
             >
               {passwordMessage}
             </Text>
@@ -80,20 +98,32 @@ export default function SignUp3Screen({ navigation, route }) {
 
           <Text style={styles.subtitle}>비밀번호 확인</Text>
           <TextInput
-            style={styles.input}
+            // style={styles.input}
+            style={confirmPassword ?styles.input:[styles.input,{fontSize:12}]}
+            placeholder="영문, 숫자, 특수문자 포함 8자 이상 16자 이내"
+            placeholderTextColor="#7B7B7B"
             onChangeText={handleConfirmPasswordChange}
             secureTextEntry={true}
+            value={confirmPassword}
+            maxLength={16}
+            ref={confirmPasswordInputRef}
+            onSubmitEditing={()=>{
+              if(isConfirmPasswordValid){
+                gotoSignUp4Screen()
+                // navigation.navigate("SignUp4Screen", { userInfo: userInfo })
+              }
+            }}
+
           />
           <View style={styles.rowContainer}>
-            <Text style={styles.inputBehindText}>
+            {/* <Text style={styles.inputBehindText}>
               영문, 숫자, 특수문자 포함 8자 이상
-            </Text>
+            </Text> */}
             <Text
-              style={{
-                color: isConfirmPasswordValid ? "blue" : "red",
-                marginLeft: 20,
-                marginTop: 0,
-              }}
+              style={ isConfirmPasswordValid ? styles.validMessage1 : styles.validMessage2}
+              // style={{
+              //   color: isConfirmPasswordValid ? "blue" : "red",
+              // }}
             >
               {confirmPasswordMessage}
             </Text>
@@ -102,9 +132,10 @@ export default function SignUp3Screen({ navigation, route }) {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() =>
-            navigation.navigate("SignUp4Screen", { userInfo: userInfo })
-          }
+          onPress={() =>{
+            gotoSignUp4Screen()
+            // navigation.navigate("SignUp4Screen", { userInfo: userInfo })
+          }}
           //TODO: 나중에 ! 붙이셈
           disabled={isPasswordValid && isConfirmPasswordValid}
         >
@@ -173,4 +204,14 @@ const styles = StyleSheet.create({
   rowContainer: {
     flexDirection: "row",
   },
+  validMessage1:{
+    color: "blue",
+    marginBottom: 20,
+    fontSize: 12,
+  },
+  validMessage2:{
+    color: "red",
+    fontSize: 12,
+    marginBottom: 20,
+  }
 });
