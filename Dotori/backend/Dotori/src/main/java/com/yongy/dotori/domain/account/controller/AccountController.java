@@ -1,5 +1,6 @@
 package com.yongy.dotori.domain.account.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotori.domain.account.dto.AccountDTO;
 import com.yongy.dotori.domain.account.service.AccountService;
 import com.yongy.dotori.domain.account.service.AccountServiceImpl;
@@ -23,7 +24,7 @@ public class AccountController {
 
     @Operation(summary = "전체 계좌 조회")
     @GetMapping
-    public ResponseEntity<List<AccountDTO>> findAllAccount(){
+    public ResponseEntity<List<AccountDTO>> findAllAccount() throws JsonProcessingException {
         List<AccountDTO> result = accountService.findAllAccount();
         return ResponseEntity.ok(result);
     }

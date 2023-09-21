@@ -36,7 +36,7 @@ public class AccountServiceImpl implements AccountService{
     private final UserAuthService userAuthService;
 
     @Override
-    public List<AccountDTO> findAllAccount() {
+    public List<AccountDTO> findAllAccount() throws JsonProcessingException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<Account> accounts = user.getAccountList();
         List<AccountDTO> result = new ArrayList<>();
@@ -45,14 +45,14 @@ public class AccountServiceImpl implements AccountService{
             result.add(AccountDTO.builder()
                     .accountSeq(account.getAccountSeq())
                     .accountTitle(account.getAccountTitle())
-                    //.currentBalance(getBalance(account.getAccountSeq()))
+                    .currentBalance(getBalance(account.getAccountSeq()))
                     .build());
         }
 
         return result;
     }
 
-    public ResponseEntity<BigDecimal> getBalance(Long accountSeq) throws JsonProcessingException {
+    public BigDecimal getBalance(Long accountSeq) throws JsonProcessingException {
         Bank bankInfo = bankRepository.findByAccountAccountSeq(accountSeq);
         String accessToken = userAuthService.getConnectionToken(bankInfo.getBankSeq());
 
@@ -82,10 +82,9 @@ public class AccountServiceImpl implements AccountService{
             ObjectMapper objectMapper = new ObjectMapper();
             BodyDataDTO data = objectMapper.readValue(responseContent,BodyDataDTO.class);
 
-            // TODO : 금액 BigDecimal로 받는 거 해야 됨
-            return ResponseEntity.ok(data.getBalance());
+            return data.getBalance();
         }
 
-        return ResponseEntity.ok(new BigDecimal(BigInteger.ZERO));
+        return null;
     }
 }
