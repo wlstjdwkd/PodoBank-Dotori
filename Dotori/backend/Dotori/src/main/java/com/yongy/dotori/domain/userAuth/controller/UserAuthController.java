@@ -35,9 +35,6 @@ public class UserAuthController {
     @Autowired
     private UserAuthService userAuthService;
 
-//    @Autowired
-//    private BankAccessTokenRepository bankAccessTokenRepository;
-
     @Autowired
     private AccountRepository accountRepository;
 
