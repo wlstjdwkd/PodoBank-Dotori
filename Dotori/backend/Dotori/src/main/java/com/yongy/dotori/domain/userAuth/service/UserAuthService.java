@@ -54,8 +54,7 @@ public class UserAuthService {
     @Autowired
     private FintechTokenRepository fintechTokenRepository;
 
-
-    private String useToken;
+    private static Bank bankInfo;
 
 
     // NOTE : 1원인증
@@ -117,11 +116,11 @@ public class UserAuthService {
     }
 
     // NOTE : accessToken이나 refreshToken을 세팅한다.(없으면 podoBankLogin을 호출해서 새로 발급해서 세팅함)
-    public Bank getConnectionToken(Long bankSeq){
+    public String getConnectionToken(Long bankSeq){
         Optional<BankAccessToken> dotoriAccessToken = bankAccessTokenRepository.findById("accessToken");
         Optional<BankRefreshToken> dotoriRefreshToken = bankRefreshTokenRepository.findById("refreshToken");
 
-        Bank bankInfo = null;
+        String useToken = null;
 
         if(dotoriAccessToken.isEmpty()){
             if(dotoriRefreshToken.isEmpty()){
@@ -134,13 +133,12 @@ public class UserAuthService {
         }else{
             useToken = dotoriAccessToken.get().getToken();
         }
-
-        return bankInfo;
+        return useToken;
     }
 
     // NOTE : 1원인증
     public ResponseEntity<? extends BaseResponseBody>sendAccountInfo(UserAccountDto userAccountDto) throws ParseException {
-        Bank bankInfo = this.getConnectionToken(userAccountDto.getBankSeq());
+        String useToken = this.getConnectionToken(userAccountDto.getBankSeq());
 
         // 은행의 정보
         if(bankInfo == null)
@@ -175,7 +173,7 @@ public class UserAuthService {
     }
     // NOTE : 1원 인증의 인증코드를 전송함
     public ResponseEntity<? extends BaseResponseBody>checkAccountAuthCode(UserAccountCodeDto userAccountCodeDto) throws ParseException {
-        Bank bankInfo = this.getConnectionToken(userAccountCodeDto.getBankSeq());
+        String useToken = this.getConnectionToken(userAccountCodeDto.getBankSeq());
 
         // 은행의 정보
         if(bankInfo == null)
