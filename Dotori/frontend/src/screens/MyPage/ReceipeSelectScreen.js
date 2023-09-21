@@ -54,7 +54,10 @@ export default function ReceipeSelectScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <HeaderComponent title="명세서 보기"></HeaderComponent>
+      <HeaderComponent
+        title="명세서 보기"
+        navigation={navigation}
+      ></HeaderComponent>
 
       <View style={styles.container}>
         {/* 명세서 선택 텍스트 */}
@@ -65,7 +68,9 @@ export default function ReceipeSelectScreen({ navigation }) {
         {/* 계좌 이름과 기간 Picker를 가로로 배치 */}
         <View style={styles.pickerContainer}>
           <View style={styles.pickerItem}>
-            <Text style={styles.dropdownLabel}>계좌 이름</Text>
+            <View style={{ alignItems: "center", borderBottomWidth: 1 }}>
+              <Text style={styles.dropdownLabel}>계좌 이름</Text>
+            </View>
             <Picker
               style={styles.dropdownPicker}
               selectedValue={selectedAccount}
@@ -83,7 +88,9 @@ export default function ReceipeSelectScreen({ navigation }) {
             </Picker>
           </View>
           <View style={styles.pickerItem}>
-            <Text style={styles.dropdownLabel}>기간</Text>
+            <View style={{ alignItems: "center", borderBottomWidth: 1 }}>
+              <Text style={styles.dropdownLabel}>기간</Text>
+            </View>
             <Picker
               style={styles.dropdownPicker}
               selectedValue={selectedReceipe}
@@ -159,10 +166,15 @@ const styles = StyleSheet.create({
   pickerItem: {
     flex: 1, // 1:1 비율로 공간을 분배
     marginRight: 8, // 간격 설정
+    borderWidth: 1,
+    borderRadius: 10,
   },
   dropdownLabel: {
     fontSize: 16,
-    fontWeight: "bold", // 라벨 텍스트 굵게 설정
+    // fontWeight: "bold", // 라벨 텍스트 굵게 설정
+    // borderWidth: 1,
+    // alignContent: "center",
+    // borderBottomWidth: 1,
   },
   dropdownPicker: {
     height: 40,

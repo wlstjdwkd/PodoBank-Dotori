@@ -72,81 +72,85 @@ export default function SignUp4Screen({ navigation, route }) {
         cancelNavi="LoginScreen"
         navigation={navigation}
       ></HeaderComponent>
-      <ScrollView style={styles.header}>
-        <Text style={styles.title}>가입정보 입력하기</Text>
-        <View style={styles.rowContainer}>
-          <Text style={styles.subtitle}>이름</Text>
-          <Text
-            style={{
-              color: isValid.isNameValid ? "blue" : "red",
-              //   marginLeft: 150,
-            }}
-          >
-            {nameMessage}
+      <View style={styles.innerContainer}>
+        <ScrollView style={styles.header}>
+          <Text style={styles.title}>가입정보 입력하기</Text>
+          <View style={styles.rowContainer}>
+            <Text style={styles.subtitle}>이름</Text>
+            <Text
+              style={{
+                color: isValid.isNameValid ? "blue" : "red",
+                //   marginLeft: 150,
+              }}
+            >
+              {nameMessage}
+            </Text>
+          </View>
+
+          <TextInput
+            style={styles.input}
+            onChangeText={handleNameChange}
+            multiline={true}
+          />
+
+          <View style={styles.rowContainer}>
+            <Text style={styles.subtitle}>생년월일</Text>
+            <Text
+              style={{
+                color: isValid.isBirthdateValid ? "blue" : "red",
+                //   marginLeft: 150,
+              }}
+            >
+              {birthDateMessage}
+            </Text>
+          </View>
+
+          <TextInput
+            style={styles.input}
+            onChangeText={handleBirthDateChange}
+            multiline={true}
+          />
+
+          <Text style={styles.inputBehindText}>
+            생년월일 8자리 예) 19991212
           </Text>
-        </View>
 
-        <TextInput
-          style={styles.input}
-          onChangeText={handleNameChange}
-          multiline={true}
-        />
+          <View style={styles.rowContainer}>
+            <Text style={styles.subtitle}>휴대폰번호</Text>
+            <Text
+              style={{
+                color: isValid.isPhoneNumberValid ? "blue" : "red",
+                //   marginLeft: 0,
+              }}
+            >
+              {phoneNumberMessage}
+            </Text>
+          </View>
 
-        <View style={styles.rowContainer}>
-          <Text style={styles.subtitle}>생년월일</Text>
-          <Text
-            style={{
-              color: isValid.isBirthdateValid ? "blue" : "red",
-              //   marginLeft: 150,
-            }}
-          >
-            {birthDateMessage}
-          </Text>
-        </View>
+          <TextInput
+            style={styles.input}
+            onChangeText={handlePhoneNumberChange}
+            multiline={true}
+          />
+        </ScrollView>
 
-        <TextInput
-          style={styles.input}
-          onChangeText={handleBirthDateChange}
-          multiline={true}
-        />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            navigation.navigate("SignUpCompleteScreen", { name: userInfo.name })
+          }
 
-        <Text style={styles.inputBehindText}>생년월일 8자리 예) 19991212</Text>
+          //TODO: DISABLED 풀기
 
-        <View style={styles.rowContainer}>
-          <Text style={styles.subtitle}>휴대폰번호</Text>
-          <Text
-            style={{
-              color: isValid.isPhoneNumberValid ? "blue" : "red",
-              //   marginLeft: 0,
-            }}
-          >
-            {phoneNumberMessage}
-          </Text>
-        </View>
-
-        <TextInput
-          style={styles.input}
-          onChangeText={handlePhoneNumberChange}
-          multiline={true}
-        />
-      </ScrollView>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          navigation.navigate("SignUpCompleteScreen", { name: userInfo.name })
-        }
-
-        //TODO: DISABLED 풀기
-
-        // disabled={
-        //   !isValid.isNameValid ||
-        //   !isValid.isBirthdateValid ||
-        //   !isValid.isPhoneNumberValid
-        // }
-      >
-        <Text style={styles.buttonText}>다음</Text>
-      </TouchableOpacity>
+          // disabled={
+          //   !isValid.isNameValid ||
+          //   !isValid.isBirthdateValid ||
+          //   !isValid.isPhoneNumberValid
+          // }
+        >
+          <Text style={styles.buttonText}>회원가입</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -157,6 +161,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 20,
     backgroundColor: "white",
+  },
+  innerContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+    marginTop: 20,
   },
   header: {
     flex: 1,
@@ -175,7 +184,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "100%",
-    height: 50,
+    height: 40,
     backgroundColor: "#D9D9D920",
     borderWidth: 1,
     borderColor: "#BAC0CA",
@@ -185,15 +194,16 @@ const styles = StyleSheet.create({
     // textAlign: "center",
   },
   button: {
-    height: 50,
+    height: 40,
     backgroundColor: "#FF965C",
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 10,
   },
   buttonText: {
     color: "white",
-    fontSize: 18,
+    fontSize: 15,
   },
   inputBehindText: {
     color: "#7B7B7B",

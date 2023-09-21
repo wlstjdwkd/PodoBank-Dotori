@@ -148,11 +148,16 @@ const styles = StyleSheet.create({
     borderColor: "#E3E3E3",
     borderWidth: 1,
     width: "100%",
+    paddingHorizontal: 20,
+
+    elevation: 5,
+    backgroundColor: "white",
   },
   innerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
+    marginTop: 10,
   },
   transDetails: {
     fontSize: 16,
