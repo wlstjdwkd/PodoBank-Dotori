@@ -20,7 +20,7 @@ export default function PurposeScreen({ navigation }) {
     },
     {
       id: "2",
-      name: "목표1",
+      name: "목표2",
       currentAmount: 2500,
       targetAmount: 10000,
     },
@@ -62,7 +62,10 @@ export default function PurposeScreen({ navigation }) {
       <FlatList
         data={data}
         renderItem={({ item }) => (
-          <View style={styles.targetContainer}>
+          <TouchableOpacity
+            style={styles.targetContainer}
+            onPress={() => navigation.navigate("PurposeDetailScreen", { itemId: item.id })}
+          >
             <Text style={styles.targetName}>{item.name}</Text>
             <View style={styles.rightAlignContainer}>
               <Text style={styles.currentAmount}>
@@ -77,7 +80,7 @@ export default function PurposeScreen({ navigation }) {
                 </Text>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         )}
         keyExtractor={(item) => item.id}
         ListFooterComponent={

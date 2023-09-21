@@ -258,8 +258,8 @@ const styles = StyleSheet.create({
   },
   chartInfoContainer: {
     alignItems: "center",
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: 15,
+    marginBottom: 15,
   },
   chartInfoText: {
     fontSize: 15,
