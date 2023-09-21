@@ -46,63 +46,70 @@ const formatNumber = (num) => {
 export default function MainPageScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <FlatList
-        data={banks}
-        ListHeaderComponent={
-          <>
-            <View style={styles.header}>
-              <View></View>
+      <View style={styles.innerContainer}>
+        <FlatList
+          data={banks}
+          ListHeaderComponent={
+            <>
+              <View style={styles.header}>
+                <View></View>
+                <Image
+                  style={styles.logo}
+                  source={require("../../assets/images/dotori_logo.png")}
+                />
+                <TouchableOpacity style={styles.helpButton}>
+                  <Text style={styles.helpIcon}>?</Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={styles.title}>당신의 소비를 계획 해보세요!</Text>
+              <Text style={styles.subtitle}>
+                계좌를 등록하고 계획을 만들어 볼까요?
+              </Text>
+
               <Image
-                style={styles.logo}
-                source={require("../../assets/images/dotori_logo.png")}
+                style={styles.rightImage}
+                source={require("../../assets/images/Hamster/MainHamster.png")}
               />
-              <TouchableOpacity style={styles.helpButton}>
-                <Text style={styles.helpIcon}>?</Text>
-              </TouchableOpacity>
-            </View>
-
-            <Text style={styles.title}>당신의 소비를 계획해보세요!</Text>
-            <Text style={styles.subtitle}>
-              계좌를 등록하고 계획을 만들어 볼까요?
-            </Text>
-
-            <Image
-              style={styles.rightImage}
-              source={require("../../assets/images/Hamster/MainHamster.png")}
-            />
-          </>
-        }
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.bankContainer}
-            onPress={() => navigation.navigate("PlanMainScreen")}
-          >
-            <Image
-              style={styles.bankIcon}
-              source={require("../../assets/images/logo_podo.png")}
-            />
-            <View>
-              <Text style={styles.bankName}>{item.name}</Text>
-              <Text style={styles.bankSubtitle}>잔액</Text>
-            </View>
-            <Text style={styles.bankBalance}>
-              {formatNumber(item.balance)}원
-            </Text>
-          </TouchableOpacity>
-        )}
-        ListFooterComponent={
-          <>
+            </>
+          }
+          renderItem={({ item }) => (
             <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => navigation.navigate("OneCent1Screen")}
+              style={styles.bankContainer}
+              onPress={() => navigation.navigate("PlanMainScreen")}
             >
-              <Text style={styles.addText}>+</Text>
+              <View style={styles.imageText}>
+                <Image
+                  style={styles.bankIcon}
+                  source={require("../../assets/images/logo_podo.png")}
+                />
+                <Text style={styles.bankName}>{item.name}</Text>
+              </View>
+
+              <View style={styles.bankTextContainer}>
+                <View style={styles.balanceRow}>
+                  <Text style={styles.bankSubtitle}>잔액</Text>
+                  <Text style={styles.bankBalance}>
+                    {formatNumber(item.balance)}원
+                  </Text>
+                </View>
+              </View>
             </TouchableOpacity>
-            <View style={{ marginTop: 50 }}></View>
-          </>
-        }
-        keyExtractor={(item) => item.id}
-      />
+          )}
+          ListFooterComponent={
+            <>
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => navigation.navigate("OneCent1Screen")}
+              >
+                <Text style={styles.addText}>+</Text>
+              </TouchableOpacity>
+              <View style={{ marginTop: 50 }}></View>
+            </>
+          }
+          keyExtractor={(item) => item.id}
+        />
+      </View>
       <View style={styles.footer}>
         <FooterScreen navigation={navigation} />
       </View>
@@ -115,6 +122,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "white",
+  },
+  innerContainer: {
+    paddingHorizontal: 20,
   },
   header: {
     flexDirection: "row",
@@ -142,8 +152,9 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 25,
-    // fontWeight: "bold",
+    fontWeight: "bold",
     marginBottom: 5,
+    marginTop: 30,
   },
   subtitle: {
     fontSize: 16,
@@ -152,36 +163,34 @@ const styles = StyleSheet.create({
   },
   rightImage: {
     alignSelf: "flex-end",
-    width: 130,
-    height: 130,
+    width: 140,
+    height: 120,
     marginBottom: 20,
   },
+  imageText: { flexDirection: "row" },
+  bankName: {
+    marginTop: 6,
+    fontSize: 18,
+  },
   bankContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    // flexDirection: "row",
+    // alignItems: "center",
     borderWidth: 1,
     borderColor: "#FCAF17",
     borderRadius: 20,
     padding: 15,
-    marginBottom: 10,
+    marginBottom: 20,
+
+    elevation: 5,
+    backgroundColor: "white",
   },
   bankIcon: {
-    width: 30,
-    height: 30,
+    width: 40,
+    height: 40,
     resizeMode: "contain",
     marginRight: 10,
   },
-  bankName: {
-    fontSize: 18,
-    marginBottom: 5,
-  },
-  bankSubtitle: {
-    fontSize: 16,
-  },
-  bankBalance: {
-    marginLeft: "auto",
-    fontSize: 16,
-  },
+
   addButton: {
     flexDirection: "row",
     justifyContent: "center",
@@ -204,5 +213,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     // marginTop: 220,
     marginBottom: -20,
+  },
+  bankTextContainer: {
+    flex: 1,
+    justifyContent: "space-between",
+    // marginTop: 20,
+    paddingHorizontal: 10,
+  },
+
+  balanceRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 30,
+  },
+
+  bankBalance: {
+    // 기존 스타일에서 marginLeft: 'auto' 삭제
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

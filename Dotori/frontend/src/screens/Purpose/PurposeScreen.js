@@ -31,6 +31,12 @@ export default function PurposeScreen({ navigation }) {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
   };
 
+  const getRandomBorderColor = () => {
+    const colors = ["#1DA9F8", "#30D71F", "#FF77E1"];
+    const randomIndex = Math.floor(Math.random() * colors.length);
+    return colors[randomIndex];
+  };
+
   return (
     <View style={styles.container}>
       {/* 상단 이미지 */}
@@ -61,24 +67,27 @@ export default function PurposeScreen({ navigation }) {
       {/* 목표 리스트 */}
       <FlatList
         data={data}
-        renderItem={({ item }) => (
-          <View style={styles.targetContainer}>
-            <Text style={styles.targetName}>{item.name}</Text>
-            <View style={styles.rightAlignContainer}>
-              <Text style={styles.currentAmount}>
-                {formatNumber(item.currentAmount)}원
-              </Text>
-            </View>
-            <View style={styles.targetAmounts}>
-              <Text style={styles.targetAmountText}>목표 금액</Text>
+        renderItem={({ item }) => {
+          const borderColor = getRandomBorderColor();
+          return (
+            <View style={[styles.targetContainer, { borderColor }]}>
+              <Text style={styles.targetName}>{item.name}</Text>
               <View style={styles.rightAlignContainer}>
-                <Text style={styles.targetAmount}>
-                  {formatNumber(item.targetAmount)}원
+                <Text style={styles.currentAmount}>
+                  {formatNumber(item.currentAmount)}원
                 </Text>
               </View>
+              <View style={styles.targetAmounts}>
+                <Text style={styles.targetAmountText}>목표 금액</Text>
+                <View style={styles.rightAlignContainer}>
+                  <Text style={styles.targetAmount}>
+                    {formatNumber(item.targetAmount)}원
+                  </Text>
+                </View>
+              </View>
             </View>
-          </View>
-        )}
+          );
+        }}
         keyExtractor={(item) => item.id}
         ListFooterComponent={
           <TouchableOpacity
@@ -127,7 +136,7 @@ const styles = StyleSheet.create({
   },
   currentSavings: {
     color: "#9D9D9D",
-    // 여기에 추가 스타일...
+    textAlign: "right",
   },
   middleImageContainer: {
     position: "absolute", // Set position to absolute
@@ -151,8 +160,12 @@ const styles = StyleSheet.create({
     borderColor: "#A6A6A6",
     borderWidth: 1,
     padding: 10,
+    marginHorizontal: 15,
     marginTop: 20,
     flexDirection: "column",
+
+    elevation: 5,
+    backgroundColor: "white",
   },
 
   targetName: {
@@ -193,6 +206,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderColor: "#A6A6A6",
     borderWidth: 1,
+    marginHorizontal: 15,
     height: 70,
     marginTop: 20,
     borderStyle: "dashed", // 점선 테두리 추가

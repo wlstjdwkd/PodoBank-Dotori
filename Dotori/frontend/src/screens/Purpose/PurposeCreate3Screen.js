@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "100%",
-    height: 50,
+    height: 40,
     backgroundColor: "#D9D9D920",
     borderWidth: 1,
     borderColor: "#BAC0CA",
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     // textAlign: "center",
   },
   button: {
-    height: 50,
+    height: 40,
     backgroundColor: "#FF965C",
     borderRadius: 8,
     justifyContent: "center",

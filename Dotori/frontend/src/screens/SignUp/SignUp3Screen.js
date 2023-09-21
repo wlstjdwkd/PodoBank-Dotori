@@ -42,7 +42,7 @@ export default function SignUp3Screen({ navigation, route }) {
       setIsConfirmPasswordValid(true);
       setUserInfo((prev) => ({ ...prev, password: text }));
     } else {
-      setConfirmPasswordMessage("비밀번호가 일치하지 않습니다");
+      setConfirmPasswordMessage("비밀번호 일치X");
       setIsConfirmPasswordValid(false);
     }
   };
@@ -54,61 +54,63 @@ export default function SignUp3Screen({ navigation, route }) {
         cancelNavi="LoginScreen"
         navigation={navigation}
       ></HeaderComponent>
-      <ScrollView style={styles.header}>
-        <Text style={styles.title}>비밀번호 설정하기</Text>
-        <Text style={styles.subtitle}>비밀번호</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={handlePasswordChange}
-          secureTextEntry={true}
-        />
-        <View style={styles.rowContainer}>
-          <Text style={styles.inputBehindText}>
-            영문, 숫자, 특수문자 포함 8자 이상
-          </Text>
-          <Text
-            style={{
-              color: isPasswordValid ? "blue" : "red",
-              marginLeft: 20,
-              marginTop: 0,
-            }}
-          >
-            {passwordMessage}
-          </Text>
-        </View>
+      <View style={styles.innerContainer}>
+        <ScrollView style={styles.header}>
+          <Text style={styles.title}>비밀번호 설정하기</Text>
+          <Text style={styles.subtitle}>비밀번호</Text>
+          <TextInput
+            style={styles.input}
+            onChangeText={handlePasswordChange}
+            secureTextEntry={true}
+          />
+          <View style={styles.rowContainer}>
+            <Text style={styles.inputBehindText}>
+              영문, 숫자, 특수문자 포함 8자 이상
+            </Text>
+            <Text
+              style={{
+                color: isPasswordValid ? "blue" : "red",
+                marginLeft: 20,
+                marginTop: 0,
+              }}
+            >
+              {passwordMessage}
+            </Text>
+          </View>
 
-        <Text style={styles.subtitle}>비밀번호 확인</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={handleConfirmPasswordChange}
-          secureTextEntry={true}
-        />
-        <View style={styles.rowContainer}>
-          <Text style={styles.inputBehindText}>
-            영문, 숫자, 특수문자 포함 8자 이상
-          </Text>
-          <Text
-            style={{
-              color: isConfirmPasswordValid ? "blue" : "red",
-              marginLeft: 20,
-              marginTop: 0,
-            }}
-          >
-            {confirmPasswordMessage}
-          </Text>
-        </View>
-      </ScrollView>
+          <Text style={styles.subtitle}>비밀번호 확인</Text>
+          <TextInput
+            style={styles.input}
+            onChangeText={handleConfirmPasswordChange}
+            secureTextEntry={true}
+          />
+          <View style={styles.rowContainer}>
+            <Text style={styles.inputBehindText}>
+              영문, 숫자, 특수문자 포함 8자 이상
+            </Text>
+            <Text
+              style={{
+                color: isConfirmPasswordValid ? "blue" : "red",
+                marginLeft: 20,
+                marginTop: 0,
+              }}
+            >
+              {confirmPasswordMessage}
+            </Text>
+          </View>
+        </ScrollView>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          navigation.navigate("SignUp4Screen", { userInfo: userInfo })
-        }
-        //TODO: 나중에 ! 붙이셈
-        disabled={isPasswordValid && isConfirmPasswordValid}
-      >
-        <Text style={styles.buttonText}>다음</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            navigation.navigate("SignUp4Screen", { userInfo: userInfo })
+          }
+          //TODO: 나중에 ! 붙이셈
+          disabled={isPasswordValid && isConfirmPasswordValid}
+        >
+          <Text style={styles.buttonText}>다음</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -119,6 +121,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 20,
     backgroundColor: "white",
+  },
+  innerContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+    marginTop: 20,
   },
   header: {
     flex: 1,
@@ -137,7 +144,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "100%",
-    height: 50,
+    height: 40,
     backgroundColor: "#D9D9D920",
     borderWidth: 1,
     borderColor: "#BAC0CA",
@@ -146,11 +153,12 @@ const styles = StyleSheet.create({
     // textAlign: "center",
   },
   button: {
-    height: 50,
+    height: 40,
     backgroundColor: "#FF965C",
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 10,
   },
   buttonText: {
     color: "white",

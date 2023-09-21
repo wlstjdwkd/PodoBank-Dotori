@@ -21,7 +21,7 @@ export default function LoginScreen({ navigation }) {
 
       <View style={styles.checkboxContainer}>
         <View style={styles.checkbox} />
-        <Text>아이디저장</Text>
+        <Text style={{ color: "#878787" }}>아이디저장</Text>
       </View>
 
       <TouchableOpacity
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 35,
+    padding: 45,
     backgroundColor: "white",
   },
   image: {
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "100%",
-    height: 50,
+    height: 40,
     backgroundColor: "#D9D9D920",
     borderWidth: 1,
     borderColor: "#BAC0CA",
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: "100%",
-    height: 50,
+    height: 40,
     backgroundColor: "#FF965C",
     borderRadius: 10,
     justifyContent: "center",
@@ -136,7 +136,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between", // 수정: 양쪽 끝으로 확장
     width: "100%",
-    marginBottom: 40,
+    marginBottom: 60,
+    paddingHorizontal: 10,
   },
   divider: {
     width: "100%",
