@@ -26,23 +26,35 @@ export default function LoginScreen({ navigation }) {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate("MainPageScreen")}
+        onPress={() => {
+          navigation.navigate("MainPageScreen")
+        }}
       >
         <Text style={styles.buttonText}>로그인</Text>
       </TouchableOpacity>
 
       <View style={styles.linksContainer}>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={()=>{
+            navigation.navigate("LoginScreen")
+          }}
+        >
           <Text style={styles.linkText}>아이디 찾기</Text>
         </TouchableOpacity>
 
         <Text style={styles.linkText}>|</Text>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={()=>{
+            navigation.navigate("LoginScreen")
+          }}
+        >
           <Text style={styles.linkText}>비밀번호 찾기</Text>
         </TouchableOpacity>
 
         <Text style={styles.linkText}>|</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("SignUp1Screen")}>
+        <TouchableOpacity onPress={() => {
+          navigation.navigate("SignUp1Screen")
+        }}>
           <Text style={styles.linkText}>회원가입</Text>
         </TouchableOpacity>
       </View>
