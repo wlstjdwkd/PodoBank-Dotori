@@ -37,7 +37,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,6 +124,50 @@ public class PlanServiceImpl implements PlanService {
     public void saving(SavingDTO savingDTO) {
         Plan plan = planRepository.findByPlanSeq(savingDTO.getPlanSeq());
         Account account = plan.getAccount();
+
+        List<PurposeData> purposeDataList = new ArrayList<>();
+        BigDecimal totalSaving = new BigDecimal(BigInteger.ZERO);
+
+        if(!plan.getPlanState().equals(State.ACTIVE)){
+            throw new IllegalArgumentException("실행 중인 계획이 아닙니다.");
+        }
+
+        // 1. 각 목표에 따라 저축 금액 update 하기
+        for (PurposeSavingDTO data : savingDTO.getPurposeSavingList()) {
+            Purpose purpose = purposeRepository.findByPurposeSeq(data.getPurposeSeq());
+
+            // 현재 금액에 저축 금액 더하기
+            purpose.addCurrentBalance(data.getSavingAmount());
+            purposeRepository.save(purpose);
+            log.info(purpose.getCurrentBalance()+"");
+
+            // 1-2. purpose_data 저장하기
+            // 각 purpose에 연결된 purpose_data에 저장
+            purposeDataList.add(PurposeData.builder()
+                    .account(account)
+                    .dataAmount(data.getSavingAmount())
+                    .purpose(purpose)
+                    .dataName(account.getAccountTitle())
+                    .dataCurrentBalance(purpose.getCurrentBalance())
+                    .dataCreatedAt(LocalDateTime.now())
+                    .build());
+
+            totalSaving = totalSaving.add(data.getSavingAmount());
+        }
+
+        if(!totalSaving.equals(savingDTO.getTotalSaving())){
+            throw new IllegalArgumentException("총 저축 금액이 일치하지 않습니다.");
+        }
+        purposeDataRepository.saveAll(purposeDataList);
+
+        // 2. 계획 종료 표시하기
+        planRepository.save(plan.updateState(State.SAVED));
+
+        // NOTE : 모든 확인이 되면 은행에 출금 요청 보내기
+        callBankAPI(account, savingDTO);
+    }
+
+    public void callBankAPI(Account account, SavingDTO savingDTO){
         Bank bankInfo = bankRepository.findByBankSeq(account.getBank().getBankSeq());
         String accessToken = userAuthService.getConnectionToken(bankInfo.getBankSeq()); // 은행 accessToken 가져오기
 
@@ -148,32 +194,8 @@ public class PlanServiceImpl implements PlanService {
         );
 
         String responseCode = response.getStatusCode().toString().split(" ")[0];
-        if(responseCode.equals("200")){
-
-            // 1. 각 목표에 따라 저축 금액 update 하기
-            for (PurposeSavingDTO data : savingDTO.getPurposeSavingList()) {
-                Purpose purpose = purposeRepository.findByPurposeSeq(data.getPurposeSeq());
-
-                // 현재 금액에 저축 금액 더하기
-                purpose.addCurrentBalance(data.getSavingAmount());
-                purposeRepository.save(purpose);
-                log.info(purpose.getCurrentBalance()+"");
-
-                // 1-2. purpose_data 저장하기
-                // 각 purpose에 연결된 purpose_data에 저장
-                purposeDataRepository.save(PurposeData.builder()
-                                .account(account)
-                                .dataAmount(savingDTO.getTotalSaving())
-                        .build());
-
-            }
-
-            // 1-1. 계획 종료 표시하기
-
-
-            return ;
+        if(!responseCode.equals("200")){
+            throw new IllegalArgumentException("출금에 실패했습니다.");
         }
-
-        throw new IllegalArgumentException("출금에 실패했습니다.");
     }
 }
