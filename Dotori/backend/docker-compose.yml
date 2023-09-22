@@ -3,7 +3,7 @@ services:
   dotori-user-service:
     image: bangjinseong/dotori-user-service:${BUILD_NUMBER}
     build:
-      context: ../Dotori/backend/Dotori-User-Service
+      context: ./Dotori-User-Service
       dockerfile: Dockerfile
       args:
         - BUILD_NUMBER
