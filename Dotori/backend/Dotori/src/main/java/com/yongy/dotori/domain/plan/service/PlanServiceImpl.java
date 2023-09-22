@@ -1,8 +1,5 @@
 package com.yongy.dotori.domain.plan.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yongy.dotori.domain.account.dto.BodyDataDTO;
 import com.yongy.dotori.domain.account.entity.Account;
 import com.yongy.dotori.domain.account.repository.AccountRepository;
 import com.yongy.dotori.domain.bank.entity.Bank;
@@ -26,7 +23,6 @@ import com.yongy.dotori.domain.userAuth.service.UserAuthService;
 import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.methods.HttpHead;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -85,8 +81,8 @@ public class PlanServiceImpl implements PlanService {
                     .groupTitle(group.getGroupTitle()).build());
 
             // 카테고리 만들기 +  Plan에 딸린 실행중인 카테고리인 PlanDetail 생성
-            List<CategoryDTO> categorise = group.getCategoryDTOList();
-            for (CategoryDTO data : categorise) {
+            List<ActiveCategoryDTO> categorise = group.getActiveCategoryDTOList();
+            for (ActiveCategoryDTO data : categorise) {
                 Category category = categoryRepository.save(Category.builder()
                         .user(loginUser)
                         .categoryTitle(data.getCategoryName())
