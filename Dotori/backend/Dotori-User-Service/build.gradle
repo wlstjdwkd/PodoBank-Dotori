@@ -10,6 +10,9 @@ version = '0.0.1-SNAPSHOT'
 java {
 	sourceCompatibility = '17'
 }
+ext {
+	set('springCloudVersion', "2022.0.4")
+}
 
 configurations {
 	compileOnly {
@@ -70,6 +73,15 @@ dependencies {
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.3.12.RELEASE'
 
 	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+
+	// Spring Cloud Config Client
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
 
 tasks.named('test') {
