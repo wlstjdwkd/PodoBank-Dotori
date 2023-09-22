@@ -60,6 +60,8 @@ public class UserService {
 
         User user = toUserEntity(registerDTO, passwordEncoder);
         userRepository.save(user);
+
+        logRegister(user);
     }
 
     @Transactional(readOnly = true)
@@ -91,6 +93,8 @@ public class UserService {
                         .refreshToken(token.getRefreshToken())
                         .build());
 
+        logLogin(user);
+
         return ResponseEntity.ok(token);
     }
 
@@ -118,6 +122,8 @@ public class UserService {
     public void logout() {
         User user = getLoginUser();
         refreshTokenRedisRepository.deleteById(user.getEmail());
+
+        logLogout(user);
     }
 
     @Transactional(readOnly = true)
@@ -144,7 +150,9 @@ public class UserService {
                 .password(passwordEncoder.encode(changePasswordDTO.getNewPassword()))
                 .build()));
 
-        //TODO: 로그아웃 처리
+        logChangePassword(user);
+
+        logout();
     }
 
     @Transactional
@@ -165,6 +173,8 @@ public class UserService {
         userRepository.save(user.update(User.builder()
                 .password(passwordEncoder.encode(resetPasswordDTO.getNewPassword()))
                 .build()));
+
+        logResetPassword(user);
     }
 
     @Transactional
@@ -180,6 +190,8 @@ public class UserService {
         }
 
         userRepository.save(user.delete());
+
+        logDeleteUser(user);
     }
 
     private User getLoginUser() {
@@ -222,4 +234,48 @@ public class UserService {
                 .phoneNumber(user.getPhoneNumber())
                 .build();
     }
+
+    private void logRegister(User user) {
+        log.info("=====" + "\t" +
+                "회원가입" + "\t" +
+                "이메일: " + user.getEmail() + "\t" +
+                "=====");
+    }
+
+    private void logLogin(User user) {
+        log.info("=====" + "\t" +
+                "로그인" + "\t" +
+                "이메일: " + user.getEmail() + "\t" +
+                "=====");
+    }
+
+    private void logLogout(User user) {
+        log.info("===== " + "\t" +
+                "로그아웃" + "\t" +
+                "이메일: " + user.getEmail() + "\t" +
+                "=====");
+    }
+
+    private void logChangePassword(User user) {
+        log.info("=====" + "\t" +
+                "비밀번호 변경" + "\t" +
+                "이메일: " + user.getEmail() + "\t" +
+                "=====");
+    }
+
+    private void logResetPassword(User user) {
+        log.info("=====" + "\t" +
+                "비밀번호 초기화" + "\t" +
+                "이메일: " + user.getEmail() + "\t" +
+                "=====");
+    }
+
+    private void logDeleteUser(User user) {
+        log.info("=====" + "\t" +
+                "회원탈퇴" + "\t" +
+                "이메일: " + user.getEmail() + "\t" +
+                "=====");
+    }
+
+
 }
