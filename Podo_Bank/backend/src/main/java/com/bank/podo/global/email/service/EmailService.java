@@ -55,6 +55,8 @@ public class EmailService {
                     .build());
         }
 
+        logSendVerificationCode(email, messageSendSuccess);
+
         return messageSendSuccess;
     }
 
@@ -84,6 +86,9 @@ public class EmailService {
                         .build());
         // 인증 코드 삭제
         verificationCodeRepository.deleteById(email);
+
+        logCheckVerificationCode(email, type);
+
         return EmailVerificationSuccessDTO.builder().email(email).successCode(successCode).build();
     }
 
@@ -131,5 +136,21 @@ public class EmailService {
         }
 
         return code.toString();
+    }
+
+    private void logSendVerificationCode(String email, boolean messageSendSuccess) {
+        log.info("=====" + "\t"
+                + "이메일 인증코드 발송" + "\t"
+                + "이메일: " + email + "\t"
+                + "발송 성공: " + messageSendSuccess + "\t"
+                + "=====");
+    }
+
+    private void logCheckVerificationCode(String email, VerificationType type) {
+        log.info("=====" + "\t"
+                + "이메일 인증코드 확인" + "\t"
+                + "이메일: " + email + "\t"
+                + "인증 타입: " + type + "\t"
+                + "=====");
     }
 }

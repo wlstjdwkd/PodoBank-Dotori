@@ -40,7 +40,7 @@ public class OpenBankingController {
     @Operation(summary = "1원 송금 확인", description = "MANAGER")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "1원 송금 확인 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "400", description = "1원 송금 확인 실패(잘못된 요청, 1원 송금 확인 실패, 1원 송금 확인 만료 등)"),
             @ApiResponse(responseCode = "401", description = "권한 없음"),
             @ApiResponse(responseCode = "404", description = "무언가 존재하지 않습니다(서비스코드, 계좌 등)."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
