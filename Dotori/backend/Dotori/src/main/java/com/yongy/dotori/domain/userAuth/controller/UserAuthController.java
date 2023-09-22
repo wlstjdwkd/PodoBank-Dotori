@@ -117,6 +117,7 @@ public class UserAuthController {
     public ResponseEntity<Void> setAccountName(@RequestParam String accountNumber,@RequestParam String accountTitle){
         Account account = accountRepository.findByAccountNumberAndDeleteAtIsNull(accountNumber);
         account.setAccountTitle(accountTitle);
+        accountRepository.save(account);
         return ResponseEntity.ok().build();
     }
 
