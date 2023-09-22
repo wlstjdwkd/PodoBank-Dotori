@@ -97,7 +97,15 @@ export default function MyPageScreen({ navigation }) {
 
       {/* 로그아웃과 회원탈퇴 */}
       <View style={styles.bottomRow}>
-        <TouchableOpacity style={styles.logoutButton}>
+        <TouchableOpacity 
+          style={styles.logoutButton}
+          onPress={()=>{
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'LoginScreen' }],
+            });
+          }}
+        >
           <Text style={styles.logoutText}>로그아웃</Text>
         </TouchableOpacity>
         <Text style={styles.separatorText}> </Text>

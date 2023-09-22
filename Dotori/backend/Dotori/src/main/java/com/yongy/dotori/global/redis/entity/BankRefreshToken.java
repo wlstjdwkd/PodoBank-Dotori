@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 @Getter
-@RedisHash(value="BankAccessToken", timeToLive = 1000L * 60 * 60 * 24 * 6)
+@RedisHash(value="BankRefreshToken", timeToLive = 1000L * 60 * 60 * 24 * 6)
 public class BankRefreshToken {
 
     @Id

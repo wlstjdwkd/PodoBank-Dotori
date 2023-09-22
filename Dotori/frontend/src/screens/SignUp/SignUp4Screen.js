@@ -81,22 +81,19 @@ export default function SignUp4Screen({ navigation, route }) {
   };
   
   const gotoSignUpCompleteScreen = () =>{
-    console.log(userInfo)
-    // isValid.isNameValid isValid.isBirthdateValid isValid.isPhoneNumberValid
-    // switch (isValid.isNameValid && isValid.isBirthdateValid && isValid.isPhoneNumberValid) {
     switch (true) {
       case !isValid.isNameValid:
-        console.log(isValid)
+        // console.log(isValid)
         Alert.alert('','작성하신 이름을 다시 확인해주세요.')
         nameInputRef.current.focus()
         break;
       case !isValid.isBirthdateValid:
-        console.log(isValid)
+        // console.log(isValid)
         Alert.alert('','작성하신 생년월일을 다시 확인해주세요.')
         birthDateInputRef.current.focus()
         break;
       case !isValid.isPhoneNumberValid:
-        console.log(isValid)
+        // console.log(isValid)
         Alert.alert('','작성하신 휴대폰번호를 다시 확인해주세요.')
         phoneNumberInputRef.current.focus()
         break;
@@ -142,9 +139,10 @@ export default function SignUp4Screen({ navigation, route }) {
             value={nameValue}
             ref={nameInputRef}
             onSubmitEditing={()=>{
-              if(isValid.isNameValid){
-                birthDateInputRef.current.focus()
-              }
+              // if(isValid.isNameValid){
+              //   birthDateInputRef.current.focus()
+              // }
+              birthDateInputRef.current.focus()
             }}
           />
           <Text
@@ -179,9 +177,10 @@ export default function SignUp4Screen({ navigation, route }) {
             value = {birthDateValue}
             ref={birthDateInputRef}
             onSubmitEditing={()=>{
-              if(isValid.isBirthdateValid){
-                phoneNumberInputRef.current.focus()
-              }
+              // if(isValid.isBirthdateValid){
+              //   phoneNumberInputRef.current.focus()
+              // }
+              phoneNumberInputRef.current.focus()
             }}
           />
           <Text
