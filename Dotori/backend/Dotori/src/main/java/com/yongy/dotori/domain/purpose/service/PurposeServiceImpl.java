@@ -8,6 +8,7 @@ import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,9 +30,7 @@ public class PurposeServiceImpl implements PurposeService{
 
     @Override
     public void createPurpose(PurposeDTO purposeDTO) {
-        // TODO 로그인 된 사용자 Id(or Seq) 가져오는 게 필요
-        //User user = User.getLoginUser();
-        User loginUser = userRepository.findByIdAndExpiredAtIsNull("1");
+        User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // 새로운 목표 DB에 저장
         purposeRepository.save(Purpose.builder()
                         .user(loginUser)
@@ -47,9 +46,7 @@ public class PurposeServiceImpl implements PurposeService{
 
     @Override
     public PurposeAllDTO findAllPurpose() {
-        //TODO 로그인 된 유저의 Seq 가져오는 걸로 변경 해야됨
-        //User user = User.getLoginUser();
-        User loginUser = userRepository.findByIdAndExpiredAtIsNull("1");
+        User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<Purpose> purposeList = purposeRepository.findAllByUserUserSeq(loginUser.getUserSeq());
 
         List<PurposeListDTO> list = new ArrayList<>();
@@ -62,6 +59,7 @@ public class PurposeServiceImpl implements PurposeService{
             }
 
             list.add(PurposeListDTO.builder()
+                            .purposeSeq(p.getPurposeSeq())
                             .title(p.getPurposeTitle())
                             .currentBalance(p.getCurrentBalance())
                             .goalAmount(p.getGoalAmount())
@@ -127,11 +125,6 @@ public class PurposeServiceImpl implements PurposeService{
                 .percentage(percentage)
                 .build();
 
-        log.info(summary.getPercentage()+"");
         return summary;
     }
-
-//        private User getLoginUser() {
-//        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//    }
 }

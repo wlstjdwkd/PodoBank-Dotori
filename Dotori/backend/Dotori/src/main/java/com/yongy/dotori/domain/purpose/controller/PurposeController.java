@@ -60,4 +60,6 @@ public class PurposeController {
         PurposeSummaryDTO summary = purposeService.summarizePurpose(purposeSeq);
         return ResponseEntity.ok(summary);
     }
+
+
 }
