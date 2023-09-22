@@ -8,7 +8,15 @@ import {
   TouchableOpacity,
 } from "react-native";
 import FooterScreen from "../Components/FooterScreen";
+import { useDispatch, useSelector } from "react-redux";
 export default function PurposeScreen({ navigation }) {
+  // 토큰
+  const grantType =  useSelector((state)=>{state.user.grantType})
+  const accessToken =  useSelector((state)=>{state.user.accessToken})
+  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const dispatch = useDispatch()
+  // 그 외
+
   const [nowPurposeAmount, setNowPurposeAmount] = useState(3000000);
   // 여기서 목표 데이터를 추가하세요
   const data = [

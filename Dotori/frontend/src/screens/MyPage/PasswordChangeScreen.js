@@ -9,8 +9,16 @@ import {
   Button,
 } from "react-native";
 import HeaderComponent from "../Components/HeaderScreen";
+import { useDispatch } from "react-redux";
 
 export default function PasswordChangeScreen({ navigation }) {
+  // 토큰
+  const grantType =  useSelector((state)=>{state.user.grantType})
+  const accessToken =  useSelector((state)=>{state.user.accessToken})
+  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const dispatch = useDispatch()
+  // 그 외
+  
   return (
     <View style={styles.container}>
       <HeaderComponent title="비밀번호 변경" />

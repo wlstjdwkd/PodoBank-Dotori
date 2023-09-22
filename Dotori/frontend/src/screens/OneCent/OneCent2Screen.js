@@ -8,8 +8,16 @@ import {
   ScrollView,
 } from "react-native";
 import FooterScreen from "../Components/FooterScreen";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function OneCent1Screen({ navigation, route }) {
+  // 토큰
+  const grantType =  useSelector((state)=>{state.user.grantType})
+  const accessToken =  useSelector((state)=>{state.user.accessToken})
+  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const dispatch = useDispatch()
+  // 그 외
+  
   const [accountInfo, setAccountInfo] = useState({
     bankName: route.params.bankName,
     bankImage: route.params.bankImage,

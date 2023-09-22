@@ -9,6 +9,7 @@ import {
   FlatList,
 } from "react-native";
 import FooterScreen from "../Components/FooterScreen";
+import { useDispatch, useSelector } from "react-redux";
 
 const banks = [
   {
@@ -34,6 +35,13 @@ const banks = [
 ];
 
 export default function OneCent1Screen({ navigation }) {
+  // 토큰
+  const grantType =  useSelector((state)=>{state.user.grantType})
+  const accessToken =  useSelector((state)=>{state.user.accessToken})
+  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const dispatch = useDispatch()
+  // 그 외
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.inContainer}>

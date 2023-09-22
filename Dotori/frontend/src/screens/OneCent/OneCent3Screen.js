@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import FooterScreen from "../Components/FooterScreen";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function OneCent3Screen({ navigation, route }) {
+  // 토큰
+  const grantType =  useSelector((state)=>{state.user.grantType})
+  const accessToken =  useSelector((state)=>{state.user.accessToken})
+  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const dispatch = useDispatch()
+  // 그 외
+  
   const [accountInfo, setAccountInfo] = useState(route.params.accountInfo);
 
   const handleConfirm = () => {

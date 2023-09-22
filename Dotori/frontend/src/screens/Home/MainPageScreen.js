@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 } from "react-native";
 
 import FooterScreen from "../Components/FooterScreen";
+import { useDispatch, useSelector } from "react-redux";
 
 const banks = [
   {
@@ -44,11 +45,37 @@ const formatNumber = (num) => {
 };
 
 export default function MainPageScreen({ navigation }) {
+  // 토큰
+  const grantType =  useSelector((state)=>{state.user.grantType})
+  const accessToken =  useSelector((state)=>{state.user.accessToken})
+  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const dispatch = useDispatch()
+  // 그 외
+
+
+  // // 정보조회 함수
+  // const do정보조회 = async () => {
+  //   const response = await 함수()
+  //   if(response.status === 200){
+  //     console.log('연결 계좌 조회 성공')
+  //   }else if(response.status === 400){
+  //     console.log('연결 계좌 조회 실패')
+
+  //   }
+  // }
+
+  
+  
+  useEffect(()=>{
+    // do정보조회()
+  },[])
+
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
         <FlatList
           data={banks}
+          showsVerticalScrollIndicator={false} // 수직 스크롤바 숨김
           ListHeaderComponent={
             <>
               <View style={styles.header}>
