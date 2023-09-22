@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import HeaderComponent from "../Components/HeaderScreen";
 import { AntDesign, Entypo, FontAwesome } from "@expo/vector-icons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 const categorys = [
   {
     categorySeq: "1",

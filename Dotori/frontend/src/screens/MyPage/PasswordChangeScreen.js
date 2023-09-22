@@ -9,7 +9,7 @@ import {
   Button,
 } from "react-native";
 import HeaderComponent from "../Components/HeaderScreen";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function PasswordChangeScreen({ navigation }) {
   // 토큰

@@ -8,7 +8,7 @@ import {
   FlatList,
 } from "react-native";
 import HeaderComponent from "../Components/HeaderScreen";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const categorys = [
   {
