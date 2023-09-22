@@ -2,14 +2,13 @@
 
 import axios from 'axios';
 // apiAddress는 수정 필요
-const apiAddress ="http://j9d107.p.ssafy.io:9000"
-
+const apiAddress ="http://j9d107.p.ssafy.io:9100"
 
 // users
 // // 사용자 회원탈퇴
 // export const userWithdraw = async (withdrawData, accessToken) => {
 //   try {
-//     const response = await axios.delete(apiAddress+`/user`, withdrawData, {
+//     const response = await axios.delete(apiAddress+`/v1/user`, withdrawData, {
 //       headers: {
 //         Authorization: `Bearer ${accessToken}`,
 //       },
@@ -17,8 +16,8 @@ const apiAddress ="http://j9d107.p.ssafy.io:9000"
 //     console.log('사용자 회원탈퇴 성공:', response.data);
 //     return response;
 //   } catch (error) {
-//     console.error('사용자 회원탈퇴 실패:', error.status, error.data);
-//     const response = error.response
+  //     console.error('사용자 회원탈퇴 실패:', error);
+  //     const response = error.response
 //     return response
 //     // throw error;
 //   }
@@ -27,7 +26,7 @@ const apiAddress ="http://j9d107.p.ssafy.io:9000"
 // 사용자 정보 조회
 export const userInfoInquiry = async (infoInquiryData, accessToken) => {
   try {
-    const response = await axios.get(apiAddress+`/user`, infoInquiryData, {
+    const response = await axios.get(apiAddress+`/v1/user`, infoInquiryData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -35,20 +34,22 @@ export const userInfoInquiry = async (infoInquiryData, accessToken) => {
     console.log('사용자 정보 조회 성공:', response.data);
     return response;
   } catch (error) {
+    console.error('사용자 정보 조회 실패:', error);
     const response = error.response
-    console.error('사용자 정보 조회 실패:', response.status, response.data);
     return response
     // throw error;
   }
 };
 // 사용자 회원가입
 export const userSignup = async (signupData) => {
+  signupData.role = "ROLE_USER";
+  console.log(signupData)
   try {
-    const response = await axios.put(apiAddress+`/user/signup`, signupData);
+    const response = await axios.put(apiAddress+`/v1/user/signup`, signupData);
     console.log('사용자 회원가입 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('사용자 회원가입 실패:', error.status, error.data);
+    console.error('사용자 회원가입 실패:', error);
     const response = error.response
     return response
     // throw error;
@@ -57,11 +58,11 @@ export const userSignup = async (signupData) => {
 // 사용자 로그인
 export const userLogin = async (loginData) => {
   try {
-    const response = await axios.post(apiAddress+`/user/signin`, loginData);
+    const response = await axios.post(apiAddress+`/v1/user/signin`, loginData);
     console.log('사용자 로그인 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('사용자 로그인 실패:', error.status, error.data);
+    console.error('사용자 로그인 실패:', error);
     const response = error.response
     return response
     // throw error;
@@ -70,7 +71,7 @@ export const userLogin = async (loginData) => {
 // 사용자 로그아웃
 export const userLogout = async (accessToken) => {
   try {
-    const response = await axios.post(apiAddress+`/user/logout`, null, {
+    const response = await axios.post(apiAddress+`/v1/user/logout`, null, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -78,7 +79,7 @@ export const userLogout = async (accessToken) => {
     console.log('사용자 로그아웃 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('사용자 로그아웃 실패:', error.status, error.data);
+    console.error('사용자 로그아웃 실패:', error);
     const response = error.response
     return response
     // throw error;
@@ -87,7 +88,7 @@ export const userLogout = async (accessToken) => {
 // 사용자 비밀번호 변경
 export const userPasswordChange = async (pwChangeData, accessToken) => {
   try {
-    const response = await axios.patch(apiAddress+`/user/password`, pwChangeData, {
+    const response = await axios.patch(apiAddress+`/v1/user/password`, pwChangeData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -95,7 +96,7 @@ export const userPasswordChange = async (pwChangeData, accessToken) => {
     console.log('사용자 비밀번호 변경 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('사용자 비밀번호 변경 실패:', error.status, error.data);
+    console.error('사용자 비밀번호 변경 실패:', error);
     const response = error.response
     return response
     // throw error;
@@ -104,7 +105,7 @@ export const userPasswordChange = async (pwChangeData, accessToken) => {
 // 사용자 휴대전화 번호 변경
 export const userCellPhoneNumberChange = async (cellPhoneNumberChangeData, accessToken) => {
   try {
-    const response = await axios.patch(apiAddress+`/user/phoneNumber`, cellPhoneNumberChangeData, {
+    const response = await axios.patch(apiAddress+`/v1/user/phoneNumber`, cellPhoneNumberChangeData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -112,7 +113,7 @@ export const userCellPhoneNumberChange = async (cellPhoneNumberChangeData, acces
     console.log('사용자 휴대전화 번호 변경 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('사용자 휴대전화 번호 변경 실패:', error.status, error.data);
+    console.error('사용자 휴대전화 번호 변경 실패:', error);
     const response = error.response
     return response
     // throw error;
@@ -121,7 +122,7 @@ export const userCellPhoneNumberChange = async (cellPhoneNumberChangeData, acces
 // 사용자 생년월일 변경
 export const userBirthdateChange = async (birthdateChangeData, accessToken) => {
   try {
-    const response = await axios.patch(apiAddress+`/user/birthDate`, birthdateChangeData, {
+    const response = await axios.patch(apiAddress+`/v1/user/birthDate`, birthdateChangeData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -129,7 +130,7 @@ export const userBirthdateChange = async (birthdateChangeData, accessToken) => {
     console.log('사용자 생년월일 변경 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('사용자 생년월일 변경 실패:', error.status, error.data);
+    console.error('사용자 생년월일 변경 실패:', error);
     const response = error.response
     return response
     // throw error;
@@ -138,7 +139,7 @@ export const userBirthdateChange = async (birthdateChangeData, accessToken) => {
 // 사용자 탈퇴하기
 export const userExitDotori = async (exitDotoriData, accessToken) => {
   try {
-    const response = await axios.patch(apiAddress+`/user/retire`, exitDotoriData, {
+    const response = await axios.patch(apiAddress+`/v1/user/retire`, exitDotoriData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -146,7 +147,7 @@ export const userExitDotori = async (exitDotoriData, accessToken) => {
     console.log('사용자 탈퇴하기 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('사용자 탈퇴하기 실패:', error.status, error.data);
+    console.error('사용자 탈퇴하기 실패:', error);
     const response = error.response
     return response
     // throw error;
@@ -155,13 +156,41 @@ export const userExitDotori = async (exitDotoriData, accessToken) => {
 // 사용자 아이디 중복 검사
 export const userIdDuplicatedCheck = async (idDuplicatedCheckData) => {
   try {
-    // const response = await axios.get(apiAddress+`/user/${idDuplicatedCheckData.id}`, idDuplicatedCheckData);
-    const response = await axios.get(apiAddress+`/user/${idDuplicatedCheckData}`);
+    // const response = await axios.get(apiAddress+`/v1/user/${idDuplicatedCheckData.id}`, idDuplicatedCheckData);
+    const response = await axios.get(apiAddress+`/v1/user/${idDuplicatedCheckData}`);
     console.log('사용자 아이디 중복 검사 성공:', response.data);
     return response;
   } catch (error) {
+    console.error('사용자 아이디 중복 검사 실패:', error);
     const response = error.response
-    console.error('사용자 아이디 중복 검사 실패:', response.status, response.data);
+    return response
+    // throw error;
+  }
+};
+// 사용자 이메일 인증코드 전송
+export const userSendEmail = async (email) => {
+  try {
+    // const response = await axios.get(apiAddress+`/v1/user/${idDuplicatedCheckData.id}`, idDuplicatedCheckData);
+    const response = await axios.post(apiAddress+`/v1/user/email/check-id`, {id:email});
+    console.log('사용자 이메일 인증코드 전송 성공:', response.data);
+    return response;
+  } catch (error) {
+    console.error('사용자 이메일 인증코드 전송 실패:', error);
+    const response = error.response
+    return response
+    // throw error;
+  }
+};
+// 사용자 이메일 인증코드 검증
+export const userEmailCodeVerificate = async (emailVerificationCode) => {
+  try {
+    // const response = await axios.get(apiAddress+`/v1/user/${idDuplicatedCheckData.id}`, idDuplicatedCheckData);
+    const response = await axios.post(apiAddress+`/v1/user/email/check-code`, {code:emailVerificationCode});
+    console.log('사용자 이메일 인증코드 검증 성공:', response.data);
+    return response;
+  } catch (error) {
+    console.error('사용자 이메일 인증코드 검증 실패:', error);
+    const response = error.response
     return response
     // throw error;
   }
@@ -172,7 +201,7 @@ export const userIdDuplicatedCheck = async (idDuplicatedCheckData) => {
 // 사용자 현재 도토리 갯수 조회
 export const userDotoriValueCheck = async (dotoriValueCheckData, accessToken) => {
   try {
-    const response = await axios.get(apiAddress+`/reward/dotori`, dotoriValueCheckData, {
+    const response = await axios.get(apiAddress+`/v1/reward/dotori`, dotoriValueCheckData, {
       headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -180,7 +209,7 @@ export const userDotoriValueCheck = async (dotoriValueCheckData, accessToken) =>
     console.log('사용자 현재 도토리 갯수 조회 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('사용자 현재 도토리 갯수 조회 실패:', error.status, error.data);
+    console.error('사용자 현재 도토리 갯수 조회 실패:', error);
     const response = error.response
     return response
     // throw error;
@@ -189,7 +218,7 @@ export const userDotoriValueCheck = async (dotoriValueCheckData, accessToken) =>
 // 사용자 현재 코인 갯수 조회
 export const userCoinValueCheck = async (coinValueCheckData, accessToken) => {
   try {
-    const response = await axios.get(apiAddress+`/reward/coin`, coinValueCheckData, {
+    const response = await axios.get(apiAddress+`/v1/reward/coin`, coinValueCheckData, {
       headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -197,7 +226,7 @@ export const userCoinValueCheck = async (coinValueCheckData, accessToken) => {
     console.log('사용자 현재 코인 갯수 조회 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('사용자 현재 코인 갯수 조회 실패:', error.status, error.data);
+    console.error('사용자 현재 코인 갯수 조회 실패:', error);
     const response = error.response
     return response
     // throw error;
@@ -206,7 +235,7 @@ export const userCoinValueCheck = async (coinValueCheckData, accessToken) => {
 // 사용자 도토리를 코인전환
 export const userChangeDotoriToCoin = async (changeDotoriToCoinData, accessToken) => {
   try {
-    const response = await axios.patch(apiAddress+`/reward`, changeDotoriToCoinData, {
+    const response = await axios.patch(apiAddress+`/v1/reward`, changeDotoriToCoinData, {
       headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -214,7 +243,7 @@ export const userChangeDotoriToCoin = async (changeDotoriToCoinData, accessToken
     console.log('사용자 도토리를 코인전환 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('사용자 도토리를 코인전환 실패:', error.status, error.data);
+    console.error('사용자 도토리를 코인전환 실패:', error);
     const response = error.response
     return response
     // throw error;

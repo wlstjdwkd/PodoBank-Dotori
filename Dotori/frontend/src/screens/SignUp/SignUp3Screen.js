@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -75,6 +75,9 @@ export default function SignUp3Screen({ navigation, route }) {
         break;
     }
   }
+  useEffect(()=>{
+    // passwordInputRef.current.focus()
+  },[])
 
   return (
     <View style={styles.container}>
@@ -131,6 +134,7 @@ export default function SignUp3Screen({ navigation, route }) {
             secureTextEntry={true}
             value={confirmPassword}
             maxLength={16}
+            returnKeyType ="done"
             ref={confirmPasswordInputRef}
             onSubmitEditing={()=>{
               // if(isConfirmPasswordValid){

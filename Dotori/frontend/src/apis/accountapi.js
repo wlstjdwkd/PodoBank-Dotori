@@ -2,14 +2,13 @@
 
 import axios from 'axios';
 // apiAddress는 수정 필요
-const apiAddress ="http://j9d107.p.ssafy.io:9000"
-
+const apiAddress ="http://j9d107.p.ssafy.io:9100"
 
 // home
 // 계좌 전체 조회
 export const accountWholeInquiry = async (wholeInquiryData, accessToken) => {
   try {
-    const response = await axios.get(apiAddress+`/home`, wholeInquiryData, {
+    const response = await axios.get(apiAddress+`/v1/home`, wholeInquiryData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -26,7 +25,7 @@ export const accountWholeInquiry = async (wholeInquiryData, accessToken) => {
 // 계좌 은행 전체 코드 반환
 export const accountBankCodeReturn = async (bankCodeReturnData, accessToken) => {
   try {
-    const response = await axios.get(apiAddress+`/home/bankList`, bankCodeReturnData, {
+    const response = await axios.get(apiAddress+`/v1/home/bankList`, bankCodeReturnData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -46,7 +45,7 @@ export const accountBankCodeReturn = async (bankCodeReturnData, accessToken) => 
 // 계좌 1원 인증 전송
 export const accountVerificationsOnecentSend = async (verificationsOnecentSendData, accessToken) => {
   try {
-    const response = await axios.post(apiAddress+`/verification`, verificationsOnecentSendData, {
+    const response = await axios.post(apiAddress+`/v1/verification`, verificationsOnecentSendData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -63,7 +62,7 @@ export const accountVerificationsOnecentSend = async (verificationsOnecentSendDa
 // 계좌 1원 인증 번호 확인
 export const accountVerificationsOnecentCheck = async (verificationsOnecentCheckData, accessToken) => {
   try {
-    const response = await axios.post(apiAddress+`/verification/valid`, verificationsOnecentCheckData, {
+    const response = await axios.post(apiAddress+`/v1/verification/valid`, verificationsOnecentCheckData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -83,7 +82,7 @@ export const accountVerificationsOnecentCheck = async (verificationsOnecentCheck
 // 계좌 전체 조회
 export const accountAllInquiry = async (allInquiryData, accessToken) => {
   try {
-    const response = await axios.get(apiAddress+`/account`, allInquiryData, {
+    const response = await axios.get(apiAddress+`/v1/account`, allInquiryData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -100,7 +99,7 @@ export const accountAllInquiry = async (allInquiryData, accessToken) => {
 // 계좌 이름 변경
 export const accountChangeNickname = async (changeNicknameData, accessToken) => {
   try {
-    const response = await axios.patch(apiAddress+`/account/${changeNicknameData.accountName}`, changeNicknameData, {
+    const response = await axios.patch(apiAddress+`/v1/account/${changeNicknameData.accountName}`, changeNicknameData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -117,7 +116,7 @@ export const accountChangeNickname = async (changeNicknameData, accessToken) => 
 // 계좌 삭제
 export const accountDelete = async (deleteData, accessToken) => {
   try {
-    const response = await axios.get(apiAddress+`/account/delete`, deleteData, {
+    const response = await axios.get(apiAddress+`/v1/account/delete`, deleteData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -134,7 +133,7 @@ export const accountDelete = async (deleteData, accessToken) => {
 // 계좌 거래 내역 상세 조회
 export const accountTransactionInquiry = async (transactionInquiryData, accessToken) => {
   try {
-    const response = await axios.get(apiAddress+`/account/payment`, transactionInquiryData, {
+    const response = await axios.get(apiAddress+`/v1/account/payment`, transactionInquiryData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

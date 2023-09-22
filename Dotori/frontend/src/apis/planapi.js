@@ -2,14 +2,13 @@
 
 import axios from 'axios';
 // apiAddress는 수정 필요
-const apiAddress ="http://j9d107.p.ssafy.io:9000"
-
+const apiAddress ="http://j9d107.p.ssafy.io:9100"
 
 // plan
 // 계획 신규 등록
 export const planNewRegister = async (newRegisterData, accessToken) => {
   try {
-    const response = await axios.post(apiAddress+`/plan`, newRegisterData, {
+    const response = await axios.post(apiAddress+`/v1/plan`, newRegisterData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -26,7 +25,7 @@ export const planNewRegister = async (newRegisterData, accessToken) => {
 // 진행중인 계획 조회
 export const planInProgress = async (inProgressData, accessToken) => {
   try {
-    const response = await axios.get(apiAddress+`/plan/${inProgressData.accountSeq}`, newRegisterData, {
+    const response = await axios.get(apiAddress+`/v1/plan/${inProgressData.accountSeq}`, newRegisterData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -43,7 +42,7 @@ export const planInProgress = async (inProgressData, accessToken) => {
 // 계획 중단하기
 export const planTerminate = async (terminateData, accessToken) => {
   try {
-    const response = await axios.patch(apiAddress+`/plan/terminate/${terminateData.planSeq}`, terminateData, {
+    const response = await axios.patch(apiAddress+`/v1/plan/terminate/${terminateData.planSeq}`, terminateData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -60,7 +59,7 @@ export const planTerminate = async (terminateData, accessToken) => {
 // 계획 상태 변경하기
 export const planStatusChange = async (statusChangeData, accessToken) => {
   try {
-    const response = await axios.patch(apiAddress+`/plan/${statusChangeData.status}`, statusChangeData, {
+    const response = await axios.patch(apiAddress+`/v1/plan/${statusChangeData.status}`, statusChangeData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -77,7 +76,7 @@ export const planStatusChange = async (statusChangeData, accessToken) => {
 // 계획 시작 종료 날짜 조회
 export const planScheduleInquiry = async (scheduleInquiryData, accessToken) => {
   try {
-    const response = await axios.get(apiAddress+`/plan/${scheduleInquiryData.accountSeq}`, scheduleInquiryData, {
+    const response = await axios.get(apiAddress+`/v1/plan/${scheduleInquiryData.accountSeq}`, scheduleInquiryData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -97,7 +96,7 @@ export const planScheduleInquiry = async (scheduleInquiryData, accessToken) => {
 // 계획 명세서 상세 조회
 export const planSpecificationDetail = async (specificationDetailData, accessToken) => {
   try {
-    const response = await axios.get(apiAddress+`/specification/detail`, specificationDetailData, {
+    const response = await axios.get(apiAddress+`/v1/specification/detail`, specificationDetailData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -114,7 +113,7 @@ export const planSpecificationDetail = async (specificationDetailData, accessTok
 // 계획 명세서 조회
 export const planSpecificationList = async (specificationListData, accessToken) => {
   try {
-    const response = await axios.get(apiAddress+`/specification`, specificationListData, {
+    const response = await axios.get(apiAddress+`/v1/specification`, specificationListData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

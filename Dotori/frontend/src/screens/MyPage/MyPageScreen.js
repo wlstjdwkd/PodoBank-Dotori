@@ -1,4 +1,5 @@
 import React from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { AntDesign, Entypo, FontAwesome } from "@expo/vector-icons";
 
@@ -8,9 +9,60 @@ const userInfo = {
   birth: "2000-01-01",
   phone: "010-1111-1111",
 };
+
 import HeaderComponent from "../Components/HeaderScreen";
+import { useDispatch, useSelector } from "react-redux";
+import {userLogout} from "../../apis/userapi"
+import {inputgrantType, inputAccessToken, inputRefreshToken} from "../../redux/slices/auth/user"
 
 export default function MyPageScreen({ navigation }) {
+  // 토큰
+  const grantType =  useSelector((state)=>{state.user.grantType})
+  const accessToken =  useSelector((state)=>{state.user.accessToken})
+  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const dispatch = useDispatch()
+  // 그 외
+
+  const doLogout = async () =>{
+    // await AsyncStorage.removeItem('grantType')
+    // await AsyncStorage.removeItem('accessToken')
+    // await AsyncStorage.removeItem('refreshToken')
+    dispatch(inputgrantType(null))
+    dispatch(inputAccessToken(null))
+    dispatch(inputRefreshToken(null))
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'LoginScreen' }],
+    });
+  }
+  // const doLogout = async () =>{
+  //   const response = await userLogout(refreshToken)
+  //   if(response.status === 200){
+  //     console.log("로그아웃 성공")
+  //     try {
+  //       await AsyncStorage.removeItem('refreshToken')
+  //       await AsyncStorage.removeItem('accessToken')
+  //       await AsyncStorage.removeItem('refreshToken')
+  //       dispatch(inputgrantType(null))
+  //       dispatch(inputAccessToken(null))
+  //       dispatch(inputRefreshToken(null))
+  //       navigation.reset({
+  //         index: 0,
+  //         routes: [{ name: 'LoginScreen' }],
+  //       });
+  //     } catch(error) {
+  //       console.log(error)
+  //     }
+  //   }else if(response.status === 400){
+  //     console.log("로그아웃 실패", response.status)
+  //   }
+  // }
+
+  const handleLogout = () => {
+    doLogout()
+  }
+
+
   return (
     <View style={styles.container}>
       <HeaderComponent title="마이페이지"></HeaderComponent>
@@ -100,10 +152,7 @@ export default function MyPageScreen({ navigation }) {
         <TouchableOpacity 
           style={styles.logoutButton}
           onPress={()=>{
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'LoginScreen' }],
-            });
+            handleLogout()
           }}
         >
           <Text style={styles.logoutText}>로그아웃</Text>
