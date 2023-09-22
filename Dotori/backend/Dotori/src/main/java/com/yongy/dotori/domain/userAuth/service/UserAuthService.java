@@ -4,6 +4,7 @@ import com.yongy.dotori.domain.account.entity.Account;
 import com.yongy.dotori.domain.account.repository.AccountRepository;
 import com.yongy.dotori.domain.bank.entity.Bank;
 import com.yongy.dotori.domain.bank.repository.BankRepository;
+import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.userAuth.dto.request.UserAccountCodeDto;
 import com.yongy.dotori.domain.userAuth.dto.request.UserAccountDto;
 import com.yongy.dotori.global.common.BaseResponseBody;
@@ -23,6 +24,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -212,8 +215,12 @@ public class UserAuthService {
 
             fintechTokenRepository.save(FintechToken.of(userAccountCodeDto.getAccountNumber(), fintechCode));
 
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
             Account account = Account.builder()
-                    .accountNumber(userAccountCodeDto.getAccountNumber()).build();
+                    .accountNumber(userAccountCodeDto.getAccountNumber())
+                            .user(user)
+                                    .bank(bankInfo).build();
 
             accountRepository.save(account);
 
