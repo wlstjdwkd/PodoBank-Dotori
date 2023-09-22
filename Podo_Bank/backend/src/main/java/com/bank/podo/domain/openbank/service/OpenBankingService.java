@@ -18,6 +18,7 @@ import com.bank.podo.domain.openbank.repository.FintechUserRepository;
 import com.bank.podo.domain.openbank.repository.ServiceRepository;
 import com.bank.podo.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OpenBankingService {
@@ -66,7 +68,7 @@ public class OpenBankingService {
         accountRepository.save(userAccount);
 
         TransactionHistory senderAccountHistory = TransactionHistory.builder()
-                .transactionType(TransactionType.TRANSFER)
+                .transactionType(TransactionType.WITHDRAWAL)
                 .amount(transferAmount)
                 .balanceAfter(ftAccount.getBalance())
                 .counterAccount(userAccount)
@@ -139,6 +141,8 @@ public class OpenBankingService {
         BigDecimal transferAmount = fintechWithdrawDTO.getAmount();
 
         transfer(fintechUser.getAccount(), fintechService.getAccount(), transferAmount, fintechWithdrawDTO.getContent());
+
+        logOpenBankingWithdraw(fintechUser.getAccount(), transferAmount);
     }
 
     @Transactional
@@ -156,6 +160,8 @@ public class OpenBankingService {
         BigDecimal transferAmount = fintechDepositDTO.getAmount();
 
         transfer(fintechService.getAccount(), receiverAccount, transferAmount, fintechDepositDTO.getContent());
+
+        logOpenBankingDeposit(receiverAccount, transferAmount);
     }
 
     @Transactional
@@ -171,7 +177,7 @@ public class OpenBankingService {
         accountRepository.save(receiverAccount);
 
         TransactionHistory senderAccountHistory = TransactionHistory.builder()
-                .transactionType(TransactionType.TRANSFER)
+                .transactionType(TransactionType.WITHDRAWAL)
                 .amount(amount.negate())
                 .balanceAfter(senderAccount.getBalance())
                 .counterAccount(receiverAccount)
@@ -188,6 +194,8 @@ public class OpenBankingService {
                 .build();
         transactionHistoryRepository.save(senderAccountHistory);
         transactionHistoryRepository.save(receiverAccountHistory);
+
+        logOpenBankingTransfer(senderAccount, receiverAccount, amount);
     }
 
     @Transactional(readOnly = true)
@@ -272,6 +280,31 @@ public class OpenBankingService {
         }
 
         return builder.build();
+    }
+
+    private void logOpenBankingWithdraw(Account account, BigDecimal amount) {
+        log.info("=====" + "\t"
+                + "오픈뱅킹 출금" + "\t"
+                + "계좌번호: " + account.getAccountNumber() + "\t"
+                + "출금액: " + amount + "\t"
+                + "=====");
+    }
+
+    private void logOpenBankingDeposit(Account account, BigDecimal amount) {
+        log.info("===== " + "\t"
+                + "오픈뱅킹 입금" + "\t"
+                + "계좌번호: " + account.getAccountNumber() + "\t"
+                + "입금액: " + amount + "\t"
+                + "=====");
+    }
+
+    private void logOpenBankingTransfer(Account senderAccount, Account receiverAccount, BigDecimal amount) {
+        log.info("===== " + "\t"
+                + "오픈뱅킹 이체" + "\t"
+                + "보내는 계좌번호: " + senderAccount.getAccountNumber() + "\t"
+                + "받는 계좌번호: " + receiverAccount.getAccountNumber() + "\t"
+                + "이체액: " + amount + "\t"
+                + "=====");
     }
 
 }
