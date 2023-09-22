@@ -40,7 +40,7 @@ public class KakaoController {
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "카카오 회원가입 성공"),
             @ApiResponse(responseCode = "201", description = "카카오 로그인 성공"),
-            @ApiResponse(responseCode = "5002", description = "카카오 인증에 실패했습니다.")
+            @ApiResponse(responseCode = "403", description = "카카오 인증에 실패했습니다.")
     })
     @Operation(summary = "카카오 회원가입/로그인", description = "ALL")
     // NOTE : 인가코드 받기
