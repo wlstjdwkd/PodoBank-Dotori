@@ -178,7 +178,7 @@ public class OpenBankingService {
 
         TransactionHistory senderAccountHistory = TransactionHistory.builder()
                 .transactionType(TransactionType.WITHDRAWAL)
-                .amount(amount.negate())
+                .amount(amount)
                 .balanceAfter(senderAccount.getBalance())
                 .counterAccount(receiverAccount)
                 .account(senderAccount)
