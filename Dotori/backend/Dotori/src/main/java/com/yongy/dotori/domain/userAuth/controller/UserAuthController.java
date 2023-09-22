@@ -107,8 +107,18 @@ public class UserAuthController {
     @Operation(summary = "[포도은행에서 1원 인증] 포도은행에 1원 인증코드 검사하기", description = "USER")
     // NOTE : 인증번호 전송
     @PostMapping("/podoBank/check-code")
-    public ResponseEntity<?> checkAccountAuthCode(@RequestBody UserAccountCodeDto userAccountCodeDto) throws ParseException {
+    public ResponseEntity<Void> checkAccountAuthCode(@RequestBody UserAccountCodeDto userAccountCodeDto) throws ParseException {
         return userAuthService.checkAccountAuthCode(userAccountCodeDto);
     }
+
+    @ApiResponse(responseCode = "200", description = "계좌이름 설정 완료")
+    @Operation(summary = "계좌의 이름 설정하기", description = "USER")
+    @PostMapping("/account/title")
+    public ResponseEntity<Void> setAccountName(@RequestParam String accountNumber,@RequestParam String accountTitle){
+        Account account = accountRepository.findByAccountNumberAndDeleteAtIsNull(accountNumber);
+        account.setAccountTitle(accountTitle);
+        return ResponseEntity.ok().build();
+    }
+
 
 }
