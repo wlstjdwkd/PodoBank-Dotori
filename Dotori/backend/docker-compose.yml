@@ -15,6 +15,18 @@ services:
       - TZ=Asia/Seoul
     depends_on:
       - redis
+  chatGPT-service:
+    image: bangjinseong/dotori-chatGPT-service:${BUILD_NUMBER}
+    build:
+      context: ./chatGPT-service
+      dockerfile: Dockerfile
+      args:
+        - BUILD_NUMBER
+    ports:
+      - "9120:9120"
+    environment:
+      - ENCRYPT_KEY=${ENCRYPT_KEY_VALUE}
+      - TZ=Asia/Seoul
   redis:
     image: redis
     ports:
