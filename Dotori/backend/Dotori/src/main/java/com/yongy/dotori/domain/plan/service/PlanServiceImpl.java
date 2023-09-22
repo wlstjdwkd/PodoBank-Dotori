@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -50,22 +51,30 @@ public class PlanServiceImpl implements PlanService{
                 .totalSavings(BigDecimal.ZERO)
                 .build());
 
+
         List<CategoryGroupListDTO> groupList = planDTO.getCategoryGroupList();
+        List<CategoryGroup> categoryGroupList = new ArrayList<>();
+        List<Category> categoryList = new ArrayList<>();
+        List<PlanDetail> planDetailList = new ArrayList<>();
         for(CategoryGroupListDTO group : groupList){
             // 카테고리 그룹 만들기
-            CategoryGroup categoryGroup= categoryGroupRepository.save(CategoryGroup.builder()
+            CategoryGroup categoryGroup = CategoryGroup.builder()
                     .user(loginUser)
-                    .groupTitle(group.getGroupTitle()).build());
+                    .groupTitle(group.getGroupTitle()).build();
+
+            categoryGroupList.add(categoryGroup);
 
             // 카테고리 만들기 +  Plan에 딸린 실행중인 카테고리인 PlanDetail 생성
             List<CategoryDTO> categorise = group.getCategoryDTOList();
             for(CategoryDTO data : categorise){
-                Category category = categoryRepository.save(Category.builder()
+                Category category = Category.builder()
                         .user(loginUser)
                         .categoryTitle(data.getCategoryName())
-                        .build());
+                        .build();
 
-                planDetailRepository.save(PlanDetail.builder()
+                categoryList.add(category);
+
+                planDetailList.add(PlanDetail.builder()
                         .plan(plan)
                         .category(category)
                         .categoryGroup(categoryGroup)
@@ -74,6 +83,10 @@ public class PlanServiceImpl implements PlanService{
                         .build());
             }
         }
+
+        categoryGroupRepository.saveAll(categoryGroupList);
+        categoryRepository.saveAll(categoryList);
+        planDetailRepository.saveAll(planDetailList);
     }
 
     @Transactional
