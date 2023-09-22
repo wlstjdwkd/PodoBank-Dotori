@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -6,9 +6,57 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
+  Alert,
 } from "react-native";
 
 export default function LoginScreen({ navigation }) {
+  const idRef = useRef(null)
+  const passwordRef = useRef(null)
+  const [idSave, setIdSave] = useState(false) // 아이디 저장여부
+  const [emailValue, setEmailValue] = useState("")
+  const [passwordValue, setPasswordValue] = useState("")
+  const [loginMessage, setLoginMessage] = useState("")
+
+
+  const handleLogin = () => {
+    console.log(emailValue+'and'+passwordValue)
+    if (!emailValue) {
+      setLoginMessage("이메일을 입력해주세요.");
+      idRef.current.focus()
+    } else if (!passwordValue) {
+      setLoginMessage("비밀번호를 입력해주세요.");
+      passwordRef.current.focus()
+    } else {
+      console.log('로그인하기');
+      doLogin();
+    }
+  }
+  
+
+  const doLogin = () => {
+    console.log("로그인완료")
+    // navigation.navigate("MainPageScreen")
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'MainPageScreen' }],
+    });
+    // cosnt data = {email:emailValue, password:passwordValue}
+    // const response = await 어쩌고함수()
+    // if(response.status === 200){
+    //   console.log('로그인 성공')
+    //   navigation.navigate("MainPageScreen")
+      // navigation.reset({
+      //   index: 0,
+      //   routes: [{ name: 'MainPageScreen' }],
+      // });
+    // }else if(response.status === 400){
+    //   console.log('로그인 실패')
+    //   Alert.alert('로그인 실패', 아이디와 비밀번호를 확인해주세요.)
+    //   setLoginMessage("아이디와 비밀번호를 확인해주세요.")
+    // }else{
+    //   console.log('오류 발생: 로그인 실패')
+    // }
+  }
   return (
     <View style={styles.container}>
       <Image
@@ -16,18 +64,59 @@ export default function LoginScreen({ navigation }) {
         source={require("../../assets/images/dotori_logo.png")}
       />
 
-      <TextInput style={styles.input} placeholder="이메일" />
-      <TextInput style={styles.input} placeholder="비밀번호" />
+      <TextInput
+        style={styles.input}
+        placeholder="이메일" 
+        keyboardType="email-address"
+        returnKeyType ="next"
+        ref = {idRef}
+        value = {emailValue}
+        onChangeText={(text)=>{
+          setEmailValue(text)
+        }}
+        onSubmitEditing={()=>{
+          passwordRef.current.focus()
+        }}
+      />
+      <TextInput 
+        style={styles.input} 
+        placeholder="비밀번호" 
+        keyboardType="default"
+        returnKeyType ="done"
+        secureTextEntry={true}
+        ref = {passwordRef}
+        value= {passwordValue}
+        onChangeText={(text)=>{
+          setPasswordValue(text)
+        }}
+        onSubmitEditing={()=>{
+          handleLogin()
+        }}
+      />
 
-      <View style={styles.checkboxContainer}>
-        <View style={styles.checkbox} />
-        <Text style={{ color: "#878787" }}>아이디저장</Text>
+      <TouchableOpacity
+        style={styles.idSave}
+        onPress={()=>{
+          setIdSave(!idSave)
+        }}
+      >
+        <View style={styles.checkboxContainer}>
+          <View style={[styles.checkbox]}>
+            {idSave
+            ?(<Text style={{textAlign:'center'}}>✔️</Text>)
+            :null}
+          </View>
+          {/* <View style={[styles.checkbox, {backgroundColor:idSave?'black':'white'}]}></View> */}
+          <Text style={{ color: "#878787" }}>아이디저장</Text>
+        </View>
+      </TouchableOpacity>
+      <View style={styles.referenceMessage}>
+        <Text style={[styles.referenceMessageText, ]}>{loginMessage}</Text>
       </View>
-
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          navigation.navigate("MainPageScreen")
+          handleLogin()
         }}
       >
         <Text style={styles.buttonText}>로그인</Text>
@@ -36,6 +125,7 @@ export default function LoginScreen({ navigation }) {
       <View style={styles.linksContainer}>
         <TouchableOpacity
           onPress={()=>{
+            Alert.alert('', '아이디 찾기 구현 필요')
             navigation.navigate("LoginScreen")
           }}
         >
@@ -45,6 +135,7 @@ export default function LoginScreen({ navigation }) {
         <Text style={styles.linkText}>|</Text>
         <TouchableOpacity
           onPress={()=>{
+            Alert.alert('', '비밀번호 찾기 구현 필요')
             navigation.navigate("LoginScreen")
           }}
         >
@@ -116,7 +207,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start", // 추가: 왼쪽 정렬
-    marginBottom: 30,
+    // marginBottom: 30,
   },
   checkbox: {
     width: 20,
@@ -169,4 +260,14 @@ const styles = StyleSheet.create({
   linkText: {
     color: "#858585",
   },
+  idSave:{
+    width:"100%", 
+    // marginBottom: 30,
+  },
+  referenceMessage:{
+    marginVertical: 10,
+  },
+  referenceMessageText:{
+    color: 'red',
+  }
 });
