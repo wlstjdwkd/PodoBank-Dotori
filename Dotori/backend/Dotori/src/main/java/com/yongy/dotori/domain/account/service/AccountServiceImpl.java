@@ -12,6 +12,7 @@ import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.userAuth.service.UserAuthService;
 import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class AccountServiceImpl implements AccountService{
@@ -37,7 +39,7 @@ public class AccountServiceImpl implements AccountService{
     @Override
     public List<AccountDTO> findAllAccount() throws JsonProcessingException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Account> accounts = user.getAccountList();
+        List<Account> accounts = accountRepository.findAllByUserUserSeq(user.getUserSeq());
         List<AccountDTO> result = new ArrayList<>();
 
         for(Account account : accounts){
@@ -61,8 +63,9 @@ public class AccountServiceImpl implements AccountService{
         httpHeaders.add("Authorization","Bearer " + accessToken);
 
         Map<String, String> bodyData = new HashMap<>();
-        bodyData.put("serviceCode", accessToken);
-        bodyData.put("fintechCode", fintechTokenRepository.findByAccountNumber(account.getAccountNumber()).getFintechCode());
+        bodyData.put("serviceCode", bankInfo.getServiceCode());
+        bodyData.put("fintechCode", fintechTokenRepository.findById(account.getAccountNumber()).get().getFintechCode());
+        log.info(fintechTokenRepository.findById(account.getAccountNumber()).get().getFintechCode());
 
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, httpHeaders);
 
@@ -70,7 +73,7 @@ public class AccountServiceImpl implements AccountService{
 
         ResponseEntity<String> response = restTemplate.exchange(
                 bankInfo.getBankUrl()+"/api/v1/fintech/balance",
-                HttpMethod.GET,
+                HttpMethod.POST,
                 httpEntity,
                 String.class
         );

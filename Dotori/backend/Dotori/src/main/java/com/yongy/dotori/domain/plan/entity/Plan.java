@@ -71,4 +71,9 @@ public class Plan {
         this.endAt = plan.endAt;
         this.planState = plan.planState;
     }
+
+    public Plan updateState(State state){
+        this.planState = state;
+        return this;
+    }
 }
