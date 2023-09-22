@@ -87,8 +87,6 @@ public class ChatGPTService {
                     .build());
         }
 
-
-
         return result;
     }
 }
