@@ -6,6 +6,8 @@ import com.yongy.dotori.domain.purpose.dto.PurposeDetailDTO;
 import com.yongy.dotori.domain.purpose.dto.PurposeSummaryDTO;
 import com.yongy.dotori.domain.purpose.service.PurposeServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,9 @@ public class PurposeController {
     }
 
     @Operation(summary = "전체 목표 리스트 조회")
+    @ApiResponses(
+            @ApiResponse()
+    )
     @GetMapping()
     public ResponseEntity<PurposeAllDTO> findAllPurpose(){
         // 전체 목표 리스트 조회

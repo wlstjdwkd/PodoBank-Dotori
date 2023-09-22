@@ -67,8 +67,22 @@ public class Purpose {
     }
 
     public void update(Purpose purpose){
-        this.endAt = purpose.getEndAt();
-        this.isTerminated = purpose.isTerminated;
-        this.terminatedAt = purpose.terminatedAt;
+        if(purpose.endAt != null){
+            this.endAt = purpose.endAt;
+        }
+        if(purpose.isTerminated){
+            this.isTerminated = false;
+        }
+        if(purpose.terminatedAt != null){
+            this.terminatedAt = purpose.terminatedAt;
+        }
+        if(purpose.currentBalance != null){
+            this.currentBalance = purpose.currentBalance;
+        }
+    }
+
+    public Purpose addCurrentBalance(BigDecimal amount){
+        this.currentBalance = this.currentBalance.add(amount);
+        return this;
     }
 }

@@ -1,44 +1,69 @@
 package com.yongy.dotori.domain.plan.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yongy.dotori.domain.account.dto.BodyDataDTO;
+import com.yongy.dotori.domain.account.entity.Account;
 import com.yongy.dotori.domain.account.repository.AccountRepository;
+import com.yongy.dotori.domain.bank.entity.Bank;
+import com.yongy.dotori.domain.bank.repository.BankRepository;
 import com.yongy.dotori.domain.category.entity.Category;
 import com.yongy.dotori.domain.category.repository.CategoryRepository;
 import com.yongy.dotori.domain.categoryGroup.entity.CategoryGroup;
 import com.yongy.dotori.domain.categoryGroup.repository.CategoryGroupRepository;
-import com.yongy.dotori.domain.plan.dto.CategoryDTO;
-import com.yongy.dotori.domain.plan.dto.CategoryGroupListDTO;
-import com.yongy.dotori.domain.plan.dto.PlanDTO;
+import com.yongy.dotori.domain.plan.dto.*;
 import com.yongy.dotori.domain.plan.entity.Plan;
 import com.yongy.dotori.domain.plan.entity.State;
 import com.yongy.dotori.domain.plan.repository.PlanRepository;
 import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotori.domain.planDetail.repository.PlanDetailRepository;
+import com.yongy.dotori.domain.purpose.entity.Purpose;
+import com.yongy.dotori.domain.purpose.repository.PurposeRepository;
+import com.yongy.dotori.domain.purposeData.entity.PurposeData;
+import com.yongy.dotori.domain.purposeData.repository.PurposeDataRepository;
 import com.yongy.dotori.domain.user.entity.User;
+import com.yongy.dotori.domain.userAuth.service.UserAuthService;
+import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.methods.HttpHead;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PlanServiceImpl implements PlanService{
+public class PlanServiceImpl implements PlanService {
 
     private final PlanRepository planRepository;
     private final AccountRepository accountRepository;
     private final CategoryGroupRepository categoryGroupRepository;
     private final CategoryRepository categoryRepository;
     private final PlanDetailRepository planDetailRepository;
+    private final PurposeRepository purposeRepository;
+    private final BankRepository bankRepository;
+    private final UserAuthService userAuthService;
+    private final FintechTokenRepository fintechTokenRepository;
+    private final PurposeDataRepository purposeDataRepository;
+
 
     @Override
     public void createPlan(PlanDTO planDTO) {
         User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+        log.info(accountRepository.findByAccountSeq(planDTO.getAccountSeq())+"");
         Plan plan = planRepository.save(Plan.builder()
                 .user(loginUser)
                 .account(accountRepository.findByAccountSeq(planDTO.getAccountSeq()))
@@ -51,15 +76,15 @@ public class PlanServiceImpl implements PlanService{
                 .build());
 
         List<CategoryGroupListDTO> groupList = planDTO.getCategoryGroupList();
-        for(CategoryGroupListDTO group : groupList){
+        for (CategoryGroupListDTO group : groupList) {
             // 카테고리 그룹 만들기
-            CategoryGroup categoryGroup= categoryGroupRepository.save(CategoryGroup.builder()
+            CategoryGroup categoryGroup = categoryGroupRepository.save(CategoryGroup.builder()
                     .user(loginUser)
                     .groupTitle(group.getGroupTitle()).build());
 
             // 카테고리 만들기 +  Plan에 딸린 실행중인 카테고리인 PlanDetail 생성
             List<CategoryDTO> categorise = group.getCategoryDTOList();
-            for(CategoryDTO data : categorise){
+            for (CategoryDTO data : categorise) {
                 Category category = categoryRepository.save(Category.builder()
                         .user(loginUser)
                         .categoryTitle(data.getCategoryName())
@@ -83,7 +108,7 @@ public class PlanServiceImpl implements PlanService{
         Plan plan = planRepository.findByPlanSeq(planSeq);
 
         // TODO 진행중인 계획이 아니면 Exception 던지기
-        if(plan.getPlanState() != State.ACTIVE){
+        if (plan.getPlanState() != State.ACTIVE) {
 
         }
 
@@ -92,6 +117,63 @@ public class PlanServiceImpl implements PlanService{
                 .planState(State.INACTIVE)
                 .build());
     }
+
+    @Override
+    public void saving(SavingDTO savingDTO) {
+        Plan plan = planRepository.findByPlanSeq(savingDTO.getPlanSeq());
+        Account account = plan.getAccount();
+        Bank bankInfo = bankRepository.findByBankSeq(account.getBank().getBankSeq());
+        String accessToken = userAuthService.getConnectionToken(bankInfo.getBankSeq()); // 은행 accessToken 가져오기
+
+        // NOTE : plan에 연결된 계좌에서 총 금액을 도토리 계좌로 입금 요청하기
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Type", "application/json;charset=utf-8");
+        httpHeaders.add("Authorization","Bearer " + accessToken);
+
+        Map<String, String> bodyData = new HashMap<>();
+        bodyData.put("serviceCode", bankInfo.getServiceCode());
+        bodyData.put("fintechCode", fintechTokenRepository.findById(account.getAccountNumber()).get().getFintechCode());
+        bodyData.put("amount", savingDTO.getTotalSaving().toString());
+        bodyData.put("content", "도토리 저축");
+
+        HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, httpHeaders);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                bankInfo.getBankUrl()+"/api/v1/fintech/withdraw",
+                HttpMethod.POST,
+                httpEntity,
+                String.class
+        );
+
+        String responseCode = response.getStatusCode().toString().split(" ")[0];
+        if(responseCode.equals("200")){
+
+            // 1. 각 목표에 따라 저축 금액 update 하기
+            for (PurposeSavingDTO data : savingDTO.getPurposeSavingList()) {
+                Purpose purpose = purposeRepository.findByPurposeSeq(data.getPurposeSeq());
+
+                // 현재 금액에 저축 금액 더하기
+                purpose.addCurrentBalance(data.getSavingAmount());
+                purposeRepository.save(purpose);
+                log.info(purpose.getCurrentBalance()+"");
+
+                // 1-2. purpose_data 저장하기
+                // 각 purpose에 연결된 purpose_data에 저장
+                purposeDataRepository.save(PurposeData.builder()
+                                .account(account)
+                                .dataAmount(savingDTO.getTotalSaving())
+                        .build());
+
+            }
+
+            // 1-1. 계획 종료 표시하기
+
+
+            return ;
+        }
+
+        throw new IllegalArgumentException("출금에 실패했습니다.");
+    }
 }
-
-
