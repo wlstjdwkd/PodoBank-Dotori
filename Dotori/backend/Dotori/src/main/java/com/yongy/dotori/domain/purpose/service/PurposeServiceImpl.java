@@ -37,7 +37,7 @@ public class PurposeServiceImpl implements PurposeService{
                         .currentBalance(BigDecimal.ZERO)
                         .startedAt(purposeDTO.getStartedAt())
                         .endAt(purposeDTO.getEndAt())
-                        .isTerminated(false)
+                        .terminated(false)
                         .terminatedAt(purposeDTO.getEndAt())
                 .build());
     }
