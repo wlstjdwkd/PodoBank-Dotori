@@ -217,6 +217,8 @@ public class UserAuthService {
 
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+            log.info("fintechCode : "+ fintechCode);
+
             Account account = Account.builder()
                     .accountNumber(userAccountCodeDto.getAccountNumber())
                     .user(user)
