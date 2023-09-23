@@ -1,18 +1,15 @@
-package com.yongy.dotori.domain.account.controller;
+package com.yongy.dotori.domain.plan.controller;
 
-
-import com.yongy.dotori.domain.account.exception.ExistAccountNumberException;
+import com.yongy.dotori.domain.plan.exception.PaymentUpdateBeforeException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
-public class AccountControllerAdvice {
+public class PlanControllerAdvice {
 
     @ExceptionHandler
-    public ResponseEntity<?> handleExistAccountNumberException(ExistAccountNumberException e){
+    public ResponseEntity<?> HandlerPaymentUpdateBeforeException(PaymentUpdateBeforeException e){
         return ResponseEntity.status(404).body(e.getMessage());
     }
-    
-
 }
