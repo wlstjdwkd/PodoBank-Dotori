@@ -3,6 +3,7 @@ package com.yongy.dotori.domain.categoryGroup.controller;
 import com.yongy.dotori.domain.categoryGroup.dto.CategoryGroupDTO;
 import com.yongy.dotori.domain.categoryGroup.repository.CategoryGroupRepository;
 import com.yongy.dotori.domain.categoryGroup.service.CategoryGroupService;
+import com.yongy.dotori.domain.categoryGroup.service.CategoryGroupServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import java.util.List;
 @RequestMapping("/v1/categoryGroup")
 public class CategoryGroupController {
 
-    private final CategoryGroupService categoryGroupService;
+    private final CategoryGroupServiceImpl categoryGroupService;
 
     @Operation(summary = "카테고리 그룹 리스트 조회")
     @GetMapping("/")
