@@ -10,7 +10,7 @@ import com.yongy.dotori.domain.bank.entity.Bank;
 import com.yongy.dotori.domain.bank.repository.BankRepository;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.userAuth.service.UserAuthService;
-import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
+// import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -32,7 +32,7 @@ public class AccountServiceImpl implements AccountService{
     private final BankRepository bankRepository;
     private final UserAuthService userAuthService;
     private final AccountRepository accountRepository;
-    private final FintechTokenRepository fintechTokenRepository;
+    // private final FintechTokenRepository fintechTokenRepository;
 
     @Override
     public List<AccountDTO> findAllAccount() throws JsonProcessingException {
@@ -62,7 +62,7 @@ public class AccountServiceImpl implements AccountService{
 
         Map<String, String> bodyData = new HashMap<>();
         bodyData.put("serviceCode", accessToken);
-        bodyData.put("fintechCode", fintechTokenRepository.findByAccountNumber(account.getAccountNumber()).getFintechCode());
+        bodyData.put("fintechCode", account.getFintechCode());
 
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, httpHeaders);
 
