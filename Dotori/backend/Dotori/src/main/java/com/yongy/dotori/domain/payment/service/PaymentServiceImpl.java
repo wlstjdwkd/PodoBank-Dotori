@@ -50,18 +50,16 @@ public class PaymentServiceImpl implements PaymentService{
 
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    // TODO : 시작날짜, 계좌seq
+    // NOTE : 시작날짜, 계좌seq
     public List<PaymentPodoResDto> getPayments(LocalDateTime updateTime, Long accountSeq) throws ParseException {
         Account account = accountRepository.findByAccountSeq(accountSeq);
         Bank bank = bankRepository.findByBankSeq(account.getBank().getBankSeq());
 
         String useToken = podoBankInfo.getConnectionToken(bank.getBankSeq());
-        log.info(updateTime.toString()+"--"+accountSeq);
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json;charset=utf-8");
         headers.add("Authorization", "Bearer " + useToken);
-
-        log.info("TOKEN : "+ useToken);
 
         HashMap<String, String> bodyData = new HashMap<>();
         bodyData.put("serviceCode",bank.getServiceCode());
@@ -71,9 +69,6 @@ public class PaymentServiceImpl implements PaymentService{
         HttpEntity<HashMap<String, String>> httpEntity = new HttpEntity<>(bodyData, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        log.info("----------1---------- : ");
-
-
 
         ResponseEntity<String> response = restTemplate.exchange(
                 bank.getBankUrl()+"/api/v1/fintech/history",
@@ -82,14 +77,13 @@ public class PaymentServiceImpl implements PaymentService{
                 String.class
         );
 
-        log.info("----------2----------");
 
         List<PaymentPodoResDto> paymentList = new ArrayList<>();
-        log.info(response.getStatusCode().toString().split(" ")[0]);
+
         if(response.getStatusCode().toString().split(" ")[0].equals("200")){
             JSONParser jsonParser = new JSONParser();
             JSONArray jsonArray = (JSONArray) jsonParser.parse(response.getBody());
-            System.out.println("FIND : "+ response.getBody());
+
             PaymentPodoResDto paymentPodoResDto;
             String paymentType = null;
             for(Object obj : jsonArray){
