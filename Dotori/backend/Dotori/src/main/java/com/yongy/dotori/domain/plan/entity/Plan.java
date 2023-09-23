@@ -49,13 +49,16 @@ public class Plan {
     @Column(name="end_at")
     private LocalDateTime endAt;
 
+    @Column(name="updated_at")
+    private LocalDateTime updatedAt;
+
     @OneToMany(mappedBy = "plan")
     private List<PlanDetail> planDetailList;
 
     @Builder
     public Plan(Long planSeq, User user, Account account, State planState,
                 BigDecimal totalSavings, BigDecimal additionalSavings, LocalDateTime saveAt,
-                LocalDateTime startAt, LocalDateTime endAt) {
+                LocalDateTime startAt, LocalDateTime endAt, LocalDateTime updatedAt) {
         this.planSeq = planSeq;
         this.user = user;
         this.account = account;
@@ -65,6 +68,7 @@ public class Plan {
         this.saveAt = saveAt;
         this.startAt = startAt;
         this.endAt = endAt;
+        this.updatedAt = updatedAt;
     }
 
     public void update(Plan plan){
