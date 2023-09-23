@@ -10,6 +10,7 @@ import com.yongy.dotori.domain.user.exception.InvalidAuthCodeException;
 import com.yongy.dotori.domain.user.exception.InvalidIdException;
 import com.yongy.dotori.domain.userAuth.dto.request.UserAccountCodeDto;
 import com.yongy.dotori.domain.userAuth.dto.request.UserAccountDto;
+import com.yongy.dotori.domain.userAuth.dto.request.UserAccountNumberTitleReqDto;
 import com.yongy.dotori.domain.userAuth.exception.FailedOneReqException;
 import com.yongy.dotori.domain.userAuth.service.UserAuthService;
 import com.yongy.dotori.global.common.BaseResponseBody;
@@ -45,7 +46,6 @@ public class UserAuthController {
     @Operation(summary = "[1원 인증의 본인인증] 사용자 이메일에 인증번호 보내기", description = "USER")
     @PostMapping("/own/check-id")
     public ResponseEntity<Void> sendMsgAuthCode(@RequestParam String id){
-
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User authUser = (User)auth.getPrincipal();
 
@@ -113,9 +113,9 @@ public class UserAuthController {
     @ApiResponse(responseCode = "200", description = "계좌이름 설정 완료")
     @Operation(summary = "계좌의 이름 설정하기", description = "USER")
     @PostMapping("/account/title")
-    public ResponseEntity<Void> setAccountName(@RequestParam String accountNumber,@RequestParam String accountTitle){
-        Account account = accountRepository.findByAccountNumberAndDeleteAtIsNull(accountNumber);
-        account.setAccountTitle(accountTitle);
+    public ResponseEntity<Void> setAccountName(@RequestBody UserAccountNumberTitleReqDto userAccountNumberTitleReqDto){
+        Account account = accountRepository.findByAccountNumberAndDeleteAtIsNull(userAccountNumberTitleReqDto.getAccountNumber());
+        account.setAccountTitle(userAccountNumberTitleReqDto.getAccountTitle());
         accountRepository.save(account);
         return ResponseEntity.ok().build();
     }
