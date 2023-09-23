@@ -54,7 +54,6 @@ public class PlanServiceImpl implements PlanService {
     private final PurposeRepository purposeRepository;
     private final BankRepository bankRepository;
     private final UserAuthService userAuthService;
-   // private final FintechTokenRepository fintechTokenRepository;
     private final PurposeDataRepository purposeDataRepository;
 
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -86,13 +85,14 @@ public class PlanServiceImpl implements PlanService {
 
             // 카테고리 만들기 +  Plan에 딸린 실행중인 카테고리인 PlanDetail 생성
             List<ActiveCategoryDTO> categorise = group.getActiveCategoryDTOList();
+            List<PlanDetail> planDetailList = new ArrayList<>();
             for (ActiveCategoryDTO data : categorise) {
                 Category category = categoryRepository.save(Category.builder()
                         .user(loginUser)
                         .categoryTitle(data.getCategoryName())
                         .build());
 
-                planDetailRepository.save(PlanDetail.builder()
+                planDetailList.add(PlanDetail.builder()
                         .plan(plan)
                         .category(category)
                         .categoryGroup(categoryGroup)
@@ -100,6 +100,7 @@ public class PlanServiceImpl implements PlanService {
                         .detailBalance(BigDecimal.ZERO)
                         .build());
             }
+            planDetailRepository.saveAll(planDetailList);
         }
     }
 

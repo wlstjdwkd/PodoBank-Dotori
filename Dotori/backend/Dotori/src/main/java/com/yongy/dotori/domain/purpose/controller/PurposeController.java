@@ -22,6 +22,9 @@ public class PurposeController {
     private final PurposeServiceImpl purposeService;
 
     @Operation(summary = "새로운 목표 생성")
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "목표 생성 성공")
+    })
     @PostMapping()
     public ResponseEntity<Void> createPurpose(@RequestBody PurposeDTO purposeDTO){
         // 새로운 목표 생성
@@ -30,9 +33,9 @@ public class PurposeController {
     }
 
     @Operation(summary = "전체 목표 리스트 조회")
-    @ApiResponses(
-            @ApiResponse()
-    )
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "목표 리스트 조회 성공")
+    })
     @GetMapping()
     public ResponseEntity<PurposeAllDTO> findAllPurpose(){
         // 전체 목표 리스트 조회
@@ -41,6 +44,9 @@ public class PurposeController {
     }
 
     @Operation(summary = "목표 상세 조회")
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "목표 상세 조회 성공")
+    })
     @GetMapping("/{purposeSeq}")
     public ResponseEntity<PurposeDetailDTO> findPurposeDetail(@PathVariable("purposeSeq") Long purposeSeq){
         // 목표 조회
@@ -51,6 +57,9 @@ public class PurposeController {
 
 
     @Operation(summary = "목표 중단")
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "목표 중단 성공")
+    })
     @PatchMapping("/terminate/{purposeSeq}")
     public ResponseEntity<Void> terminatePurpose(@PathVariable("purposeSeq") Long purposeSeq){
         // 목표 중단하기
@@ -59,6 +68,9 @@ public class PurposeController {
     }
 
     @Operation(summary = "목표 진행 현황")
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "목표 진행 현황 반환 성공")
+    })
     @GetMapping("/terminate/{purposeSeq}")
     public ResponseEntity<PurposeSummaryDTO> terminateCheck(@PathVariable("purposeSeq") Long purposeSeq){
         // 목표 중단하기 눌렀을 때 현재 목표 진행 현황 보여줌
