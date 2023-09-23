@@ -6,12 +6,14 @@ import com.yongy.dotori.domain.payment.entity.Payment;
 import com.yongy.dotori.domain.plan.entity.Plan;
 //import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
 
+@Getter
 @NoArgsConstructor
 @Entity(name="plan_details")
 public class PlanDetail {
