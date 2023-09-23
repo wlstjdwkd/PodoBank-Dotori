@@ -11,6 +11,7 @@ import com.yongy.dotori.domain.categoryGroup.repository.CategoryGroupRepository;
 import com.yongy.dotori.domain.plan.dto.*;
 import com.yongy.dotori.domain.plan.entity.Plan;
 import com.yongy.dotori.domain.plan.entity.State;
+import com.yongy.dotori.domain.plan.exception.NotActivePlanException;
 import com.yongy.dotori.domain.plan.repository.PlanRepository;
 import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotori.domain.planDetail.repository.PlanDetailRepository;
@@ -119,6 +120,17 @@ public class PlanServiceImpl implements PlanService {
                 .endAt(LocalDateTime.now())
                 .planState(State.INACTIVE)
                 .build());
+    }
+
+    @Override
+    public void updateState(PlanStateDTO planStateDTO) {
+        Plan plan = planRepository.findByPlanSeq(planStateDTO.getPlanSeq());
+
+        if(!plan.getPlanState().equals(State.ACTIVE)){
+            throw new NotActivePlanException("실행 중인 계획이 아닙니다.");
+        }
+
+        plan.updateState(State.COMPLETED);
     }
 
     @Override
