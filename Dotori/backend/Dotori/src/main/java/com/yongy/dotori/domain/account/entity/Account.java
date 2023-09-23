@@ -40,6 +40,9 @@ public class Account {
 
     private String accountTitle;
 
+    @Column(name="fintech_code")
+    private String fintechCode;
+
     private LocalDateTime deleteAt;
 
     @OneToMany(mappedBy = "account")
@@ -49,12 +52,13 @@ public class Account {
     private Plan plan;
 
     @Builder
-    public Account(Long accountSeq, User user, Bank bank, String accountNumber, String accountTitle, LocalDateTime deleteAt) {
+    public Account(Long accountSeq, User user, Bank bank, String accountNumber, String accountTitle, String fintechCode, LocalDateTime deleteAt) {
         this.accountSeq = accountSeq;
         this.user = user;
         this.bank = bank;
         this.accountNumber = accountNumber;
         this.accountTitle = accountTitle;
+        this.fintechCode = fintechCode;
         this.deleteAt = deleteAt;
     }
 }
