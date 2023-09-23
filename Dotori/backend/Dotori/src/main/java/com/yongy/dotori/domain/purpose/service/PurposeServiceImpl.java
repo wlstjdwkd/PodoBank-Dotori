@@ -45,7 +45,7 @@ public class PurposeServiceImpl implements PurposeService{
     @Override
     public PurposeAllDTO findAllPurpose() {
         User loginUser = this.getLoginUser();
-        List<Purpose> purposeList = purposeRepository.findAllByUserUserSeqAndTerminateIsTrue(loginUser.getUserSeq());
+        List<Purpose> purposeList = purposeRepository.findAllByUserUserSeqAndTerminatedIsTrue(loginUser.getUserSeq());
 
         List<PurposeListDTO> list = new ArrayList<>();
         BigDecimal total = BigDecimal.ZERO;
