@@ -11,6 +11,6 @@ public interface PurposeRepository extends JpaRepository<Purpose, Long> {
     Purpose findByPurposeSeq(Long purposeSeq);
     List<Purpose> findAllByUserUserSeq(Long userSeq);
 
-    List<Purpose> findAllByUserUserSeqAndTerminatedIsTrue(Long userSeq);
+    List<Purpose> findAllByUserUserSeqAndTerminatedIsFalse(Long userSeq);
 
 }

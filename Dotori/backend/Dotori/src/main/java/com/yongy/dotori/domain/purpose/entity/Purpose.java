@@ -55,8 +55,8 @@ public class Purpose {
         if(purpose.endAt != null){
             this.endAt = purpose.endAt;
         }
-        if(purpose.terminated){
-            this.terminated = false;
+        if(!purpose.terminated){
+            this.terminated = true;
         }
         if(purpose.terminatedAt != null){
             this.terminatedAt = purpose.terminatedAt;
