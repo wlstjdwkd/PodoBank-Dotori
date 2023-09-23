@@ -25,12 +25,10 @@ public class PurposeServiceImpl implements PurposeService{
 
     private final PurposeRepository purposeRepository;
     private final PurposeDataRepository purposeDataRepository;
-    private final UserRepository userRepository;
-
 
     @Override
     public void createPurpose(PurposeDTO purposeDTO) {
-        User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User loginUser = this.getLoginUser();
         // 새로운 목표 DB에 저장
         purposeRepository.save(Purpose.builder()
                         .user(loginUser)
@@ -39,15 +37,15 @@ public class PurposeServiceImpl implements PurposeService{
                         .currentBalance(BigDecimal.ZERO)
                         .startedAt(purposeDTO.getStartedAt())
                         .endAt(purposeDTO.getEndAt())
-                        .isTerminated(false)
+                        .terminated(false)
                         .terminatedAt(purposeDTO.getEndAt())
                 .build());
     }
 
     @Override
     public PurposeAllDTO findAllPurpose() {
-        User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Purpose> purposeList = purposeRepository.findAllByUserUserSeq(loginUser.getUserSeq());
+        User loginUser = this.getLoginUser();
+        List<Purpose> purposeList = purposeRepository.findAllByUserUserSeqAndTerminatedIsFalse(loginUser.getUserSeq());
 
         List<PurposeListDTO> list = new ArrayList<>();
         BigDecimal total = BigDecimal.ZERO;
@@ -100,7 +98,7 @@ public class PurposeServiceImpl implements PurposeService{
         purpose.update(Purpose.builder()
                 .endAt(LocalDateTime.now())
                 .terminatedAt(LocalDateTime.now())
-                .isTerminated(true)
+                .terminated(true)
                 .build());
     }
 
@@ -126,5 +124,9 @@ public class PurposeServiceImpl implements PurposeService{
                 .build();
 
         return summary;
+    }
+
+    public User getLoginUser(){
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }
