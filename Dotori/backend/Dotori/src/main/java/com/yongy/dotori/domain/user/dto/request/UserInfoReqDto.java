@@ -9,7 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserInfoReqDto {
-    private Role role;
     private String id;
     private String password;
     private String userName;
@@ -17,8 +16,7 @@ public class UserInfoReqDto {
     private String phoneNumber;
 
     @Builder
-    public UserInfoReqDto(Role role, String id, String password, String userName, String birthDate, String phoneNumber) {
-        this.role = role;
+    public UserInfoReqDto(String id, String password, String userName, String birthDate, String phoneNumber) {
         this.id = id;
         this.password = password;
         this.userName = userName;
