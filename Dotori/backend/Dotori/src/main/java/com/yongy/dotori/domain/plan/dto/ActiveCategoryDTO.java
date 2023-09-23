@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryDTO {
+public class ActiveCategoryDTO {
     String categoryName;
     BigDecimal targetAmount;
 

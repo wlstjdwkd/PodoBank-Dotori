@@ -1,6 +1,6 @@
 package com.yongy.dotori.domain.chatGPT.service;
 import com.yongy.dotori.domain.chatGPT.dto.*;
-import com.yongy.dotori.domain.plan.dto.CategoryDTO;
+import com.yongy.dotori.domain.plan.dto.ActiveCategoryDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -63,10 +63,10 @@ public class ChatGPTService {
         Message message = responseDetailDTO.getChoices().get(0).getMessage();
 
         objectMapper = new ObjectMapper();
-        Map<String, List<CategoryDTO>> dataMap = objectMapper.readValue(message.getContent(), Map.class);
+        Map<String, List<ActiveCategoryDTO>> dataMap = objectMapper.readValue(message.getContent(), Map.class);
 
         List<ResultDataDTO> result = new ArrayList<>();
-        for(Map.Entry<String, List<CategoryDTO>> entry : dataMap.entrySet()){
+        for(Map.Entry<String, List<ActiveCategoryDTO>> entry : dataMap.entrySet()){
             result.add(ResultDataDTO.builder()
                     .categoryGroupName(entry.getKey())
                     .categories(entry.getValue())
