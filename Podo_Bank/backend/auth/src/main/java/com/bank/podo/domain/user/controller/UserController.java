@@ -100,23 +100,23 @@ public class UserController {
         return userService.refresh(refreshToken, request);
     }
 
-    @Operation(summary = "리프레시 토큰 삭제")
+    @Operation(summary = "리프레시 토큰 삭제", hidden = true)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "리프레시 토큰 삭제 성공"),
             @ApiResponse(responseCode = "400", description = "리프레시 토큰 삭제 실패")
     })
-    @GetMapping("/logout/{email}")
-    public ResponseEntity<Void> deleteRefreshToken(@PathVariable String email) {
+    @PostMapping("/logout")
+    public ResponseEntity<Void> deleteRefreshToken(@RequestBody String email) {
         userService.deleteRefreshToken(email);
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "인증 성공 확인")
+    @Operation(summary = "인증 성공 확인", hidden = true)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "인증 성공"),
             @ApiResponse(responseCode = "400", description = "인증 실패")
     })
-    @PostMapping("/email/checkSuccessCode/")
+    @PostMapping("/checkSuccessCode")
     public ResponseEntity<Void> checkSuccessCode(@RequestBody CheckSuccessCodeDTO checkSuccessCodeDTO) {
         boolean success = emailService.checkSuccessCode(checkSuccessCodeDTO.getEmail(),
                 checkSuccessCodeDTO.getSuccessCode(), checkSuccessCodeDTO.getVerificationType());

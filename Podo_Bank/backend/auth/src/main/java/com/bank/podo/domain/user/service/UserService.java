@@ -114,8 +114,11 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteRefreshToken(String token) {
-        refreshTokenRedisRepository.deleteById(token);
+    public void deleteRefreshToken(String email) {
+        log.info(email);
+        refreshTokenRedisRepository.deleteById(email);
+
+        logDeleteRefreshToken(email);
     }
 
     public void checkEmailFormat(String email) {
@@ -157,6 +160,13 @@ public class UserService {
         log.info("=====" + "\t" +
                 "로그인" + "\t" +
                 "이메일: " + user.getEmail() + "\t" +
+                "=====");
+    }
+
+    private void logDeleteRefreshToken(String email) {
+        log.info("=====" + "\t" +
+                "로그아웃" + "\t" +
+                "이메일: " + email + "\t" +
                 "=====");
     }
 }

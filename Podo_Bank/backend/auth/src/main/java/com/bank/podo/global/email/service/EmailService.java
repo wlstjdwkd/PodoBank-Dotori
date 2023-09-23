@@ -107,6 +107,7 @@ public class EmailService {
             return false;
         }
 
+        verificationSuccessRepository.deleteById(email);
         logCheckSuccessCode(email, type);
 
         return true;
