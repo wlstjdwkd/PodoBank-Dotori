@@ -39,6 +39,7 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,19 +61,22 @@ public class PlanServiceImpl implements PlanService {
    // private final FintechTokenRepository fintechTokenRepository;
     private final PurposeDataRepository purposeDataRepository;
 
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
 
     @Override
     public void createPlan(PlanDTO planDTO) {
         User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
         log.info(accountRepository.findByAccountSeq(planDTO.getAccountSeq())+"");
         Plan plan = planRepository.save(Plan.builder()
                 .user(loginUser)
                 .account(accountRepository.findByAccountSeq(planDTO.getAccountSeq()))
-                .startAt(planDTO.getStartedAt())
-                .endAt(planDTO.getEndAt())
+                .startAt(LocalDateTime.parse(planDTO.getStartedAt(), formatter))
+                .endAt(LocalDateTime.parse(planDTO.getEndAt(), formatter))
                 .planState(State.ACTIVE)
-                .saveAt(planDTO.getEndAt())
                 .additionalSavings(BigDecimal.ZERO)
                 .totalSavings(BigDecimal.ZERO)
                 .build());
