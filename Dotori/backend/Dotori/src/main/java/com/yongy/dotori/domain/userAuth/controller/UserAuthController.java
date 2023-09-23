@@ -3,6 +3,7 @@ package com.yongy.dotori.domain.userAuth.controller;
 import com.yongy.dotori.domain.account.entity.Account;
 import com.yongy.dotori.domain.account.exception.ExistAccountNumberException;
 import com.yongy.dotori.domain.account.repository.AccountRepository;
+import com.yongy.dotori.domain.user.dto.request.UserEmailReqDto;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.user.exception.ExpiredAuthCodeException;
 import com.yongy.dotori.domain.user.exception.InvalidAuthCodeException;
@@ -64,15 +65,13 @@ public class UserAuthController {
     @Operation(summary = "[1원 인증의 본인인증] 인증코드 확인하기", description = "USER")
     // NOTE : 1원인증 인증코드 확인하기
     @PostMapping("/own/check-code")
-    public ResponseEntity<Void>validSmsCodeCheck(@RequestParam String code){
-        String authId = userAuthService.getOwnAuthId(code);
-
-        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public ResponseEntity<Void>validSmsCodeCheck(@RequestBody UserEmailReqDto userEmailReqDto){
+        String authId = userAuthService.getOwnAuthId(userEmailReqDto.getCode());
 
         if(authId == null) { // 인증번호의 시간이 만료됨
             throw new ExpiredAuthCodeException("인증번호가 만료되었습니다.");
-        }else if(authId.equals(user.getId())){
-            userAuthService.deleteOwnAuthCode(code); // 인증번호 삭제
+        }else if(authId.equals(userEmailReqDto.getId())){
+            userAuthService.deleteOwnAuthCode(userEmailReqDto.getCode()); // 인증번호 삭제
             return ResponseEntity.ok().build();
         }else{ // 인증번호가 틀림
             throw new InvalidAuthCodeException("인증번호가 올바르지 않습니다.");
