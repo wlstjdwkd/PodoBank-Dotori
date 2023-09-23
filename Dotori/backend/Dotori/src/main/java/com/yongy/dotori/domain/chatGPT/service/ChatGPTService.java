@@ -1,5 +1,7 @@
 package com.yongy.dotori.domain.chatGPT.service;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotori.domain.chatGPT.dto.*;
+import com.yongy.dotori.domain.payment.entity.Payment;
 import com.yongy.dotori.domain.plan.dto.ActiveCategoryDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
@@ -34,22 +36,8 @@ public class ChatGPTService {
         // 대화 메시지 구성
         ObjectMapper objectMapper = new ObjectMapper();
 
-        // 카테고리 그룹, 카테고리를 String으로 바꿔서 message로 전달
-        List<Message> messageList = new ArrayList<>();
-        messageList.add(Message.builder().role("system").content("JSON result like {categoryGroup1:[{categoryName1, targetAmount1}, {categoryName2,targetAmount2}...], categoryGroup2:[{category3, targetAmount3} , {category4, targetAmount4}, ...], ...}").build());
-        messageList.add(Message.builder().role("system").content("all categories must belong to one categoryGroup").build());
-        messageList.add(Message.builder().role("user").content(categoryDataDTO.toString()).build());
-        log.info(categoryDataDTO.toString());
-
-        RequestDTO requestDTO = RequestDTO.builder()
-                .model("gpt-3.5-turbo")
-                .messages(messageList)
-                .temperature(1.0)
-                .maxTokens(256)
-                .topP(1)
-                .frequencyPenalty(0)
-                .presencePenalty(0)
-                .build();
+        // 들어온 객체에 따라 message 및 request 만들기
+        RequestDTO requestDTO = createRequest(categoryDataDTO);
 
         // API 요청 본문 설정
         String requestBody = objectMapper.writeValueAsString(requestDTO);
@@ -74,5 +62,39 @@ public class ChatGPTService {
         }
 
         return result;
+    }
+
+    // NOTE : ChatGPT에 요청할 Request 만들기
+    public RequestDTO createRequest(Object object){
+        List<Message> messageList = new ArrayList<>();
+
+        if(object instanceof CategoryDataDTO){
+            messageList.add(Message.builder().role("system").content("JSON result like {categoryGroup1:[{categoryName1, targetAmount1}, {categoryName2,targetAmount2}...], categoryGroup2:[{category3, targetAmount3} , {category4, targetAmount4}, ...], ...}").build());
+            messageList.add(Message.builder().role("system").content("all categories must belong to one categoryGroup").build());
+            messageList.add(Message.builder().role("user").content(object.toString()).build());
+        }
+
+        if(object instanceof List<?>){
+            messageList.add(Message.builder().role("system").content("JSON result like {category1:[{paymentName1, paymentPrice1}, {paymentName2,paymentPrice2}...], category2:[{category3, paymentPrice3} , {category4, paymentPrice4}, ...], ...}").build());
+            messageList.add(Message.builder().role("system").content("all payments must belong to one category").build());
+            messageList.add(Message.builder().role("user").content(object.toString()).build());
+        }
+
+        RequestDTO requestDTO = RequestDTO.builder()
+                .model("gpt-3.5-turbo")
+                .messages(messageList)
+                .temperature(1.0)
+                .maxTokens(256)
+                .topP(1)
+                .frequencyPenalty(0)
+                .presencePenalty(0)
+                .build();
+
+        return requestDTO;
+    }
+
+    public void getCategoryPaymentList(List<Payment> paymentList) {
+        // 계좌에 연결된 planDetail에 연결된 category 리스트랑 payment 리스트에 있는 name이랑 분류
+
     }
 }

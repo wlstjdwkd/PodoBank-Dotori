@@ -34,6 +34,9 @@ public class Payment {
     @Column(name = "payment_price", nullable = false)
     private BigDecimal paymentPrice;
 
+    @Column(name = "checked")
+    private boolean checked;
+
     @Builder
     public Payment(Long paymentSeq, User user, PlanDetail planDetail, String paymentName, BigDecimal paymentPrice) {
         this.paymentSeq = paymentSeq;

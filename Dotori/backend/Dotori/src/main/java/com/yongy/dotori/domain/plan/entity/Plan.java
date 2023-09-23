@@ -49,6 +49,9 @@ public class Plan {
     @Column(name="end_at")
     private LocalDateTime endAt;
 
+    @Column(name="updated_at")
+    private LocalDateTime updatedAt;
+
     @OneToMany(mappedBy = "plan")
     private List<PlanDetail> planDetailList;
 
