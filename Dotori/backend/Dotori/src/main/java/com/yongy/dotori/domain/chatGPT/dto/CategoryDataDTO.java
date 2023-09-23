@@ -16,7 +16,7 @@ public class CategoryDataDTO {
 
     @Override
     public String toString() {
-        return "카테고리그룹=" + categoryGroups +
-                ", 카테고리=" + categorise;
+        return "categoryGroup=" + categoryGroups +
+                ", categories=" + categorise;
     }
 }

@@ -35,8 +35,8 @@ export const userInfoInquiry = async (infoInquiryData, accessToken) => {
     console.log('사용자 정보 조회 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('사용자 정보 조회 실패:', error.status, error.data);
     const response = error.response
+    console.error('사용자 정보 조회 실패:', response.status, response.data);
     return response
     // throw error;
   }
@@ -155,12 +155,13 @@ export const userExitDotori = async (exitDotoriData, accessToken) => {
 // 사용자 아이디 중복 검사
 export const userIdDuplicatedCheck = async (idDuplicatedCheckData) => {
   try {
-    const response = await axios.get(apiAddress+`/user/${idDuplicatedCheckData.id}`, idDuplicatedCheckData);
+    // const response = await axios.get(apiAddress+`/user/${idDuplicatedCheckData.id}`, idDuplicatedCheckData);
+    const response = await axios.get(apiAddress+`/user/${idDuplicatedCheckData}`);
     console.log('사용자 아이디 중복 검사 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('사용자 아이디 중복 검사 실패:', error.status, error.data);
     const response = error.response
+    console.error('사용자 아이디 중복 검사 실패:', response.status, response.data);
     return response
     // throw error;
   }

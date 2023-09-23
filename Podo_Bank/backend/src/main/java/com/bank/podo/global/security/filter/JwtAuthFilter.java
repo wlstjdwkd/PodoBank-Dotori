@@ -31,6 +31,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("Request received: " + request.getRemoteAddr() + " " + request.getMethod() + " " + request.getRequestURI());
+
         // 헤더에서 토큰 분리
         String token = extractTokenFromRequest(request);
 
@@ -53,5 +54,4 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
         return null;
     }
-
 }

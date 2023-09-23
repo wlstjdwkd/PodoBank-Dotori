@@ -50,6 +50,8 @@ public class JwtProvider {
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .compact();
 
+        logGenerateToken(email, role);
+
         return new Token(accessToken, refreshToken);
     }
 
@@ -80,17 +82,30 @@ public class JwtProvider {
         try {
             claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
         } catch (SignatureException e) {
+            log.info("잘못된 비밀키");
             throw new BadCredentialsException("잘못된 비밀키", e);
         } catch (ExpiredJwtException e) {
+            log.info("만료된 토큰");
             throw new BadCredentialsException("만료된 토큰", e);
         } catch (MalformedJwtException e) {
+            log.info("유효하지 않은 구성의 토큰");
             throw new BadCredentialsException("유효하지 않은 구성의 토큰", e);
         } catch (UnsupportedJwtException e) {
+            log.info("지원되지 않는 형식이나 구성의 토큰");
             throw new BadCredentialsException("지원되지 않는 형식이나 구성의 토큰", e);
         } catch (IllegalArgumentException e) {
+            log.info("잘못된 입력값");
             throw new BadCredentialsException("잘못된 입력값", e);
         }
         return claims;
+    }
+
+    private void logGenerateToken(String email, Role role) {
+        log.info("=====" + "\t" +
+                "JWT 토큰 생성" + "\t" +
+                "email: " + email + "\t" +
+                "role: " + role + "\t" +
+                "=====");
     }
 }
 

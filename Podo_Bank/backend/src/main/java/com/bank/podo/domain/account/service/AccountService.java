@@ -65,6 +65,8 @@ public class AccountService {
                 .build();
         accountRepository.save(account);
 
+        logCreateAccount(account);
+
         return AccountDTO.builder()
                 .accountNumber(account.getAccountNumber())
                 .accountType(account.getAccountType())
@@ -121,7 +123,6 @@ public class AccountService {
             default -> new ArrayList<>();
         };
 
-
         return toTransactionHistoryDTOList(transactionHistoryList);
     }
 
@@ -139,6 +140,8 @@ public class AccountService {
         accountRepository.save(account.update(Account.builder()
                 .password(passwordEncoder.encode(changePasswordDTO.getNewPassword()))
                 .build()));
+
+        logChangePassword(account);
     }
 
     @Transactional
@@ -166,6 +169,7 @@ public class AccountService {
                 .password(passwordEncoder.encode(resetPasswordDTO.getNewPassword()))
                 .build()));
 
+        logResetPassword(account);
     }
 
     @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
@@ -190,6 +194,8 @@ public class AccountService {
                 .content(depositDTO.getContent())
                 .build();
         transactionHistoryRepository.save(depositHistory);
+
+        logDeposit(account, depositAmount);
     }
 
 
@@ -219,6 +225,8 @@ public class AccountService {
                 .content(withdrawDTO.getContent())
                 .build();
         transactionHistoryRepository.save(withdrawalHistory);
+
+        logWithdraw(account, withdrawalAmount);
     }
 
     @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
@@ -261,6 +269,8 @@ public class AccountService {
                 .build();
         transactionHistoryRepository.save(senderAccountHistory);
         transactionHistoryRepository.save(receiverAccountHistory);
+
+        logTransfer(senderAccount, receiverAccount, transferAmount);
     }
 
     public void deleteAccount(DeleteAccountDTO deleteAccountDTO, PasswordEncoder passwordEncoder) {
@@ -276,6 +286,8 @@ public class AccountService {
         }
 
         accountRepository.save(account.delete());
+
+        logDeleteAccount(account);
     }
 
     @Transactional(readOnly = true)
@@ -314,6 +326,8 @@ public class AccountService {
                 .build());
 
         accountRepository.save(account);
+
+        logUpdateAccountNickname(account);
     }
 
     private User getLoginUser() {
@@ -436,5 +450,68 @@ public class AccountService {
                 .interestRate(accountCategory.getInterestRate())
                 .build();
     }
+
+
+
+    private void logCreateAccount(Account account) {
+        log.info("=====" + "\t"
+                + "계좌 생성" + "\t"
+                + "계좌 번호: " + account.getAccountNumber() + "\t"
+                + "=====");
+    }
+
+    private void logDeposit(Account account, BigDecimal depositAmount) {
+        log.info("=====" + "\t"
+                + "입금" + "\t"
+                + "계좌 번호: " + account.getAccountNumber() + "\t"
+                + "입금액: " + depositAmount + "\t"
+                + "=====");
+    }
+
+    private void logWithdraw(Account account, BigDecimal withdrawalAmount) {
+        log.info("=====" + "\t"
+                + "출금" + "\t"
+                + "계좌 번호: " + account.getAccountNumber() + "\t"
+                + "출금액: " + withdrawalAmount + "\t"
+                + "=====");
+    }
+
+    private void logTransfer(Account senderAccount, Account receiverAccount, BigDecimal transferAmount) {
+        log.info("=====" + "\t"
+                + "송금" + "\t"
+                + "송금 계좌 번호: " + senderAccount.getAccountNumber() + "\t"
+                + "수신 계좌 번호: " + receiverAccount.getAccountNumber() + "\t"
+                + "송금액: " + transferAmount + "\t"
+                + "=====");
+    }
+
+    private void logChangePassword(Account account) {
+        log.info("===== " + "\t"
+                + "비밀번호 변경" + "\t"
+                + "계좌 번호: " + account.getAccountNumber() + "\t"
+                + "=====");
+    }
+
+    private void logResetPassword(Account account) {
+        log.info("=====" + "\t"
+                + "비밀번호 초기화" + "\t"
+                + "계좌 번호: " + account.getAccountNumber() + "\t"
+                + "=====");
+    }
+
+    private void logDeleteAccount(Account account) {
+        log.info("=====" + "\t"
+                + "계좌 삭제" + "\t"
+                + "계좌 번호: " + account.getAccountNumber() + "\t"
+                + "=====");
+    }
+
+    private void logUpdateAccountNickname(Account account) {
+        log.info("=====" + "\t"
+                + "계좌 별칭 변경" + "\t"
+                + "계좌 번호: " + account.getAccountNumber() + "\t"
+                + "=====");
+    }
+
 
 }
