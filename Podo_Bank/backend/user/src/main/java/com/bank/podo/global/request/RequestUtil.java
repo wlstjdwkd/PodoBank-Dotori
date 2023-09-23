@@ -1,5 +1,8 @@
 package com.bank.podo.global.request;
 
+import com.bank.podo.domain.user.dto.CheckSuccessCodeDTO;
+import com.bank.podo.domain.user.dto.ResetPasswordDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -23,14 +26,21 @@ public class RequestUtil {
     }
 
     public boolean removeRefreshToken(String email) {
-        String url = authUrl + "/api/v1/auth/logout/" + email;
+        String url = authUrl + "/api/v1/auth/logout";
 
-        return requestApi.apiPost(url, "");
+        return requestApi.apiPost(url, email);
     }
 
-    public boolean checkVerificationSuccess(String successCode, String type) {
-        String url = authUrl + "/api/v1/auth/verification/" + type + "/" + successCode;
+    public boolean checkVerificationSuccess(CheckSuccessCodeDTO checkSuccessCodeDTO) {
+        String url = authUrl + "/api/v1/auth/checkSuccessCode";
 
-        return requestApi.apiGet(url);
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(checkSuccessCodeDTO);
+            return requestApi.apiPost(url, json);
+        } catch (Exception e) {
+            return false;
+        }
+
     }
 }

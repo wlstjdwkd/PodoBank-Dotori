@@ -21,18 +21,6 @@ public class UserController {
 
     private final PasswordEncoder passwordEncoder;
 
-    @Operation(summary = "아이디 중복 체크")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "이메일 사용 가능"),
-            @ApiResponse(responseCode = "409", description = "이메일 중복"),
-            @ApiResponse(responseCode = "422", description = "이메일 형식 오류")
-    })
-    @GetMapping("/email/{email}")
-    public ResponseEntity<Void> checkUsername(@PathVariable String email) {
-        userService.checkUsername(email);
-        return ResponseEntity.ok().build();
-    }
-
     @Operation(summary = "로그아웃", description = "USER")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그아웃 성공"),
@@ -41,9 +29,14 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "토큰 없음")
     })
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
-        userService.logout();
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> logout(@RequestBody String email) {
+        boolean success = userService.logout(email);
+
+        if(success) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @Operation(summary = "회원 정보 조회", description = "USER")
@@ -54,8 +47,8 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "토큰 없음")
     })
     @GetMapping("")
-    public ResponseEntity<UserInfoDTO> getUserInfo() {
-        UserInfoDTO userInfoDTO = userService.getUserInfo();
+    public ResponseEntity<UserInfoDTO> getUserInfo(@RequestBody String email) {
+        UserInfoDTO userInfoDTO = userService.getUserInfo(email);
         return ResponseEntity.ok(userInfoDTO);
     }
 
@@ -69,8 +62,8 @@ public class UserController {
             @ApiResponse(responseCode = "422", description = "비밀번호 형식 오류")
     })
     @PatchMapping("/password/change")
-    public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
-        userService.changePassword(changePasswordDTO, passwordEncoder);
+    public ResponseEntity<Void> changePassword(@RequestBody String email, @RequestBody ChangePasswordDTO changePasswordDTO) {
+        userService.changePassword(email, changePasswordDTO, passwordEncoder);
         return ResponseEntity.ok().build();
     }
 
@@ -96,8 +89,8 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 회원")
     })
     @PostMapping("")
-    public ResponseEntity<Void> deleteUser(@RequestBody UserDeleteDTO userDeleteDTO) {
-        userService.deleteUser(userDeleteDTO, passwordEncoder);
+    public ResponseEntity<Void> deleteUser(@RequestBody String email, @RequestBody UserDeleteDTO userDeleteDTO) {
+        userService.deleteUser(email, userDeleteDTO, passwordEncoder);
         return ResponseEntity.ok().build();
     }
 }
