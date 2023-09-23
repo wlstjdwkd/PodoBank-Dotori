@@ -217,10 +217,13 @@ public class UserAuthService {
 
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+//            Account account = Account.builder()
+//                    .accountNumber(userAccountCodeDto.getAccountNumber())
+//                    .userSeq(user.getUserSeq()).bankSeq(bankInfo.getBankSeq()).build();
+
             Account account = Account.builder()
                     .accountNumber(userAccountCodeDto.getAccountNumber())
-                            .user(user)
-                                    .bank(bankInfo).build();
+                    .user(user).bank(bankInfo).build();
 
             accountRepository.save(account);
 

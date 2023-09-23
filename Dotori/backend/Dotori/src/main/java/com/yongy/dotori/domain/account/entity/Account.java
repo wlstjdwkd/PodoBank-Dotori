@@ -31,6 +31,10 @@ public class Account {
     @ManyToOne
     @JoinColumn(name = "bankSeq")
     private Bank bank;
+//
+//    private Long userSeq;
+//
+//    private Long bankSeq;
 
     private String accountNumber;
 
