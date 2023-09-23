@@ -22,7 +22,7 @@ public class AccountController {
     private final AccountServiceImpl accountService;
 
     @Operation(summary = "전체 계좌 조회")
-    @GetMapping
+    @GetMapping()
     public ResponseEntity<List<AccountDTO>> findAllAccount() throws JsonProcessingException {
         List<AccountDTO> result = accountService.findAllAccount();
         return ResponseEntity.ok(result);

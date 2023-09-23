@@ -96,8 +96,10 @@ public class AccountController {
     })
     @GetMapping("/{accountNumber}/history")
     public ResponseEntity<List<TransactionHistoryDTO>> getAccountHistory(@PathVariable String accountNumber,
-                                             @RequestParam int searchMonth, @RequestParam String transactionType,
-                                             @RequestParam int sortType, @RequestParam int page) {
+                                             @RequestParam(required = false, defaultValue = "1") int searchMonth,
+                                             @RequestParam(required = false, defaultValue = "ALL") String transactionType,
+                                             @RequestParam(required = false, defaultValue = "0") int sortType,
+                                             @RequestParam(required = false, defaultValue = "0") int page) {
         List<TransactionHistoryDTO> accountHistoryList = accountService.getAccountHistory(accountNumber,
                 searchMonth, transactionType, sortType, page);
         return ResponseEntity.ok(accountHistoryList);

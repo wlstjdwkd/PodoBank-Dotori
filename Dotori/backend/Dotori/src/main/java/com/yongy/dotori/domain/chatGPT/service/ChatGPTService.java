@@ -36,24 +36,10 @@ public class ChatGPTService {
 
         // 카테고리 그룹, 카테고리를 String으로 바꿔서 message로 전달
         List<Message> messageList = new ArrayList<>();
+        messageList.add(Message.builder().role("system").content("JSON result like {categoryGroup1:[{categoryName1, targetAmount1}, {categoryName2,targetAmount2}...], categoryGroup2:[{category3, targetAmount3} , {category4, targetAmount4}, ...], ...}").build());
+        messageList.add(Message.builder().role("system").content("all categories must belong to one categoryGroup").build());
         messageList.add(Message.builder().role("user").content(categoryDataDTO.toString()).build());
         log.info(categoryDataDTO.toString());
-        messageList.add(Message.builder().role("assistant").content("Please return it in JSON format, categorizing 카테고리 by 카테고리그룹, using each 카테고리그룹 as the key and returning the corresponding 카테고리 as values in the List<categoryName, targetAmount> format.").build());
-        messageList.add(Message.builder().role("assistant").content("카테고리 and 카테고리그룹 utilize the provided data. Each 카테고리 cannot have duplicates across multiple 카테고리그룹.").build());
-        messageList.add(Message.builder().role("assistant").content("답변 예시\n" +
-                "{\n" +
-                "[\n" +
-                "\"카테고리그룹\":[\n" +
-                "{\n" +
-                "\"categoryName\":\" \",\n" +
-                "\"targetAmount\":0\n" +
-                "},\n" +
-                "...\n" +
-                "]\n" +
-                "},\n" +
-                "]\n" +
-                "...\n" +
-                "}").build());
 
         RequestDTO requestDTO = RequestDTO.builder()
                 .model("gpt-3.5-turbo")

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Alert,
 } from "react-native";
 
 import HeaderComponent from "../Components/HeaderScreen";
@@ -39,7 +40,8 @@ export default function SignUp3Screen({ navigation, route }) {
 
   const handleConfirmPasswordChange = (text) => {
     setConfirmPassword(text);
-    if (text === password && isPasswordValid) {
+    // if ((text === password) && isPasswordValid) {
+    if ((text === password) && validatePassword(text)) {
       setConfirmPasswordMessage("완벽합니다.");
       setIsConfirmPasswordValid(true);
       setUserInfo((prev) => ({ ...prev, password: text }));
@@ -50,7 +52,28 @@ export default function SignUp3Screen({ navigation, route }) {
   };
 
   const gotoSignUp4Screen = () =>{
-    navigation.navigate("SignUp4Screen", { userInfo: userInfo })
+    switch (true) {
+      case !password:
+        Alert.alert('','사용하실 비밀번호를 입력해주세요')
+        passwordInputRef.current.focus()
+        break;
+      case !confirmPassword:
+        Alert.alert('','비밀번호 확인란을 입력해주세요')
+        confirmPasswordInputRef.current.focus()
+        break;
+      case !isPasswordValid:
+        Alert.alert('','비밀번호가 올바른지 확인해주세요.')
+        passwordInputRef.current.focus()
+        break;
+      case !isConfirmPasswordValid:
+        Alert.alert('','비밀번호 확인이 사용하실 비밀번호와 일치하지 않습니다. 비밀번호를 확인해주세요.')
+        confirmPasswordInputRef.current.focus()
+        break;
+      default:
+        console.log(userInfo)
+        navigation.navigate("SignUp4Screen", { userInfo: userInfo })
+        break;
+    }
   }
 
   return (
@@ -77,9 +100,10 @@ export default function SignUp3Screen({ navigation, route }) {
             returnKeyType ="next"
             ref={passwordInputRef}
             onSubmitEditing={()=>{
-              if(isPasswordValid){
-                confirmPasswordInputRef.current.focus()
-              }
+              // if(isPasswordValid){
+              //   confirmPasswordInputRef.current.focus()
+              // }
+              confirmPasswordInputRef.current.focus()
             }}
           />
           <View style={styles.rowContainer}>
@@ -100,7 +124,8 @@ export default function SignUp3Screen({ navigation, route }) {
           <TextInput
             // style={styles.input}
             style={confirmPassword ?styles.input:[styles.input,{fontSize:12}]}
-            placeholder="영문, 숫자, 특수문자 포함 8자 이상 16자 이내"
+            // placeholder="영문, 숫자, 특수문자 포함 8자 이상 16자 이내"
+            placeholder="비밀번호를 다시 입력해주세요."
             placeholderTextColor="#7B7B7B"
             onChangeText={handleConfirmPasswordChange}
             secureTextEntry={true}
@@ -108,10 +133,11 @@ export default function SignUp3Screen({ navigation, route }) {
             maxLength={16}
             ref={confirmPasswordInputRef}
             onSubmitEditing={()=>{
-              if(isConfirmPasswordValid){
-                gotoSignUp4Screen()
-                // navigation.navigate("SignUp4Screen", { userInfo: userInfo })
-              }
+              // if(isConfirmPasswordValid){
+              //   gotoSignUp4Screen()
+              //   // navigation.navigate("SignUp4Screen", { userInfo: userInfo })
+              // }
+              gotoSignUp4Screen()
             }}
 
           />
@@ -131,13 +157,15 @@ export default function SignUp3Screen({ navigation, route }) {
         </ScrollView>
 
         <TouchableOpacity
-          style={styles.button}
+          style={[
+            styles.button, 
+            !(isPasswordValid && isConfirmPasswordValid) && {backgroundColor: "grey",},
+          ]}
           onPress={() =>{
             gotoSignUp4Screen()
             // navigation.navigate("SignUp4Screen", { userInfo: userInfo })
           }}
-          //TODO: 나중에 ! 붙이셈
-          disabled={isPasswordValid && isConfirmPasswordValid}
+          disabled={!isPasswordValid || !isConfirmPasswordValid}
         >
           <Text style={styles.buttonText}>다음</Text>
         </TouchableOpacity>
