@@ -23,7 +23,7 @@ import com.yongy.dotori.domain.purposeData.entity.PurposeData;
 import com.yongy.dotori.domain.purposeData.repository.PurposeDataRepository;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.userAuth.service.UserAuthService;
-import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
+//import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpHead;
@@ -57,7 +57,7 @@ public class PlanServiceImpl implements PlanService {
     private final PurposeRepository purposeRepository;
     private final BankRepository bankRepository;
     private final UserAuthService userAuthService;
-    private final FintechTokenRepository fintechTokenRepository;
+   // private final FintechTokenRepository fintechTokenRepository;
     private final PurposeDataRepository purposeDataRepository;
 
 
@@ -178,7 +178,7 @@ public class PlanServiceImpl implements PlanService {
 
         Map<String, String> bodyData = new HashMap<>();
         bodyData.put("serviceCode", bankInfo.getServiceCode());
-        bodyData.put("fintechCode", fintechTokenRepository.findById(account.getAccountNumber()).get().getFintechCode());
+        bodyData.put("fintechCode", account.getFintechCode());
         bodyData.put("amount", savingDTO.getTotalSaving().toString());
         bodyData.put("content", "도토리 저축");
 
