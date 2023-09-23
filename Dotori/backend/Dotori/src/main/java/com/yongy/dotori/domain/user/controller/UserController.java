@@ -1,5 +1,6 @@
 package com.yongy.dotori.domain.user.controller;
 
+import com.yongy.dotori.domain.user.dto.request.UserEmailReqDto;
 import com.yongy.dotori.domain.user.dto.request.UserInfoReqDto;
 import com.yongy.dotori.domain.user.dto.request.UserLoginReqDto;
 import com.yongy.dotori.domain.user.dto.response.UserInfoResDto;
@@ -77,15 +78,15 @@ public class UserController {
     })
     @Operation(summary = "회원가입의 이메일 인증코드 확인", description = "ALL")
     @PostMapping("/email/check-code")
-    public ResponseEntity<Void> validEmailCodeCheck(@RequestParam String id, @RequestParam(name="code") String code){
+    public ResponseEntity<Void> validEmailCodeCheck(@RequestBody UserEmailReqDto userEmailReqDto){
 
         // NOTE : RedisDB에서 인증코드가 존재하면 사용자의 아이디를 가져온다.
-        String authId = userService.getEmailAuthId(code);
+        String authId = userService.getEmailAuthId(userEmailReqDto.getCode());
 
         if(authId == null) { // 인증번호의 시간이 만료됨
             throw new ExpiredAuthCodeException("인증번호가 만료되었습니다.");
-        }else if(authId.equals(id)){ // 인증번호 일치
-            userService.deleteEmailAuthCode(code); // 인증번호 삭제
+        }else if(authId.equals(userEmailReqDto.getId())){ // 인증번호 일치
+            userService.deleteEmailAuthCode(userEmailReqDto.getCode()); // 인증번호 삭제
             return ResponseEntity.ok().build();
         }else{ // 인증번호 불일치
             throw new InvalidAuthCodeException("인증번호가 올바르지 않습니다.");
