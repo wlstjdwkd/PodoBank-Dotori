@@ -113,6 +113,11 @@ public class UserService {
         return ResponseEntity.badRequest().build();
     }
 
+    @Transactional
+    public void deleteRefreshToken(String token) {
+        refreshTokenRedisRepository.deleteById(token);
+    }
+
     public void checkEmailFormat(String email) {
         String emailPattern =
                 "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";

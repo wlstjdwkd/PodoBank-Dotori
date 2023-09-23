@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1/auth")
 public class UserController {
 
     private final UserService userService;
@@ -98,5 +98,33 @@ public class UserController {
     @PostMapping("/refresh")
     public ResponseEntity<Token> refresh(@RequestParam String refreshToken, HttpServletRequest request) {
         return userService.refresh(refreshToken, request);
+    }
+
+    @Operation(summary = "리프레시 토큰 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리프레시 토큰 삭제 성공"),
+            @ApiResponse(responseCode = "400", description = "리프레시 토큰 삭제 실패")
+    })
+    @GetMapping("/logout/{email}")
+    public ResponseEntity<Void> deleteRefreshToken(@PathVariable String email) {
+        userService.deleteRefreshToken(email);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "인증 성공 확인")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "인증 성공"),
+            @ApiResponse(responseCode = "400", description = "인증 실패")
+    })
+    @PostMapping("/email/checkSuccessCode/")
+    public ResponseEntity<Void> checkSuccessCode(@RequestBody CheckSuccessCodeDTO checkSuccessCodeDTO) {
+        boolean success = emailService.checkSuccessCode(checkSuccessCodeDTO.getEmail(),
+                checkSuccessCodeDTO.getSuccessCode(), checkSuccessCodeDTO.getVerificationType());
+
+        if(success) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

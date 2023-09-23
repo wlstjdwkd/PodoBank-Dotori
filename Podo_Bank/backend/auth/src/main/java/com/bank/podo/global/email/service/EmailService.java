@@ -92,6 +92,26 @@ public class EmailService {
         return EmailVerificationSuccessDTO.builder().email(email).successCode(successCode).build();
     }
 
+    public boolean checkSuccessCode(String email, String successCode, VerificationType type) {
+        VerificationSuccess verificationSuccess = verificationSuccessRepository.findById(email).orElse(null);
+
+        if(verificationSuccess == null) {
+            return false;
+        }
+
+        if(!verificationSuccess.getType().equals(type)) {
+            return false;
+        }
+
+        if(!verificationSuccess.getSuccessCode().equals(successCode)) {
+            return false;
+        }
+
+        logCheckSuccessCode(email, type);
+
+        return true;
+    }
+
     private boolean sendMessage(String email, String subject, String info) {
         MimeMessage message = javaMailSender.createMimeMessage();
 
@@ -147,6 +167,14 @@ public class EmailService {
     }
 
     private void logCheckVerificationCode(String email, VerificationType type) {
+        log.info("=====" + "\t"
+                + "이메일 인증코드 확인" + "\t"
+                + "이메일: " + email + "\t"
+                + "인증 타입: " + type + "\t"
+                + "=====");
+    }
+
+    private void logCheckSuccessCode(String email, VerificationType type) {
         log.info("=====" + "\t"
                 + "이메일 인증코드 확인" + "\t"
                 + "이메일: " + email + "\t"
