@@ -64,7 +64,7 @@ public class ChatGPTService {
         return result;
     }
 
-    // NOTE : ChatGPT에 요청할 Request 만들기
+    // NOTE : ChatGPT에 요청할 Request 만드는 메소드
     public RequestDTO createRequest(Object object){
         List<Message> messageList = new ArrayList<>();
 
