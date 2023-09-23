@@ -77,15 +77,14 @@ public class UserController {
     })
     @Operation(summary = "회원가입의 이메일 인증코드 확인", description = "ALL")
     @PostMapping("/email/check-code")
-    public ResponseEntity<Void> validEmailCodeCheck(@RequestParam(name="code") String code){
+    public ResponseEntity<Void> validEmailCodeCheck(@RequestParam String id, @RequestParam(name="code") String code){
 
         // NOTE : RedisDB에서 인증코드가 존재하면 사용자의 아이디를 가져온다.
         String authId = userService.getEmailAuthId(code);
-        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if(authId == null) { // 인증번호의 시간이 만료됨
             throw new ExpiredAuthCodeException("인증번호가 만료되었습니다.");
-        }else if(authId.equals(user.getId())){ // 인증번호 일치
+        }else if(authId.equals(id)){ // 인증번호 일치
             userService.deleteEmailAuthCode(code); // 인증번호 삭제
             return ResponseEntity.ok().build();
         }else{ // 인증번호 불일치
