@@ -13,13 +13,13 @@ services:
       - SPRING_REDIS_HOST=redis
       - ENCRYPT_KEY=${ENCRYPT_KEY_VALUE}
       - TZ=Asia/Seoul
-    depends_on:
-      - redis
+#    depends_on:
+#      - redis
 
-  redis:
-    image: redis
-    ports:
-      - "9050:6379"
-    volumes:
-      - /etc/redis/redis.conf:/usr/local/etc/redis/redis.conf
-    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+#  redis:
+#    image: redis
+#    ports:
+#      - "9050:6379"
+#    volumes:
+#      - /etc/redis/redis.conf:/usr/local/etc/redis/redis.conf
+#    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
