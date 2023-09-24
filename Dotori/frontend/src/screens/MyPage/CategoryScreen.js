@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import HeaderComponent from "../Components/HeaderScreen";
 import { AntDesign, Entypo, FontAwesome } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
 const categorys = [
   {
     categorySeq: "1",
@@ -51,6 +52,13 @@ const randomColors = [
 ];
 
 export default function CategoryScreen({ navigation }) {
+  // 토큰
+  const grantType =  useSelector((state)=>{state.user.grantType})
+  const accessToken =  useSelector((state)=>{state.user.accessToken})
+  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const dispatch = useDispatch()
+  // 그 외
+  
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={[
