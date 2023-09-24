@@ -19,6 +19,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
@@ -29,6 +30,7 @@ import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 @Service
 public class AccountServiceImpl implements AccountService{
     private final BankRepository bankRepository;
