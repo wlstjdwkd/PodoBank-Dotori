@@ -1,16 +1,14 @@
 package com.yongy.dotori.domain.user.dto.request;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@RequiredArgsConstructor
 public class UserUpdatePasswordReqDto {
     private String beforePassword;
     private String afterPassword;
 
-    @Builder
     public UserUpdatePasswordReqDto(String beforePassword, String afterPassword) {
         this.beforePassword = beforePassword;
         this.afterPassword = afterPassword;
