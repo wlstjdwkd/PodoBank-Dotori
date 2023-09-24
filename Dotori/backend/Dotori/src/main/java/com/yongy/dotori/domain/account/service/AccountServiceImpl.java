@@ -10,8 +10,9 @@ import com.yongy.dotori.domain.bank.entity.Bank;
 import com.yongy.dotori.domain.bank.repository.BankRepository;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.userAuth.service.UserAuthService;
-import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
+// import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -26,18 +27,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class AccountServiceImpl implements AccountService{
     private final BankRepository bankRepository;
     private final UserAuthService userAuthService;
     private final AccountRepository accountRepository;
-    private final FintechTokenRepository fintechTokenRepository;
+    // private final FintechTokenRepository fintechTokenRepository;
 
     @Override
     public List<AccountDTO> findAllAccount() throws JsonProcessingException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Account> accounts = user.getAccountList();
+        List<Account> accounts = accountRepository.findAllByUserUserSeq(user.getUserSeq());
         List<AccountDTO> result = new ArrayList<>();
 
         for(Account account : accounts){
@@ -62,7 +64,7 @@ public class AccountServiceImpl implements AccountService{
 
         Map<String, String> bodyData = new HashMap<>();
         bodyData.put("serviceCode", accessToken);
-        bodyData.put("fintechCode", fintechTokenRepository.findByAccountNumber(account.getAccountNumber()).getFintechCode());
+        bodyData.put("fintechCode", account.getFintechCode());
 
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, httpHeaders);
 
@@ -70,7 +72,7 @@ public class AccountServiceImpl implements AccountService{
 
         ResponseEntity<String> response = restTemplate.exchange(
                 bankInfo.getBankUrl()+"/api/v1/fintech/balance",
-                HttpMethod.GET,
+                HttpMethod.POST,
                 httpEntity,
                 String.class
         );
@@ -86,4 +88,6 @@ public class AccountServiceImpl implements AccountService{
 
         throw new IllegalArgumentException("계좌 정보를 불러오는데 실패했습니다.");
     }
+
+
 }

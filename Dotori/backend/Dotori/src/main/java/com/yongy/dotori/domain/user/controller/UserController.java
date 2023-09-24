@@ -1,7 +1,6 @@
 package com.yongy.dotori.domain.user.controller;
 
-import com.yongy.dotori.domain.user.dto.request.UserInfoReqDto;
-import com.yongy.dotori.domain.user.dto.request.UserLoginReqDto;
+import com.yongy.dotori.domain.user.dto.request.*;
 import com.yongy.dotori.domain.user.dto.response.UserInfoResDto;
 import com.yongy.dotori.domain.user.entity.Provider;
 import com.yongy.dotori.domain.user.entity.Role;
@@ -77,16 +76,15 @@ public class UserController {
     })
     @Operation(summary = "회원가입의 이메일 인증코드 확인", description = "ALL")
     @PostMapping("/email/check-code")
-    public ResponseEntity<Void> validEmailCodeCheck(@RequestParam(name="code") String code){
+    public ResponseEntity<Void> validEmailCodeCheck(@RequestBody UserEmailReqDto userEmailReqDto){
 
         // NOTE : RedisDB에서 인증코드가 존재하면 사용자의 아이디를 가져온다.
-        String authId = userService.getEmailAuthId(code);
-        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String authId = userService.getEmailAuthId(userEmailReqDto.getCode());
 
         if(authId == null) { // 인증번호의 시간이 만료됨
             throw new ExpiredAuthCodeException("인증번호가 만료되었습니다.");
-        }else if(authId.equals(user.getId())){ // 인증번호 일치
-            userService.deleteEmailAuthCode(code); // 인증번호 삭제
+        }else if(authId.equals(userEmailReqDto.getId())){ // 인증번호 일치
+            userService.deleteEmailAuthCode(userEmailReqDto.getCode()); // 인증번호 삭제
             return ResponseEntity.ok().build();
         }else{ // 인증번호 불일치
             throw new InvalidAuthCodeException("인증번호가 올바르지 않습니다.");
@@ -162,12 +160,12 @@ public class UserController {
     })
     @Operation(summary = "새로운 토큰 발급", description = "ALL")
     @PostMapping("/new-token")
-    public ResponseEntity<JwtToken> generateNewToken(String refreshToken){
+    public ResponseEntity<JwtToken> generateNewToken(@RequestBody UserRefreshTokenDto userRefreshTokenDto){
 
         // refreshToken이 유효한 경우
-        if(refreshTokenRepository.findById(refreshToken) != null){
+        if(refreshTokenRepository.findById(userRefreshTokenDto.getRefreshToken()) != null){
 
-            String id = jwtTokenProvider.getUserId(refreshToken);
+            String id = jwtTokenProvider.getUserId(userRefreshTokenDto.getRefreshToken());
             JwtToken jwtToken = jwtTokenProvider.createToken(id , Role.ROLE_USER);
 
             // refreshToken 저장하기
@@ -201,9 +199,9 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "사용자의 생년월일 업데이트 완료")
     @Operation(summary = "사용자의 생년월일 업데이트", description = "USER")
     @PatchMapping("/birthDate")
-    public ResponseEntity<Void>updateBirthDate(@RequestParam String birthDate){
+    public ResponseEntity<Void>updateBirthDate(@RequestBody UserBirthDateReqDto userBirthDateReqDto){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        user.setBirthDate(LocalDate.parse(birthDate));
+        user.setBirthDate(LocalDate.parse(userBirthDateReqDto.getBirthDate()));
         userRepository.save(user);
         return ResponseEntity.ok().build();
     }
@@ -213,9 +211,9 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "사용자의 헨드폰번호 업데이트 완료")
     @Operation(summary = "사용자의 헨드폰번호 업데이트", description = "USER")
     @PatchMapping("/phoneNumber")
-    public ResponseEntity<?>updatePhoneNumber(@RequestParam String phoneNumber){
+    public ResponseEntity<?>updatePhoneNumber(@RequestBody UserPhoneNumberReqDto userPhoneNumberReqDto){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        user.setPhoneNumber(phoneNumber);
+        user.setPhoneNumber(userPhoneNumberReqDto.getPhoneNumber());
         userRepository.save(user);
         return ResponseEntity.ok().build();
     }
@@ -225,18 +223,17 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "사용자 비밀번호 변경 완료"),
             @ApiResponse(responseCode = "403", description = "네이버, 카카오 로그인은 비밀번호를 변경할 수 없습니다."),
             @ApiResponse(responseCode = "404", description = "비밀번호를 확인해주세요.")
-
     })
     @Operation(summary = "사용자의 비밀번호 업데이트", description = "USER")
     @PatchMapping("/password")
-    public ResponseEntity<?>updatePassword(@RequestParam String beforePassword, @RequestParam String afterPassword){
+    public ResponseEntity<?>updatePassword(@RequestBody UserUpdatePasswordReqDto userUpdatePasswordReqDto){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if(!user.getAuthProvider().equals(Provider.DOTORI))
             throw new AccessDeniedSocialPwdException("네이버, 카카오 로그인은 비밀번호를 변경할 수 없습니다.");
 
-        if(passwordEncoder.encode(beforePassword).equals(user.getPassword())){
-            user.setPassword(passwordEncoder.encode(afterPassword));
+        if(passwordEncoder.encode(userUpdatePasswordReqDto.getBeforePassword()).equals(user.getPassword())){
+            user.setPassword(passwordEncoder.encode(userUpdatePasswordReqDto.getAfterPassword()));
             userRepository.save(user);
             return ResponseEntity.ok().build();
         }
@@ -248,9 +245,9 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "사용자 로그아웃 완료")
     @Operation(summary = "사용자 로그아웃", description = "USER")
     @PatchMapping("/logout")
-    public ResponseEntity<String>logout(@RequestParam String refreshToken){
+    public ResponseEntity<String>logout(@RequestBody UserRefreshTokenDto userRefreshTokenDto){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        refreshTokenRepository.deleteById(refreshToken);
+        refreshTokenRepository.deleteById(userRefreshTokenDto.getRefreshToken());
         return ResponseEntity.ok().build(); // FE에서 accessToken 삭제함
     }
 
@@ -259,11 +256,11 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "사용자 탈퇴 완료")
     @Operation(summary = "사용자 탈퇴하기", description = "USER")
     @PatchMapping("/retire")
-    public ResponseEntity<String>retire(String refreshToken){
+    public ResponseEntity<String>retire(@RequestBody UserRefreshTokenDto userRefreshTokenDto){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         user.setExpiredAt(LocalDateTime.now());
         userRepository.save(user);
-        refreshTokenRepository.deleteById(refreshToken);
+        refreshTokenRepository.deleteById(userRefreshTokenDto.getRefreshToken());
         return ResponseEntity.ok().build(); // FE에서 accessToken 삭제함
     }
 
