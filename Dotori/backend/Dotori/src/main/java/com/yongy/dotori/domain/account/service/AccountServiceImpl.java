@@ -10,7 +10,7 @@ import com.yongy.dotori.domain.bank.entity.Bank;
 import com.yongy.dotori.domain.bank.repository.BankRepository;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.userAuth.service.UserAuthService;
-import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
+// import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -34,7 +34,7 @@ public class AccountServiceImpl implements AccountService{
     private final BankRepository bankRepository;
     private final UserAuthService userAuthService;
     private final AccountRepository accountRepository;
-    private final FintechTokenRepository fintechTokenRepository;
+    // private final FintechTokenRepository fintechTokenRepository;
 
     @Override
     public List<AccountDTO> findAllAccount() throws JsonProcessingException {
@@ -63,9 +63,8 @@ public class AccountServiceImpl implements AccountService{
         httpHeaders.add("Authorization","Bearer " + accessToken);
 
         Map<String, String> bodyData = new HashMap<>();
-        bodyData.put("serviceCode", bankInfo.getServiceCode());
-        bodyData.put("fintechCode", fintechTokenRepository.findById(account.getAccountNumber()).get().getFintechCode());
-        log.info(fintechTokenRepository.findById(account.getAccountNumber()).get().getFintechCode());
+        bodyData.put("serviceCode", accessToken);
+        bodyData.put("fintechCode", account.getFintechCode());
 
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, httpHeaders);
 
@@ -89,4 +88,6 @@ public class AccountServiceImpl implements AccountService{
 
         throw new IllegalArgumentException("계좌 정보를 불러오는데 실패했습니다.");
     }
+
+
 }

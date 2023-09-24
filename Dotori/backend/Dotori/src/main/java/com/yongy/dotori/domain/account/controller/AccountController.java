@@ -3,11 +3,13 @@ package com.yongy.dotori.domain.account.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotori.domain.account.dto.AccountDTO;
 import com.yongy.dotori.domain.account.service.AccountServiceImpl;
+import com.yongy.dotori.domain.payment.entity.Payment;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,4 +29,15 @@ public class AccountController {
         List<AccountDTO> result = accountService.findAllAccount();
         return ResponseEntity.ok(result);
     }
+
+//    @Operation(summary = "계좌 내역 가져오기", description = "USER")
+//    @PostMapping("/totalList")
+//    public ResponseEntity<List<Payment>> findAllAcount(String ){
+//
+//    }
+
+
+
+
+
 }

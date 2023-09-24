@@ -1,6 +1,6 @@
 package com.yongy.dotori.domain.chatGPT.dto;
 
-import com.yongy.dotori.domain.plan.dto.CategoryDTO;
+import com.yongy.dotori.domain.plan.dto.ActiveCategoryDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CategoryDataDTO {
     private List<String> categoryGroups;
-    private List<CategoryDTO> categorise;
+    private List<ActiveCategoryDTO> categorise;
 
     @Override
     public String toString() {

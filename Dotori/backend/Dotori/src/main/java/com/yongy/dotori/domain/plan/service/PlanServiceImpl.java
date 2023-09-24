@@ -1,8 +1,5 @@
 package com.yongy.dotori.domain.plan.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yongy.dotori.domain.account.dto.BodyDataDTO;
 import com.yongy.dotori.domain.account.entity.Account;
 import com.yongy.dotori.domain.account.repository.AccountRepository;
 import com.yongy.dotori.domain.bank.entity.Bank;
@@ -23,10 +20,9 @@ import com.yongy.dotori.domain.purposeData.entity.PurposeData;
 import com.yongy.dotori.domain.purposeData.repository.PurposeDataRepository;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.userAuth.service.UserAuthService;
-import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
+//import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.methods.HttpHead;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -39,8 +35,13 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+<<<<<<< HEAD
+import java.util.ArrayList;
+=======
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+>>>>>>> a5a17dab00283bd4a94fa90d0d08d37e87050a77
 import java.util.List;
 import java.util.Map;
 
@@ -57,42 +58,66 @@ public class PlanServiceImpl implements PlanService {
     private final PurposeRepository purposeRepository;
     private final BankRepository bankRepository;
     private final UserAuthService userAuthService;
-    private final FintechTokenRepository fintechTokenRepository;
     private final PurposeDataRepository purposeDataRepository;
+
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 
     @Override
     public void createPlan(PlanDTO planDTO) {
         User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        log.info(accountRepository.findByAccountSeq(planDTO.getAccountSeq())+"");
+        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
         Plan plan = planRepository.save(Plan.builder()
                 .user(loginUser)
                 .account(accountRepository.findByAccountSeq(planDTO.getAccountSeq()))
-                .startAt(planDTO.getStartedAt())
-                .endAt(planDTO.getEndAt())
+                .startAt(LocalDateTime.parse(planDTO.getStartedAt(), formatter))
+                .endAt(LocalDateTime.parse(planDTO.getEndAt(), formatter))
                 .planState(State.ACTIVE)
-                .saveAt(planDTO.getEndAt())
+                .updatedAt(LocalDateTime.parse(planDTO.getStartedAt(), formatter)) // 마지막 업데이트 날짜
                 .additionalSavings(BigDecimal.ZERO)
                 .totalSavings(BigDecimal.ZERO)
                 .build());
 
+
         List<CategoryGroupListDTO> groupList = planDTO.getCategoryGroupList();
+<<<<<<< HEAD
+        List<CategoryGroup> categoryGroupList = new ArrayList<>();
+        List<Category> categoryList = new ArrayList<>();
+        List<PlanDetail> planDetailList = new ArrayList<>();
+        for(CategoryGroupListDTO group : groupList){
+            // 카테고리 그룹 만들기
+            CategoryGroup categoryGroup = CategoryGroup.builder()
+=======
         for (CategoryGroupListDTO group : groupList) {
             // 카테고리 그룹 만들기
             CategoryGroup categoryGroup = categoryGroupRepository.save(CategoryGroup.builder()
+>>>>>>> a5a17dab00283bd4a94fa90d0d08d37e87050a77
                     .user(loginUser)
-                    .groupTitle(group.getGroupTitle()).build());
+                    .groupTitle(group.getGroupTitle()).build();
+
+            categoryGroupList.add(categoryGroup);
 
             // 카테고리 만들기 +  Plan에 딸린 실행중인 카테고리인 PlanDetail 생성
+<<<<<<< HEAD
             List<CategoryDTO> categorise = group.getCategoryDTOList();
-            for (CategoryDTO data : categorise) {
+            for(CategoryDTO data : categorise){
+                Category category = Category.builder()
+=======
+            List<ActiveCategoryDTO> categorise = group.getActiveCategoryDTOList();
+            log.info(categorise.isEmpty()+"");
+            List<PlanDetail> planDetailList = new ArrayList<>();
+            for (ActiveCategoryDTO data : categorise) {
                 Category category = categoryRepository.save(Category.builder()
+>>>>>>> a5a17dab00283bd4a94fa90d0d08d37e87050a77
                         .user(loginUser)
                         .categoryTitle(data.getCategoryName())
-                        .build());
+                        .build();
 
-                planDetailRepository.save(PlanDetail.builder()
+                categoryList.add(category);
+
+                planDetailList.add(PlanDetail.builder()
                         .plan(plan)
                         .category(category)
                         .categoryGroup(categoryGroup)
@@ -100,7 +125,12 @@ public class PlanServiceImpl implements PlanService {
                         .detailBalance(BigDecimal.ZERO)
                         .build());
             }
+            planDetailRepository.saveAll(planDetailList);
         }
+
+        categoryGroupRepository.saveAll(categoryGroupList);
+        categoryRepository.saveAll(categoryList);
+        planDetailRepository.saveAll(planDetailList);
     }
 
     @Transactional
@@ -178,7 +208,7 @@ public class PlanServiceImpl implements PlanService {
 
         Map<String, String> bodyData = new HashMap<>();
         bodyData.put("serviceCode", bankInfo.getServiceCode());
-        bodyData.put("fintechCode", fintechTokenRepository.findById(account.getAccountNumber()).get().getFintechCode());
+        bodyData.put("fintechCode", account.getFintechCode());
         bodyData.put("amount", savingDTO.getTotalSaving().toString());
         bodyData.put("content", "도토리 저축");
 
