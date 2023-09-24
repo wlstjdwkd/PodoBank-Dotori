@@ -77,6 +77,7 @@ public class PlanServiceImpl implements PlanService {
                 .startAt(LocalDateTime.parse(planDTO.getStartedAt(), formatter))
                 .endAt(LocalDateTime.parse(planDTO.getEndAt(), formatter))
                 .planState(State.ACTIVE)
+                .updatedAt(LocalDateTime.parse(planDTO.getStartedAt(), formatter)) // 마지막 업데이트 날짜
                 .additionalSavings(BigDecimal.ZERO)
                 .totalSavings(BigDecimal.ZERO)
                 .build());
