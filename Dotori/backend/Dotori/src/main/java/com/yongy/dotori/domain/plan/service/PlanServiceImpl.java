@@ -86,14 +86,14 @@ public class PlanServiceImpl implements PlanService {
 
             // 카테고리 만들기 +  Plan에 딸린 실행중인 카테고리인 PlanDetail 생성
             List<ActiveCategoryDTO> categorise = group.getActiveCategoryDTOList();
-            List<PlanDetail> planDetailList = new ArrayList<>();
+            //List<PlanDetail> planDetailList = new ArrayList<>();
             for (ActiveCategoryDTO data : categorise) {
                 Category category = categoryRepository.save(Category.builder()
                         .user(loginUser)
                         .categoryTitle(data.getCategoryName())
                         .build());
 
-                planDetailList.add(PlanDetail.builder()
+                planDetailRepository.save(PlanDetail.builder()
                         .plan(plan)
                         .category(category)
                         .categoryGroup(categoryGroup)
@@ -101,7 +101,7 @@ public class PlanServiceImpl implements PlanService {
                         .detailBalance(BigDecimal.ZERO)
                         .build());
             }
-            planDetailRepository.saveAll(planDetailList);
+            //planDetailRepository.saveAll(planDetailList);
         }
     }
 
