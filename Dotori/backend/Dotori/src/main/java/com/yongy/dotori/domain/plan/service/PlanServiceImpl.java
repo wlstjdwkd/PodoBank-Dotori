@@ -9,6 +9,7 @@ import com.yongy.dotori.domain.category.repository.CategoryRepository;
 import com.yongy.dotori.domain.categoryGroup.entity.CategoryGroup;
 import com.yongy.dotori.domain.categoryGroup.repository.CategoryGroupRepository;
 import com.yongy.dotori.domain.plan.dto.*;
+import com.yongy.dotori.domain.plan.dto.response.PlanListDto;
 import com.yongy.dotori.domain.plan.entity.Plan;
 import com.yongy.dotori.domain.plan.entity.State;
 import com.yongy.dotori.domain.plan.repository.PlanRepository;
@@ -67,7 +68,7 @@ public class PlanServiceImpl implements PlanService {
 
         Plan plan = planRepository.save(Plan.builder()
                 .user(loginUser)
-                .account(accountRepository.findByAccountSeq(planDTO.getAccountSeq()))
+                .account(accountRepository.findByAccountSeqAndDeleteAtIsNull(planDTO.getAccountSeq()))
                 .startAt(LocalDateTime.parse(planDTO.getStartedAt(), formatter))
                 .endAt(LocalDateTime.parse(planDTO.getEndAt(), formatter))
                 .planState(State.ACTIVE)
@@ -199,5 +200,16 @@ public class PlanServiceImpl implements PlanService {
         if(!responseCode.equals("200")){
             throw new IllegalArgumentException("출금에 실패했습니다.");
         }
+    }
+
+    public List<PlanListDto> getPlanList(Long userSeq){
+        List<Plan> planList = planRepository.findAllByUserUserSeqAndTerminatedAtIsNull(userSeq);
+        List<PlanListDto> planListDtoList = null;
+        for(Plan plan : planList){
+            planListDtoList.add(PlanListDto.builder().planSeq(plan.getPlanSeq())
+                    .startAt(plan.getStartAt().format(formatter))
+                    .endAt(plan.getEndAt().format(formatter)).build());
+        }
+        return planListDtoList;
     }
 }

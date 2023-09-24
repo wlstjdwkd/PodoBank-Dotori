@@ -52,6 +52,9 @@ public class Plan {
     @Column(name="end_at")
     private LocalDateTime endAt;
 
+    @Column(name="terminate_at")
+    private LocalDateTime terminatedAt;
+
     @Column(name="updated_at")
     private LocalDateTime updatedAt;
 
@@ -61,7 +64,7 @@ public class Plan {
     @Builder
     public Plan(Long planSeq, User user, Account account, State planState,
                 BigDecimal totalSavings, BigDecimal additionalSavings, LocalDateTime saveAt,
-                LocalDateTime startAt, LocalDateTime endAt, LocalDateTime updatedAt) {
+                LocalDateTime startAt, LocalDateTime endAt, LocalDateTime terminatedAt, LocalDateTime updatedAt) {
         this.planSeq = planSeq;
         this.user = user;
         this.account = account;
@@ -71,6 +74,7 @@ public class Plan {
         this.saveAt = saveAt;
         this.startAt = startAt;
         this.endAt = endAt;
+        this.terminatedAt = terminatedAt;
         this.updatedAt = updatedAt;
     }
 

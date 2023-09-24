@@ -64,5 +64,11 @@ public class UserControllerAdvice {
         return ResponseEntity.status(403).body(e.getMessage());
     }
 
+    // NOTE : 탈퇴할 수 없습니다.
+    @ExceptionHandler
+    public ResponseEntity<?> handleFailedRetiredException(FailedRetiredException e){
+        return ResponseEntity.status(404).body(e.getMessage());
+    }
+
 
 }

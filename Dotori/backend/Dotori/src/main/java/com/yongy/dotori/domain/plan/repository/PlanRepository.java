@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface PlanRepository extends JpaRepository<Plan, Long> {
     Plan findByPlanSeq(Long planSeq);
-
     List<Plan> findAllByPlanState(State state);
+
+    List<Plan> findAllByUserUserSeqAndTerminatedAtIsNull(Long userSeq);
 }

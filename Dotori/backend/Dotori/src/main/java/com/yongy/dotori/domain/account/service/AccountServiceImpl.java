@@ -41,7 +41,7 @@ public class AccountServiceImpl implements AccountService{
     @Override
     public List<AccountDTO> findAllAccount() throws JsonProcessingException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Account> accounts = accountRepository.findAllByUserUserSeq(user.getUserSeq());
+        List<Account> accounts = accountRepository.findAllByUserUserSeqAndDeleteAtIsNull(user.getUserSeq());
         List<AccountDTO> result = new ArrayList<>();
 
         for(Account account : accounts){
@@ -56,7 +56,7 @@ public class AccountServiceImpl implements AccountService{
     }
 
     public BigDecimal getBalance(Long accountSeq) throws JsonProcessingException {
-        Account account = accountRepository.findByAccountSeq(accountSeq);
+        Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
         Bank bankInfo = bankRepository.findByBankSeq(account.getBank().getBankSeq());
         String accessToken = userAuthService.getConnectionToken(bankInfo.getBankSeq()); // 은행 accessToken 가져오기
 

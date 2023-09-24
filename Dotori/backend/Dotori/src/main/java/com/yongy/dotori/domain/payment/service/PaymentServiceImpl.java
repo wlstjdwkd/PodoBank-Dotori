@@ -54,7 +54,7 @@ public class PaymentServiceImpl implements PaymentService{
 
     // NOTE : 시작날짜, 계좌seq
     public List<PaymentPodoResDto> getPayments(LocalDateTime updateTime, Long accountSeq) throws ParseException {
-        Account account = accountRepository.findByAccountSeq(accountSeq);
+        Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
         Bank bank = bankRepository.findByBankSeq(account.getBank().getBankSeq());
 
         String useToken = podoBankInfo.getConnectionToken(bank.getBankSeq());

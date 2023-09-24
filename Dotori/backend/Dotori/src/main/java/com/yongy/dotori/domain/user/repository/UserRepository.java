@@ -10,6 +10,5 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByIdAndExpiredAtIsNull(String id);
 
-    int deleteById(String id);
-/// findByIdAndExpiredAtIsNull
+
 }
