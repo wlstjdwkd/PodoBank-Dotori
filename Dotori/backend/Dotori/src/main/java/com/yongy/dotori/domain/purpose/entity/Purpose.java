@@ -42,10 +42,10 @@ public class Purpose {
     @Column(name="end_at", nullable = false)
     private LocalDateTime endAt;
 
-    @Column(name="terminat", nullable = false)
+    @Column(name="terminate", nullable = false)
     private boolean terminated;
 
-    @Column(name="terminat_at")
+    @Column(name="terminate_at")
     private LocalDateTime terminatedAt;
 
     @OneToMany(mappedBy = "purpose")
