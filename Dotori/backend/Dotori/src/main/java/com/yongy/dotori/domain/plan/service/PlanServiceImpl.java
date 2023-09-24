@@ -26,6 +26,7 @@ import com.yongy.dotori.domain.purpose.repository.PurposeRepository;
 import com.yongy.dotori.domain.purposeData.entity.PurposeData;
 import com.yongy.dotori.domain.purposeData.repository.PurposeDataRepository;
 import com.yongy.dotori.domain.user.entity.User;
+import com.yongy.dotori.domain.user.repository.UserRepository;
 import com.yongy.dotori.domain.userAuth.service.UserAuthService;
 //import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,14 +66,13 @@ public class PlanServiceImpl implements PlanService {
     private final UserAuthService userAuthService;
     private final PurposeDataRepository purposeDataRepository;
     private final AccountServiceImpl accountService;
-    //private final PaymentRepository paymentRepository;
-
+    private final UserRepository userRepository;
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 
     @Override
     public void createPlan(PlanDTO planDTO) {
-        User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User loginUser = this.getLoginUser();
 
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -263,5 +264,29 @@ public class PlanServiceImpl implements PlanService {
         if(!responseCode.equals("200")){
             throw new IllegalArgumentException("출금에 실패했습니다.");
         }
+    }
+
+    // NOTE : 12시 되면 날짜 확인하고 실행
+    @Scheduled(cron = "0 0 0 * * *") // 매일 자정에 실행
+    public void startPlan(){
+        // 모든 사용자의 모든 READY인 Plan 가져와서 ACTIVE로 변경하기
+
+        log.info("스케쥴!!");
+
+        List<User> users = userRepository.findAll();
+
+        for(User user : users){
+            List<Plan> plans = planRepository.findAllByUserUserSeqAndPlanState(user.getUserSeq(), State.READY);
+
+            List<Plan> startPlan = new ArrayList<>();
+            for(Plan p : plans){
+                startPlan.add(p.updateState(State.ACTIVE));
+            }
+            planRepository.saveAll(startPlan);
+        }
+    }
+
+    public User getLoginUser(){
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

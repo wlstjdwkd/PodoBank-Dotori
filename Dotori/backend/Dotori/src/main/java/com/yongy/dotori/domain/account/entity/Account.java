@@ -17,7 +17,6 @@ import java.util.List;
 @Setter
 @Getter
 @NoArgsConstructor
-@Getter
 @Entity(name="accounts")
 public class Account {
     @Id

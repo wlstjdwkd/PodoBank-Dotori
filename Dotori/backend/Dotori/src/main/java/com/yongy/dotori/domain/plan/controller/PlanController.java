@@ -6,7 +6,6 @@ import com.yongy.dotori.domain.plan.dto.PlanDTO;
 import com.yongy.dotori.domain.plan.dto.PlanStateDTO;
 import com.yongy.dotori.domain.plan.dto.SavingDTO;
 import com.yongy.dotori.domain.plan.service.PlanServiceImpl;
-import com.yongy.dotori.domain.reward.repository.RewardRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -15,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -39,7 +37,7 @@ public class PlanController {
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "계획 중단 성공")
     })
-    @GetMapping("/stop/{planSeq}")
+    @PatchMapping("/stop/{planSeq}")
     public ResponseEntity<Void> terminatePlan(@PathVariable Long planSeq){
         planService.terminatePlan(planSeq);
         return ResponseEntity.ok().build();
@@ -49,7 +47,7 @@ public class PlanController {
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "저축 성공")
     })
-    @GetMapping("/saving")
+    @PostMapping("/saving")
     public ResponseEntity<Void> saving(@RequestBody SavingDTO savingDTO) {
         planService.saving(savingDTO);
         return ResponseEntity.ok().build();
