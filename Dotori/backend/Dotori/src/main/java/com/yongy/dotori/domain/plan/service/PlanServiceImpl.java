@@ -75,13 +75,13 @@ public class PlanServiceImpl implements PlanService {
 
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        log.info(accountRepository.findByAccountSeq(planDTO.getAccountSeq())+"");
         Plan plan = planRepository.save(Plan.builder()
                 .user(loginUser)
                 .account(accountRepository.findByAccountSeq(planDTO.getAccountSeq()))
                 .startAt(LocalDateTime.parse(planDTO.getStartedAt(), formatter))
                 .endAt(LocalDateTime.parse(planDTO.getEndAt(), formatter))
                 .planState(State.ACTIVE)
+                .updatedAt(LocalDateTime.parse(planDTO.getStartedAt(), formatter)) // 마지막 업데이트 날짜
                 .additionalSavings(BigDecimal.ZERO)
                 .totalSavings(BigDecimal.ZERO)
                 .build());
@@ -95,6 +95,7 @@ public class PlanServiceImpl implements PlanService {
 
             // 카테고리 만들기 +  Plan에 딸린 실행중인 카테고리인 PlanDetail 생성
             List<ActiveCategoryDTO> categorise = group.getActiveCategoryDTOList();
+            log.info(categorise.isEmpty()+"");
             List<PlanDetail> planDetailList = new ArrayList<>();
             for (ActiveCategoryDTO data : categorise) {
                 Category category = categoryRepository.save(Category.builder()
@@ -102,7 +103,7 @@ public class PlanServiceImpl implements PlanService {
                         .categoryTitle(data.getCategoryName())
                         .build());
 
-                planDetailList.add(PlanDetail.builder()
+                planDetailRepository.save(PlanDetail.builder()
                         .plan(plan)
                         .category(category)
                         .categoryGroup(categoryGroup)
