@@ -47,8 +47,8 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "토큰 없음")
     })
     @GetMapping("")
-    public ResponseEntity<UserInfoDTO> getUserInfo(@RequestBody String email) {
-        UserInfoDTO userInfoDTO = userService.getUserInfo(email);
+    public ResponseEntity<UserInfoDTO> getUserInfo() {
+        UserInfoDTO userInfoDTO = userService.getUserInfo();
         return ResponseEntity.ok(userInfoDTO);
     }
 
@@ -62,8 +62,8 @@ public class UserController {
             @ApiResponse(responseCode = "422", description = "비밀번호 형식 오류")
     })
     @PatchMapping("/password/change")
-    public ResponseEntity<Void> changePassword(@RequestBody String email, @RequestBody ChangePasswordDTO changePasswordDTO) {
-        userService.changePassword(email, changePasswordDTO, passwordEncoder);
+    public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+        userService.changePassword(changePasswordDTO, passwordEncoder);
         return ResponseEntity.ok().build();
     }
 
@@ -89,8 +89,8 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 회원")
     })
     @PostMapping("")
-    public ResponseEntity<Void> deleteUser(@RequestBody String email, @RequestBody UserDeleteDTO userDeleteDTO) {
-        userService.deleteUser(email, userDeleteDTO, passwordEncoder);
+    public ResponseEntity<Void> deleteUser(@RequestBody UserDeleteDTO userDeleteDTO) {
+        userService.deleteUser(userDeleteDTO, passwordEncoder);
         return ResponseEntity.ok().build();
     }
 }

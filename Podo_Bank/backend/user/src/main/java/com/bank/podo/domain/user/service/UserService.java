@@ -42,14 +42,14 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserInfoDTO getUserInfo(String email) {
-        User user = getLoginUser(email);
+    public UserInfoDTO getUserInfo() {
+        User user = getLoginUser();
         return toUserInfoDTO(user);
     }
 
     @Transactional
-    public void changePassword(String email, ChangePasswordDTO changePasswordDTO, PasswordEncoder passwordEncoder) {
-        User user = getLoginUser(email);
+    public void changePassword(ChangePasswordDTO changePasswordDTO, PasswordEncoder passwordEncoder) {
+        User user = getLoginUser();
 
         if(!passwordEncoder.matches(changePasswordDTO.getPassword(), user.getPassword())) {
             throw new PasswordNotMatchException("기존 비밀번호가 일치하지 않습니다.");
@@ -67,7 +67,7 @@ public class UserService {
 
         logChangePassword(user);
 
-        logout(email);
+        logout(user.getEmail());
     }
 
     @Transactional
@@ -93,8 +93,8 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(String email, UserDeleteDTO userDeleteDTO, PasswordEncoder passwordEncoder) {
-        User user = getLoginUser(email);
+    public void deleteUser(UserDeleteDTO userDeleteDTO, PasswordEncoder passwordEncoder) {
+        User user = getLoginUser();
 
         if(!passwordEncoder.matches(userDeleteDTO.getPassword(), user.getPassword())) {
             throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
@@ -109,9 +109,8 @@ public class UserService {
         logDeleteUser(user);
     }
 
-    private User getLoginUser(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+    private User getLoginUser() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     public void checkEmailFormat(String email) {
