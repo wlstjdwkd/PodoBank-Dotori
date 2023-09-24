@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PlanDetailRepository extends JpaRepository<PlanDetail, Long> {
+    PlanDetail findByPlanPlanSeq(Long planSeq);
 
 }

@@ -4,17 +4,20 @@ import com.yongy.dotori.domain.account.entity.Account;
 import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotori.domain.user.entity.User;
 //import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
+@Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity(name="plans")
 public class Plan {
     @Id
@@ -55,20 +58,6 @@ public class Plan {
     @OneToMany(mappedBy = "plan")
     private List<PlanDetail> planDetailList;
 
-    @Builder
-    public Plan(Long planSeq, User user, Account account, State planState,
-                BigDecimal totalSavings, BigDecimal additionalSavings, LocalDateTime saveAt,
-                LocalDateTime startAt, LocalDateTime endAt) {
-        this.planSeq = planSeq;
-        this.user = user;
-        this.account = account;
-        this.planState = planState;
-        this.totalSavings = totalSavings;
-        this.additionalSavings = additionalSavings;
-        this.saveAt = saveAt;
-        this.startAt = startAt;
-        this.endAt = endAt;
-    }
 
     public void update(Plan plan){
         this.endAt = plan.endAt;

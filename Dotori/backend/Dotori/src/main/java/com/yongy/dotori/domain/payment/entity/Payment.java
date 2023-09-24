@@ -5,6 +5,7 @@ import com.yongy.dotori.domain.user.entity.User;
 //import jakarta.persistence.Entity;
 //import jakarta.persistence.*;
 //import jakarta.persistence.GenerationType;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,8 @@ import java.math.BigDecimal;
 
 @Entity(name = "payments")
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Payment {
 
     @Id
@@ -33,16 +36,4 @@ public class Payment {
 
     @Column(name = "payment_price", nullable = false)
     private BigDecimal paymentPrice;
-
-    @Column(name = "checked")
-    private boolean checked;
-
-    @Builder
-    public Payment(Long paymentSeq, User user, PlanDetail planDetail, String paymentName, BigDecimal paymentPrice) {
-        this.paymentSeq = paymentSeq;
-        this.user = user;
-        this.planDetail = planDetail;
-        this.paymentName = paymentName;
-        this.paymentPrice = paymentPrice;
-    }
 }
