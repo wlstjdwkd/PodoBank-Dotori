@@ -11,11 +11,11 @@ import com.yongy.dotori.global.common.BaseResponseBody;
 import com.yongy.dotori.global.email.EmailUtil;
 import com.yongy.dotori.global.redis.entity.BankAccessToken;
 import com.yongy.dotori.global.redis.entity.BankRefreshToken;
-import com.yongy.dotori.global.redis.entity.FintechToken;
+// import com.yongy.dotori.global.redis.entity.FintechToken;
 import com.yongy.dotori.global.redis.entity.PersonalAuth;
 import com.yongy.dotori.global.redis.repository.BankAccessTokenRepository;
 import com.yongy.dotori.global.redis.repository.BankRefreshTokenRepository;
-import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
+// import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
 import com.yongy.dotori.global.redis.repository.PersonalAuthRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,8 +59,8 @@ public class UserAuthService {
     @Autowired
     private BankRefreshTokenRepository bankRefreshTokenRepository;
 
-    @Autowired
-    private FintechTokenRepository fintechTokenRepository;
+   // @Autowired
+  //  private FintechTokenRepository fintechTokenRepository;
 
     private static Bank bankInfo;
 
@@ -213,18 +213,20 @@ public class UserAuthService {
 
             String fintechCode = jsonObject.get("fintechCode").toString();
 
-            fintechTokenRepository.save(FintechToken.of(userAccountCodeDto.getAccountNumber(), fintechCode));
+            // fintechTokenRepository.save(FintechToken.of(userAccountCodeDto.getAccountNumber(), fintechCode));
 
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+            log.info("fintechCode : "+ fintechCode);
+
             Account account = Account.builder()
                     .accountNumber(userAccountCodeDto.getAccountNumber())
-                            .user(user)
-                                    .bank(bankInfo).build();
+                    .user(user)
+                    .bank(bankInfo)
+                    .fintechCode(fintechCode) // NOTE : fintech 코드를 계좌에 등록한다.
+                    .build();
 
             accountRepository.save(account);
-
-            // TODO : 계좌 이름 수정
 
             return ResponseEntity.ok().build();
         }

@@ -11,5 +11,5 @@ import java.util.List;
 @AllArgsConstructor
 public class CategoryGroupListDTO {
     private String groupTitle;
-    private List<CategoryDTO> categoryDTOList;
+    private List<ActiveCategoryDTO> activeCategoryDTOList;
 }

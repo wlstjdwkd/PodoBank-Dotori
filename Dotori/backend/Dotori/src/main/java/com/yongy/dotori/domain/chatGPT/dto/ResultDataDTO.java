@@ -1,7 +1,6 @@
 package com.yongy.dotori.domain.chatGPT.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.yongy.dotori.domain.plan.dto.CategoryDTO;
+import com.yongy.dotori.domain.plan.dto.ActiveCategoryDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,5 +13,5 @@ import java.util.List;
 @AllArgsConstructor
 public class ResultDataDTO {
     String categoryGroupName;
-    List<CategoryDTO> categories;
+    List<ActiveCategoryDTO> categories;
 }
