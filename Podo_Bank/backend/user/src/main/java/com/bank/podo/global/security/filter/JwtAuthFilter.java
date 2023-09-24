@@ -23,7 +23,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String userEmail = request.getHeader("userEmail");
 
-
         if (userEmail != null) {
             // 인증 정보가 존재할 때의 처리
             Authentication authentication = jwtProvider.getAuthentication(userEmail);
@@ -34,5 +33,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // 인증 정보가 존재하지 않을 때의 처리
             log.info("authentication is null");
         }
+
+        filterChain.doFilter(request, response);
     }
 }
