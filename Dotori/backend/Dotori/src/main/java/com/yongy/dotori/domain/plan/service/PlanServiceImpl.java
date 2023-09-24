@@ -1,7 +1,9 @@
 package com.yongy.dotori.domain.plan.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotori.domain.account.entity.Account;
 import com.yongy.dotori.domain.account.repository.AccountRepository;
+import com.yongy.dotori.domain.account.service.AccountServiceImpl;
 import com.yongy.dotori.domain.bank.entity.Bank;
 import com.yongy.dotori.domain.bank.repository.BankRepository;
 import com.yongy.dotori.domain.category.entity.Category;
@@ -9,8 +11,13 @@ import com.yongy.dotori.domain.category.repository.CategoryRepository;
 import com.yongy.dotori.domain.categoryGroup.entity.CategoryGroup;
 import com.yongy.dotori.domain.categoryGroup.repository.CategoryGroupRepository;
 import com.yongy.dotori.domain.plan.dto.*;
+import com.yongy.dotori.domain.payment.repository.PaymentRepository;
+import com.yongy.dotori.domain.plan.dto.*;
 import com.yongy.dotori.domain.plan.entity.Plan;
 import com.yongy.dotori.domain.plan.entity.State;
+import com.yongy.dotori.domain.plan.exception.NotActivePlanException;
+import com.yongy.dotori.domain.plan.exception.NotExistPlanException;
+import com.yongy.dotori.domain.plan.exception.NotStartedPlanException;
 import com.yongy.dotori.domain.plan.repository.PlanRepository;
 import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotori.domain.planDetail.repository.PlanDetailRepository;
@@ -19,6 +26,7 @@ import com.yongy.dotori.domain.purpose.repository.PurposeRepository;
 import com.yongy.dotori.domain.purposeData.entity.PurposeData;
 import com.yongy.dotori.domain.purposeData.repository.PurposeDataRepository;
 import com.yongy.dotori.domain.user.entity.User;
+import com.yongy.dotori.domain.user.repository.UserRepository;
 import com.yongy.dotori.domain.userAuth.service.UserAuthService;
 //import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +35,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,10 +43,12 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -55,22 +66,28 @@ public class PlanServiceImpl implements PlanService {
     private final BankRepository bankRepository;
     private final UserAuthService userAuthService;
     private final PurposeDataRepository purposeDataRepository;
-
+    private final AccountServiceImpl accountService;
+    private final UserRepository userRepository;
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 
     @Override
     public void createPlan(PlanDTO planDTO) {
-        User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
+        User loginUser = this.getLoginUser();
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime startTime = LocalDateTime.parse(planDTO.getStartedAt(), formatter);
+
+        State state = State.READY;
+        if(startTime.toLocalDate().equals(LocalDate.now())){
+            state = State.ACTIVE;
+        }
 
         Plan plan = planRepository.save(Plan.builder()
                 .user(loginUser)
                 .account(accountRepository.findByAccountSeq(planDTO.getAccountSeq()))
                 .startAt(LocalDateTime.parse(planDTO.getStartedAt(), formatter))
                 .endAt(LocalDateTime.parse(planDTO.getEndAt(), formatter))
-                .planState(State.ACTIVE)
+                .planState(state)
                 .updatedAt(LocalDateTime.parse(planDTO.getStartedAt(), formatter)) // 마지막 업데이트 날짜
                 .additionalSavings(BigDecimal.ZERO)
                 .totalSavings(BigDecimal.ZERO)
@@ -113,13 +130,67 @@ public class PlanServiceImpl implements PlanService {
 
         // TODO 진행중인 계획이 아니면 Exception 던지기
         if (plan.getPlanState() != State.ACTIVE) {
-
+            throw new NotActivePlanException("진행 중인 계획이 아닙니다.");
         }
 
         plan.update(Plan.builder()
                 .endAt(LocalDateTime.now())
                 .planState(State.INACTIVE)
                 .build());
+    }
+
+    @Override
+    public ActivePlanDTO findAllPlan(Long accountSeq) throws JsonProcessingException {
+        // 실행중인 계획 리스트 조회
+        Account account = accountRepository.findByAccountSeq(accountSeq);
+        Plan plan = planRepository.findByAccountAccountSeq(accountSeq);
+
+        // Plan이 있는 지 확인, 실행중인 Plan인지 확인
+        // 플랜이 있고, 실행중이면 : 로직 처리
+        // 플랜이 있고, 시작 전인 플랜이 있으면
+        // 플랜이 없으면 : 플랜 만들기 페이지
+
+        if(plan != null && plan.getPlanState().equals(State.ACTIVE)){
+            // 실행 중인 카테고리 가져오기
+            List<PlanDetail> planDetailList = plan.getPlanDetailList();
+            List<ActivePlanDetailDTO> activePlanList = new ArrayList<>();
+
+            for(int i = 0; i < planDetailList.size(); i++){
+                PlanDetail planDetail = planDetailList.get(i);
+                activePlanList.add(ActivePlanDetailDTO.builder()
+                                .title(planDetail.getCategory().getCategoryTitle())
+                                .groupTitle(planDetail.getCategoryGroup().getGroupTitle())
+                                .goalAmount(planDetail.getDetailLimit())
+                                .currentBalance(planDetail.getDetailBalance())
+                        .build());
+            }
+
+            ActivePlanDTO result = ActivePlanDTO.builder()
+                    .accountBalance(accountService.getBalance(accountSeq))
+                    .endAt(plan.getEndAt())
+                    //.unclassified() // 미분류 어떻게 할 건지 정해야 됨!
+                    .activePlanList(activePlanList)
+                .build();
+
+            return result;
+        }
+
+        if(plan != null && plan.getPlanState().equals(State.READY)){
+            throw new NotStartedPlanException("아직 예약된 계획이 시작되지 않았습니다.");
+        }
+
+        throw new NotExistPlanException("계획이 존재하지 않습니다.");
+    }
+
+    @Override
+    public void updateState(PlanStateDTO planStateDTO) {
+        Plan plan = planRepository.findByPlanSeq(planStateDTO.getPlanSeq());
+
+        if(!plan.getPlanState().equals(State.ACTIVE)){
+            throw new NotActivePlanException("실행 중인 계획이 아닙니다.");
+        }
+
+        plan.updateState(State.COMPLETED);
     }
 
     @Override
@@ -199,5 +270,29 @@ public class PlanServiceImpl implements PlanService {
         if(!responseCode.equals("200")){
             throw new IllegalArgumentException("출금에 실패했습니다.");
         }
+    }
+
+    // NOTE : 12시 되면 날짜 확인하고 실행
+    @Scheduled(cron = "0 0 0 * * *") // 매일 자정에 실행
+    public void startPlan(){
+        // 모든 사용자의 모든 READY인 Plan 가져와서 ACTIVE로 변경하기
+        List<User> users = userRepository.findAll(); // 모든 사용자 가져오기
+
+
+        for(User user : users){
+            List<Plan> plans = planRepository.findAllByUserUserSeqAndPlanState(user.getUserSeq(), State.READY);
+            List<Plan> startPlan = new ArrayList<>();
+
+            for(Plan p : plans){
+                if(p.getStartAt().toLocalDate().equals(LocalDate.now())){
+                    startPlan.add(p.updateState(State.ACTIVE));
+                }
+            }
+            planRepository.saveAll(startPlan);
+        }
+    }
+
+    public User getLoginUser(){
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

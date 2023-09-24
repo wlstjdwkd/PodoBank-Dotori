@@ -9,6 +9,7 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByIdAndExpiredAtIsNull(String id);
+    List<User> findAll();
 
     int deleteById(String id);
 /// findByIdAndExpiredAtIsNull
