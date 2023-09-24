@@ -115,8 +115,11 @@ public class UserAuthController {
     @PostMapping("/account/title")
     public ResponseEntity<Void> setAccountName(@RequestBody UserAccountNumberTitleReqDto userAccountNumberTitleReqDto){
         Account account = accountRepository.findByAccountNumberAndDeleteAtIsNull(userAccountNumberTitleReqDto.getAccountNumber());
+        log.info("----1----");
         account.setAccountTitle(userAccountNumberTitleReqDto.getAccountTitle());
+        log.info("----2----");
         accountRepository.save(account);
+        log.info("----3----");
         return ResponseEntity.ok().build();
     }
 
