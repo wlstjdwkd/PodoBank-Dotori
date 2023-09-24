@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -16,6 +17,6 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     Plan findByAccountAccountSeq(Long accountSeq);
     List<Plan> findAllByUserUserSeqAndPlanState(@Param("userSeq") Long userSeq, @Param("planState") State state);
 
-
+    List<Plan> findAllByEndAt(LocalDateTime endAt);
     List<Plan> findAllByPlanState(State state);
 }
