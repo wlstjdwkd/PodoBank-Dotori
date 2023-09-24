@@ -7,7 +7,6 @@ import com.yongy.dotori.domain.payment.service.PaymentService;
 import com.yongy.dotori.domain.plan.entity.Plan;
 import com.yongy.dotori.domain.plan.exception.PaymentUpdateBeforeException;
 import com.yongy.dotori.domain.plan.repository.PlanRepository;
-import com.yongy.dotori.domain.plan.service.PlanService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
@@ -29,9 +28,6 @@ import java.util.List;
 public class PaymentController {
 
     @Autowired
-    private PaymentRepository paymentRepository;
-
-    @Autowired
     private PaymentService paymentService;
 
     @Autowired
@@ -45,17 +41,16 @@ public class PaymentController {
 
         Plan plan = planRepository.findByPlanSeq(paymentPodoReqDto.getPlanSeq());
 
-        LocalDateTime updateTime = LocalDateTime.parse(paymentPodoReqDto.getStartAt(), formatter);
+        LocalDateTime updateTime = LocalDateTime.parse(paymentPodoReqDto.getStartAt(), formatter); // 오늘의 날짜
 
-        // 현재 찾으려는 시간이 업데이트한 시간보다 이전이다.
-        if(plan.getUpdatedAt() != null && updateTime.isBefore(plan.getUpdatedAt())){
+        // 현재 찾으려는 시간이 업데이트한 시간보다 이전이다. plan.getUpdatedAt() != null &&
+        if(updateTime.isBefore(plan.getUpdatedAt())){
             throw new PaymentUpdateBeforeException("이미 이전에 업데이트를 했음");
         }
 
-
         // 업데이트를 하려는 날짜, 계좌의 sequence
         List<PaymentPodoResDto> paymenetList;
-        paymenetList = paymentService.getPayments(updateTime, paymentPodoReqDto.getAccountSeq());
+        paymenetList = paymentService.getPayments(plan.getUpdatedAt(), paymentPodoReqDto.getAccountSeq());
 
         // 업데이트한 날짜 저장
         plan.setUpdatedAt(updateTime);
