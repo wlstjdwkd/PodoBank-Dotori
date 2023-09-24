@@ -1,7 +1,9 @@
 package com.yongy.dotori.domain.plan.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotori.domain.account.entity.Account;
 import com.yongy.dotori.domain.account.repository.AccountRepository;
+import com.yongy.dotori.domain.account.service.AccountServiceImpl;
 import com.yongy.dotori.domain.bank.entity.Bank;
 import com.yongy.dotori.domain.bank.repository.BankRepository;
 import com.yongy.dotori.domain.category.entity.Category;
@@ -14,6 +16,8 @@ import com.yongy.dotori.domain.plan.dto.*;
 import com.yongy.dotori.domain.plan.entity.Plan;
 import com.yongy.dotori.domain.plan.entity.State;
 import com.yongy.dotori.domain.plan.exception.NotActivePlanException;
+import com.yongy.dotori.domain.plan.exception.NotExistPlanException;
+import com.yongy.dotori.domain.plan.exception.NotStartedPlanException;
 import com.yongy.dotori.domain.plan.repository.PlanRepository;
 import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotori.domain.planDetail.repository.PlanDetailRepository;
@@ -59,10 +63,11 @@ public class PlanServiceImpl implements PlanService {
     private final BankRepository bankRepository;
     private final UserAuthService userAuthService;
     private final PurposeDataRepository purposeDataRepository;
+    private final AccountServiceImpl accountService;
+    //private final PaymentRepository paymentRepository;
 
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    private final PaymentRepository paymentRepository;
 
     @Override
     public void createPlan(PlanDTO planDTO) {
@@ -117,7 +122,7 @@ public class PlanServiceImpl implements PlanService {
 
         // TODO 진행중인 계획이 아니면 Exception 던지기
         if (plan.getPlanState() != State.ACTIVE) {
-
+            throw new NotActivePlanException("진행 중인 계획이 아닙니다.");
         }
 
         plan.update(Plan.builder()
@@ -127,24 +132,22 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public ActivePlanDTO findAllPlan(Long accountSeq) {
+    public ActivePlanDTO findAllPlan(Long accountSeq) throws JsonProcessingException {
         // 실행중인 계획 리스트 조회
         Account account = accountRepository.findByAccountSeq(accountSeq);
         Plan plan = planRepository.findByAccountAccountSeq(accountSeq);
 
         // Plan이 있는 지 확인, 실행중인 Plan인지 확인
         // 플랜이 있고, 실행중이면 : 로직 처리
-        // 플랜이 있고, 실행중인 플랜이 없으면 : 플랜 만들기 페이지
+        // 플랜이 있고, 시작 전인 플랜이 있으면
         // 플랜이 없으면 : 플랜 만들기 페이지
 
-        //
-        //if(plan != null && plan.getPlanState() == State.ACTIVE){
-            log.info("들어옴");
+        if(plan != null && plan.getPlanState().equals(State.ACTIVE)){
             // 실행 중인 카테고리 가져오기
             List<PlanDetail> planDetailList = plan.getPlanDetailList();
             List<ActivePlanDetailDTO> activePlanList = new ArrayList<>();
 
-            for(int i = 1; i < planDetailList.size(); i++){
+            for(int i = 0; i < planDetailList.size(); i++){
                 PlanDetail planDetail = planDetailList.get(i);
                 activePlanList.add(ActivePlanDetailDTO.builder()
                                 .title(planDetail.getCategory().getCategoryTitle())
@@ -155,24 +158,22 @@ public class PlanServiceImpl implements PlanService {
             }
 
             ActivePlanDTO result = ActivePlanDTO.builder()
-                    // TODO 계좌 잔액 가져오기 : 포도은행 API 사용
-                    .accountBalance(new BigDecimal("123456"))
+                    .accountBalance(accountService.getBalance(accountSeq))
                     .endAt(plan.getEndAt())
-                    .unclassified(paymentRepository.countByPlanDetailPlanDetailSeq(planDetailList.get(0).getPlanDetailSeq()))
+                    //.unclassified() // 미분류 어떻게 할 건지 정해야 됨!
                     .activePlanList(activePlanList)
                 .build();
 
             return result;
-        //}
+        }
 
-//        log.info("안들어옴");
-//        return null;
+        if(plan != null && plan.getPlanState().equals(State.READY)){
+            throw new NotStartedPlanException("아직 예약된 계획이 시작되지 않았습니다.");
+        }
+
+        throw new NotExistPlanException("계획이 존재하지 않습니다.");
     }
 
-//        private User getLoginUser() {
-//        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//    }
-}
     @Override
     public void updateState(PlanStateDTO planStateDTO) {
         Plan plan = planRepository.findByPlanSeq(planStateDTO.getPlanSeq());

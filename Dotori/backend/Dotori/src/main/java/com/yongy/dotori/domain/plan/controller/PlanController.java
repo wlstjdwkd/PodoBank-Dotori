@@ -1,5 +1,6 @@
 package com.yongy.dotori.domain.plan.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotori.domain.plan.dto.ActivePlanDTO;
 import com.yongy.dotori.domain.plan.dto.PlanDTO;
 import com.yongy.dotori.domain.plan.dto.PlanStateDTO;
@@ -66,7 +67,7 @@ public class PlanController {
 
     @Operation(summary = "계좌에 연결된 실행중인 계획 조회")
     @GetMapping("/{accountSeq}")
-    public ResponseEntity<ActivePlanDTO> findAllPlan(@PathVariable Long accountSeq){
+    public ResponseEntity<ActivePlanDTO> findAllPlan(@PathVariable Long accountSeq) throws JsonProcessingException {
         ActivePlanDTO result = planService.findAllPlan(accountSeq);
         return ResponseEntity.ok(result);
     }
