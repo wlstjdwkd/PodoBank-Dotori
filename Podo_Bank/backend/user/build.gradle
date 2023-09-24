@@ -50,20 +50,15 @@ dependencies {
     implementation 'com.mysql:mysql-connector-j'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
-<<<<<<<< HEAD:Podo_Bank/backend/auth/build.gradle
-    // eureka
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-========
 // actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // eureka
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
-        // Spring Cloud Config Client
+    // Spring Cloud Config Client
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
 
->>>>>>>> a5d6db1c91bedb57fd40733f86dc58b14728d1fe:Podo_Bank/backend/user/build.gradle
 }
 
 dependencyManagement {
