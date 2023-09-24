@@ -13,15 +13,17 @@ services:
       - SPRING_REDIS_HOST=redis
       - ENCRYPT_KEY=${ENCRYPT_KEY_VALUE}
       - TZ=Asia/Seoul
-    depends_on:
-      - redis
-  redis:
-    image: redis
-    ports:
-      - "9050:6379"
-    volumes:
-      - /etc/redis/redis.conf:/usr/local/etc/redis/redis.conf
-    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    external_links:
+      - podo_redis:redis
+#    depends_on:
+#      - redis
+#  redis:
+#    image: redis
+#    ports:
+#      - "9050:6379"
+#    volumes:
+#      - /etc/redis/redis.conf:/usr/local/etc/redis/redis.conf
+#    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
 
 
   dotori:
@@ -34,15 +36,17 @@ services:
     ports:
       - "9100:9100"
     environment:
-      - SPRING_REDIS_HOST=redis_dotori
+      - SPRING_REDIS_HOST=redis
       - ENCRYPT_KEY=${ENCRYPT_KEY_VALUE}
       - TZ=Asia/Seoul
-    depends_on:
-      - redis_dotori
-  redis_dotori:
-    image: redis
-    ports:
-      - "9150:6379"
-    volumes:
-      - /etc/redis/redis.conf:/usr/local/etc/redis/redis.conf
-    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    external_links:
+      - dotori_redis:redis
+#    depends_on:
+#      - redis_dotori
+#  redis_dotori:
+#    image: redis
+#    ports:
+#      - "9150:6379"
+#    volumes:
+#      - /etc/redis/redis.conf:/usr/local/etc/redis/redis.conf
+#    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
