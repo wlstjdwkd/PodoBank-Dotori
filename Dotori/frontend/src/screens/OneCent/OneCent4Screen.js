@@ -29,6 +29,7 @@ export default function OneCent2Screen({ navigation, route }) {
   };
 
   const handleInputChange = (text, index) => {
+    // 백스페이스시 앞으로 넘어감.
     if (text === "" && index > 0) {
       inputRefs[index - 1].current.focus();
     }
