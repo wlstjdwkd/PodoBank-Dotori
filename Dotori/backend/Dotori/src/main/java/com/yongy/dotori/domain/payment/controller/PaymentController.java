@@ -41,10 +41,10 @@ public class PaymentController {
 
         Plan plan = planRepository.findByPlanSeq(paymentPodoReqDto.getPlanSeq());
 
-        LocalDateTime updateTime = LocalDateTime.parse(paymentPodoReqDto.getStartAt(), formatter); // 오늘의 날짜
+        LocalDateTime currentTime = LocalDateTime.now(); // 현재시간
 
-        // 현재 찾으려는 시간이 업데이트한 시간보다 이전이다. plan.getUpdatedAt() != null &&
-        if(updateTime.isBefore(plan.getUpdatedAt())){
+        // 현재 찾으려는 시간이 업데이트한 시간보다 이전이다.
+        if(currentTime.isBefore(plan.getUpdatedAt())){
             throw new PaymentUpdateBeforeException("이미 이전에 업데이트를 했음");
         }
 
@@ -53,7 +53,7 @@ public class PaymentController {
         paymenetList = paymentService.getPayments(plan.getUpdatedAt(), paymentPodoReqDto.getAccountSeq());
 
         // 업데이트한 날짜 저장
-        plan.setUpdatedAt(updateTime);
+        plan.setUpdatedAt(currentTime);
         planRepository.save(plan);
 
 
