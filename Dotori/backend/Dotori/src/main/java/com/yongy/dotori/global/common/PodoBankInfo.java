@@ -87,13 +87,16 @@ public class PodoBankInfo {
 
         if(dotoriAccessToken.isEmpty()){
             if(dotoriRefreshToken.isEmpty()){
+                log.info("accessToken, refreshToken 재발급");
                 bankInfo = bankRepository.findByBankSeq(bankSeq);
                 this.podoBankLogin(bankInfo); // accessToken, refreshToken 재발급
                 useToken = bankAccessTokenRepository.findById("accessToken").get().getToken();
             }else{
+                log.info("refreshToken 사용");
                 useToken = dotoriRefreshToken.get().getToken();
             }
         }else{
+            log.info("accessToken 사용");
             useToken = dotoriAccessToken.get().getToken();
         }
         return useToken;
