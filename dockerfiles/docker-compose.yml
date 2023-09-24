@@ -13,6 +13,7 @@ services:
       - SPRING_REDIS_HOST=redis
       - ENCRYPT_KEY=${ENCRYPT_KEY_VALUE}
       - TZ=Asia/Seoul
+# 안되면 답없음
 #    external_links:
 #      - podo_redis:redis
     depends_on:
