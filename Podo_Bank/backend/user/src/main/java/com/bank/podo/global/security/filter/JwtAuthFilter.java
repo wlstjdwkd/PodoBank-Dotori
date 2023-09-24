@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -27,7 +26,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (userEmail != null) {
             // 인증 정보가 존재할 때의 처리
-            Authentication authentication = new UsernamePasswordAuthenticationToken(userEmail, null, null);
+            Authentication authentication = jwtProvider.getAuthentication(userEmail);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             log.info(userEmail);
