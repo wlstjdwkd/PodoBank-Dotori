@@ -1,4 +1,4 @@
-package src.main.java.com.bank.podo.domain.account.exception;
+package com.bank.podo.domain.account.exception;
 
 public class AccountPasswordFormatException extends RuntimeException {
     public AccountPasswordFormatException(String message) {

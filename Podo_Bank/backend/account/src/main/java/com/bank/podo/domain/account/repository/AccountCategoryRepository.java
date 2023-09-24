@@ -1,4 +1,4 @@
-package src.main.java.com.bank.podo.domain.account.repository;
+package com.bank.podo.domain.account.repository;
 
 import com.bank.podo.domain.account.entity.AccountCategory;
 import org.springframework.data.jpa.repository.JpaRepository;

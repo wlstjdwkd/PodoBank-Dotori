@@ -1,4 +1,4 @@
-package src.main.java.com.bank.podo.domain.account.controller;
+package com.bank.podo.domain.account.controller;
 
 import com.bank.podo.domain.account.exception.*;
 import lombok.extern.slf4j.Slf4j;

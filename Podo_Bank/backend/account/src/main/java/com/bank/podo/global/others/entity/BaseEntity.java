@@ -1,4 +1,4 @@
-package src.main.java.com.bank.podo.global.others.entity;
+package com.bank.podo.global.others.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;

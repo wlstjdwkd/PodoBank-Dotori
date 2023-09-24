@@ -1,4 +1,4 @@
-package src.main.java.com.bank.podo.domain.account.controller;
+package com.bank.podo.domain.account.controller;
 
 import com.bank.podo.domain.account.dto.*;
 import com.bank.podo.domain.account.service.AccountService;
@@ -31,6 +31,7 @@ public class AccountController {
     })
     @GetMapping("/type")
     public ResponseEntity<List<AccountCategoryDTO>> getAccountTypeList() {
+        log.info("나와라");
         List<AccountCategoryDTO> accountCategoryList = accountService.getAccountTypeList();
         return ResponseEntity.ok(accountCategoryList);
     }

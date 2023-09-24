@@ -1,4 +1,4 @@
-package src.main.java.com.bank.podo.domain.account.repository;
+package com.bank.podo.domain.account.repository;
 
 import com.bank.podo.domain.account.entity.Account;
 import com.bank.podo.domain.user.entity.User;

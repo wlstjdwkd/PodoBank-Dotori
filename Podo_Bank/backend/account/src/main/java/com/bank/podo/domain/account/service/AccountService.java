@@ -1,4 +1,4 @@
-package src.main.java.com.bank.podo.domain.account.service;
+package com.bank.podo.domain.account.service;
 
 import com.bank.podo.domain.account.dto.*;
 import com.bank.podo.domain.account.entity.Account;
@@ -6,14 +6,11 @@ import com.bank.podo.domain.account.entity.AccountCategory;
 import com.bank.podo.domain.account.entity.TransactionHistory;
 import com.bank.podo.domain.account.enums.TransactionType;
 import com.bank.podo.domain.account.exception.*;
-import src.main.java.com.bank.podo.domain.account.repository.AccountCategoryRepository;
-import src.main.java.com.bank.podo.domain.account.repository.AccountRepository;
-import src.main.java.com.bank.podo.domain.account.repository.TransactionHistoryRepository;
+import com.bank.podo.domain.account.repository.AccountCategoryRepository;
+import com.bank.podo.domain.account.repository.AccountRepository;
+import com.bank.podo.domain.account.repository.TransactionHistoryRepository;
 import com.bank.podo.domain.user.entity.User;
-import src.main.java.com.bank.podo.global.email.entity.VerificationSuccess;
-import src.main.java.com.bank.podo.global.email.enums.VerificationType;
-import src.main.java.com.bank.podo.global.email.exception.EmailVerificationException;
-import src.main.java.com.bank.podo.global.email.repository.VerificationSuccessRepository;
+import com.bank.podo.global.request.RequestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -36,13 +33,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AccountService {
 
+    private final RequestUtil requestUtil;
+
     private final AccountRepository accountRepository;
     private final AccountCategoryRepository accountCategoryRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
-    private final VerificationSuccessRepository verificationSuccessRepository;
 
     public List<AccountCategoryDTO> getAccountTypeList() {
         List<AccountCategory> accountCategories = accountCategoryRepository.findAll();
+        log.info("accountCategories : {}", accountCategories);
         return toAccountCategoryDTOList(accountCategories);
     }
 
@@ -154,12 +153,12 @@ public class AccountService {
             throw new AccountUserNotMatchException("계좌의 소유자가 아닙니다.");
         }
 
-        VerificationSuccess verificationSuccess = verificationSuccessRepository.findById(user.getEmail())
-                .orElseThrow(() -> new EmailVerificationException("이메일 인증이 만료되었습니다."));
-
-        if(!verificationSuccess.getSuccessCode().equals(resetPasswordDTO.getSuccessCode())
-                || !verificationSuccess.getType().equals(VerificationType.RESET_ACCOUNT_PASSWORD)) {
-            throw new EmailVerificationException("이메일 인증이 만료되었습니다.");
+        if(!requestUtil.checkVerificationSuccess(CheckSuccessCodeDTO.builder()
+                .email(account.getUser().getEmail())
+                .successCode(resetPasswordDTO.getSuccessCode())
+                .verificationType("RESET_ACCOUNT_PASSWORD")
+                .build())) {
+            throw new IllegalArgumentException("인증 코드가 일치하지 않습니다.");
         }
 
         checkAccountPasswordFormat(resetPasswordDTO.getNewPassword());

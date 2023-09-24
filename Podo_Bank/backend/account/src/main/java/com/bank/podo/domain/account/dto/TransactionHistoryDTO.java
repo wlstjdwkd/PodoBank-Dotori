@@ -1,6 +1,6 @@
-package src.main.java.com.bank.podo.domain.account.dto;
+package com.bank.podo.domain.account.dto;
 
-import src.main.java.com.bank.podo.domain.account.enums.TransactionType;
+import com.bank.podo.domain.account.enums.TransactionType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;

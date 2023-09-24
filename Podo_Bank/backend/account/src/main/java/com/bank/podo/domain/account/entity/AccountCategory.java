@@ -1,7 +1,7 @@
-package src.main.java.com.bank.podo.domain.account.entity;
+package com.bank.podo.domain.account.entity;
 
 import com.bank.podo.domain.account.enums.AccountType;
-import src.main.java.com.bank.podo.global.others.entity.BaseEntity;
+import com.bank.podo.global.others.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
