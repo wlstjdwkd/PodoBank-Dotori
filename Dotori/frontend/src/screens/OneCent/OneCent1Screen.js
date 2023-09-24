@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,37 +10,58 @@ import {
 } from "react-native";
 import FooterScreen from "../Components/FooterScreen";
 import { useDispatch, useSelector } from "react-redux";
+import {accountWholeBank} from '../../apis/accountapi'
 
 const banks = [
   {
-    id: "1",
-    name: "포도은행",
+    bankSeq: 1,
+    bankName: "포도은행",
     image: require("../../assets/images/logo_podo.png"),
   },
   {
-    id: "2",
-    name: "국민은행",
+    bankSeq: 2,
+    bankName: "국민은행",
     image: require("../../assets/images/logo_podo.png"),
   },
   {
-    id: "3",
-    name: "카카오뱅크",
+    bankSeq: 3,
+    bankName: "카카오뱅크",
     image: require("../../assets/images/logo_podo.png"),
   },
   {
-    id: "4",
-    name: "신한은행",
+    bankSeq: 4,
+    bankName: "신한은행",
     image: require("../../assets/images/logo_podo.png"),
   },
 ];
 
-export default function OneCent1Screen({ navigation }) {
+export default function OneCent1Screen({ navigation,route }) {
   // 토큰
-  const grantType =  useSelector((state)=>{state.user.grantType})
-  const accessToken =  useSelector((state)=>{state.user.accessToken})
-  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
+  const [bankList, setBankList] = useState([])
+  const [userName, setUserName] = useState(route.params.userName)
+
+  const doAccountWholeBank = async () => {
+    try{
+      const response = await accountWholeBank(accessToken, grantType)
+      if(response.status===200){
+        setBankList(response.data)
+        console.log(response.data)
+      }else{
+        console.log("은행 리스트 조회 실패", response.status)
+      }
+    }catch(error){
+      console.log(error)
+    }
+  }
+
+  useEffect(()=>{
+    doAccountWholeBank()
+  },[])
   
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -56,17 +77,21 @@ export default function OneCent1Screen({ navigation }) {
         <View style={styles.bankContainer}>
           {banks.map((bank) => (
             <TouchableOpacity
-              key={bank.id}
+              key={bank.bankSeq}
               style={styles.bankBox}
               onPress={() =>
                 navigation.navigate("OneCent2Screen", {
-                  bankName: bank.name,
+                  userName: userName,
+                  bankSeq: bank.bankSeq,
+                  bankName: bank.bankName,
                   bankImage: bank.image,
                 })
               }
+              // 미리 front에서 등록해둔 은행이 back에서 불러온 것과 일치하지 않으면 비활성
+              disabled={bankList.some((item) => item.bankSeq != bank.bankSeq)}  
             >
               <Image style={styles.bankLogo} source={bank.image} />
-              <Text style={styles.bankName}>{bank.name}</Text>
+              <Text style={styles.bankName}>{bank.bankName}</Text>
             </TouchableOpacity>
           ))}
         </View>

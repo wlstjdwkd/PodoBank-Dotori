@@ -34,43 +34,42 @@ export default function SignUpCompleteScreen({ navigation, route }) {
     }
   }
 
-  const doLogin = async () => {
-    console.log("로그인완료")
-    dispatch(inputgrantType("123"))
-    dispatch(inputAccessToken("456"))
-    dispatch(inputRefreshToken("789"))
-    console.log('출력',abc)
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'MainPageScreen' }],
-    });
-  }
-
   // const doLogin = async () => {
-  //   const data = {email:loginInfo.id, password:loginInfo.password}
-  //   const response = await userLogin(data)
-  //   if(response.status === 200){
-  //     console.log('로그인 성공')
-  //     try{
-  //       dispatch(inputgrantType(response.data.grantType))
-  //       dispatch(inputAccessToken(response.data.accessToken))
-  //       dispatch(inputRefreshToken(response.data.refreshToken))
-  //       navigation.reset({
-  //         index: 0,
-  //         routes: [{ name: 'MainPageScreen' }],
-  //       });
-  //     }catch(error){
-  //       console.log("access토큰 저장 실패")
-  //       navigation.navigate("LoginScreen")
-  //     }
-  //   }else if(response.status === 400){
-  //     console.log('로그인 실패')
-  //     navigation.navigate("LoginScreen")
-  //   }else{
-  //     console.log('오류 발생: 로그인 실패')
-  //     navigation.navigate("LoginScreen")
-  //   }
+  //   console.log("로그인완료")
+  //   dispatch(inputgrantType("123"))
+  //   dispatch(inputAccessToken("456"))
+  //   dispatch(inputRefreshToken("789"))
+  //   navigation.reset({
+  //     index: 0,
+  //     routes: [{ name: 'MainPageScreen' }],
+  //   });
   // }
+
+  const doLogin = async () => {
+    const data = {id:loginInfo.id, password:loginInfo.password}
+    const response = await userLogin(data)
+    if(response.status === 200){
+      console.log('로그인 성공')
+      try{
+        dispatch(inputgrantType(response.data.grantType))
+        dispatch(inputAccessToken(response.data.accessToken))
+        dispatch(inputRefreshToken(response.data.refreshToken))
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainPageScreen' }],
+        });
+      }catch(error){
+        console.log("access토큰 저장 실패")
+        navigation.navigate("LoginScreen")
+      }
+    }else if(response.status === 400){
+      console.log('로그인 실패')
+      navigation.navigate("LoginScreen")
+    }else{
+      console.log('오류 발생: 로그인 실패')
+      navigation.navigate("LoginScreen")
+    }
+  }
 
 
   return (

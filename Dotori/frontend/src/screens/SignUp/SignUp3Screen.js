@@ -76,7 +76,7 @@ export default function SignUp3Screen({ navigation, route }) {
     }
   }
   useEffect(()=>{
-    // passwordInputRef.current.focus()
+    passwordInputRef.current.focus()
   },[])
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -12,13 +12,16 @@ import { useDispatch, useSelector } from "react-redux";
 
 export default function OneCent1Screen({ navigation, route }) {
   // 토큰
-  const grantType =  useSelector((state)=>{state.user.grantType})
-  const accessToken =  useSelector((state)=>{state.user.accessToken})
-  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
-  
+  const accountNumberRef = useRef(null)
+
   const [accountInfo, setAccountInfo] = useState({
+    userName: route.params.userName,
+    bankSeq: route.params.bankSeq,
     bankName: route.params.bankName,
     bankImage: route.params.bankImage,
     accountNumber: "",
@@ -27,9 +30,25 @@ export default function OneCent1Screen({ navigation, route }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [isValid, setIsValid] = useState(false);
 
+
+
+  const handleAccountNumber = (text) =>{
+    setAccountInfo({ ...accountInfo, accountNumber: text });
+    
+    // setAccountNumber(text);
+    const regex = /^[0-9]{13}$/;
+    if (!regex.test(text)) {
+      setErrorMessage("계좌 번호를 13자리 숫자로 입력해주세요.");
+    } else {
+      setErrorMessage("");
+    }
+  }
+
   const handleConfirm = () => {
-    if (accountInfo.accountNumber.length !== 13) {
-      setErrorMessage("계좌 번호를 13자리로 입력해주세요.");
+    const regex = /^[0-9]{13}$/;
+    // if (accountInfo.accountNumber.length !== 13) {
+    if (!regex.test(accountInfo.accountNumber)) {
+      setErrorMessage("계좌 번호를 13자리 숫자로 입력해주세요.");
     } else {
       setErrorMessage("");
       // console.log(accountInfo);
@@ -38,6 +57,10 @@ export default function OneCent1Screen({ navigation, route }) {
       }); // 계좌 번호를 다음 페이지로 전달
     }
   };
+
+  useEffect(()=>{
+    accountNumberRef.current.focus()
+  })
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -48,33 +71,37 @@ export default function OneCent1Screen({ navigation, route }) {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="계좌 번호를 입력하세요."
+            placeholder="'-'를 제외한 계좌 번호를 입력하세요."
             placeholderTextColor="#A9A9A9"
             underlineColorAndroid="transparent" // 하단 선 숨기기
+            returnKeyType="done"
             keyboardType="numeric" // 숫자 키패드 표시
             maxLength={13} // 최대 13자리로 제한
             textAlign="center" // 가운데 정렬
             value={accountInfo.accountNumber}
+            ref={accountNumberRef}
             onChangeText={(text) => {
-              setAccountInfo({ ...accountInfo, accountNumber: text });
-
-              // setAccountNumber(text);
-              if (text.length !== 13) {
-                setErrorMessage("계좌 번호를 13자리로 입력해주세요.");
-              } else {
-                setErrorMessage("");
-              }
+              handleAccountNumber(text)
+            }}
+            onSubmitEditing={()=>{
+              handleConfirm()
             }}
           />
         </View>
 
         {/* 오류 메시지 */}
-        {errorMessage !== "" && (
+        {/* {errorMessage !== "" && (
           <Text style={styles.errorMessage}>{errorMessage}</Text>
-        )}
+        )} */}
+        <Text style={styles.errorMessage}>{(errorMessage !== "") &&errorMessage}</Text>
+        
 
         {/* 버튼 */}
-        <TouchableOpacity style={styles.button} onPress={handleConfirm}>
+        <TouchableOpacity style={styles.button}
+          onPress={() => {
+            handleConfirm()
+          }}
+        >
           <Text style={styles.buttonText}>확인</Text>
         </TouchableOpacity>
       </View>
@@ -125,7 +152,8 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 10,
     alignItems: "center",
-    marginTop: 35,
+    // marginTop: 35,
+    marginTop: 15,
   },
   buttonText: {
     fontSize: 15,
@@ -134,9 +162,10 @@ const styles = StyleSheet.create({
   },
   errorMessage: {
     color: "red",
-    fontSize: 16,
+    // fontSize: 16,
+    fontSize: 15,
     textAlign: "center",
-    marginTop: 8,
+    // marginTop: 8,
   },
   footer: {
     flex: 1,

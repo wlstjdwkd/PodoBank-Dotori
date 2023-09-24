@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,8 @@ import {
 
 import FooterScreen from "../Components/FooterScreen";
 import { useDispatch, useSelector } from "react-redux";
+import {accountWholeInquiry} from "../../apis/accountapi"
+import {userInfoInquiry} from '../../apis/userapi'
 
 const banks = [
   {
@@ -44,13 +46,16 @@ const formatNumber = (num) => {
   return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 };
 
+
 export default function MainPageScreen({ navigation }) {
   // 토큰
-  const grantType =  useSelector((state)=>{state.user.grantType})
-  const accessToken =  useSelector((state)=>{state.user.accessToken})
-  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
+  const [accountList, setAccountList] = useState([])
+  const [userInfo, setUserInfo] = useState(null)
 
 
   // // 정보조회 함수
@@ -60,14 +65,38 @@ export default function MainPageScreen({ navigation }) {
   //     console.log('연결 계좌 조회 성공')
   //   }else if(response.status === 400){
   //     console.log('연결 계좌 조회 실패')
-
   //   }
   // }
 
-  
-  
+  const doAccountWholeInquiry = async () =>{
+    try{
+      const response = await accountWholeInquiry(accessToken, grantType)
+      if(response.status === 200){
+        setAccountList(response.data)
+      }else{
+        console.log("전체 계좌 리스트 불러오기 실패")
+      }
+    }catch(error){
+      console.log(error)
+    }
+  }
+  const doUserInfoInquiry = async () => {
+    try {
+      const response = await userInfoInquiry(accessToken, grantType);
+      if(response.status===200){
+        setUserInfo(response.data);
+      }else{
+        console.log('사용자 정보 조회 실패',response.status)
+      }
+    } catch (error) {
+      console.error('오류 발생 : 사용자 정보 조회 실패:', error);
+    }
+  }
+
   useEffect(()=>{
     // do정보조회()
+    doAccountWholeInquiry()
+    doUserInfoInquiry()
   },[])
 
   return (
@@ -127,7 +156,9 @@ export default function MainPageScreen({ navigation }) {
             <>
               <TouchableOpacity
                 style={styles.addButton}
-                onPress={() => navigation.navigate("OneCent1Screen")}
+                onPress={() => {
+                  navigation.navigate("OneCent1Screen", {userName:userInfo.userName})
+                }}
               >
                 <Text style={styles.addText}>+</Text>
               </TouchableOpacity>

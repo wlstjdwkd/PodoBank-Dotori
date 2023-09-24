@@ -106,31 +106,56 @@ export default function SignUp4Screen({ navigation, route }) {
     }
   }
 
-  const doSignup = async () =>{
-    Alert.alert('',"axios됬다하고")
-    console.log(userInfo)
-    const loginInfo = {
-      "userName": userInfo.userName, "id":userInfo.id, "password":userInfo.password
-    }
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'SignUpCompleteScreen', params:{loginInfo} }],
-    });
-  }
   // const doSignup = async () =>{
-  //   const response = await userSignup(userInfo)
-  //   if(response.status === 200){
-  //       navigation.reset({
-  //         index: 0,
-  //         routes: [{ name: 'SignUpCompleteScreen', params:{userName: userInfo.userName} }],
-  //       });
-  //     console.log('회원가입 성공')
-  //   }else if(response.status === 400){
-  //     console.log('회원가입 실패', response.status)
-  //   }else{
-  //     console.log('오류발생 : 회원가입 실패')
+  //   Alert.alert('',"axios됬다하고")
+  //   console.log(userInfo)
+  //   const loginInfo = {
+  //     "userName": userInfo.userName, "id":userInfo.id, "password":userInfo.password
   //   }
+  //   navigation.reset({
+  //     index: 0,
+  //     routes: [{ name: 'SignUpCompleteScreen', params:{loginInfo} }],
+  //   });
   // }
+
+  changeFormbirthDate = (birthDate) => {
+    if (birthDate.length === 8) {
+      const year = birthDate.slice(0, 4);
+      const month = birthDate.slice(4, 6);
+      const day = birthDate.slice(6, 8);
+      const formattedDate = `${year}-${month}-${day}`;
+      return formattedDate;
+    } else {
+      // 유효하지 않은 입력인 경우 또는 길이가 8이 아닌 경우에 대한 처리
+      return '유효하지 않은 날짜';
+    }
+  }
+
+
+  const doSignup = async () =>{
+    // console.log(userInfo)
+    // changeFormbirthDate(userInfo.birthDate)
+    const userInfoSending = {...userInfo, birthDate:changeFormbirthDate(userInfo.birthDate)}
+    try{
+      const response = await userSignup(userInfoSending)
+      if(response.status === 200){
+        const loginInfo = {
+          "userName": userInfo.userName, "id":userInfo.id, "password":userInfo.password
+        }
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'SignUpCompleteScreen', params:{loginInfo} }],
+        });
+        console.log('회원가입 성공')
+      }else if(response.status === 400){
+        console.log('회원가입 실패', response.status)
+      }else{
+        console.log('오류발생 : 회원가입 실패')
+      }
+    }catch(error){
+      console.log('오류발생 : 회원가입 실패',error)
+    }
+  }
 
   useEffect(()=>{
     nameInputRef.current.focus()
