@@ -1,8 +1,17 @@
 spring:
   application:
     name: podo-auth-service
+  cloud:
+    config:
+      name: podo
+      profile: auth
+  config:
+    import: "optional:configserver:http://j9d107.p.ssafy.io:9900/"
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:9761/eureka/
+      defaultZone: http://j9d107.p.ssafy:9761/eureka/
+
+encrypt:
+  key: ${ENCRYPT_KEY}
