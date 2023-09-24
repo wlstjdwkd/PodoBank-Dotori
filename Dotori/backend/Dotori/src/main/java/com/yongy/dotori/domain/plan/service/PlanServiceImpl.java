@@ -43,6 +43,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -73,15 +74,20 @@ public class PlanServiceImpl implements PlanService {
     @Override
     public void createPlan(PlanDTO planDTO) {
         User loginUser = this.getLoginUser();
-
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime startTime = LocalDateTime.parse(planDTO.getStartedAt(), formatter);
+
+        State state = State.READY;
+        if(startTime.toLocalDate().equals(LocalDate.now())){
+            state = State.ACTIVE;
+        }
 
         Plan plan = planRepository.save(Plan.builder()
                 .user(loginUser)
                 .account(accountRepository.findByAccountSeq(planDTO.getAccountSeq()))
                 .startAt(LocalDateTime.parse(planDTO.getStartedAt(), formatter))
                 .endAt(LocalDateTime.parse(planDTO.getEndAt(), formatter))
-                .planState(State.ACTIVE)
+                .planState(state)
                 .updatedAt(LocalDateTime.parse(planDTO.getStartedAt(), formatter)) // 마지막 업데이트 날짜
                 .additionalSavings(BigDecimal.ZERO)
                 .totalSavings(BigDecimal.ZERO)
@@ -270,17 +276,17 @@ public class PlanServiceImpl implements PlanService {
     @Scheduled(cron = "0 0 0 * * *") // 매일 자정에 실행
     public void startPlan(){
         // 모든 사용자의 모든 READY인 Plan 가져와서 ACTIVE로 변경하기
+        List<User> users = userRepository.findAll(); // 모든 사용자 가져오기
 
-        log.info("스케쥴!!");
-
-        List<User> users = userRepository.findAll();
 
         for(User user : users){
             List<Plan> plans = planRepository.findAllByUserUserSeqAndPlanState(user.getUserSeq(), State.READY);
-
             List<Plan> startPlan = new ArrayList<>();
+
             for(Plan p : plans){
-                startPlan.add(p.updateState(State.ACTIVE));
+                if(p.getStartAt().toLocalDate().equals(LocalDate.now())){
+                    startPlan.add(p.updateState(State.ACTIVE));
+                }
             }
             planRepository.saveAll(startPlan);
         }
