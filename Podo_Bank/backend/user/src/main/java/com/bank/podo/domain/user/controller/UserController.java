@@ -1,6 +1,10 @@
 package com.bank.podo.domain.user.controller;
 
-import com.bank.podo.domain.user.dto.*;
+import com.bank.podo.domain.user.dto.ChangePasswordDTO;
+import com.bank.podo.domain.user.dto.ResetPasswordDTO;
+import com.bank.podo.domain.user.dto.UserDeleteDTO;
+import com.bank.podo.domain.user.dto.UserInfoDTO;
+import com.bank.podo.domain.user.entity.User;
 import com.bank.podo.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -92,5 +96,13 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@RequestBody UserDeleteDTO userDeleteDTO) {
         userService.deleteUser(userDeleteDTO, passwordEncoder);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "회원 조회", hidden = true)
+    @PostMapping("/userInfo")
+    public ResponseEntity<User> getUser(@RequestBody String email) {
+        log.info(email);
+        User user = userService.getUser(email);
+        return ResponseEntity.ok(user);
     }
 }

@@ -25,14 +25,6 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
-    public void checkUsername(String email) {
-        checkEmailFormat(email);
-        if(userRepository.existsByEmail(email)) {
-            throw new AlreadyUsedUsernameException("이미 사용중인 아이디입니다.");
-        }
-    }
-
     public boolean logout(String email) {
         boolean isLogout = requestUtil.removeRefreshToken(email);
 
@@ -107,6 +99,12 @@ public class UserService {
         userRepository.save(user.delete());
 
         logDeleteUser(user);
+    }
+
+    @Transactional(readOnly = true)
+    public User getUser(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
     }
 
     private User getLoginUser() {
