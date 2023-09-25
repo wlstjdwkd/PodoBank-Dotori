@@ -135,7 +135,7 @@ public class PlanServiceImpl implements PlanService {
         }
 
         plan.update(Plan.builder()
-                .endAt(LocalDateTime.now())
+                .terminatedAt(LocalDateTime.now())
                 .planState(State.INACTIVE)
                 .build());
     }
@@ -286,21 +286,33 @@ public class PlanServiceImpl implements PlanService {
 
     // NOTE : 12시 되면 날짜 확인하고 실행
     @Scheduled(cron = "0 0 0 * * *") // 매일 자정에 실행
-    public void startPlan(){
+    public void startEndPlan(){
         // 모든 사용자의 모든 READY인 Plan 가져와서 ACTIVE로 변경하기
+        LocalDateTime today = LocalDateTime.now();
         List<User> users = userRepository.findAll(); // 모든 사용자 가져오기
 
-
         for(User user : users){
-            List<Plan> plans = planRepository.findAllByUserUserSeqAndPlanState(user.getUserSeq(), State.READY);
-            List<Plan> startPlan = new ArrayList<>();
+            // 시작 처리
+            List<Plan> startplans = planRepository.findAllByUserUserSeqAndPlanState(user.getUserSeq(), State.READY);
+            List<Plan> startResult = new ArrayList<>();
 
-            for(Plan p : plans){
-                if(p.getStartAt().toLocalDate().equals(LocalDate.now())){
-                    startPlan.add(p.updateState(State.ACTIVE));
+            for(Plan p : startplans){
+                if(p.getStartAt().toLocalDate().equals(today)){
+                    startResult.add(p.updateState(State.ACTIVE));
                 }
             }
-            planRepository.saveAll(startPlan);
+            planRepository.saveAll(startResult);
+
+            // 종료 처리
+            List<Plan> endPlans = planRepository.findAllByEndAt(today);
+            List<Plan> endResult = new ArrayList<>();
+
+            for(Plan p : endPlans){
+                if(p.getEndAt().toLocalDate().equals(today)){
+                    endResult.add(p.terminate(today));
+                }
+            }
+            planRepository.saveAll(endResult);
         }
     }
 

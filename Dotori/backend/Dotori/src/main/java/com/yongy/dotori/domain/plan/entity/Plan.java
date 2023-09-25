@@ -4,9 +4,12 @@ import com.yongy.dotori.domain.account.entity.Account;
 import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotori.domain.user.entity.User;
 //import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -14,9 +17,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity(name="plans")
 public class Plan {
     @Id
@@ -78,8 +79,13 @@ public class Plan {
     }
 
     public void update(Plan plan){
-        this.endAt = plan.endAt;
+        this.terminatedAt = plan.terminatedAt;
         this.planState = plan.planState;
+    }
+
+    public Plan terminate(LocalDateTime localDateTime){
+        this.terminatedAt = localDateTime;
+        return this;
     }
 
     public Plan updateState(State state){
