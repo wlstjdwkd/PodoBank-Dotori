@@ -180,7 +180,7 @@ public class PlanServiceImpl implements PlanService {
             throw new NotStartedPlanException("아직 예약된 계획이 시작되지 않았습니다.");
         }
 
-        throw new NotExistPlanException("계획이 존재하지 않습니다.");
+        return ActivePlanDTO.builder().accountBalance(accountService.getBalance(accountSeq)).build();
     }
 
     @Override
