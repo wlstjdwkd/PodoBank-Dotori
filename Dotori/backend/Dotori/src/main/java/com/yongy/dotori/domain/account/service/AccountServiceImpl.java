@@ -65,7 +65,7 @@ public class AccountServiceImpl implements AccountService{
         httpHeaders.add("Authorization","Bearer " + accessToken);
 
         Map<String, String> bodyData = new HashMap<>();
-        bodyData.put("serviceCode", accessToken);
+        bodyData.put("serviceCode", bankInfo.getServiceCode());
         bodyData.put("fintechCode", account.getFintechCode());
 
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, httpHeaders);
