@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import FooterScreen from "../Components/FooterScreen";
 import { useDispatch, useSelector } from "react-redux";
@@ -40,6 +40,10 @@ export default function WithDraw1Screen({ navigation, route }) {
       console.log('오류 발생: 1원 인증 실패',error)
     }
   }
+
+  useEffect(() => {
+
+  }, [])
 
   return (
     <View style={styles.container}>
