@@ -39,4 +39,10 @@ public class Payment {
 
     @Column(name = "checked")
     private boolean checked;
+
+    @Override
+    public String toString() {
+        return "{ paymentSeq=" + paymentSeq +
+                ", paymentName='" + paymentName + "}";
+    }
 }

@@ -38,28 +38,23 @@ public class PaymentsScheduler {
 
     @Autowired
     private PaymentService paymentService;
-
     @Autowired
     private ChatGPTService chatGPTService;
-
     @Autowired
     private PlanRepository planRepository;
-
     @Autowired
     private CategoryDataRepository categoryDataRepository;
-
     @Autowired
     private CategoryRepository categoryRepository;
-
     @Autowired
     private PlanDetailRepository planDetailRepository;
     @Autowired
     private PaymentRepository paymentRepository;
 
-    @Scheduled(fixedRate = 30 * 60 * 1000) // 30분(밀리초 단위)
+    //@Scheduled(fixedRate = 30 * 60 * 1000) // 30분(밀리초 단위)
     public void getPayments() throws ParseException, IOException {
 
-        List<Plan> activePlanList = planRepository.findAllByPlanState(State.ACTIVE);
+        List<Plan> activePlanList = planRepository.findAllByPlanStateAndTerminatedAtIsNull(State.ACTIVE);
 
         LocalDateTime currentTime = LocalDateTime.now(); // 현재시간
         log.info("현재 시간: {}", currentTime);
@@ -72,6 +67,7 @@ public class PaymentsScheduler {
             }
 
             List<PaymentPodoResDto> paymentResDto = paymentService.getPayments(plan.getUpdatedAt(),plan.getAccount().getAccountSeq());
+            log.info(paymentResDto.size()+"");
             List<Payment> chatGPT = new ArrayList<>();
             List<Payment> existPayment = new ArrayList<>();
 
@@ -80,9 +76,17 @@ public class PaymentsScheduler {
                 CategoryData categoryData = categoryDataRepository.findByDataCode(payment.getCode());
 
                 if(categoryData == null){
-                    chatGPT.add(Payment.builder().build());
+                    log.info(payment.getContent());
+                    chatGPT.add(Payment.builder()
+                            .paymentName(payment.getContent())
+                            .paymentPrice(payment.getAmount())
+                            .user(plan.getUser())
+                            .checked(false)
+                            .build());
                     continue;
                 }
+
+                log.info(payment.getContent());
 
                 // 카테고리 데이터가 이미 있어서 planDetail에 연결 돼있는지 확인 해야하면
                 // 카테고리데이터에 연결된 카테고리로 planDetail 찾기
@@ -109,12 +113,17 @@ public class PaymentsScheduler {
                         .build());
             }
 
-            // TODO : planSeq가 실행하는 카테고리로 GPT 자동화
-            List<PlanDetail> planDetails = planDetailRepository.findAllByPlanPlanSeq(plan.getPlanSeq());
-            List<UnclassifiedResponseDTO> result = chatGPTService.getPaymentChatGPTResponse(UnclassifiedDataDTO.builder()
-                    .payments(chatGPT)
-                    .build());
+            paymentRepository.saveAll(chatGPT); // chatGPT로 분류할 거 저장
             paymentRepository.saveAll(existPayment); // 이미 등록된 사업장인 payment 한 번에 저장
+
+            // NOTE : chatGPT로 분류
+            List<PlanDetail> planDetails = planDetailRepository.findAllByPlanPlanSeq(plan.getPlanSeq());
+//            List<UnclassifiedResponseDTO> result =
+//                    chatGPTService.getPaymentChatGPTResponse(UnclassifiedDataDTO.builder()
+//                            .planDetails(planDetails)
+//                            .payments(chatGPT)
+//                            .build());
+
         }
     }
 }

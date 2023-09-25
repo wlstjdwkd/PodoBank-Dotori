@@ -85,6 +85,7 @@ public class ChatGPTService {
                     "```").build());
             messageList.add(Message.builder().role("system").content("JSON result what List<UnclassifiedResponseDTO> type.").build());
             messageList.add(Message.builder().role("user").content(object.toString()).build());
+            log.info(object.toString());
         }
 
         RequestDTO requestDTO = RequestDTO.builder()
@@ -122,7 +123,6 @@ public class ChatGPTService {
         // API 호출 및 응답 처리
         HttpResponse response = httpClient.execute(request);
         String responseContent = EntityUtils.toString(response.getEntity(),"UTF-8");
-        log.info(responseContent);
 
         ResponseDetailDTO responseDetailDTO = objectMapper.readValue(responseContent, ResponseDetailDTO.class);
         Message message = responseDetailDTO.getChoices().get(0).getMessage();
