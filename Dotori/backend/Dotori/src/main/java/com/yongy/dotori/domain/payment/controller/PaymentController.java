@@ -52,6 +52,7 @@ public class PaymentController {
         List<PaymentPodoResDto> paymenetList;
         paymenetList = paymentService.getPayments(plan.getUpdatedAt(), paymentPodoReqDto.getAccountSeq());
 
+
         // 업데이트한 날짜 저장
         plan.setUpdatedAt(currentTime);
         planRepository.save(plan);
