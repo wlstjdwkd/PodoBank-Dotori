@@ -9,7 +9,6 @@ import lombok.*;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -52,12 +51,31 @@ public class Plan {
     @Column(name="end_at")
     private LocalDateTime endAt;
 
+    @Column(name="terminate_at")
+    private LocalDateTime terminatedAt;
+
     @Column(name="updated_at")
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "plan")
     private List<PlanDetail> planDetailList;
 
+    @Builder
+    public Plan(Long planSeq, User user, Account account, State planState,
+                BigDecimal totalSavings, BigDecimal additionalSavings, LocalDateTime saveAt,
+                LocalDateTime startAt, LocalDateTime endAt, LocalDateTime terminatedAt, LocalDateTime updatedAt) {
+        this.planSeq = planSeq;
+        this.user = user;
+        this.account = account;
+        this.planState = planState;
+        this.totalSavings = totalSavings;
+        this.additionalSavings = additionalSavings;
+        this.saveAt = saveAt;
+        this.startAt = startAt;
+        this.endAt = endAt;
+        this.terminatedAt = terminatedAt;
+        this.updatedAt = updatedAt;
+    }
 
     public void update(Plan plan){
         this.endAt = plan.endAt;

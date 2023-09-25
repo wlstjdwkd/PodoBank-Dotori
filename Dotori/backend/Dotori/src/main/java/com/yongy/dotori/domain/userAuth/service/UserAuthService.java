@@ -49,7 +49,6 @@ public class UserAuthService {
     @Autowired
     private AccountRepository accountRepository;
 
-    // NOTE : RedisDB
     @Autowired
     private PersonalAuthRepository personalAuthRepository;
 
@@ -59,41 +58,50 @@ public class UserAuthService {
     @Autowired
     private BankRefreshTokenRepository bankRefreshTokenRepository;
 
-   // @Autowired
-  //  private FintechTokenRepository fintechTokenRepository;
-
     private static Bank bankInfo;
 
-
-    // NOTE : 1원인증
-    public void ownCert(String id){
-        Random random = new Random();
-        String authCode = String.valueOf(random.nextInt(888888) + 111111); // 11111 ~ 99999의 랜덤한 숫자
-        sendOwnAuthCode(id, authCode);
+    // NOTE : PersonalAuth 반환
+    public PersonalAuth getPersonalAuth(String authCode) {
+        return personalAuthRepository.findByAuthCode(authCode);
     }
 
-    public void sendOwnAuthCode(String id, String authCode){
+    // NOTE : PersonalAuth 삭제
+    public void deletePersonalAuth(String email){
+        personalAuthRepository.deleteById(email);
+    }
+
+    // NOTE : 사용자의 계좌 반환
+    public Account getUserAccount(String accountNumber){
+        return accountRepository.findByAccountNumberAndDeleteAtIsNull(accountNumber);
+    }
+
+    // NOTE : 사용자의 계좌 저장
+    public void saveUserAccount(Account account){
+        accountRepository.save(account);
+    }
+
+    // NOTE : [본인인증]이메일 인증코드를 생성한다.
+    public void emailCertification(String id){
+        Random random = new Random();
+        String authCode = String.valueOf(random.nextInt(888888) + 111111); // 11111 ~ 99999의 랜덤한 숫자
+        sendEmailCertification(id, authCode);
+    }
+
+    // NOTE : [본인인증]인증코드를 사용자 이메일로 전송한다.
+    public void sendEmailCertification(String id, String authCode){
         emailUtil.setSubject("도토리 1원인증 코드");
         emailUtil.setPrefix("1원인증을 위한 인증번호는 ");
         emailUtil.sendEmailAuthCode(id, authCode);
-        personalAuthRepository.save(PersonalAuth.of(authCode, id));
+        personalAuthRepository.save(PersonalAuth.of(id, authCode));
     }
 
-    public String getOwnAuthId(String authCode) {
-        Optional<PersonalAuth> personalAuth = personalAuthRepository.findById(authCode);
-        if (personalAuth != null)
-            return personalAuth.get().getId();
-        return null;
-    }
-    public void deleteOwnAuthCode(String authCode){ personalAuthRepository.deleteById(authCode);}
 
-    // NOTE: 사용자의 access, refreshToken 가져오기 headers.add("Content-Type", "application/json;charset=utf-8");
-    public void podoBankLogin(Bank bankInfo){
+    // NOTE: 사용자의 access, refreshToken 가져오기
+    public void podoBankLogin(){
         try{
-
             HttpHeaders headers = new HttpHeaders();
             headers.add("Content-Type", "application/json;charset=utf-8");
-
+            log.info(bankInfo.getBankId()+"/"+bankInfo.getBankPwd());
             Map<String, String> bodyData = new HashMap<>();
             bodyData.put("email", bankInfo.getBankId());
             bodyData.put("password", bankInfo.getBankPwd());
@@ -107,7 +115,6 @@ public class UserAuthService {
                     HttpMethod.POST,
                     httpEntity,
                     String.class
-
             );
 
             JSONParser jsonParser = new JSONParser();
@@ -116,8 +123,8 @@ public class UserAuthService {
             String accessToken = (String) jsonObject.get("accessToken");
             String refreshToken = (String) jsonObject.get("refreshToken");
 
-            bankAccessTokenRepository.save(BankAccessToken.of("accessToken", accessToken));
-            bankRefreshTokenRepository.save(BankRefreshToken.of("refreshToken", refreshToken));
+            bankAccessTokenRepository.save(BankAccessToken.of(bankInfo.getBankName(), accessToken));
+            bankRefreshTokenRepository.save(BankRefreshToken.of(bankInfo.getBankName(), refreshToken));
         } catch (ParseException e) {
             throw new IllegalArgumentException("포도뱅크에 로그인할 수 없음");
         }
@@ -125,32 +132,39 @@ public class UserAuthService {
 
     // NOTE : accessToken이나 refreshToken을 세팅한다.(없으면 podoBankLogin을 호출해서 새로 발급해서 세팅함)
     public String getConnectionToken(Long bankSeq){
-        Optional<BankAccessToken> dotoriAccessToken = bankAccessTokenRepository.findById("accessToken");
-        Optional<BankRefreshToken> dotoriRefreshToken = bankRefreshTokenRepository.findById("refreshToken");
+        bankInfo = bankRepository.findByBankSeq(bankSeq);
+
+        log.info(bankInfo.getBankName()+"--1");
+
+        BankAccessToken bankAccessToken = bankAccessTokenRepository.findByBankName(bankInfo.getBankName());
+        BankRefreshToken bankRefreshToken = bankRefreshTokenRepository.findByBankName(bankInfo.getBankName());
 
         String useToken = null;
 
-        if(dotoriAccessToken.isEmpty()){
-            if(dotoriRefreshToken.isEmpty()){
-                bankInfo = bankRepository.findByBankSeq(bankSeq);
-                this.podoBankLogin(bankInfo); // accessToken, refreshToken 재발급
-                useToken = bankAccessTokenRepository.findById("accessToken").get().getToken();
+
+        if(bankAccessToken == null){
+            if(bankRefreshToken == null){
+                this.podoBankLogin(); // accessToken, refreshToken 재발급
+                if(bankAccessTokenRepository.findById(bankInfo.getBankName()).orElse(null) != null){
+                    useToken = bankAccessTokenRepository.findById(bankInfo.getBankName()).get().getToken();
+                }
             }else{
-                useToken = dotoriRefreshToken.get().getToken();
+                if(bankRefreshTokenRepository.findById(bankInfo.getBankName()).orElse(null) != null){
+                    useToken = bankRefreshTokenRepository.findById(bankInfo.getBankName()).get().getToken();
+                }
             }
         }else{
-            useToken = dotoriAccessToken.get().getToken();
+            if(bankAccessTokenRepository.findById(bankInfo.getBankName()).orElse(null) != null){
+                useToken = bankAccessTokenRepository.findById(bankInfo.getBankName()).get().getToken();
+            }
         }
+
         return useToken;
     }
 
-    // NOTE : 1원인증
-    public String sendAccountInfo(UserAccountDto userAccountDto){
+    // NOTE : 1원 인증코드를 보낸다.
+    public String sendAccountAuthCode(UserAccountDto userAccountDto){
         String useToken = this.getConnectionToken(userAccountDto.getBankSeq());
-
-        // 은행의 정보
-        if(bankInfo == null)
-            bankInfo = bankRepository.findByBankSeq(userAccountDto.getBankSeq());
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + useToken);
@@ -158,8 +172,7 @@ public class UserAuthService {
 
         Map<String, String> bodyData = new HashMap<>();
         bodyData.put("serviceCode", bankInfo.getServiceCode());
-        bodyData.put("accountNumber", userAccountDto.getAccountNumber()); // accountNumber
-
+        bodyData.put("accountNumber", userAccountDto.getAccountNumber());
 
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, headers);
 
@@ -172,18 +185,14 @@ public class UserAuthService {
                     String.class
         );
 
-        String responseCode = response.getStatusCode().toString().split(" ")[0];
+        String responseCode = response.getStatusCode().toString().split(" ")[0]; // 200
 
         return responseCode;
-
     }
+
     // NOTE : 1원 인증의 인증코드를 전송함
     public ResponseEntity<Void>checkAccountAuthCode(UserAccountCodeDto userAccountCodeDto) throws ParseException {
         String useToken = this.getConnectionToken(userAccountCodeDto.getBankSeq());
-
-        // 은행의 정보
-        if(bankInfo == null)
-            bankInfo = bankRepository.findByBankSeq(userAccountCodeDto.getBankSeq());
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + useToken);
@@ -213,11 +222,7 @@ public class UserAuthService {
 
             String fintechCode = jsonObject.get("fintechCode").toString();
 
-            // fintechTokenRepository.save(FintechToken.of(userAccountCodeDto.getAccountNumber(), fintechCode));
-
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-            log.info("fintechCode : "+ fintechCode);
 
             Account account = Account.builder()
                     .accountNumber(userAccountCodeDto.getAccountNumber())
@@ -232,7 +237,4 @@ public class UserAuthService {
         }
         throw new IllegalArgumentException("1원 인증 실패");
     }
-
-
-
 }
