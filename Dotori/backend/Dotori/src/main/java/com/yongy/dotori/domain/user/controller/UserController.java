@@ -227,7 +227,8 @@ public class UserController {
         if(!user.getAuthProvider().equals(Provider.DOTORI))
             throw new AccessDeniedSocialPwdException("네이버, 카카오 로그인은 비밀번호를 변경할 수 없습니다.");
 
-        if(passwordEncoder.encode(userUpdatePasswordReqDto.getBeforePassword()).equals(user.getPassword())){
+
+        if(passwordEncoder.matches(userUpdatePasswordReqDto.getBeforePassword(), user.getPassword())){
             user.setPassword(passwordEncoder.encode(userUpdatePasswordReqDto.getAfterPassword()));
             userService.saveUser(user);
             return ResponseEntity.ok().build();
