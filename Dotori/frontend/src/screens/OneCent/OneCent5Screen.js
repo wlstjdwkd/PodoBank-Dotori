@@ -6,40 +6,36 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Alert,
 } from "react-native";
 import FooterScreen from "../Components/FooterScreen";
 import { useDispatch, useSelector } from "react-redux";
+import { accountNicknameRegist } from '../../apis/accountapi'
 
-export default function OneCent1Screen({ navigation, route }) {
+export default function OneCent5Screen({ navigation, route }) {
   // 토큰
   const grantType =  useSelector((state)=>state.user.grantType)
   const accessToken =  useSelector((state)=>state.user.accessToken)
   const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
-  const accountNumberRef = useRef(null)
+  const accountTitleRef = useRef(null)
 
-  const [accountInfo, setAccountInfo] = useState({
-    userName: route.params.userName,
-    bankSeq: route.params.bankSeq,
-    bankName: route.params.bankName,
-    bankImage: route.params.bankImage,
-    accountNumber: "",
-  });
-  // const [accountNumber, setAccountNumber] = useState("");
+  const [accountInfo, setAccountInfo] = useState({...route.params.accountInfo, accountTitle:""});
   const [errorMessage, setErrorMessage] = useState("");
   const [isValid, setIsValid] = useState(false);
 
+  const validateAccountTitle = (text) => {
+    const regex = /^[A-Za-z0-9가-힣]{1,10}$/; 
+    return regex.test(text);
+  };
 
-
-  const handleAccountNumber = (text) =>{
-    setAccountInfo({ ...accountInfo, accountNumber: text });
+  const handleAccountTitle = (text) =>{
+    setAccountInfo({ ...accountInfo, accountTitle: text });
     
-    // setAccountNumber(text);
-    const regex = /^[0-9]{13}$/;
-    if (!regex.test(text)) {
+    if (!validateAccountTitle(text)) {
       setIsValid(false)
-      setErrorMessage("계좌 번호를 13자리 숫자로 입력해주세요.");
+      setErrorMessage("계좌 별칭을 10자리 띄어쓰기 없이 음절로 입력해주세요.");
     } else {
       setIsValid(true)
       setErrorMessage("");
@@ -47,63 +43,85 @@ export default function OneCent1Screen({ navigation, route }) {
   }
 
   const handleConfirm = () => {
-    const regex = /^[0-9]{13}$/;
-    // if (accountInfo.accountNumber.length !== 13) {
-    if (!regex.test(accountInfo.accountNumber)) {
-      setIsValid(false)
-      setErrorMessage("계좌 번호를 13자리 숫자로 입력해주세요.");
+    if (!validateAccountTitle(accountInfo.accountTitle)) {
+      setErrorMessage("계좌 별칭을 10자리 띄어쓰기 없이 음절로 입력해주세요.")
     } else {
-      setIsValid(true)
       setErrorMessage("");
-      // console.log(accountInfo);
       navigation.navigate("OneCent3Screen", {
         accountInfo: accountInfo,
-      }); // 계좌 번호를 다음 페이지로 전달
+      })
     }
   };
 
+  const handleAccountNicknameRegist = () => {
+    if(isValid){
+      setErrorMessage("")
+      doAccountNicknameRegist()
+    }else{
+      setErrorMessage("10자 이내로 띄어쓰기 없이 올바르게 작성해주세요")
+    }
+  }
+
+  const doAccountNicknameRegist = async () => {
+    const data = {accountNumber: accountInfo.accountNumber, accountTitle: accountInfo.accountTitle}
+    try{
+      const response =  await accountNicknameRegist(data, accessToken, grantType)
+      if(response.status === 200){
+        console.log('계좌 별칭 설정 성공')
+        Alert.alert("","계좌 별칭 설정을 완료했습니다.")
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainPageScreen', params:{}}],
+        });
+        // navigation.navigate("OneCent5Screen", { accountInfo: accountInfo, })
+      }else{
+        console.log('계좌 별칭 설정 실패', response.status)
+        setErrorMessage("계좌 별칭을 다시 확인해주세요.")
+      }
+    }catch(error){
+      console.log('계좌 별칭 설정 실패', error)
+      setErrorMessage("오류 발생: 계좌 별칭 설정 실패")
+    }
+  }
+
   useEffect(()=>{
-    accountNumberRef.current.focus()
+    accountTitleRef.current.focus()
   })
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.innerContainer}>
-        <Text style={styles.boldTextLeft}>계좌 번호를 입력해주세요.</Text>
+        <Text style={styles.boldTextLeft}>계좌 별칭을 입력해주세요.</Text>
 
         {/* 텍스트 입력 박스 */}
         <View style={styles.inputContainer}>
           <TextInput
-            style={styles.input}
-            placeholder="'-'를 제외한 계좌 번호를 입력하세요."
+            style={[styles.input, {fontSize:accountInfo.accountTitle?16:12}]}
+            placeholder="10자 이내로 띄어쓰기 없이 음절로 작성해주세요."
             placeholderTextColor="#A9A9A9"
             underlineColorAndroid="transparent" // 하단 선 숨기기
             returnKeyType="done"
-            keyboardType="numeric" // 숫자 키패드 표시
-            maxLength={13} // 최대 13자리로 제한
+            keyboardType="default" // 숫자 키패드 표시
+            maxLength={10}
             textAlign="center" // 가운데 정렬
-            value={accountInfo.accountNumber}
-            ref={accountNumberRef}
+            value={accountInfo.accountTitle}
+            ref={accountTitleRef}
             onChangeText={(text) => {
-              handleAccountNumber(text)
+              handleAccountTitle(text)
             }}
             onSubmitEditing={()=>{
-              handleConfirm()
+              handleAccountNicknameRegist()
             }}
           />
         </View>
 
-        {/* 오류 메시지 */}
-        {/* {errorMessage !== "" && (
-          <Text style={styles.errorMessage}>{errorMessage}</Text>
-        )} */}
         <Text style={styles.errorMessage}>{(errorMessage !== "") &&errorMessage}</Text>
         
 
         {/* 버튼 */}
-        <TouchableOpacity style={[styles.button, {backgroundColor:isValid?"#FF965C":'gray'}]}
+        <TouchableOpacity style={[styles.button, {backgroundColor:isValid?"#FF965C":"gray"}]}
           onPress={() => {
-            handleConfirm()
+            handleAccountNicknameRegist()
           }}
           disabled={!isValid}
         >
@@ -168,7 +186,8 @@ const styles = StyleSheet.create({
   errorMessage: {
     color: "red",
     // fontSize: 16,
-    fontSize: 15,
+    // fontSize: 15,
+    fontSize: 12,
     textAlign: "center",
     // marginTop: 8,
   },
