@@ -36,4 +36,7 @@ public class Payment {
 
     @Column(name = "payment_price", nullable = false)
     private BigDecimal paymentPrice;
+
+    @Column(name = "checked")
+    private boolean checked;
 }

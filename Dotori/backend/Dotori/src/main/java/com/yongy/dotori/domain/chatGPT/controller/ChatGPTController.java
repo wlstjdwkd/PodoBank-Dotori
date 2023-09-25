@@ -1,9 +1,7 @@
 package com.yongy.dotori.domain.chatGPT.controller;
 
 import com.yongy.dotori.domain.categoryGroup.entity.CategoryGroup;
-import com.yongy.dotori.domain.chatGPT.dto.CategoryDataDTO;
-import com.yongy.dotori.domain.chatGPT.dto.RequestDTO;
-import com.yongy.dotori.domain.chatGPT.dto.ResultDataDTO;
+import com.yongy.dotori.domain.chatGPT.dto.*;
 import com.yongy.dotori.domain.chatGPT.service.ChatGPTService;
 import com.yongy.dotori.domain.payment.entity.Payment;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,9 +29,8 @@ public class ChatGPTController {
     }
 
     @Operation(summary = "카테고리에 따라 payment 분류")
-    @PostMapping("/unclassified")
-    public List<Payment> unclassifiedChatGPT(List<Payment> paymentList){
-        chatGPTService.getCategoryPaymentList(paymentList);
-        return new ArrayList<>();
+    @GetMapping("/unclassified")
+    public ResponseEntity<List<UnclassifiedResponseDTO>> unclassifiedChatGPT(UnclassifiedDataDTO unclassifiedDataDTO) throws IOException {
+        return ResponseEntity.ok().body(chatGPTService.getPaymentChatGPTResponse(unclassifiedDataDTO));
     }
 }
