@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -8,15 +8,24 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage' // 스토리지에 저장하기 위해 사용되는 import
+import {inputgrantType, inputAccessToken, inputRefreshToken} from "../../redux/slices/auth/user"
+import {userLogin} from "../../apis/userapi"
+import { useDispatch, useSelector } from "react-redux" 
 
 export default function LoginScreen({ navigation }) {
+  // 토큰
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
+  const dispatch = useDispatch()
+  // 그 외
   const idRef = useRef(null)
   const passwordRef = useRef(null)
   const [idSave, setIdSave] = useState(false) // 아이디 저장여부
   const [emailValue, setEmailValue] = useState("")
   const [passwordValue, setPasswordValue] = useState("")
   const [loginMessage, setLoginMessage] = useState("")
-
 
   const handleLogin = () => {
     console.log(emailValue+'and'+passwordValue)
@@ -31,32 +40,85 @@ export default function LoginScreen({ navigation }) {
       doLogin();
     }
   }
-  
 
-  const doLogin = () => {
-    console.log("로그인완료")
-    // navigation.navigate("MainPageScreen")
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'MainPageScreen' }],
-    });
-    // cosnt data = {email:emailValue, password:passwordValue}
-    // const response = await 어쩌고함수()
-    // if(response.status === 200){
-    //   console.log('로그인 성공')
-    //   navigation.navigate("MainPageScreen")
-      // navigation.reset({
-      //   index: 0,
-      //   routes: [{ name: 'MainPageScreen' }],
-      // });
-    // }else if(response.status === 400){
-    //   console.log('로그인 실패')
-    //   Alert.alert('로그인 실패', 아이디와 비밀번호를 확인해주세요.)
-    //   setLoginMessage("아이디와 비밀번호를 확인해주세요.")
-    // }else{
-    //   console.log('오류 발생: 로그인 실패')
-    // }
+  // const doLogin = async () => {
+  //   console.log("로그인완료")
+  //   if(idSave){
+  //     await AsyncStorage.setItem("id", emailValue);
+  //     console.log(emailValue)
+  //   }else{
+  //     await AsyncStorage.removeItem('id')
+  //   }
+  //   dispatch(inputgrantType("123"))
+  //   dispatch(inputAccessToken("456"))
+  //   dispatch(inputRefreshToken("789"))
+  //   navigation.reset({
+  //     index: 0,
+  //     routes: [{ name: 'MainPageScreen' }],
+  //   });
+  // }
+
+  const doLogin = async () => {
+    const data = {id:emailValue, password:passwordValue}
+    try{
+      const response = await userLogin(data)
+      if(response.status === 200){
+        console.log('로그인 성공')
+        dispatch(inputgrantType(response.data.grantType))
+        dispatch(inputAccessToken(response.data.accessToken))
+        dispatch(inputRefreshToken(response.data.refreshToken))
+        try{
+          if(idSave){
+            await AsyncStorage.setItem("id", emailValue);
+            console.log(emailValue)
+          }else{
+            await AsyncStorage.removeItem('id')
+          }
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'MainPageScreen' }],
+          });
+        }catch(error){
+          setLoginMessage('오류 발생: 로그인 실패')
+        }
+      }else if(response.status === 404){
+        console.log('로그인 실패')
+        Alert.alert('로그인 실패', "아이디와 비밀번호를 확인해주세요.")
+        setLoginMessage("아이디와 비밀번호를 확인해주세요.")
+      }else{
+        setLoginMessage('오류 발생: 로그인 실패')
+      }
+    }catch(error){
+      console.log(error)
+      setLoginMessage('오류 발생: 로그인 실패')
+    }
   }
+
+  useEffect(()=>{
+    dispatch(inputgrantType(null))
+    dispatch(inputAccessToken(null))
+    dispatch(inputRefreshToken(null))
+
+    const getExistingId = async () => {
+      try{
+        const existingId = await AsyncStorage.getItem("id");
+        if(existingId){
+          // 데이터 발견, 해당 데이터로 무언가 수행
+          setEmailValue(existingId)
+          passwordRef.current.focus()
+          setIdSave(true)
+        }else {
+          // 데이터 없음
+          idRef.current.focus()
+        }
+      }catch (error) {
+        console.log(error)
+      }
+    }
+    getExistingId()
+  }, [])
+
+
   return (
     <View style={styles.container}>
       <Image

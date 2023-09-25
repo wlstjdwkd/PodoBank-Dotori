@@ -9,8 +9,16 @@ import {
 } from "react-native";
 
 import HeaderComponent from "../Components/HeaderScreen";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function PurposeCreate1Screen({ navigation }) {
+  // 토큰
+  const grantType =  useSelector((state)=>{state.user.grantType})
+  const accessToken =  useSelector((state)=>{state.user.accessToken})
+  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const dispatch = useDispatch()
+  // 그 외
+  
   const [purposeInfo, setPurposeInfo] = useState({
     purposeName: "",
   });

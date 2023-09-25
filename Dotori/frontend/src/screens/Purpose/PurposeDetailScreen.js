@@ -1,6 +1,7 @@
 import React from "react";
 import { View, StyleSheet, TouchableOpacity, Text, ScrollView } from "react-native";
 import Feather from "react-native-vector-icons/Feather"; // Feather 아이콘을 가져올 수 있는 라이브러리
+import { useDispatch, useSelector } from "react-redux";
 
 
 
@@ -51,6 +52,13 @@ const data = {
 
 
 export default function PurposeDetailScreen({ route, navigation }) {
+  // 토큰
+  const grantType =  useSelector((state)=>{state.user.grantType})
+  const accessToken =  useSelector((state)=>{state.user.accessToken})
+  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const dispatch = useDispatch()
+  // 그 외
+
   const { itemId } = route.params;
 
   // 날짜 형식을 변환하는 함수

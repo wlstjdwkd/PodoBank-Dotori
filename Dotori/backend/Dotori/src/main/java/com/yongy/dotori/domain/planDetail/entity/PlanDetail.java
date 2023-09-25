@@ -15,8 +15,8 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @Entity(name="plan_details")
 public class PlanDetail {
