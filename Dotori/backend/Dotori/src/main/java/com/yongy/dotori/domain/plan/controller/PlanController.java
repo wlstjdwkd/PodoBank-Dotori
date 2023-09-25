@@ -60,7 +60,7 @@ public class PlanController {
     })
 
     @PostMapping("/saving")
-    public ResponseEntity<Void> saving(@RequestBody SavingDTO savingDTO) {
+    public ResponseEntity<Void> saving(@RequestBody SavingDTO savingDTO) throws JsonProcessingException {
         planService.saving(savingDTO);
         return ResponseEntity.ok().build();
     }

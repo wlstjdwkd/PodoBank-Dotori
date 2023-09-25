@@ -94,6 +94,7 @@ public class UserController {
     @Operation(summary = "사용자 회원가입", description = "ALL")
     @PostMapping("/signup")
     public ResponseEntity<Void> signup(@RequestBody UserInfoReqDto userInfoReqDto){
+
         try{
             User user = User.builder()
                     .id(userInfoReqDto.getId())
