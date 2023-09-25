@@ -13,9 +13,9 @@ import {accountVerificationsOnecentCheck} from "../../apis/accountapi"
 
 export default function OneCent2Screen({ navigation, route }) {
   // 토큰
-  const grantType =  useSelector((state)=>{state.user.grantType})
-  const accessToken =  useSelector((state)=>{state.user.accessToken})
-  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
   
@@ -53,8 +53,11 @@ export default function OneCent2Screen({ navigation, route }) {
     try{
       const response = await accountVerificationsOnecentCheck(data, accessToken, grantType)
       if(response.status === 200){
-        Alert.alert('','1원 인증 완료입니다.')
-        navigation.navigate("MainPageScreen")
+        // navigation.navigate("OneCent5Screen", { accountInfo: accountInfo, })
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'OneCent5Screen', params:{ accountInfo: accountInfo, }}],
+        });
       }else if(response.status === 404){
         console.log('1원 인증 코드 검증 실패',response.status)
       }else{
