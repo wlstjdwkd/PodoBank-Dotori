@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, Alert, Pressable } from "react-native";
 import { AntDesign, Entypo, FontAwesome } from "@expo/vector-icons";
 
 // const userInfo = {
@@ -14,6 +14,7 @@ import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux";
 import {userLogout,userExitDotori, userInfoInquiry} from "../../apis/userapi"
 import {inputgrantType, inputAccessToken, inputRefreshToken} from "../../redux/slices/auth/user"
+import { useIsFocused } from "@react-navigation/native";
 
 export default function MyPageScreen({ navigation }) {
   // 토큰
@@ -23,19 +24,10 @@ export default function MyPageScreen({ navigation }) {
   const dispatch = useDispatch()
   // 그 외
   const [userInfo, setUserInfo] = useState(null)
+  const isFocused = useIsFocused();
+  const [modalVisible, setModalVisible] = useState(false);
 
-  // const doLogout = async () =>{
-  //   // await AsyncStorage.removeItem('grantType')
-  //   // await AsyncStorage.removeItem('accessToken')
-  //   // await AsyncStorage.removeItem('refreshToken')
-  //   dispatch(inputgrantType(null))
-  //   dispatch(inputAccessToken(null))
-  //   dispatch(inputRefreshToken(null))
-  //   navigation.reset({
-  //     index: 0,
-  //     routes: [{ name: 'LoginScreen' }],
-  //   });
-  // }
+
   const doLogout = async () =>{
     try{
       const response = await userLogout(refreshToken, accessToken, grantType)
@@ -91,8 +83,10 @@ export default function MyPageScreen({ navigation }) {
   }
 
   useEffect(() => {
-    doUserInfoInquiry();
-  }, []);
+    if(isFocused){
+      doUserInfoInquiry();
+    }
+  }, [isFocused]);
 
 
   return (
@@ -126,16 +120,26 @@ export default function MyPageScreen({ navigation }) {
         <View style={styles.infoItem}>
           <Text style={styles.infoText}>생년월일</Text>
           {/* <Text style={styles.infoText}>{userInfo.birth}</Text> */}
-          <Text style={styles.infoText}>{userInfo?userInfo.birthDate:"1999-12-12"}</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoText}>{userInfo?userInfo.birthDate:"1999-12-12"} </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("EditBirthDateScreen", {birthDate: userInfo.birthDate})}
+            >
+              <Image
+                style={styles.editIcon}
+                source={require("../../assets/icon/pencil.png")} // 편집 아이콘 이미지 경로
+              />
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={styles.infoItem}>
           <Text style={styles.infoText}>핸드폰 번호</Text>
           <View style={styles.infoRow}>
             {/* <Text style={styles.infoText}>{userInfo.phone}</Text> */}
-            <Text style={styles.infoText}>{userInfo?changeFormPhoneNumber(userInfo.phoneNumber):"010-1234-1234"}</Text>
+            <Text style={styles.infoText}>{userInfo?changeFormPhoneNumber(userInfo.phoneNumber):"010-1234-1234"} </Text>
             {/* <Text style={styles.infoText}>{userInfo?userInfo.phoneNumber:"010-1234-1234"}</Text> */}
             <TouchableOpacity
-              onPress={() => navigation.navigate("EditPhoneNumberScreen")}
+              onPress={() => navigation.navigate("EditPhoneNumberScreen", {phoneNumber: userInfo.phoneNumber})}
             >
               <Image
                 style={styles.editIcon}
@@ -205,6 +209,8 @@ export default function MyPageScreen({ navigation }) {
           <Text style={styles.withdrawText}>회원탈퇴</Text>
         </TouchableOpacity>
       </View>
+      
+
     </View>
   );
 }
