@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 } from "react-native";
 
 import HeaderComponent from "../Components/HeaderScreen";
+import {userSignup} from "../../apis/userapi"
 
 export default function SignUp4Screen({ navigation, route }) {
   const nameInputRef = useRef(null); // 이름 입력란 ref
@@ -29,7 +30,7 @@ export default function SignUp4Screen({ navigation, route }) {
     isNameValid: false,
     isBirthdateValid: false,
     isPhoneNumberValid: false,
-  });
+  }); 
 
   const validateName = (text) => {
     const regex = /^[A-Za-z가-힣]{2,}$/;
@@ -48,11 +49,11 @@ export default function SignUp4Screen({ navigation, route }) {
     if (validateName(text)) {
       setNameMessage("이름 작성 완료");
       setIsValid((prev) => ({ ...prev, isNameValid: true }));
-      setUserInfo({ ...userInfo, name: text });
+      setUserInfo({ ...userInfo, userName: text });
     } else {
       setNameMessage("이름은 2글자 이상 음절로 이루어져야 합니다.");
       setIsValid((prev) => ({ ...prev, isNameValid: false }));
-      setUserInfo({ ...userInfo, name: "" });
+      setUserInfo({ ...userInfo, userName: "" });
     }
   };
   const handleBirthDateChange = (text) => {
@@ -98,12 +99,67 @@ export default function SignUp4Screen({ navigation, route }) {
         phoneNumberInputRef.current.focus()
         break;
       default:
-        console.log(userInfo)
-        navigation.navigate("SignUpCompleteScreen", { name: userInfo.name })
+        doSignup()
+        
+        // navigation.navigate("SignUpCompleteScreen", { userName: userInfo.userName })
         break;
     }
   }
 
+  // const doSignup = async () =>{
+  //   Alert.alert('',"axios됬다하고")
+  //   console.log(userInfo)
+  //   const loginInfo = {
+  //     "userName": userInfo.userName, "id":userInfo.id, "password":userInfo.password
+  //   }
+  //   navigation.reset({
+  //     index: 0,
+  //     routes: [{ name: 'SignUpCompleteScreen', params:{loginInfo} }],
+  //   });
+  // }
+
+  changeFormbirthDate = (birthDate) => {
+    if (birthDate.length === 8) {
+      const year = birthDate.slice(0, 4);
+      const month = birthDate.slice(4, 6);
+      const day = birthDate.slice(6, 8);
+      const formattedDate = `${year}-${month}-${day}`;
+      return formattedDate;
+    } else {
+      // 유효하지 않은 입력인 경우 또는 길이가 8이 아닌 경우에 대한 처리
+      return '유효하지 않은 날짜';
+    }
+  }
+
+
+  const doSignup = async () =>{
+    // console.log(userInfo)
+    // changeFormbirthDate(userInfo.birthDate)
+    const userInfoSending = {...userInfo, birthDate:changeFormbirthDate(userInfo.birthDate)}
+    try{
+      const response = await userSignup(userInfoSending)
+      if(response.status === 200){
+        const loginInfo = {
+          "userName": userInfo.userName, "id":userInfo.id, "password":userInfo.password
+        }
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'SignUpCompleteScreen', params:{loginInfo} }],
+        });
+        console.log('회원가입 성공')
+      }else if(response.status === 400){
+        console.log('회원가입 실패', response.status)
+      }else{
+        console.log('오류발생 : 회원가입 실패')
+      }
+    }catch(error){
+      console.log('오류발생 : 회원가입 실패',error)
+    }
+  }
+
+  useEffect(()=>{
+    nameInputRef.current.focus()
+  },[])
 
   return (
     <View style={styles.container}>
@@ -235,10 +291,11 @@ export default function SignUp4Screen({ navigation, route }) {
         </ScrollView>
         
         <TouchableOpacity
-          style={styles.button}
+          style={[styles.button,{backgroundColor:(isValid.isNameValid && isValid.isBirthdateValid && isValid.isPhoneNumberValid)?"#FF965C":'grey'}]}
           onPress={() =>{
             gotoSignUpCompleteScreen()
           }}
+          disabled={!(isValid.isNameValid && isValid.isBirthdateValid && isValid.isPhoneNumberValid)}
         >
           <Text style={styles.buttonText}>회원가입</Text>
         </TouchableOpacity>

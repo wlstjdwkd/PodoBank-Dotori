@@ -7,10 +7,17 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function PurposeCompleteScreen({ navigation, route }) {
-  const name = route.params.name;
+  // 토큰
+  const grantType =  useSelector((state)=>{state.user.grantType})
+  const accessToken =  useSelector((state)=>{state.user.accessToken})
+  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const dispatch = useDispatch()
+  // 그 외
 
+  const name = route.params.name;
   return (
     <View style={styles.container}>
       <View style={styles.centerContainer}>

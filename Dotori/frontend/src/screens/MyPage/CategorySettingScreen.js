@@ -8,6 +8,7 @@ import {
   FlatList,
 } from "react-native";
 import HeaderComponent from "../Components/HeaderScreen";
+import { useDispatch, useSelector } from "react-redux";
 
 const categorys = [
   {
@@ -43,6 +44,13 @@ const categorys = [
 ];
 
 export default function CategorySettingScreen({ navigation, route }) {
+  // 토큰
+  const grantType =  useSelector((state)=>{state.user.grantType})
+  const accessToken =  useSelector((state)=>{state.user.accessToken})
+  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const dispatch = useDispatch()
+  // 그 외
+  
   // route.params를 통해 이전 페이지에서 받은 categorySeq를 가져옵니다.
   const { categorySeq } = route.params;
 

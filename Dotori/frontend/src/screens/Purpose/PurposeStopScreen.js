@@ -2,6 +2,7 @@ import React from "react";
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
 import { BarChart } from "react-native-gifted-charts";
+import { useDispatch, useSelector } from "react-redux";
 
 const data = {
   id: "1",
@@ -87,6 +88,13 @@ const generateBarData = (data) => {
 };
 
 export default function PurposeDetailScreen({ navigation }) {
+  // 토큰
+  const grantType =  useSelector((state)=>{state.user.grantType})
+  const accessToken =  useSelector((state)=>{state.user.accessToken})
+  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const dispatch = useDispatch()
+  // 그 외
+
 const sortedPurposeDataList = data.purposeDataList.sort((a, b) => {
   const dateA = new Date(a.month);
   const dateB = new Date(b.month);

@@ -8,8 +8,16 @@ import {
   FlatList,
 } from "react-native";
 import HeaderComponent from "../Components/HeaderScreen";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function PlanNotClassifyScreen({ navigation }) {
+  // 토큰
+  const grantType =  useSelector((state)=>{state.user.grantType})
+  const accessToken =  useSelector((state)=>{state.user.accessToken})
+  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const dispatch = useDispatch()
+  // 그 외
+  
   // TODO: 서버에서 데이터를 가져와 아래 변수들을 설정하세요
   const sampleData = {
     accountName: "시민주의 통장",
