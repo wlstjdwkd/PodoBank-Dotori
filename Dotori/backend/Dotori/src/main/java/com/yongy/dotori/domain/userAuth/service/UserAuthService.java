@@ -141,16 +141,24 @@ public class UserAuthService {
 
         String useToken = null;
 
+
         if(bankAccessToken == null){
             if(bankRefreshToken == null){
                 this.podoBankLogin(); // accessToken, refreshToken 재발급
-                useToken = bankAccessTokenRepository.findByBankName(bankInfo.getBankName()).getToken();
+                if(bankAccessTokenRepository.findById(bankInfo.getBankName()).orElse(null) != null){
+                    useToken = bankAccessTokenRepository.findById(bankInfo.getBankName()).get().getToken();
+                }
             }else{
-                useToken = bankRefreshTokenRepository.findByBankName(bankInfo.getBankName()).getToken();
+                if(bankRefreshTokenRepository.findById(bankInfo.getBankName()).orElse(null) != null){
+                    useToken = bankRefreshTokenRepository.findById(bankInfo.getBankName()).get().getToken();
+                }
             }
         }else{
-            useToken = bankAccessTokenRepository.findByBankName(bankInfo.getBankName()).getToken();
+            if(bankAccessTokenRepository.findById(bankInfo.getBankName()).orElse(null) != null){
+                useToken = bankAccessTokenRepository.findById(bankInfo.getBankName()).get().getToken();
+            }
         }
+
         return useToken;
     }
 
