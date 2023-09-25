@@ -1,16 +1,44 @@
 import React, { useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import FooterScreen from "../Components/FooterScreen";
+import { useDispatch, useSelector } from "react-redux";
+import {accountVerificationsOnecentSend} from '../../apis/accountapi'
 
 export default function OneCent3Screen({ navigation, route }) {
+  // 토큰
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
+  const dispatch = useDispatch()
+  // 그 외
+  
   const [accountInfo, setAccountInfo] = useState(route.params.accountInfo);
 
   const handleConfirm = () => {
-    // 페이지 이동 예시:
-    navigation.navigate("OneCent4Screen", {
-      accountInfo: accountInfo,
-    });
+    doAccountVerificationsOnecentSend()
+    // // 페이지 이동 예시:
+    // navigation.navigate("OneCent4Screen", {
+    //   accountInfo: accountInfo,
+    // });
   };
+
+  const doAccountVerificationsOnecentSend = async () =>{
+    const data = {bankSeq: accountInfo.bankSeq, accountNumber:accountInfo.accountNumber}
+    try{
+      const response = await accountVerificationsOnecentSend(data, accessToken, grantType)
+      if(response.status === 200){
+        navigation.navigate("OneCent4Screen", {
+          accountInfo: accountInfo,
+        });
+      }else if(response.status === 404){
+        console.log('1원 인증 실패',response.status)
+      }else{
+        console.log('1원 인증 실패',response.status)
+      }
+    }catch(error){
+      console.log('오류 발생: 1원 인증 실패',error)
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -27,13 +55,17 @@ export default function OneCent3Screen({ navigation, route }) {
         <Text style={styles.text}>{accountInfo.accountNumber}</Text>
       </View>
 
-      <Text style={styles.text}>시민주님 계좌가 맞는지</Text>
+      <Text style={styles.text}>{accountInfo.userName}님 계좌가 맞는지</Text>
       <Text style={styles.text}>확인하기 위해</Text>
       <Text style={{ fontSize: 18 }}>
         <Text style={{ color: "#FF965C" }}>1원</Text>을 보내볼께요
       </Text>
 
-      <TouchableOpacity style={styles.button} onPress={handleConfirm}>
+      <TouchableOpacity style={styles.button}
+        onPress={() =>{
+          handleConfirm()
+        }}
+      >
         <Text style={styles.buttonText}>1원 보내기</Text>
       </TouchableOpacity>
 

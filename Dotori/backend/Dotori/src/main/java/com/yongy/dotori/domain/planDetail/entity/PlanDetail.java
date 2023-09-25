@@ -10,10 +10,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @Entity(name="plan_details")
 public class PlanDetail {
