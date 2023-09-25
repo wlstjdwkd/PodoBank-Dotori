@@ -81,7 +81,7 @@ public class PaymentServiceImpl implements PaymentService{
 
 
         List<PaymentPodoResDto> paymentList = new ArrayList<>();
-
+        log.info("state : "+ response.getStatusCode().toString().split(" ")[0]);
         if(response.getStatusCode().toString().split(" ")[0].equals("200")){
             JSONParser jsonParser = new JSONParser();
             JSONArray jsonArray = (JSONArray) jsonParser.parse(response.getBody());
