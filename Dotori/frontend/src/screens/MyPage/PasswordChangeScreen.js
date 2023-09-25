@@ -30,7 +30,7 @@ export default function PasswordChangeScreen({ navigation }) {
     currentPwMessage : "",
     changePwMessage : "",
     confirmChangePwMessage : "",
-    responseMessage : "비밀번호 변경 중",
+    responseMessage : "",
   })
   const [isValidPw, setIsValidPw] = useState({
     isCurrentPwValid: false,
@@ -160,10 +160,11 @@ export default function PasswordChangeScreen({ navigation }) {
       setIsValidPw((prev) => ({...prev, isCanChange:true}))
       setPwMessage((prev)=>({...prev, responseMessage:"비밀번호 변경 가능"}))
     }else{
-      setPwMessage((prev)=>({...prev, responseMessage:"비밀번호 변경 중"}))
+      if(currentPassword || changePassword || changeConfirmPassword){
+        setPwMessage((prev)=>({...prev, responseMessage:"비밀번호 변경 중"}))
+      }
       setIsValidPw((prev) => ({...prev, isCanChange:false}))
     }
-    console.log(isValidPw)
   },[isValidPw.isCurrentPwValid, isValidPw.isChangePwValid, isValidPw.isConfirmPwValid])
   return (
     <View style={styles.container}>

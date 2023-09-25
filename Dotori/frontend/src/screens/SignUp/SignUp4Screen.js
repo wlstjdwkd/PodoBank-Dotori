@@ -15,7 +15,7 @@ import {userSignup} from "../../apis/userapi"
 export default function SignUp4Screen({ navigation, route }) {
   const nameInputRef = useRef(null); // 이름 입력란 ref
   const birthDateInputRef = useRef(null); // 생년월일 입력란 ref
-  const phoneNumberInputRef = useRef(null); // 휴대폰번호 입력란 ref
+  const phoneNumberInputRef = useRef(null); // 핸드폰번호 입력란 ref
 
   const [userInfo, setUserInfo] = useState(route.params.userInfo);
   const [nameMessage, setNameMessage] = useState("");
@@ -71,7 +71,7 @@ export default function SignUp4Screen({ navigation, route }) {
   const handlePhoneNumberChange = (text) => {
     setPhoneNumberValue(text)
     if (validatePhoneNumber(text)) {
-      setPhoneNumberMessage("휴대폰번호 작성 완료");
+      setPhoneNumberMessage("핸드폰번호 작성 완료");
       setIsValid((prev) => ({ ...prev, isPhoneNumberValid: true }));
       setUserInfo({ ...userInfo, phoneNumber: text });
     } else {
@@ -95,7 +95,7 @@ export default function SignUp4Screen({ navigation, route }) {
         break;
       case !isValid.isPhoneNumberValid:
         // console.log(isValid)
-        Alert.alert('','작성하신 휴대폰번호를 다시 확인해주세요.')
+        Alert.alert('','작성하신 핸드폰번호를 다시 확인해주세요.')
         phoneNumberInputRef.current.focus()
         break;
       default:
@@ -250,7 +250,7 @@ export default function SignUp4Screen({ navigation, route }) {
           </Text> */}
 
           <View style={styles.rowContainer}>
-            <Text style={styles.subtitle}>휴대폰번호</Text>
+            <Text style={styles.subtitle}>핸드폰번호</Text>
             {/* <Text
               style={{
                 color: isValid.isPhoneNumberValid ? "blue" : "red",

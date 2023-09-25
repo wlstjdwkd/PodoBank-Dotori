@@ -13,6 +13,7 @@ import FooterScreen from "../Components/FooterScreen";
 import { useDispatch, useSelector } from "react-redux";
 import {accountWholeInquiry} from "../../apis/accountapi"
 import {userInfoInquiry} from '../../apis/userapi'
+import { useIsFocused } from "@react-navigation/native";
 
 const banks = [
   {
@@ -56,8 +57,8 @@ export default function MainPageScreen({ navigation }) {
   // 그 외
   const [accountList, setAccountList] = useState([])
   const [userInfo, setUserInfo] = useState(null)
-
-
+  const isFocused = useIsFocused()
+  
   // // 정보조회 함수
   // const do정보조회 = async () => {
   //   const response = await 함수()
@@ -72,6 +73,7 @@ export default function MainPageScreen({ navigation }) {
     try{
       const response = await accountWholeInquiry(accessToken, grantType)
       if(response.status === 200){
+        console.log("전체 계좌 리스트 불러오기 성공")
         setAccountList(response.data)
       }else{
         console.log("전체 계좌 리스트 불러오기 실패")
@@ -94,10 +96,12 @@ export default function MainPageScreen({ navigation }) {
   }
 
   useEffect(()=>{
-    // do정보조회()
-    doAccountWholeInquiry()
-    doUserInfoInquiry()
-  },[])
+    if(isFocused){
+      // do정보조회()
+      doAccountWholeInquiry()
+      doUserInfoInquiry()
+    }
+  },[isFocused])
 
   return (
     <View style={styles.container}>
