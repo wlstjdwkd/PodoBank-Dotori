@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity,Modal, Alert } from "react-native";
 import FooterScreen from "../Components/FooterScreen";
 import { useDispatch, useSelector } from "react-redux";
-import {accountVerificationsOnecentSend} from '../../apis/accountapi'
+import { userWithdrawDotori } from "../../apis/userapi"
+import {inputgrantType, inputAccessToken, inputRefreshToken} from "../../redux/slices/auth/user"
 
 export default function WithDraw1Screen({ navigation, route }) {
   // 토큰
@@ -11,34 +12,56 @@ export default function WithDraw1Screen({ navigation, route }) {
   const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
-  
   const [userInfo, setUserInfo] = useState(route.params.userInfo)
-  const [accountInfo, setAccountInfo] = useState(route.params.accountInfo);
+  const [userWithdrawModalVisible, setUserWithdrawModalVisible] = useState(false);
 
-  const handleConfirm = () => {
-    doAccountVerificationsOnecentSend()
-    // // 페이지 이동 예시:
-    // navigation.navigate("OneCent4Screen", {
-    //   accountInfo: accountInfo,
-    // });
-  };
+  const handleUserWithdrawDotori = () => {
+    setUserWithdrawModalVisible(true)
+  }
 
-  const doAccountVerificationsOnecentSend = async () =>{
-    const data = {bankSeq: accountInfo.bankSeq, accountNumber:accountInfo.accountNumber}
+  const doUserWithdrawDotori = async () => {
     try{
-      const response = await accountVerificationsOnecentSend(data, accessToken, grantType)
+      const response = await userWithdrawDotori(refreshToken, accessToken, grantType)
       if(response.status === 200){
-        navigation.navigate("OneCent4Screen", {
-          accountInfo: accountInfo,
-        });
-      }else if(response.status === 404){
-        console.log('1원 인증 실패',response.status)
+        console.log('회원탈퇴 성공')
+        dispatch(inputgrantType(null))
+        dispatch(inputAccessToken(null))
+        dispatch(inputRefreshToken(null))
+        Alert.alert('', `${userInfo.userName}님 탈퇴가 완료되었습니다.`, [
+          {
+            text: '확인',
+            onPress: () => {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'LoginScreen' }],
+              });
+            },
+          },
+        ]);
       }else{
-        console.log('1원 인증 실패',response.status)
+        console.log("오류 발생: 회원탈퇴 실패", response.status)
       }
     }catch(error){
-      console.log('오류 발생: 1원 인증 실패',error)
+      console.log("오류 발생: 회원탈퇴 실패", error)
     }
+  }
+
+  // const doUserWithdrawDotori = async () => {
+  //   Alert.alert('', `${userInfo.userName}님 탈퇴가 완료되었습니다.`, [
+  //     {
+  //       text: '확인',
+  //       onPress: () => {
+  //         navigation.reset({
+  //           index: 0,
+  //           routes: [{ name: 'MainPageScreen' }],
+  //         });
+  //       },
+  //     },
+  //   ]);
+  // }
+
+  const cancelUserWithdrawDotori = () => {
+    navigation.navigate("MyPageScreen")
   }
 
   useEffect(() => {
@@ -48,7 +71,7 @@ export default function WithDraw1Screen({ navigation, route }) {
   return (
     <View style={styles.container}>
       <Image
-        style={styles.image}
+        style={[styles.image]}
         source={require("../../assets/images/Hamster/LightHamster.png")}
       />
 
@@ -57,26 +80,73 @@ export default function WithDraw1Screen({ navigation, route }) {
           style={styles.leftImage}
           source={require("../../assets/images/logo_podo.png")}
         />
-        <Text style={styles.text}>{accountInfo.accountNumber}</Text>
+        <Text style={styles.text}>{}</Text>
       </View>
 
-      <Text style={styles.text}>{accountInfo.userName}님 계좌가 맞는지</Text>
-      <Text style={styles.text}>확인하기 위해</Text>
+      <Text style={styles.text}>{userInfo.userName}님</Text>
+      <Text style={styles.text}>정말로</Text>
       <Text style={{ fontSize: 18 }}>
-        <Text style={{ color: "#FF965C" }}>1원</Text>을 보내볼께요
+        <Text style={{ color: "#FF965C" }}>탈퇴</Text>하실건가요?
       </Text>
+      {/* 위치 맞추기 위한 View */}
+      <View style={{margin:25}}></View>
 
-      <TouchableOpacity style={styles.button}
+      <TouchableOpacity style={styles.button1}
         onPress={() =>{
-          handleConfirm()
+          handleUserWithdrawDotori()
         }}
       >
-        <Text style={styles.buttonText}>1원 보내기</Text>
+        <Text style={styles.buttonText}>네, 탈퇴할거에요.</Text>
       </TouchableOpacity>
+      <View style={{margin: 10}}></View>
+      <TouchableOpacity style={styles.button2}
+        onPress={() =>{
+          cancelUserWithdrawDotori()
+        }}
+      >
+        <Text style={styles.buttonText}>아니오, 잘못눌렀어요.</Text>
+      </TouchableOpacity>
+
+      {/* 회원탈퇴 모달창 */}
+      <View style={styles.centeredView}>
+        <Modal
+          animationType="none"
+          transparent={true}
+          visible={userWithdrawModalVisible}
+          onRequestClose={() => {
+            // Alert.alert('Modal has been closed.');
+            setUserWithdrawModalVisible(false);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>회원탈퇴를 진행 하시겠습니까?</Text>
+              <View style={{flexDirection:'row', justifyContent:'space-around'}}>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => {
+                    setUserWithdrawModalVisible(false)
+                    doUserWithdrawDotori()
+                  }}>
+                  <Text style={styles.textStyle}>예</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => {
+                    setUserWithdrawModalVisible(false)
+                    cancelUserWithdrawDotori()
+                  }}>
+                  <Text style={styles.textStyle}>아니오</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </View>
 
       <View style={styles.footer}>
         <FooterScreen navigation={navigation} />
       </View>
+
     </View>
   );
 }
@@ -115,14 +185,23 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#000000",
   },
-  button: {
+  button1: {
     backgroundColor: "#FF965C",
     borderRadius: 8,
     width: "80%",
     // padding: 16,
     height: 40,
-    marginTop: 180,
-    marginBottom: -100,
+    // marginTop: 180,
+    // marginBottom: -100,
+  },
+  button2: {
+    backgroundColor: "#FF965C",
+    borderRadius: 8,
+    width: "80%",
+    // padding: 16,
+    height: 40,
+    // marginTop: 180,
+    // marginBottom: -100,
   },
   buttonText: {
     fontSize: 15,
@@ -135,5 +214,51 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     marginBottom: -20,
+  },
+
+  // 모달 관련 스타일
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    // alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    flex:1,
+    borderRadius: 20,
+    padding: 10,
+    marginHorizontal: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    // backgroundColor: '#2196F3',
+    backgroundColor: '#FF965C',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });
