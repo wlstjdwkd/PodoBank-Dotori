@@ -4,7 +4,7 @@ services:
     image: bangjinseong/podobank:${BUILD_NUMBER}
     build:
       context: ../Podo_Bank/backend
-      dockerfile: Dockerfile.Podo_back
+      dockerfile: ../Podo_Bank/backend/openbanking/Dockerfile.Podo_back
       args:
         - BUILD_NUMBER
     ports:
