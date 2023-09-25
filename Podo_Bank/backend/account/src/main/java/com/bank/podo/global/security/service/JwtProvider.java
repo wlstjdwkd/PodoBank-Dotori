@@ -1,8 +1,7 @@
 package com.bank.podo.global.security.service;
 
 import com.bank.podo.domain.user.entity.User;
-import com.bank.podo.domain.user.exception.UserNotFoundException;
-import com.bank.podo.domain.user.repository.UserRepository;
+import com.bank.podo.global.request.RequestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,10 +15,13 @@ import java.util.Collections;
 @Service
 @RequiredArgsConstructor
 public class JwtProvider {
-    private final UserRepository userRepository;
-    public Authentication getAuthentication(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("존재하지 않는 아이디입니다."));
-        return new UsernamePasswordAuthenticationToken(user, null, Collections.singleton(new SimpleGrantedAuthority(user.getRole().name())));
-    }
+    private final RequestUtil requestUtil;
 
+    public Authentication getAuthentication(String email) {
+        User user = requestUtil.getUser(email);
+        if(user == null) {
+            return null;
+        }
+        return new UsernamePasswordAuthenticationToken(user, null, Collections.singleton(new SimpleGrantedAuthority(user.getRole())));
+    }
 }
