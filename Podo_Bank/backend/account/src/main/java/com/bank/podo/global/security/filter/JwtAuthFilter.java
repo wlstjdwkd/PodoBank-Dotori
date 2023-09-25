@@ -28,6 +28,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (userEmail != null) {
             // 인증 정보가 존재할 때의 처리
             Authentication authentication = jwtProvider.getAuthentication(userEmail);
+            if(authentication == null) {
+                log.info("authentication is null");
+                return;
+            }
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             log.info(userEmail);
