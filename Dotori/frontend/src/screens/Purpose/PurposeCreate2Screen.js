@@ -269,7 +269,7 @@ export default function PurposeCreate2Screen({ navigation, route }) {
         </View>
 
         <TouchableOpacity
-          style={styles.button}
+          style={[styles.button, {backgroundColor:(!startingDate||!endingDate)?"gray":"#FF965C"}]}
           onPress={() =>
             navigation.navigate("PurposeCreate3Screen", {
               purposeInfo: purposeInfo,
@@ -277,6 +277,7 @@ export default function PurposeCreate2Screen({ navigation, route }) {
           }
           //TODO: 풀기
           // disabled={!isValid}
+          disabled={!startingDate||!endingDate}
         >
           <Text style={styles.buttonText}>다음</Text>
         </TouchableOpacity>

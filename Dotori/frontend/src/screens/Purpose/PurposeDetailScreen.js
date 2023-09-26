@@ -1,8 +1,9 @@
-import React from "react";
+import { useIsFocused } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, TouchableOpacity, Text, ScrollView } from "react-native";
 import Feather from "react-native-vector-icons/Feather"; // Feather 아이콘을 가져올 수 있는 라이브러리
 import { useDispatch, useSelector } from "react-redux";
-
+import { purposeDetail } from "../../apis/purposeapi"
 
 
 const data = {
@@ -51,7 +52,7 @@ const data = {
 
 
 
-export default function PurposeDetailScreen({ route, navigation }) {
+export default function PurposeDetailScreen({ navigation, route }) {
   // 토큰
   const grantType =  useSelector((state)=>state.user.grantType)
   const accessToken =  useSelector((state)=>state.user.accessToken)
@@ -59,8 +60,11 @@ export default function PurposeDetailScreen({ route, navigation }) {
   const dispatch = useDispatch()
   // 그 외
 
+  const isFocused = useIsFocused()
   // const { itemId } = route.params;
-  const [itemId] = route.params.itemId
+  const [purposeSeq, setPurposeSeq] = useState(route.params.purposeSeq)
+  const [purposeDetailData, setPurposeDetailData] = useState({})
+
 
   // 날짜 형식을 변환하는 함수
   const formatDate = (dateString) => {
@@ -89,21 +93,45 @@ export default function PurposeDetailScreen({ route, navigation }) {
     dateGroups[dateKey].push(item);
   });
 
+
+  const doPurposeDetail = async () =>{
+    try{
+      const response = await purposeDetail(purposeSeq, accessToken, grantType)
+      if(response.status===200){
+        console.log("목표 상세 조회 성공")
+        setPurposeDetailData(response.data)
+      }else{
+        console.log("목표 상세 조회 실패", response.status)
+      }
+    }catch(error){
+      console.log("목표 상세 조회 실패", error)
+    }
+  }
+  
+
+  useEffect(()=>{
+    if(isFocused){
+      doPurposeDetail()
+    }
+  }, [isFocused])
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View style={{ flex: 1 }} />
+        <View style={{ flex: 1, }} />
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Feather name="x" size={30} style={styles.closeIcon} />
+          <Feather name="x" size={30} 
+            // style={styles.closeIcon} 
+          />
         </TouchableOpacity>
       </View>
 
       {/* Title Container */}
       <View style={styles.titleContainer}>
-        <Text style={styles.purposeTitle}>{data.purposeTitle}</Text>
-        <Text style={styles.titleRight}>{data.currentBalance.toLocaleString()}원</Text>
+        <Text style={styles.purposeTitle}>{purposeDetailData.purposeTitle}</Text>
+        <Text style={styles.titleRight}>{purposeDetailData.currentBalance ? purposeDetailData.currentBalance.toLocaleString() : purposeDetailData.currentBalance}원</Text>
       <Text style={styles.goalAmountText}>목표 금액</Text>
-      <Text style={styles.goalAmount}>{data.goalAmount.toLocaleString()}원</Text>
+      <Text style={styles.goalAmount}>{purposeDetailData.goalAmount ? purposeDetailData.goalAmount.toLocaleString() : purposeDetailData.goalAmount}원</Text>
       </View>
 
       {/* 구분선 */}
@@ -123,10 +151,10 @@ export default function PurposeDetailScreen({ route, navigation }) {
                 <View style={styles.dataBoxInTop}key={item.purposeDataSeq}>
                   <Text style={styles.timeText}>{formatTime(item.dataCreateAt)}</Text>
                   <Text style={styles.dataNameText}>{item.dataName}</Text>
-                  <Text style={styles.dataAmountText}>{item.dataAmount.toLocaleString()}원</Text>
+                  <Text style={styles.dataAmountText}>{item.dataAmount ? item.dataAmount.toLocaleString():item.dataAmount}원</Text>
                 </View>
                 <View style={styles.dataBoxInBottom}>
-                  <Text style={styles.dataCurrentBalanceText}>{item.dataCurrentBalance.toLocaleString()}원</Text>
+                  <Text style={styles.dataCurrentBalanceText}>{item.dataCurrentBalance ? item.dataCurrentBalance.toLocaleString() : item.dataCurrentBalance}원</Text>
                 </View>
               </View>
             ))}
@@ -136,7 +164,7 @@ export default function PurposeDetailScreen({ route, navigation }) {
         <View style={styles.purposeStopContainer}>
           <TouchableOpacity
             style={styles.stopPurposeButton}
-            onPress={() => navigation.navigate("PurposeStopScreen")}
+            onPress={() => navigation.navigate("PurposeStopScreen", {purposeSeq:purposeSeq, purposeDetailData:purposeDetailData})}
           >
             <Text style={styles.stopPurposeText}>목표 중단하기</Text>
           </TouchableOpacity>
@@ -157,7 +185,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    width: "100%",
+    width: "90%",
     justifyContent: "flex-end",
     paddingVertical: 10,
     marginTop: 20,

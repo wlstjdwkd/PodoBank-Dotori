@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
 import { BarChart } from "react-native-gifted-charts";
 import { useDispatch, useSelector } from "react-redux";
+import { purposeQuit } from "../../apis/purposeapi"
 
 const data = {
   id: "1",
@@ -87,13 +88,30 @@ const generateBarData = (data) => {
   return barData;
 };
 
-export default function PurposeDetailScreen({ navigation }) {
+
+const doPurposeQuit = async () => {
+  try{
+    const response = await purposeQuit(purposeSeq, accessToken, grantType)
+    if(response.status === 200){
+      console.log('목표 중단 완료')
+    }else{
+      console.log('목표 중단 실패', response.status)
+    }
+  }catch(error){
+    console.log('오류 발생: 목표 중단 실패', error)
+  }
+}
+
+export default function PurposeDetailScreen({ navigation, route }) {
   // 토큰
   const grantType =  useSelector((state)=>state.user.grantType)
   const accessToken =  useSelector((state)=>state.user.accessToken)
   const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
+
+  const [purposeSeq, setPurposeSeq] = useState(route.params.purposeSeq)
+  const [purposeDetailData, setPurposeDetailData] = useState(route.params.purposeDetailData)
 
 const sortedPurposeDataList = data.purposeDataList.sort((a, b) => {
   const dateA = new Date(a.month);
