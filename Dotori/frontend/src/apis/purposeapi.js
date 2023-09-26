@@ -77,6 +77,7 @@ export const purposeStatusInquiry = async (purposeSeq, accessToken, grantType) =
 //   }
 // }
 export const purposeNewRegister = async (newRegisterData, accessToken, grantType) => {
+  console.log(newRegisterData)
   try {
     const response = await axios.post(apiAddress+`/v1/purpose`, newRegisterData, {
       headers: {

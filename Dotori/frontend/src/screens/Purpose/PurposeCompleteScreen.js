@@ -17,7 +17,8 @@ export default function PurposeCompleteScreen({ navigation, route }) {
   const dispatch = useDispatch()
   // 그 외
 
-  const name = route.params.name;
+  // const name = route.params.name;
+  const [name,setName] = useState(route.params.name);
   return (
     <View style={styles.container}>
       <View style={styles.centerContainer}>
