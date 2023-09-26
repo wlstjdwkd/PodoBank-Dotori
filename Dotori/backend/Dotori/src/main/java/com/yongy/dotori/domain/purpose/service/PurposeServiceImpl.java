@@ -3,6 +3,8 @@ package com.yongy.dotori.domain.purpose.service;
 import com.yongy.dotori.domain.purpose.dto.*;
 import com.yongy.dotori.domain.purpose.entity.Purpose;
 import com.yongy.dotori.domain.purpose.repository.PurposeRepository;
+import com.yongy.dotori.domain.purposeData.dto.PurposeDataDTO;
+import com.yongy.dotori.domain.purposeData.entity.PurposeData;
 import com.yongy.dotori.domain.purposeData.repository.PurposeDataRepository;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.user.repository.UserRepository;
@@ -79,12 +81,23 @@ public class PurposeServiceImpl implements PurposeService{
     public PurposeDetailDTO findPurposeDetail(Long purposeSeq) {
         // 목표 상세 내역 조회
         Purpose purpose = purposeRepository.findByPurposeSeq(purposeSeq);
+        List<PurposeData> list = purposeDataRepository.findAllByPurposeDataSeq(purposeSeq);
+        List<PurposeDataDTO> purposeData = new ArrayList<>();
+
+        for(PurposeData data : list){
+            purposeData.add(PurposeDataDTO.builder()
+                            .dataName(data.getAccount().getAccountTitle())
+                            .dataAmount(data.getDataAmount())
+                            .dataCurrentBalance(data.getDataCurrentBalance())
+                            .dataCreatedAt(data.getDataCreatedAt())
+                    .build());
+        }
 
         PurposeDetailDTO detail = PurposeDetailDTO.builder()
                 .purposeTitle(purpose.getPurposeTitle())
                 .currentBalance(purpose.getCurrentBalance())
                 .goalAmount(purpose.getGoalAmount())
-                .purposeDataList(purposeDataRepository.findAllByPurposeDataSeq(purposeSeq))
+                .purposeDataList(purposeData)
                 .build();
 
         return detail;

@@ -12,4 +12,5 @@ import java.util.List;
 public interface PaymentService {
     List<PaymentPodoResDto> getPayments(LocalDateTime updateTime, Long accountSeq) throws ParseException, JsonProcessingException;
     List<PaymentDetailDTO> findAllUnclassified(Long planSeq);
+    void updateUnclassified(Long planSeq);
 }

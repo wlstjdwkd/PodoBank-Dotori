@@ -1,6 +1,7 @@
 package com.yongy.dotori.domain.purpose.dto;
 
 
+import com.yongy.dotori.domain.purposeData.dto.PurposeDataDTO;
 import com.yongy.dotori.domain.purposeData.entity.PurposeData;
 import lombok.*;
 
@@ -15,5 +16,5 @@ public class PurposeDetailDTO {
     private String purposeTitle;
     private BigDecimal currentBalance;
     private BigDecimal goalAmount;
-    private List<PurposeData> purposeDataList;
+    private List<PurposeDataDTO> purposeDataList;
 }

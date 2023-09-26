@@ -140,4 +140,9 @@ public class PaymentServiceImpl implements PaymentService{
 
         return result;
     }
+
+    @Override
+    public void updateUnclassified(Long planSeq) {
+        // TODO : payment의 checked = true로 변경
+    }
 }
