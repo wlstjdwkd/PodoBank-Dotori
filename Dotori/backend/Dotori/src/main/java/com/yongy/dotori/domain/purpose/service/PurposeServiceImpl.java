@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class PurposeServiceImpl implements PurposeService{
 
     private final PurposeRepository purposeRepository;
     private final PurposeDataRepository purposeDataRepository;
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     public void createPurpose(PurposeDTO purposeDTO) {
@@ -90,7 +92,7 @@ public class PurposeServiceImpl implements PurposeService{
                             .dataName(data.getAccount().getAccountTitle())
                             .dataAmount(data.getDataAmount())
                             .dataCurrentBalance(data.getDataCurrentBalance())
-                            .dataCreatedAt(data.getDataCreatedAt())
+                            .dataCreatedAt(data.getDataCreatedAt().format(formatter))
                     .build());
         }
 
