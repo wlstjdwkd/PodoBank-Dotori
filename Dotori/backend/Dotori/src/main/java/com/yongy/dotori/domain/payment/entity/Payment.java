@@ -8,14 +8,17 @@ import com.yongy.dotori.domain.user.entity.User;
 //import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity(name = "payments")
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 @Builder
 public class Payment {
 
@@ -37,6 +40,9 @@ public class Payment {
 
     @Column(name = "payment_price", nullable = false)
     private BigDecimal paymentPrice;
+
+    @Column(name = "payment_date", nullable = false)
+    private LocalDateTime paymentDate;
 
     @Column(name = "checked")
     private boolean checked;

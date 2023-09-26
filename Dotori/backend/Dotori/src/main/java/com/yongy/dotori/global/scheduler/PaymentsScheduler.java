@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +52,8 @@ public class PaymentsScheduler {
     @Autowired
     private PaymentRepository paymentRepository;
 
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     //@Scheduled(fixedRate = 30 * 60 * 1000) // 30분(밀리초 단위)
     public void getPayments() throws ParseException, IOException {
 
@@ -67,6 +70,8 @@ public class PaymentsScheduler {
             }
 
             List<PaymentPodoResDto> paymentResDto = paymentService.getPayments(plan.getUpdatedAt(),plan.getAccount().getAccountSeq());
+            log.info(paymentResDto.toString());
+
             log.info(paymentResDto.size()+"");
             List<Payment> chatGPT = new ArrayList<>();
             List<Payment> existPayment = new ArrayList<>();
@@ -82,11 +87,11 @@ public class PaymentsScheduler {
                             .paymentPrice(payment.getAmount())
                             .user(plan.getUser())
                             .checked(false)
+                            .paymentDate(payment.getTransactionAt())
                             .build());
                     continue;
                 }
 
-                log.info(payment.getContent());
 
                 // 카테고리 데이터가 이미 있어서 planDetail에 연결 돼있는지 확인 해야하면
                 // 카테고리데이터에 연결된 카테고리로 planDetail 찾기

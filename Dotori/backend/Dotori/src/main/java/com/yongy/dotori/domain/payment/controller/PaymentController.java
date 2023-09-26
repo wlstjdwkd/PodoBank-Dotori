@@ -1,5 +1,7 @@
 package com.yongy.dotori.domain.payment.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.yongy.dotori.domain.payment.dto.PaymentDetailDTO;
 import com.yongy.dotori.domain.payment.dto.request.PaymentPodoReqDto;
 import com.yongy.dotori.domain.payment.dto.response.PaymentPodoResDto;
 import com.yongy.dotori.domain.payment.repository.PaymentRepository;
@@ -12,10 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,7 +36,7 @@ public class PaymentController {
 
     // NOTE : 결제내역 가져오기
     @PostMapping("/listAll")
-    public ResponseEntity<List<PaymentPodoResDto>> updatePayments(@RequestBody PaymentPodoReqDto paymentPodoReqDto) throws ParseException {
+    public ResponseEntity<List<PaymentPodoResDto>> updatePayments(@RequestBody PaymentPodoReqDto paymentPodoReqDto) throws ParseException, JsonProcessingException {
 
         Plan plan = planRepository.findByPlanSeq(paymentPodoReqDto.getPlanSeq());
 
@@ -59,5 +58,10 @@ public class PaymentController {
 
 
         return ResponseEntity.ok(paymenetList);
+    }
+
+    @GetMapping("/unclassified/{planSeq}")
+    public ResponseEntity<List<PaymentDetailDTO>> findAllUnclassified(@PathVariable Long planSeq){
+        return ResponseEntity.ok().body(paymentService.findAllUnclassified(planSeq));
     }
 }
