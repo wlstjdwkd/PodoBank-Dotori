@@ -2,6 +2,7 @@ package com.yongy.dotori.domain.payment.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotori.domain.payment.dto.PaymentDetailDTO;
+import com.yongy.dotori.domain.payment.dto.UpdateUnclassifiedDTO;
 import com.yongy.dotori.domain.payment.dto.request.PaymentPodoReqDto;
 import com.yongy.dotori.domain.payment.dto.response.PaymentPodoResDto;
 import com.yongy.dotori.domain.payment.repository.PaymentRepository;
@@ -69,8 +70,8 @@ public class PaymentController {
 
     @Operation(summary = "미분류 Payment category 수정 확인")
     @PatchMapping("/unclassified/{planSeq}")
-    public ResponseEntity<Void> updateUnclassified(@PathVariable Long planSeq){
-        paymentService.updateUnclassified(planSeq);
+    public ResponseEntity<Void> updateUnclassified(@PathVariable Long planSeq, @RequestBody UpdateUnclassifiedDTO updateUnclassifiedDTO){
+        paymentService.updateUnclassified(planSeq, updateUnclassifiedDTO);
         return ResponseEntity.ok().build();
     }
 }

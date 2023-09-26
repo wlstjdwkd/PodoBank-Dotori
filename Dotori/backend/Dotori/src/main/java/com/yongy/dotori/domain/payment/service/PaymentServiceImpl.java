@@ -8,6 +8,8 @@ import com.yongy.dotori.domain.bank.entity.Bank;
 import com.yongy.dotori.domain.bank.repository.BankRepository;
 import com.yongy.dotori.domain.payment.dto.PaymentDetailDTO;
 import com.yongy.dotori.domain.payment.dto.TransactionHistoryDTO;
+import com.yongy.dotori.domain.payment.dto.UpdateDataDTO;
+import com.yongy.dotori.domain.payment.dto.UpdateUnclassifiedDTO;
 import com.yongy.dotori.domain.payment.dto.response.PaymentPodoResDto;
 import com.yongy.dotori.domain.payment.entity.Payment;
 import com.yongy.dotori.domain.payment.repository.PaymentRepository;
@@ -137,12 +139,24 @@ public class PaymentServiceImpl implements PaymentService{
                             .paymentDate(payment.getPaymentDate().format(formatter))
                     .build());
         }
-
         return result;
     }
 
     @Override
-    public void updateUnclassified(Long planSeq) {
+    public void updateUnclassified(Long planSeq, UpdateUnclassifiedDTO updateUnclassifiedDTO) {
+
         // TODO : payment의 checked = true로 변경
+        // TODO : category_data에 저장
+        List<UpdateDataDTO> payments = updateUnclassifiedDTO.getUpdateData();
+        List<Payment> result = new ArrayList<>();
+
+        for(UpdateDataDTO data : payments){
+            Payment payment = paymentRepository.findByPaymentSeq(data.getPaymentSeq());
+            result.add(payment.updateChecked());
+        }
+
+        paymentRepository.saveAll(result);
+
+
     }
 }

@@ -52,6 +52,11 @@ public class Payment {
         return this;
     }
 
+    public Payment updateChecked() {
+        this.checked = true;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "{ paymentSeq=" + paymentSeq +
