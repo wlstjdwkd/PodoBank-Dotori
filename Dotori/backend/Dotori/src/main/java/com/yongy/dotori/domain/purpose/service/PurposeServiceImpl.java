@@ -42,7 +42,6 @@ public class PurposeServiceImpl implements PurposeService{
                         .currentBalance(BigDecimal.ZERO)
                         .startedAt(purposeDTO.getStartedAt())
                         .endAt(purposeDTO.getEndAt())
-                        .terminated(false)
                         .terminatedAt(null)
                 .build());
     }
@@ -50,14 +49,14 @@ public class PurposeServiceImpl implements PurposeService{
     @Override
     public PurposeAllDTO findAllPurpose() {
         User loginUser = this.getLoginUser();
-        List<Purpose> purposeList = purposeRepository.findAllByUserUserSeqAndTerminatedIsFalse(loginUser.getUserSeq());
+        List<Purpose> purposeList = purposeRepository.findAllByUserUserSeqAndTerminatedAtIsNull(loginUser.getUserSeq());
 
         List<PurposeListDTO> list = new ArrayList<>();
         BigDecimal total = BigDecimal.ZERO;
 
         // 전체 목표에서 title, currentBalance, goalAmount 데이터만 뽑아오기
         for(Purpose p : purposeList){
-            if(p.isTerminated()){
+            if(p.getTerminatedAt() != null){
                 continue;
             }
 
@@ -117,7 +116,6 @@ public class PurposeServiceImpl implements PurposeService{
         purpose.update(Purpose.builder()
                 .endAt(LocalDate.now())
                 .terminatedAt(LocalDateTime.now())
-                .terminated(true)
                 .build());
     }
 

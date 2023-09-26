@@ -82,7 +82,7 @@ public class NaverController {
                 return ResponseEntity.ok().body(jwtToken);
             }
 
-            // NOTE : 도토리 or 네이버로 회원가입이 되어있음
+            // NOTE : 도토리 or 카카오로 회원가입이 되어있음
             throw new AlreadyExistIdException("다른 경로로 회원가입이 되어있습니다.");
         }
     }
