@@ -85,7 +85,7 @@ public class ChatGPTService {
         }
 
         if(object instanceof UnclassifiedDataDTO){
-            messageList.add(Message.builder().role("system").content("All payments must belong to one planDetails.").build());
+            messageList.add(Message.builder().role("system").content("All element of payments must belong to one planDetails.").build());
             messageList.add(Message.builder().role("system").content("import java.util.List;\n" +
                     "\n" +
                     "@Builder\n" +
@@ -147,13 +147,18 @@ public class ChatGPTService {
 
         log.info(data.size()+"");
 
+        int count = 0;
+
         for(UnclassifiedResponseDTO temp : data){
             for(Long paymentSeq : temp.getPaymentSeqs()){
                 Payment tempPayment = paymentRepository.findByPaymentSeq(paymentSeq);
                 tempPayment.updatePlanDetail(planDetailRepository.findByPlanDetailSeq(temp.getPlanDetailSeq()));
                 result.add(tempPayment);
             }
+            count += temp.getPaymentSeqs().size();
         }
+
+        log.info("결제 내역 개수 : "+count);
         paymentRepository.saveAll(result);
 
     }
