@@ -175,6 +175,7 @@ public class PlanServiceImpl implements PlanService {
                     .endAt(plan.getEndAt())
                     .state(plan.getPlanState())
                     .planSeq(plan.getPlanSeq())
+                    .terminatedAt(plan.getTerminatedAt())
                     //.unclassified() // 미분류 어떻게 할 건지 정해야 됨!
                     .activePlanList(activePlanList)
                 .build();
