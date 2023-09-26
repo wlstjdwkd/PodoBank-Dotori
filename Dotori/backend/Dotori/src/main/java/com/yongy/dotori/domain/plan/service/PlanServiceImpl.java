@@ -172,6 +172,7 @@ public class PlanServiceImpl implements PlanService {
             ActivePlanDTO result = ActivePlanDTO.builder()
                     .accountBalance(accountService.getBalance(accountSeq))
                     .endAt(plan.getEndAt())
+                    .planSeq(plan.getPlanSeq())
                     //.unclassified() // 미분류 어떻게 할 건지 정해야 됨!
                     .activePlanList(activePlanList)
                 .build();
