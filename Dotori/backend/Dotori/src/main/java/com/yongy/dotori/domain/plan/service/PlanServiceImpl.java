@@ -99,10 +99,10 @@ public class PlanServiceImpl implements PlanService {
             // 카테고리 그룹 만들기
             CategoryGroup categoryGroup = categoryGroupRepository.save(CategoryGroup.builder()
                     .user(loginUser)
-                    .groupTitle(group.getGroupTitle()).build());
+                    .groupTitle(group.getCategoryGroupName()).build());
 
             // 카테고리 만들기 +  Plan에 딸린 실행중인 카테고리인 PlanDetail 생성
-            List<ActiveCategoryDTO> categorise = group.getActiveCategoryDTOList();
+            List<ActiveCategoryDTO> categorise = group.getCategories();
             log.info(categorise.isEmpty()+"");
             List<PlanDetail> planDetailList = new ArrayList<>();
             for (ActiveCategoryDTO data : categorise) {
