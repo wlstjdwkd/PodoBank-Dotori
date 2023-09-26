@@ -1,11 +1,13 @@
 package com.yongy.dotori.global.redis.entity;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 import lombok.Getter;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
 @Getter
+@RequiredArgsConstructor
 @RedisHash(value="EmailAuth", timeToLive = 1000L * 60 * 5)
 public class EmailAuth {
 
