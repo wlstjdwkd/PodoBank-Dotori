@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface CategoryDataRepository extends JpaRepository<CategoryData, Long> {
     List<CategoryData> findAllByCategoryCategorySeq(String categorySeq);
-
+    CategoryData findByDataCode(String code);
     int deleteByCategoryDataSeq(String categoryDataSeq);
 }

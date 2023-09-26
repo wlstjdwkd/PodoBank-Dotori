@@ -18,7 +18,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     List<Plan> findAllByUserUserSeqAndPlanState(@Param("userSeq") Long userSeq, @Param("planState") State state);
 
     List<Plan> findAllByEndAt(LocalDateTime endAt);
-    List<Plan> findAllByPlanState(State state);
+    List<Plan> findAllByPlanStateAndTerminatedAtIsNull(State state);
     List<Plan> findAllByUserUserSeqAndTerminatedAtIsNull(Long userSeq);
 
 }

@@ -56,4 +56,10 @@ public class PlanDetail {
         this.detailLimit = detailLimit;
         this.detailBalance = detailBalance;
     }
+
+    @Override
+    public String toString() {
+        return "{ planDetailSeq=" + planDetailSeq +
+                ", " + category+"}";
+    }
 }
