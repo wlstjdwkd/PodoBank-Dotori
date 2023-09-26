@@ -76,11 +76,11 @@ export default function WithDraw1Screen({ navigation, route }) {
       />
 
       <View style={styles.box}>
-        <Image
+        {/* <Image
           style={styles.leftImage}
           source={require("../../assets/images/logo_podo.png")}
-        />
-        <Text style={styles.text}>{}</Text>
+        /> */}
+        <Text style={styles.text}>탈퇴하실 거에요?</Text>
       </View>
 
       <Text style={styles.text}>{userInfo.userName}님</Text>
@@ -96,7 +96,7 @@ export default function WithDraw1Screen({ navigation, route }) {
           handleUserWithdrawDotori()
         }}
       >
-        <Text style={styles.buttonText}>네, 탈퇴할거에요.</Text>
+        <Text style={styles.buttonText}>네, 탈퇴할 거에요.</Text>
       </TouchableOpacity>
       <View style={{margin: 10}}></View>
       <TouchableOpacity style={styles.button2}
@@ -104,7 +104,7 @@ export default function WithDraw1Screen({ navigation, route }) {
           cancelUserWithdrawDotori()
         }}
       >
-        <Text style={styles.buttonText}>아니오, 잘못눌렀어요.</Text>
+        <Text style={styles.buttonText}>아니요, 잘못 눌렀어요.</Text>
       </TouchableOpacity>
 
       {/* 회원탈퇴 모달창 */}
@@ -119,7 +119,7 @@ export default function WithDraw1Screen({ navigation, route }) {
           }}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <Text style={styles.modalText}>회원탈퇴를 진행 하시겠습니까?</Text>
+              <Text style={styles.modalText}>마지막 확인입니다.{"\n"}회원탈퇴를 진행 하시겠습니까?</Text>
               <View style={{flexDirection:'row', justifyContent:'space-around'}}>
                 <TouchableOpacity
                   style={[styles.button, styles.buttonClose]}

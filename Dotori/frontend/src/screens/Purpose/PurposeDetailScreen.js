@@ -53,13 +53,14 @@ const data = {
 
 export default function PurposeDetailScreen({ route, navigation }) {
   // 토큰
-  const grantType =  useSelector((state)=>{state.user.grantType})
-  const accessToken =  useSelector((state)=>{state.user.accessToken})
-  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
 
-  const { itemId } = route.params;
+  // const { itemId } = route.params;
+  const [itemId] = route.params.itemId
 
   // 날짜 형식을 변환하는 함수
   const formatDate = (dateString) => {
