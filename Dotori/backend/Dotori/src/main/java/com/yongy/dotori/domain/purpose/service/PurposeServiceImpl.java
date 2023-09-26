@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class PurposeServiceImpl implements PurposeService{
                         .startedAt(purposeDTO.getStartedAt())
                         .endAt(purposeDTO.getEndAt())
                         .terminated(false)
-                        .terminatedAt(purposeDTO.getEndAt())
+                        .terminatedAt(null)
                 .build());
     }
 
@@ -96,7 +97,7 @@ public class PurposeServiceImpl implements PurposeService{
         Purpose purpose = purposeRepository.findByPurposeSeq(purposeSeq);
 
         purpose.update(Purpose.builder()
-                .endAt(LocalDateTime.now())
+                .endAt(LocalDate.now())
                 .terminatedAt(LocalDateTime.now())
                 .terminated(true)
                 .build());

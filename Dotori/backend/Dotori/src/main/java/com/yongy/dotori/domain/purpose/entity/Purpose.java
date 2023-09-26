@@ -5,8 +5,11 @@ import com.yongy.dotori.domain.user.entity.User;
 import lombok.*;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,12 +40,13 @@ public class Purpose {
     private BigDecimal currentBalance;
 
     @Column(name="started_at", nullable = false)
-    private LocalDateTime startedAt;
+    private LocalDate startedAt;
 
     @Column(name="end_at", nullable = false)
-    private LocalDateTime endAt;
+    private LocalDate endAt;
 
     @Column(name="terminate", nullable = false)
+    @ColumnDefault("false")
     private boolean terminated;
 
     @Column(name="terminate_at")
