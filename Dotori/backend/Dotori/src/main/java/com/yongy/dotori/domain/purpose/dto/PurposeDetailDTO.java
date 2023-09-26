@@ -14,10 +14,10 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class PurposeDetailDTO {
-    private String purposeTitle;
-    private BigDecimal currentBalance;
-    private BigDecimal goalAmount;
-    private LocalDate startedAt;
-    private LocalDate endAt;
-    private List<PurposeDataDTO> purposeDataList;
+    String purposeTitle;
+    BigDecimal currentBalance;
+    BigDecimal goalAmount;
+    LocalDate startedAt;
+    LocalDate endAt;
+    List<PurposeDataDTO> purposeDataList;
 }
