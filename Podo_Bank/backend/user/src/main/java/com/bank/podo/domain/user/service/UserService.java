@@ -25,10 +25,12 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public boolean logout(String email) {
-        boolean isLogout = requestUtil.removeRefreshToken(email);
+    public boolean logout() {
+        User user = getLoginUser();
 
-        logLogout(email, isLogout);
+        boolean isLogout = requestUtil.removeRefreshToken(user.getEmail());
+
+        logLogout(user.getEmail(), isLogout);
 
         return isLogout;
     }
@@ -59,7 +61,7 @@ public class UserService {
 
         logChangePassword(user);
 
-        logout(user.getEmail());
+        logout();
     }
 
     @Transactional
