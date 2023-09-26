@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, Alert, Pressable } from "react-native";
 import { AntDesign, Entypo, FontAwesome } from "@expo/vector-icons";
 
 // const userInfo = {
@@ -12,8 +12,9 @@ import { AntDesign, Entypo, FontAwesome } from "@expo/vector-icons";
 
 import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux";
-import {userLogout,userExitDotori, userInfoInquiry} from "../../apis/userapi"
+import {userLogout,userWithdrawDotori, userInfoInquiry} from "../../apis/userapi"
 import {inputgrantType, inputAccessToken, inputRefreshToken} from "../../redux/slices/auth/user"
+import { useIsFocused } from "@react-navigation/native";
 
 export default function MyPageScreen({ navigation }) {
   // 토큰
@@ -23,19 +24,10 @@ export default function MyPageScreen({ navigation }) {
   const dispatch = useDispatch()
   // 그 외
   const [userInfo, setUserInfo] = useState(null)
+  const isFocused = useIsFocused();
+  const [userWithdrawModalVisible, setUserWithdrawModalVisible] = useState(false);
 
-  // const doLogout = async () =>{
-  //   // await AsyncStorage.removeItem('grantType')
-  //   // await AsyncStorage.removeItem('accessToken')
-  //   // await AsyncStorage.removeItem('refreshToken')
-  //   dispatch(inputgrantType(null))
-  //   dispatch(inputAccessToken(null))
-  //   dispatch(inputRefreshToken(null))
-  //   navigation.reset({
-  //     index: 0,
-  //     routes: [{ name: 'LoginScreen' }],
-  //   });
-  // }
+
   const doLogout = async () =>{
     try{
       const response = await userLogout(refreshToken, accessToken, grantType)
@@ -66,8 +58,8 @@ export default function MyPageScreen({ navigation }) {
     doLogout()
   }
 
-  const hanldeUserExitDotor = async () =>{
-    userExitDotori
+  const hanldeuserWithdrawDotori = async () =>{
+    setUserWithdrawModalVisible(true)
   }
 
   const changeFormPhoneNumber = (phoneNumber) => {
@@ -91,8 +83,10 @@ export default function MyPageScreen({ navigation }) {
   }
 
   useEffect(() => {
-    doUserInfoInquiry();
-  }, []);
+    if(isFocused){
+      doUserInfoInquiry();
+    }
+  }, [isFocused]);
 
 
   return (
@@ -126,16 +120,26 @@ export default function MyPageScreen({ navigation }) {
         <View style={styles.infoItem}>
           <Text style={styles.infoText}>생년월일</Text>
           {/* <Text style={styles.infoText}>{userInfo.birth}</Text> */}
-          <Text style={styles.infoText}>{userInfo?userInfo.birthDate:"1999-12-12"}</Text>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoText}>{userInfo?userInfo.birthDate:"1999-12-12"} </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("EditBirthDateScreen", {birthDate: userInfo.birthDate})}
+            >
+              <Image
+                style={styles.editIcon}
+                source={require("../../assets/icon/pencil.png")} // 편집 아이콘 이미지 경로
+              />
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={styles.infoItem}>
           <Text style={styles.infoText}>핸드폰 번호</Text>
           <View style={styles.infoRow}>
             {/* <Text style={styles.infoText}>{userInfo.phone}</Text> */}
-            <Text style={styles.infoText}>{userInfo?changeFormPhoneNumber(userInfo.phoneNumber):"010-1234-1234"}</Text>
+            <Text style={styles.infoText}>{userInfo?changeFormPhoneNumber(userInfo.phoneNumber):"010-1234-1234"} </Text>
             {/* <Text style={styles.infoText}>{userInfo?userInfo.phoneNumber:"010-1234-1234"}</Text> */}
             <TouchableOpacity
-              onPress={() => navigation.navigate("EditPhoneNumberScreen")}
+              onPress={() => navigation.navigate("EditPhoneNumberScreen", {phoneNumber: userInfo.phoneNumber})}
             >
               <Image
                 style={styles.editIcon}
@@ -199,12 +203,52 @@ export default function MyPageScreen({ navigation }) {
         <Text style={styles.separatorText}> </Text>
         <TouchableOpacity style={styles.withdrawButton}
           onPress={()=>{
-            hanldeUserExitDotor()
+            hanldeuserWithdrawDotori()
           }}
         >
           <Text style={styles.withdrawText}>회원탈퇴</Text>
         </TouchableOpacity>
       </View>
+      
+      {/* 회원탈퇴 모달창 */}
+      <View style={styles.centeredView}>
+        <Modal
+          animationType="none"
+          transparent={true}
+          visible={userWithdrawModalVisible}
+          onRequestClose={() => {
+            // Alert.alert('Modal has been closed.');
+            setUserWithdrawModalVisible(false);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>회원탈퇴를 진행 하시겠습니까?</Text>
+              <View style={{flexDirection:'row', justifyContent:'space-around'}}>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => {
+                    setUserWithdrawModalVisible(false)
+                    navigation.navigate("WithDraw1Screen", {userInfo : userInfo})
+                    // navigation.reset({
+                    //   index: 0,
+                    //   routes: [{ name: 'MainPageScreen' }],
+                    // });
+                  }}>
+                  <Text style={styles.textStyle}>예</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => {
+                    setUserWithdrawModalVisible(false)
+                  }}>
+                  <Text style={styles.textStyle}>아니오</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      </View>
+
     </View>
   );
 }
@@ -307,5 +351,50 @@ const styles = StyleSheet.create({
   withdrawText: {
     fontSize: 10,
     color: "#FF3737",
+  },
+  // 모달 관련 스타일
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    // alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    flex:1,
+    borderRadius: 20,
+    padding: 10,
+    marginHorizontal: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    // backgroundColor: '#2196F3',
+    backgroundColor: '#FF965C',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });

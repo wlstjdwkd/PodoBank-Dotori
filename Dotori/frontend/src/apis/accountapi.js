@@ -89,7 +89,6 @@ export const accountEmailCodeVerificationOneCent = async (emailCodeVerificationO
 //   }
 // }
 export const accountVerificationsOnecentCheck = async (verificationsOnecentCheckData, accessToken, grantType) => {
-  console.log(verificationsOnecentCheckData)
   try {
     const response = await axios.post(apiAddress+`/v1/auth/podoBank/check-code`, verificationsOnecentCheckData, {
       headers: {
@@ -155,6 +154,8 @@ export const accountWholeBank = async (accessToken, grantType) => {
 //Account
 // 전체 계좌 조회하기
 export const accountWholeInquiry = async (accessToken, grantType) => {
+  console.log(accessToken)
+  console.log(grantType)
   try {
     const response = await axios.get(apiAddress+`/v1/account`, {
       headers: {

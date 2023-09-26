@@ -123,6 +123,9 @@ public class UserAuthService {
             String accessToken = (String) jsonObject.get("accessToken");
             String refreshToken = (String) jsonObject.get("refreshToken");
 
+            log.info("1- accessToken : "+ accessToken);
+            log.info("2- refreshToken : "+ refreshToken);
+
             bankAccessTokenRepository.save(BankAccessToken.of(bankInfo.getBankName(), accessToken));
             bankRefreshTokenRepository.save(BankRefreshToken.of(bankInfo.getBankName(), refreshToken));
         } catch (ParseException e) {
@@ -136,27 +139,29 @@ public class UserAuthService {
 
         log.info(bankInfo.getBankName()+"--1");
 
-        BankAccessToken bankAccessToken = bankAccessTokenRepository.findByBankName(bankInfo.getBankName());
-        BankRefreshToken bankRefreshToken = bankRefreshTokenRepository.findByBankName(bankInfo.getBankName());
+        Optional<BankAccessToken> bankAccessToken = bankAccessTokenRepository.findById(bankInfo.getBankName());
+
+        Optional<BankRefreshToken> bankRefreshToken = bankRefreshTokenRepository.findById(bankInfo.getBankName());
+
+        log.info("1- accessToken : "+ bankAccessToken);
+        log.info("2- refreshToken : "+ bankRefreshToken);
+
 
         String useToken = null;
 
 
-        if(bankAccessToken == null){
-            if(bankRefreshToken == null){
+        if(bankAccessToken.isEmpty()){
+            if(bankRefreshToken.isEmpty()){
                 this.podoBankLogin(); // accessToken, refreshToken 재발급
-                if(bankAccessTokenRepository.findById(bankInfo.getBankName()).orElse(null) != null){
-                    useToken = bankAccessTokenRepository.findById(bankInfo.getBankName()).get().getToken();
-                }
+                log.info("--1--");
+                useToken = bankAccessTokenRepository.findById(bankInfo.getBankName()).get().getToken();
             }else{
-                if(bankRefreshTokenRepository.findById(bankInfo.getBankName()).orElse(null) != null){
-                    useToken = bankRefreshTokenRepository.findById(bankInfo.getBankName()).get().getToken();
-                }
+                log.info("--2--");
+                useToken = bankRefreshToken.get().getToken();
             }
         }else{
-            if(bankAccessTokenRepository.findById(bankInfo.getBankName()).orElse(null) != null){
-                useToken = bankAccessTokenRepository.findById(bankInfo.getBankName()).get().getToken();
-            }
+            log.info("--3--");
+            useToken = bankAccessToken.get().getToken();
         }
 
         return useToken;

@@ -27,13 +27,18 @@ import OneCent1Screen from "../screens/OneCent/OneCent1Screen";
 import OneCent2Screen from "../screens/OneCent/OneCent2Screen";
 import OneCent3Screen from "../screens/OneCent/OneCent3Screen";
 import OneCent4Screen from "../screens/OneCent/OneCent4Screen";
+import OneCent5Screen from "../screens/OneCent/OneCent5Screen";
 
 import MyPageScreen from "../screens/MyPage/MyPageScreen"
 import PasswordChangeScreen from "../screens/MyPage/PasswordChangeScreen"
+import EditPhoneNumberScreen from "../screens/MyPage/EditPhoneNumberScreen"
+import EditBirthDateScreen from "../screens/MyPage/EditBirthDateScreen"
 import CategoryScreen from "../screens/MyPage/CategoryScreen"
 import CategorySettingScreen from "../screens/MyPage/CategorySettingScreen";
 import ReceipeSelectScreen from "../screens/MyPage/ReceipeSelectScreen";
 import ReceipeScreen from "../screens/MyPage/ReceipeScreen";
+
+import WithDraw1Screen from "../screens/WithdrawDotoriScreen/WithDraw1Screen"
 
 const Stack = createStackNavigator();
 
@@ -145,12 +150,24 @@ export default function AppNavigator() {
         component={OneCent4Screen}
       ></Stack.Screen>
       <Stack.Screen
+        name="OneCent5Screen"
+        component={OneCent5Screen}
+      ></Stack.Screen>
+      <Stack.Screen
       name="MyPageScreen"
       component={MyPageScreen}
       ></Stack.Screen>
       <Stack.Screen
       name="PasswordChangeScreen"
       component={PasswordChangeScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+      name="EditPhoneNumberScreen"
+      component={EditPhoneNumberScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+      name="EditBirthDateScreen"
+      component={EditBirthDateScreen}
       ></Stack.Screen>
       <Stack.Screen
       name="CategoryScreen"
@@ -167,6 +184,10 @@ export default function AppNavigator() {
       <Stack.Screen
       name="ReceipeScreen"
       component={ReceipeScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+      name="WithDraw1Screen"
+      component={WithDraw1Screen}
       ></Stack.Screen>
     </Stack.Navigator>
   );

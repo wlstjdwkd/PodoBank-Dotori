@@ -1,6 +1,8 @@
 package com.yongy.dotori.domain.user.controller;
 
+import com.yongy.dotori.domain.user.entity.Provider;
 import com.yongy.dotori.domain.user.entity.User;
+import com.yongy.dotori.domain.user.exception.AlreadyExistIdException;
 import com.yongy.dotori.domain.user.exception.FailedSocialAuthException;
 import com.yongy.dotori.domain.user.repository.UserRepository;
 import com.yongy.dotori.domain.user.service.UserService;
@@ -62,18 +64,23 @@ public class KakaoController {
             throw new FailedSocialAuthException("카카오 인증에 실패했습니다.");
         }else{
             // NOTE : 회원가입
-
-            if(userService.getUser(user.getId()) == null){
-                userService.saveUser(user); // DB에 사용자 저장
+            User userFromDB = userService.getUser(user.getId());
+            if(userFromDB == null){
+                userService.saveUser(user);  // DB에 사용자 저장
                 return ResponseEntity.ok().build();
             }
 
-            // NOTE : 로그인
-            JwtToken jwtToken = jwtTokenProvider.createToken(user.getId(), user.getRole());
+            // NOTE : 카카오 로그인
+            if(userFromDB.getAuthProvider() == Provider.KAKAO){
+                JwtToken jwtToken = jwtTokenProvider.createToken(user.getId(), user.getRole());
 
-            userService.saveUserRefreshToken(UserRefreshToken.of(user.getId(), jwtToken.getRefreshToken()));
+                userService.saveUserRefreshToken(UserRefreshToken.of(user.getId(), jwtToken.getRefreshToken()));
 
-            return ResponseEntity.ok().body(jwtToken);
+                return ResponseEntity.ok().body(jwtToken);
+            }
+
+            // NOTE : 도토리 or 네이버로 회원가입이 되어있음
+            throw new AlreadyExistIdException("다른 경로로 회원가입이 되어있습니다.");
         }
     }
 

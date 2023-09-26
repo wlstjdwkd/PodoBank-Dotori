@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -15,6 +16,6 @@ import java.time.LocalDateTime;
 public class PurposeDTO {
     private String purposeTitle;
     private BigDecimal goalAmount;
-    private LocalDateTime startedAt;
-    private LocalDateTime endAt;
+    private LocalDate startedAt;
+    private LocalDate endAt;
 }

@@ -76,8 +76,8 @@ export const userLogout = async (refreshToken, accessToken, grantType) => {
 export const userPasswordChange = async (pwChangeData, accessToken, grantType) => {
   console.log(pwChangeData)
   try {
-    // const response = await axios.patch(apiAddress+`/v1/user/password`, pwChangeData, {
-    const response = await axios.patch(apiAddress+`/v1/user/password`, {beforePassword: pwChangeData.beforePassword, afterPassword:pwChangeData.afterPassword}, {
+    const response = await axios.patch(apiAddress+`/v1/user/password`, pwChangeData, {
+    // const response = await axios.patch(apiAddress+`/v1/user/password`, {beforePassword: pwChangeData.beforePassword, afterPassword:pwChangeData.afterPassword}, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -111,7 +111,7 @@ export const userCellPhoneNumberChange = async (phoneNumber, accessToken, grantT
 };
 
 // 사용자 탈퇴하기
-export const userExitDotori = async (refreshToken, accessToken, grantType) => {
+export const userWithdrawDotori = async (refreshToken, accessToken, grantType) => {
   try {
     const response = await axios.patch(apiAddress+`/v1/user/retire`, {refreshToken:refreshToken}, {
       headers: {

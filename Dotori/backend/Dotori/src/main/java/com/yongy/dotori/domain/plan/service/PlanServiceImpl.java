@@ -83,6 +83,8 @@ public class PlanServiceImpl implements PlanService {
             state = State.ACTIVE;
         }
 
+        log.info(state+"");
+
         Plan plan = planRepository.save(Plan.builder()
                 .user(loginUser)
                 .account(accountRepository.findByAccountSeqAndDeleteAtIsNull(planDTO.getAccountSeq()))
@@ -99,10 +101,10 @@ public class PlanServiceImpl implements PlanService {
             // 카테고리 그룹 만들기
             CategoryGroup categoryGroup = categoryGroupRepository.save(CategoryGroup.builder()
                     .user(loginUser)
-                    .groupTitle(group.getGroupTitle()).build());
+                    .groupTitle(group.getCategoryGroupName()).build());
 
             // 카테고리 만들기 +  Plan에 딸린 실행중인 카테고리인 PlanDetail 생성
-            List<ActiveCategoryDTO> categorise = group.getActiveCategoryDTOList();
+            List<ActiveCategoryDTO> categorise = group.getCategories();
             log.info(categorise.isEmpty()+"");
             List<PlanDetail> planDetailList = new ArrayList<>();
             for (ActiveCategoryDTO data : categorise) {
@@ -180,7 +182,7 @@ public class PlanServiceImpl implements PlanService {
             throw new NotStartedPlanException("아직 예약된 계획이 시작되지 않았습니다.");
         }
 
-        throw new NotExistPlanException("계획이 존재하지 않습니다.");
+        return ActivePlanDTO.builder().accountBalance(accountService.getBalance(accountSeq)).build();
     }
 
     @Override

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -10,25 +10,78 @@ import {
 
 import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux";
+import { purposeNewRegister } from "../../apis/purposeapi"
 
 export default function PurposeCreate3Screen({ navigation, route }) {
   // 토큰
-  const grantType =  useSelector((state)=>{state.user.grantType})
-  const accessToken =  useSelector((state)=>{state.user.accessToken})
-  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
-
+  
+  const goalAmountRef = useRef()
   const [purposeInfo, setPurposeInfo] = useState(route.params.purposeInfo);
   const [isValid, setIsValid] = useState(false);
+  const [goalAmountMessage, setgoalAmountMessage] = useState("숫자만 입력해주세요.")
+
+  const validategoalAmount = (text) => {
+    const regex = /^[0-9]{1,}$/
+    return regex.test(text)
+  }
+
   const handleMoneyChange = (text) => {
-    setPurposeInfo((prev) => ({ ...prev, purposeMoney: text }));
-    if (text.length > 0) {
-      setIsValid(true);
-    } else {
-      setIsValid(false);
+    if(validategoalAmount(text)) {
+      setPurposeInfo((prev) => ({ ...prev, goalAmount: text }))
+      setIsValid(true)
+      setgoalAmountMessage("목표 금액 설정 완료!")
+    }else if(text.length <= 0){
+      setPurposeInfo((prev) => ({ ...prev, goalAmount: "" }))
+      setIsValid(false)
+      setgoalAmountMessage("숫자만 입력해주세요.")
     }
-  };
+    else {
+      setIsValid(false)
+      setgoalAmountMessage("숫자만 입력해주세요.")
+    }
+  }
+
+  const handlePurposeNewRegister = () => {
+    if(isValid){
+      doPurposeNewRegister()
+    }else{
+      setIsValid(false)
+      setgoalAmountMessage("숫자만 입력해주세요.")
+    }
+  }
+
+  const doPurposeNewRegister = async () => {
+    data = {
+      "purposeTitle" : purposeInfo.purposeTitle,
+      "goalAmount" : parseInt(purposeInfo.goalAmount),
+      "startedAt" : purposeInfo.startedAt,
+      "endAt" : purposeInfo.endAt,
+      // "startedAt" : purposeInfo.startedAt + " 00:00:00",
+      // "endAt" : purposeInfo.endAt + " 23:59:59",
+    }
+    try{
+      const response = await purposeNewRegister(data, accessToken, grantType)
+      if(response.status===200){
+        console.log("목표 등록 성공")
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'PurposeCompleteScreen', params: {name : purposeInfo.purposeTitle}}],
+        })
+      }else if(response.status===400){
+        console.log("목표 등록 실패", response.status)
+      }else{
+        console.log("목표 등록 실패", response.status)
+      }
+    }catch(error){
+      console.log("오류발생: 목표 등록 실패")
+    }
+  }
+
   return (
     <View style={styles.container}>
       <HeaderComponent
@@ -47,21 +100,24 @@ export default function PurposeCreate3Screen({ navigation, route }) {
             multiline={true}
             placeholder="예시) 10000"
             keyboardType="numeric"
+            returnKeyType="done"
+            ref={goalAmountRef}
+            onSubmitEditing={()=>{
+              handlePurposeNewRegister()
+            }}
+            value={purposeInfo.goalAmount}
           />
           <View style={styles.textRight}>
-            <Text style={styles.instructionText}>숫자만 적어주세요.</Text>
+            <Text style={[styles.instructionText, {color:isValid?'blue':'#A9A9A9'}]}>{goalAmountMessage}</Text>
           </View>
         </View>
 
         <TouchableOpacity
-          style={styles.button}
-          onPress={() =>
-            navigation.navigate("PurposeCompleteScreen", {
-              name: purposeInfo.purposeName,
-            })
-          }
-          //TODO: 풀기
-          // disabled={!isValid}
+          style={[styles.button, {backgroundColor:isValid?"#FF965C":"gray"}]}
+          onPress={() => {
+            handlePurposeNewRegister()
+          }}
+          disabled={!isValid}
         >
           <Text style={styles.buttonText}>목표 생성하기</Text>
         </TouchableOpacity>
