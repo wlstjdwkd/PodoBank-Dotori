@@ -1,12 +1,14 @@
 package com.yongy.dotori.global.redis.entity;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
 
 @Getter
+@RequiredArgsConstructor
 @RedisHash(value="UserRefreshToken", timeToLive = 1000L * 60 * 60 * 24)
 public class UserRefreshToken {
 

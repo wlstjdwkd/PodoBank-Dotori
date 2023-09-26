@@ -34,7 +34,7 @@ public class Plan {
     private Account account;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="plan_state", nullable = false)
+    @Column(name="plan_state")
     private State planState;
 
     @Column(name="total_savings", nullable = false)
