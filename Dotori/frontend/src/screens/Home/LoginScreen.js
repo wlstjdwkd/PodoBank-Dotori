@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Image,
   StyleSheet,
   Alert,
+  Linking,
 } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage' // 스토리지에 저장하기 위해 사용되는 import
 import {inputgrantType, inputAccessToken, inputRefreshToken} from "../../redux/slices/auth/user"
@@ -118,6 +119,17 @@ export default function LoginScreen({ navigation }) {
     getExistingId()
   }, [])
 
+  // // 카카오 로그인
+  // const handleKakaoLogin = () => {
+  //   const kakaoLoginUrl = 'https://accounts.kakao.com/login/?continue=https%3A%2F%2Fkauth.kakao.com%2Foauth%2Fauthorize%3Fresponse_type%3Dcode%26redirect_uri%3Dhttp%253A%252F%252Fj9d107.p.ssafy.io%253A9100%252Fv1%252Fkakao%252Fcallback%26through_account%3Dtrue%26client_id%3D866dc3358fdb2e42441c258a45fe9850#login';
+  //   Linking.openURL(kakaoLoginUrl)
+  //     .then((url) => {
+  //       console.log('URL opened:', url);
+  //     })
+  //     .catch((error) => {
+  //       console.log('URL open error:', error);
+  //     });
+  // };
 
   return (
     <View style={styles.container}>
@@ -218,7 +230,11 @@ export default function LoginScreen({ navigation }) {
 
       {/* 카카오, 네이버 로그인 버튼은 라이브러리나 직접 이미지로 구현해야 합니다. */}
       <View style={styles.oauth}>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={()=>{
+            // handleKakaoLogin()
+          }}
+        >
           <Image
             style={styles.oauthImage}
             source={require("../../assets/images/kakao.png")}

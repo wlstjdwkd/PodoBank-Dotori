@@ -116,14 +116,14 @@ export default function PurposeScreen({ navigation }) {
               <Text style={styles.targetName}>{item.title}</Text>
               <View style={styles.rightAlignContainer}>
                 <Text style={styles.currentAmount}>
-                  {item.currentBalance}원
+                  {item.currentBalance.toLocaleString()}원
                 </Text>
               </View>
               <View style={styles.targetAmounts}>
                 <Text style={styles.targetAmountText}>목표 금액</Text>
                 <View style={styles.rightAlignContainer}>
                   <Text style={styles.targetAmount}>
-                    {item.goalAmount}원
+                    {item.goalAmount.toLocaleString()}원
                   </Text>
                 </View>
               </View>

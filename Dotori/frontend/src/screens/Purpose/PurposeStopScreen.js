@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Text, Modal } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
 import { BarChart } from "react-native-gifted-charts";
 import { useDispatch, useSelector } from "react-redux";
@@ -54,7 +54,23 @@ const data = {
     {
       month: "2023-09",
       dataAmount: 320000,
-    }
+    },
+    {
+      month: "2023-10",
+      dataAmount: 320000,
+    },
+    {
+      month: "2023-11",
+      dataAmount: 320000,
+    },
+    {
+      month: "2023-12",
+      dataAmount: 320000,
+    },
+    {
+      month: "2024-01",
+      dataAmount: 320000,
+    },
   ]
 };
 
@@ -70,7 +86,7 @@ const generateBarData = (data) => {
 
   data.forEach((item) => {
     const { month, dataAmount } = item;
-    const [year, monthNumber] = month.split('-'); // 월과 연도 추출
+    const [ year, monthNumber ] = month.split('-'); // 월과 연도 추출
 
     let isCurrentYearMonth = false;
 
@@ -89,18 +105,6 @@ const generateBarData = (data) => {
 };
 
 
-const doPurposeQuit = async () => {
-  try{
-    const response = await purposeQuit(purposeSeq, accessToken, grantType)
-    if(response.status === 200){
-      console.log('목표 중단 완료')
-    }else{
-      console.log('목표 중단 실패', response.status)
-    }
-  }catch(error){
-    console.log('오류 발생: 목표 중단 실패', error)
-  }
-}
 
 export default function PurposeDetailScreen({ navigation, route }) {
   // 토큰
@@ -112,14 +116,29 @@ export default function PurposeDetailScreen({ navigation, route }) {
 
   const [purposeSeq, setPurposeSeq] = useState(route.params.purposeSeq)
   const [purposeDetailData, setPurposeDetailData] = useState(route.params.purposeDetailData)
+  const [isQuitModalVisible, setIsQuitModalVisible] = useState(false)
 
-const sortedPurposeDataList = data.purposeDataList.sort((a, b) => {
-  const dateA = new Date(a.month);
-  const dateB = new Date(b.month);
-  return dateA - dateB;
-});
-
+  const sortedPurposeDataList = data.purposeDataList.sort((a, b) => {
+    const dateA = new Date(a.month);
+    const dateB = new Date(b.month);
+    return dateA - dateB;
+  });
   const barData = generateBarData(sortedPurposeDataList);
+
+  
+  const doPurposeQuit = async () => {
+    try{
+      // const response = await purposeQuit(purposeSeq, accessToken, grantType)
+      // if(response.status === 200){
+      //   console.log('목표 중단 완료')
+      // }else{
+      //   console.log('목표 중단 실패', response.status)
+      // }
+      console.log("테스트")
+    }catch(error){
+      console.log('오류 발생: 목표 중단 실패', error)
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -133,7 +152,8 @@ const sortedPurposeDataList = data.purposeDataList.sort((a, b) => {
 
       {/* 목표 이름 */}
       <View style={styles.titleContainer}>
-        <Text style={styles.purposeTitle}>{data.purposeTitle}</Text>
+        {/* <Text style={styles.purposeTitle}>{data.purposeTitle}</Text> */}
+        <Text style={styles.purposeTitle}>{purposeDetailData.purposeTitle}</Text>
       </View>
 
       {/* 금액 정보 */}
@@ -141,19 +161,24 @@ const sortedPurposeDataList = data.purposeDataList.sort((a, b) => {
         <View style={styles.balanceItem}>
           <Text style={styles.balanceLabel}>목표 금액</Text>
           <Text style={styles.balanceValue}>
-            {data.goalAmount.toLocaleString()}원
+            {/* {data.goalAmount.toLocaleString()}원 */}
+            {purposeDetailData.goalAmount.toLocaleString()}원
           </Text>
         </View>
         <View style={styles.balanceItem}>
           <Text style={styles.balanceLabel}>현재 금액</Text>
           <Text style={styles.balanceValue}>
-            {data.currentBalance.toLocaleString()}원
+            {/* {data.currentBalance.toLocaleString()}원 */}
+            {purposeDetailData.currentBalance.toLocaleString()}원
           </Text>
         </View>
         <View style={styles.balanceItem}>
           <Text style={styles.balanceLabel}>남은 금액</Text>
           <Text style={styles.balanceValue}>
-            {(data.goalAmount - data.currentBalance).toLocaleString()}원
+            {/* {(data.goalAmount - data.currentBalance).toLocaleString()}원 */}
+            {purposeDetailData.goalAmount - purposeDetailData.currentBalance > 0
+              ?(purposeDetailData.goalAmount - purposeDetailData.currentBalance).toLocaleString()
+              : 0}원
           </Text>
         </View>
       </View>
@@ -211,6 +236,7 @@ const sortedPurposeDataList = data.purposeDataList.sort((a, b) => {
           style={styles.stopPurposeButtonYes}
           onPress={() => {
             // 중단 요청
+            setIsQuitModalVisible(true)
           }}
         >
           <View style={styles.stopPurposeButtonInner}>
@@ -225,6 +251,50 @@ const sortedPurposeDataList = data.purposeDataList.sort((a, b) => {
             <Text style={styles.stopPurposeText}>아니오</Text>
           </View>
         </TouchableOpacity>
+      </View>
+
+
+      {/* 목표 종료 모달 */}
+      {/* 회원탈퇴 모달창 */}
+      <View style={styles.centeredView}>
+        <Modal
+          animationType="none"
+          transparent={true}
+          visible={isQuitModalVisible}
+          onRequestClose={() => {
+            // Alert.alert('Modal has been closed.');
+            setIsQuitModalVisible(false);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>
+                목표까지 {"\n"}
+                {purposeDetailData.goalAmount - purposeDetailData.currentBalance > 0
+                ?(purposeDetailData.goalAmount - purposeDetailData.currentBalance).toLocaleString()
+                : 0}원 
+                남았습니다.{"\n"} 목표 진행을 중단 하시겠습니까?
+              </Text>
+              <View style={{flexDirection:'row', justifyContent:'space-around'}}>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => {
+                    setIsQuitModalVisible(false)
+                    doPurposeQuit()
+                  }}>
+                  <Text style={styles.textStyle}>예</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => {
+                    setIsQuitModalVisible(false)
+                    // cancelUserWithdrawDotori()
+                  }}>
+                  <Text style={styles.textStyle}>아니오</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     </View>
   );
@@ -344,5 +414,53 @@ const styles = StyleSheet.create({
   },
   closeIcon: {
     marginRight: 20,
+  },
+
+  // 목표 종료 모달 스타일
+  // 모달 관련 스타일
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    // alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    flex:1,
+    borderRadius: 20,
+    padding: 10,
+    marginHorizontal: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    // backgroundColor: '#2196F3',
+    backgroundColor: '#FF965C',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    lineHeight: 24,
   },
 });
