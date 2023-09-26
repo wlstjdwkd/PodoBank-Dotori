@@ -26,14 +26,18 @@ public class OpenBankingController {
     @Operation(summary = "1원 송금", description = "MANAGER")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "1원 송금 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "400", description = "1원 송금 실패"),
             @ApiResponse(responseCode = "401", description = "권한 없음"),
             @ApiResponse(responseCode = "404", description = "무언가 존재하지 않습니다(서비스코드, 계좌 등)."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PostMapping("/oneCentVerification")
-    public void oneCentVerification(@RequestBody FintechOneCentVerificationDTO fintechOneCentVerificationDTO) {
-        openBankingService.oneCentVerification(fintechOneCentVerificationDTO);
+    public ResponseEntity<Void> oneCentVerification(@RequestBody FintechOneCentVerificationDTO fintechOneCentVerificationDTO) {
+        if(openBankingService.oneCentVerification(fintechOneCentVerificationDTO)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @Operation(summary = "1원 송금 확인", description = "MANAGER")
@@ -54,35 +58,41 @@ public class OpenBankingController {
     @Operation(summary = "사용자 계좌 출금", description = "MANAGER")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자 계좌 출금 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "400", description = "사용자 계좌 출금 실패(잘못된 요청, 잔액 부족 등)"),
             @ApiResponse(responseCode = "401", description = "권한 없음"),
             @ApiResponse(responseCode = "404", description = "무언가 존재하지 않습니다(서비스코드, 계좌 등)."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PostMapping("/withdraw")
     public ResponseEntity<Void> withdrawUserAccount(@RequestBody FintechWithdrawDTO fintechWithdrawDTO) {
-        openBankingService.withdrawUserAccount(fintechWithdrawDTO);
-        return ResponseEntity.ok().build();
+        if(openBankingService.withdrawUserAccount(fintechWithdrawDTO)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(400).build();
+        }
     }
 
     @Operation(summary = "사용자 계좌 입금", description = "MANAGER")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자 계좌 입금 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "400", description = "사용자 계좌 입금 실패(잘못된 요청, 잔액 부족 등)"),
             @ApiResponse(responseCode = "401", description = "권한 없음"),
             @ApiResponse(responseCode = "404", description = "무언가 존재하지 않습니다(서비스코드, 계좌 등)."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PostMapping("/deposit")
     public ResponseEntity<Void> depositUserAccount(@RequestBody FintechDepositDTO fintechDepositDTO) {
-        openBankingService.depositUserAccount(fintechDepositDTO);
-        return ResponseEntity.ok().build();
+        if(openBankingService.depositUserAccount(fintechDepositDTO)){
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(400).build();
+        }
     }
 
     @Operation(summary = "사용자 계좌 잔액 조회", description = "MANAGER")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용자 계좌 잔액 조회 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "400", description = "사용자 계좌 잔액 조회 실패(잘못된 요청)"),
             @ApiResponse(responseCode = "401", description = "권한 없음"),
             @ApiResponse(responseCode = "404", description = "무언가 존재하지 않습니다(서비스코드, 계좌 등)."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
@@ -90,7 +100,11 @@ public class OpenBankingController {
     @PostMapping("/balance")
     public ResponseEntity<FintechUserBalanceDTO> getUserAccountBalance(@RequestBody FintechUserDTO fintechUserDTO) {
         FintechUserBalanceDTO fintechUserBalanceDTO = openBankingService.getUserAccountBalance(fintechUserDTO);
-        return ResponseEntity.ok(fintechUserBalanceDTO);
+        if(fintechUserBalanceDTO == null) {
+            return ResponseEntity.badRequest().build();
+        } else {
+            return ResponseEntity.ok(fintechUserBalanceDTO);
+        }
     }
 
     @Operation(summary = "사용자 계좌 내역 조회", description = "MANAGER")

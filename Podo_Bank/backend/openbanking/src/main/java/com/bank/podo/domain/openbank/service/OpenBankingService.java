@@ -1,15 +1,16 @@
 package com.bank.podo.domain.openbank.service;
 
-import com.bank.podo.domain.account.entity.Account;
-import com.bank.podo.domain.account.entity.TransactionHistory;
-import com.bank.podo.domain.account.exception.InsufficientBalanceException;
 import com.bank.podo.domain.openbank.dto.*;
+import com.bank.podo.domain.openbank.entity.AccountVerificationCode;
 import com.bank.podo.domain.openbank.entity.FintechService;
 import com.bank.podo.domain.openbank.entity.FintechUser;
 import com.bank.podo.domain.openbank.exception.FintechServiceNotFoundException;
+import com.bank.podo.domain.openbank.exception.VerificationCodeNotMathchException;
+import com.bank.podo.domain.openbank.repository.AccountVerificationCodeRepository;
 import com.bank.podo.domain.openbank.repository.FintechUserRepository;
 import com.bank.podo.domain.openbank.repository.ServiceRepository;
 import com.bank.podo.domain.user.entity.User;
+import com.bank.podo.global.request.RequestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,24 +21,37 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class OpenBankingService {
 
-    private final FintechUserRepository fintechUserRepository;
+    private final RequestUtil requestUtil;
+
     private final ServiceRepository serviceRepository;
+    private final FintechUserRepository fintechUserRepository;
+
+    private final AccountVerificationCodeRepository accountVerificationCodeRepository;
 
     @Transactional
-    public void oneCentVerification(FintechOneCentVerificationDTO fintechOneCentVerificationDTO) {
+    public boolean oneCentVerification(FintechOneCentVerificationDTO fintechOneCentVerificationDTO) {
         System.out.println(fintechOneCentVerificationDTO.getServiceCode());
-        com.bank.podo.domain.openbank.entity.FintechService FintechService =
-                serviceRepository.findByServiceCode(fintechOneCentVerificationDTO.getServiceCode())
+        FintechService fintechService = serviceRepository.findByServiceCode(fintechOneCentVerificationDTO.getServiceCode())
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
 
-        // TODO: 1원 인증 요청
+        String verificationCode = generateVerificationCode(fintechService.getServiceName());
+
+        if(transfer(fintechService.getAccountNumber(), fintechOneCentVerificationDTO.getAccountNumber(),
+                    BigDecimal.ONE, "1원 인증", verificationCode)) {
+            accountVerificationCodeRepository.save(AccountVerificationCode.builder()
+                    .accountNumber(fintechOneCentVerificationDTO.getAccountNumber())
+                    .code(verificationCode)
+                    .build());
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Transactional
@@ -48,31 +62,39 @@ public class OpenBankingService {
                 serviceRepository.findByServiceCodeAndUser(fintechOneCentVerificationCheckDTO.getServiceCode(), user)
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
 
-        // TODO : 계좌 학인
+        log.info(fintechOneCentVerificationCheckDTO.getAccountNumber());
 
-        // TODO : 1원 인증코드 확인
+        AccountVerificationCode accountVerificationCode =
+                accountVerificationCodeRepository.findById(fintechOneCentVerificationCheckDTO.getAccountNumber())
+                        .orElseThrow(() -> new VerificationCodeNotMathchException("인증 코드가 존재하지 않습니다."));
 
+        // 인증코드 확인
+        if(!accountVerificationCode.getCode().equals(fintechOneCentVerificationCheckDTO.getVerificationCode())) {
+            throw new VerificationCodeNotMathchException("인증 코드가 일치하지 않습니다.");
+        } else {
+            accountVerificationCodeRepository.delete(accountVerificationCode);
+        }
 
         String userFintechCode = generateFintechUserCode();
 
-
-        // TODO : account 채우기
         fintechUserRepository.save(FintechUser.builder()
                 .fintechCode(userFintechCode)
                 .locked(false)
                 .fintechService(fintechService)
-                .account(null)
+                .accountNumber(fintechOneCentVerificationCheckDTO.getAccountNumber())
                 .build());
 
         return UserAccountFintechCodeDTO.builder()
                 .fintechCode(userFintechCode)
-                .accountNumber(null)
+                .accountNumber(fintechOneCentVerificationCheckDTO.getAccountNumber())
                 .serviceCode(fintechService.getServiceCode())
                 .build();
     }
 
+
+    // 사용자 계좌 출금
     @Transactional
-    public void withdrawUserAccount(FintechWithdrawDTO fintechWithdrawDTO) {
+    public boolean withdrawUserAccount(FintechWithdrawDTO fintechWithdrawDTO) {
         User user = getLoginUser();
 
         FintechService fintechService = serviceRepository.findByServiceCodeAndUser(fintechWithdrawDTO.getServiceCode(), user)
@@ -83,13 +105,15 @@ public class OpenBankingService {
 
         BigDecimal transferAmount = fintechWithdrawDTO.getAmount();
 
-        transfer(fintechUser.getAccount(), fintechService.getAccount(), transferAmount, fintechWithdrawDTO.getContent());
+        boolean success = transfer(fintechUser.getAccountNumber(), fintechService.getAccountNumber(),
+                transferAmount, fintechWithdrawDTO.getContent(), fintechUser.getAccountNumber());
 
-        logOpenBankingWithdraw(fintechUser.getAccount(), transferAmount);
+        return success;
     }
 
+    // 사용자 계좌 입금
     @Transactional
-    public void depositUserAccount(FintechDepositDTO fintechDepositDTO) {
+    public boolean depositUserAccount(FintechDepositDTO fintechDepositDTO) {
         User user = getLoginUser();
 
         com.bank.podo.domain.openbank.entity.FintechService fintechService = serviceRepository.findByServiceCodeAndUser(fintechDepositDTO.getServiceCode(), user)
@@ -98,27 +122,28 @@ public class OpenBankingService {
         FintechUser fintechUser = fintechUserRepository.findByFintechServiceAndFintechCode(fintechService, fintechDepositDTO.getFintechCode())
                 .orElseThrow(() -> new FintechServiceNotFoundException("핀테크 정보가 없습니다."));
 
-        Account receiverAccount = fintechUser.getAccount();
-
         BigDecimal transferAmount = fintechDepositDTO.getAmount();
 
-        transfer(fintechService.getAccount(), receiverAccount, transferAmount, fintechDepositDTO.getContent());
+        boolean success = transfer(fintechService.getAccountNumber(), fintechUser.getAccountNumber(),
+                transferAmount, fintechDepositDTO.getContent(), fintechService.getServiceName());
 
-        logOpenBankingDeposit(receiverAccount, transferAmount);
+        return success;
     }
 
     @Transactional
-    public void transfer(Account senderAccount, Account receiverAccount, BigDecimal amount, String content) {
-        if(senderAccount.getBalance().compareTo(amount) < 0) {
-            throw new InsufficientBalanceException("잔액이 부족합니다.");
-        }
+    public boolean transfer(String senderAccountNumber, String receiverAccountNumber, BigDecimal amount, String senderContent, String receiverContent) {
 
-        senderAccount.withdraw(amount);
-        receiverAccount.deposit(amount);
+        boolean success = requestUtil.transfer(FintechTransferDTO.builder()
+                            .senderAccountNumber(senderAccountNumber)
+                            .receiverAccountNumber(receiverAccountNumber)
+                            .amount(amount)
+                            .senderContent(senderContent)
+                            .receiverContent(receiverContent)
+                            .build());
 
-        // TODO : 송금 요청
+        logOpenBankingTransfer(senderAccountNumber, receiverAccountNumber, amount, success);
 
-        logOpenBankingTransfer(senderAccount, receiverAccount, amount);
+        return success;
     }
 
     @Transactional(readOnly = true)
@@ -131,10 +156,7 @@ public class OpenBankingService {
         FintechUser fintechUser = fintechUserRepository.findByFintechServiceAndFintechCode(fintechService, fintechUserDTO.getFintechCode())
                 .orElseThrow(() -> new FintechServiceNotFoundException("핀테크 정보가 없습니다."));
 
-        return FintechUserBalanceDTO.builder()
-                .accountNumber(fintechUser.getAccount().getAccountNumber())
-                .balance(fintechUser.getAccount().getBalance())
-                .build();
+        return requestUtil.getBalance(fintechUser.getAccountNumber());
     }
 
     @Transactional(readOnly = true)
@@ -147,9 +169,7 @@ public class OpenBankingService {
         FintechUser fintechUser = fintechUserRepository.findByFintechServiceAndFintechCode(fintechService, fintechUserHistoryDTO.getFintechCode())
                 .orElseThrow(() -> new FintechServiceNotFoundException("핀테크 정보가 없습니다."));
 
-        // TODO : 거래 내역 조회
-
-        return toTransactionHistoryDTOList(null);
+        return requestUtil.getHistory(fintechUser.getAccountNumber(), fintechUserHistoryDTO.getStartAt());
     }
 
     private String generateFintechUserCode() {
@@ -182,50 +202,14 @@ public class OpenBankingService {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    private List<TransactionHistoryDTO> toTransactionHistoryDTOList(List<TransactionHistory> transactionHistoryList) {
-        return transactionHistoryList.stream()
-                .map(this::toTransactionHistoryDTO)
-                .collect(Collectors.toList());
-    }
-
-    private TransactionHistoryDTO toTransactionHistoryDTO(TransactionHistory transactionHistory) {
-        TransactionHistoryDTO.TransactionHistoryDTOBuilder builder = TransactionHistoryDTO.builder()
-                .transactionType(transactionHistory.getTransactionType())
-                .transactionAt(transactionHistory.getCreatedAt())
-                .amount(transactionHistory.getAmount())
-                .balanceAfter(transactionHistory.getBalanceAfter())
-                .content(transactionHistory.getContent());
-
-        if (transactionHistory.getCounterAccount() != null) {
-            builder.counterAccountName(transactionHistory.getCounterAccount().getUser().getName());
-        }
-
-        return builder.build();
-    }
-
-    private void logOpenBankingWithdraw(Account account, BigDecimal amount) {
-        log.info("=====" + "\t"
-                + "오픈뱅킹 출금" + "\t"
-                + "계좌번호: " + account.getAccountNumber() + "\t"
-                + "출금액: " + amount + "\t"
-                + "=====");
-    }
-
-    private void logOpenBankingDeposit(Account account, BigDecimal amount) {
-        log.info("===== " + "\t"
-                + "오픈뱅킹 입금" + "\t"
-                + "계좌번호: " + account.getAccountNumber() + "\t"
-                + "입금액: " + amount + "\t"
-                + "=====");
-    }
-
-    private void logOpenBankingTransfer(Account senderAccount, Account receiverAccount, BigDecimal amount) {
+    private void logOpenBankingTransfer(String senderAccount, String receiverAccount, BigDecimal amount, boolean success) {
         log.info("===== " + "\t"
                 + "오픈뱅킹 이체" + "\t"
-                + "보내는 계좌번호: " + senderAccount.getAccountNumber() + "\t"
-                + "받는 계좌번호: " + receiverAccount.getAccountNumber() + "\t"
+                + "보내는 계좌번호: " + senderAccount + "\t"
+                + "받는 계좌번호: " + receiverAccount + "\t"
                 + "이체액: " + amount + "\t"
-                + "=====");
+                + "성공여부: " + success + "\t"
+                + " =====");
     }
 
 }

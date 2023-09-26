@@ -1,6 +1,5 @@
 package com.bank.podo.domain.openbank.entity;
 
-import com.bank.podo.domain.account.entity.Account;
 import com.bank.podo.domain.user.entity.User;
 import com.bank.podo.global.others.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -23,7 +22,6 @@ public class FintechService extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "account_id")
-    private Account account;
+    @Column
+    private String accountNumber;
 }

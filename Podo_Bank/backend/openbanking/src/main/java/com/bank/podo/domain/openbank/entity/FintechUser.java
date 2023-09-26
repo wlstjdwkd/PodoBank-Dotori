@@ -1,6 +1,5 @@
 package com.bank.podo.domain.openbank.entity;
 
-import com.bank.podo.domain.account.entity.Account;
 import com.bank.podo.global.others.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -28,15 +27,17 @@ public class FintechUser extends BaseEntity {
     @JoinColumn(name = "service_id")
     private FintechService fintechService;
 
-    @ManyToOne
-    @JoinColumn(name = "account_id")
-    private Account account;
+    @Column
+    private String accountNumber;
+
+    @Column
+    private String bankName;
 
     @Builder
-    public FintechUser(String fintechCode, boolean locked, FintechService fintechService, Account account) {
+    public FintechUser(String fintechCode, boolean locked, FintechService fintechService, String accountNumber) {
         this.fintechCode = fintechCode;
         this.locked = locked;
         this.fintechService = fintechService;
-        this.account = account;
+        this.accountNumber = accountNumber;
     }
 }
