@@ -81,7 +81,8 @@ public class PurposeServiceImpl implements PurposeService{
     public PurposeDetailDTO findPurposeDetail(Long purposeSeq) {
         // 목표 상세 내역 조회
         Purpose purpose = purposeRepository.findByPurposeSeq(purposeSeq);
-        List<PurposeData> list = purposeDataRepository.findAllByPurposeDataSeq(purposeSeq);
+        List<PurposeData> list = purposeDataRepository.findAllByPurpose(purpose);
+        log.info(list.size()+"");
         List<PurposeDataDTO> purposeData = new ArrayList<>();
 
         for(PurposeData data : list){
