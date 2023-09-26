@@ -7,8 +7,9 @@ const apiAddress ="http://j9d107.p.ssafy.io:9100"
 // Purpose
 // 목표 상세 조회
 export const purposeDetail = async (purposeSeq, accessToken, grantType) => {
+  console.log(purposeSeq)
   try {
-    const response = await axios.get(apiAddress+`/v1/purpose/${purposeSeq}`, null, {
+    const response = await axios.get(apiAddress+`/v1/purpose/${purposeSeq}`, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -95,9 +96,9 @@ export const purposeNewRegister = async (newRegisterData, accessToken, grantType
 };
 
 // 전체 목표 조회
-export const purposeList = async (accessToken, grantType) => {
+export const purposeGetList = async (accessToken, grantType) => {
   try {
-    const response = await axios.get(apiAddress+`/v1/purpose`, null, {
+    const response = await axios.get(apiAddress+`/v1/purpose`, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -118,7 +119,7 @@ export const purposeList = async (accessToken, grantType) => {
 
 // // Purpose
 // // 전체 목표 조회
-// export const purposeList = async (listData, accessToken) => {
+// export const purposeGetList = async (listData, accessToken) => {
 //   try {
 //     const response = await axios.get(apiAddress+`/v1/purpose`, listData, {
 //       headers: {

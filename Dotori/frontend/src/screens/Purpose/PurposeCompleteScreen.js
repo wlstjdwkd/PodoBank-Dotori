@@ -26,7 +26,8 @@ export default function PurposeCompleteScreen({ navigation, route }) {
           style={styles.centerImage}
           source={require("../../assets/images/Hamster/PurposeCompleteHamster.png")}
         />
-        <Text style={styles.boldText}>" {name} "</Text>
+        {/* <Text style={styles.boldText}>" {name} "</Text> */}
+        <Text style={styles.boldText}>{name}</Text>
         <Text style={styles.regularText}>목표를 생성하였습니다!</Text>
       </View>
 
