@@ -12,7 +12,7 @@ import java.util.List;
 public interface PlanDetailRepository extends JpaRepository<PlanDetail, Long> {
     List<PlanDetail> findAllByPlanPlanSeq(Long planSeq);
     PlanDetail findByCategory(Category category);
-    PlanDetail findByPlanPlanSeq(Long planSeq);
+    PlanDetail findByPlanDetailSeq(Long planDetailSeq);
 
 
 }

@@ -118,12 +118,10 @@ public class PaymentsScheduler {
 
             // NOTE : chatGPT로 분류
             List<PlanDetail> planDetails = planDetailRepository.findAllByPlanPlanSeq(plan.getPlanSeq());
-//            List<UnclassifiedResponseDTO> result =
-//                    chatGPTService.getPaymentChatGPTResponse(UnclassifiedDataDTO.builder()
-//                            .planDetails(planDetails)
-//                            .payments(chatGPT)
-//                            .build());
-
+            chatGPTService.getPaymentChatGPTResponse(UnclassifiedDataDTO.builder()
+                    .planDetails(planDetails)
+                    .payments(chatGPT)
+                    .build());
         }
     }
 }

@@ -1,8 +1,13 @@
 package com.yongy.dotori.domain.chatGPT.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.yongy.dotori.domain.chatGPT.dto.*;
 import com.yongy.dotori.domain.payment.entity.Payment;
+import com.yongy.dotori.domain.payment.repository.PaymentRepository;
 import com.yongy.dotori.domain.plan.dto.ActiveCategoryDTO;
+import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
+import com.yongy.dotori.domain.planDetail.repository.PlanDetailRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -20,8 +25,12 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class ChatGPTService {
+    private final PaymentRepository paymentRepository;
+    private final PlanDetailRepository planDetailRepository;
+
     @Value("${chatGPT.api-key}")
     private String API_KEY;
     private static final String API_URL = "https://api.openai.com/v1/chat/completions";
@@ -77,12 +86,16 @@ public class ChatGPTService {
 
         if(object instanceof UnclassifiedDataDTO){
             messageList.add(Message.builder().role("system").content("All payments must belong to one planDetails.").build());
-            messageList.add(Message.builder().role("system").content("```\n" +
+            messageList.add(Message.builder().role("system").content("import java.util.List;\n" +
+                    "\n" +
+                    "@Builder\n" +
+                    "@Getter\n" +
+                    "@NoArgsConstructor\n" +
+                    "@AllArgsConstructor\n" +
                     "public class UnclassifiedResponseDTO {\n" +
                     "    Long planDetailSeq;\n" +
                     "    List<Long> paymentSeqs;\n" +
-                    "}\n" +
-                    "```").build());
+                    "}").build());
             messageList.add(Message.builder().role("system").content("JSON result what List<UnclassifiedResponseDTO> type.").build());
             messageList.add(Message.builder().role("user").content(object.toString()).build());
             log.info(object.toString());
@@ -101,7 +114,7 @@ public class ChatGPTService {
         return requestDTO;
     }
 
-    public List<UnclassifiedResponseDTO> getPaymentChatGPTResponse(UnclassifiedDataDTO unclassifiedDataDTO) throws IOException {
+    public void getPaymentChatGPTResponse(UnclassifiedDataDTO unclassifiedDataDTO) throws IOException {
         // 계좌에 연결된 planDetail에 연결된 category 리스트랑 payment 리스트에 있는 name이랑 분류
         HttpClient httpClient = HttpClients.createDefault();
         HttpPost request = new HttpPost(API_URL);
@@ -126,18 +139,22 @@ public class ChatGPTService {
 
         ResponseDetailDTO responseDetailDTO = objectMapper.readValue(responseContent, ResponseDetailDTO.class);
         Message message = responseDetailDTO.getChoices().get(0).getMessage();
+        log.info("메세지\n"+message.getContent());
 
-//        objectMapper = new ObjectMapper();
-//        Map<Long, List<Long>> dataMap = objectMapper.readValue(message.getContent(), Map.class);
+        objectMapper = new ObjectMapper();
+        List<UnclassifiedResponseDTO> data = objectMapper.readValue(message.getContent(), new TypeReference<List<UnclassifiedResponseDTO>>() {});
+        List<Payment> result = new ArrayList<>();
 
-        List<UnclassifiedResponseDTO> result = new ArrayList<>();
-//        for(Map.Entry<Long, List<Long>> entry : dataMap.entrySet()){
-//            result.add(UnclassifiedResponseDTO.builder()
-//                            .planDetailSeq(entry.getKey())
-//                            .paymentSeqs(entry.getValue())
-//                    .build());
-//        }
+        log.info(data.size()+"");
 
-        return result;
+        for(UnclassifiedResponseDTO temp : data){
+            for(Long paymentSeq : temp.getPaymentSeqs()){
+                Payment tempPayment = paymentRepository.findByPaymentSeq(paymentSeq);
+                tempPayment.updatePlanDetail(planDetailRepository.findByPlanDetailSeq(temp.getPlanDetailSeq()));
+                result.add(tempPayment);
+            }
+        }
+        paymentRepository.saveAll(result);
+
     }
 }

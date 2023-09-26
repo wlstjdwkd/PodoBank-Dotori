@@ -1,5 +1,6 @@
 package com.yongy.dotori.domain.payment.entity;
 
+import com.yongy.dotori.domain.plan.entity.Plan;
 import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotori.domain.user.entity.User;
 //import jakarta.persistence.Entity;
@@ -40,9 +41,14 @@ public class Payment {
     @Column(name = "checked")
     private boolean checked;
 
+    public Payment updatePlanDetail(PlanDetail planDetailSeq){
+        this.planDetail = planDetailSeq;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "{ paymentSeq=" + paymentSeq +
-                ", paymentName='" + paymentName + "}";
+                ", paymentName='" + paymentName + "'}";
     }
 }
