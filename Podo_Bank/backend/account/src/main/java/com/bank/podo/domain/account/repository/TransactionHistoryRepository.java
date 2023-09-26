@@ -26,4 +26,6 @@ public interface TransactionHistoryRepository extends JpaRepository<TransactionH
     List<Account> findThreeMostRecentUniqueAccounts(Account account);
 
     List<TransactionHistory> findAllByAccountAndTransactionTypeAndCreatedAtGreaterThanEqual(Account account, TransactionType transactionType, LocalDateTime createdAt, PageRequest pageRequest);
+
+    List<TransactionHistory> findAllByAccountAccountNumberAndCreatedAtGreaterThanEqual(String accountNumber, LocalDateTime startAt);
 }
