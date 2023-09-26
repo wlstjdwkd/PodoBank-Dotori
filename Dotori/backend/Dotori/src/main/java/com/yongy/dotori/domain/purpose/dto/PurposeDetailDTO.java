@@ -1,10 +1,12 @@
 package com.yongy.dotori.domain.purpose.dto;
 
 
+import com.yongy.dotori.domain.purposeData.dto.PurposeDataDTO;
 import com.yongy.dotori.domain.purposeData.entity.PurposeData;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -15,5 +17,7 @@ public class PurposeDetailDTO {
     private String purposeTitle;
     private BigDecimal currentBalance;
     private BigDecimal goalAmount;
-    private List<PurposeData> purposeDataList;
+    private LocalDate startAt;
+    private LocalDate endAt;
+    private List<PurposeDataDTO> purposeDataList;
 }

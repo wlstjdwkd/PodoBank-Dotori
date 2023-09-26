@@ -168,6 +168,7 @@ public class PlanServiceImpl implements PlanService {
                         .build());
             }
 
+            // TODO : 미분류 count 넘겨주기
             ActivePlanDTO result = ActivePlanDTO.builder()
                     .accountBalance(accountService.getBalance(accountSeq))
                     .endAt(plan.getEndAt())
@@ -224,7 +225,6 @@ public class PlanServiceImpl implements PlanService {
                     .account(account)
                     .dataAmount(data.getSavingAmount())
                     .purpose(purpose)
-                    .dataName(account.getAccountTitle())
                     .dataCurrentBalance(purpose.getCurrentBalance())
                     .dataCreatedAt(LocalDateTime.now())
                     .build());
