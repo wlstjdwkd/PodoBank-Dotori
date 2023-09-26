@@ -1,6 +1,5 @@
 package com.yongy.dotori.global.redis.entity;
 
-import lombok.NonNull;
 import org.springframework.data.annotation.Id;
 import lombok.Getter;
 import org.springframework.data.redis.core.RedisHash;
