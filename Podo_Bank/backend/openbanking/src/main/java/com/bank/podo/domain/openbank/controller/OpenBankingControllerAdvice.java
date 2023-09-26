@@ -13,18 +13,18 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class OpenBankingControllerAdvice {
 
     @ExceptionHandler
-    public ResponseEntity<Void> handleFintechServiceNotFoundException(FintechServiceNotFoundException e) {
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<String> handleFintechServiceNotFoundException(FintechServiceNotFoundException e) {
+        return ResponseEntity.status(404).body(e.getMessage());
     }
 
     @ExceptionHandler
-    public ResponseEntity<Void> handleVerificationCodeNotMathchException(VerificationCodeNotMathchException e) {
-        return ResponseEntity.badRequest().build();
+    public ResponseEntity<String> handleVerificationCodeNotMathchException(VerificationCodeNotMathchException e) {
+        return ResponseEntity.status(400).body(e.getMessage());
     }
 
     @ExceptionHandler
-    public ResponseEntity<Void> handleAlreadyExistUserException(AlreadyExistUserException e) {
-        return ResponseEntity.badRequest().build();
+    public ResponseEntity<String> handleAlreadyExistUserException(AlreadyExistUserException e) {
+        return ResponseEntity.status(409).body(e.getMessage());
     }
 
 }

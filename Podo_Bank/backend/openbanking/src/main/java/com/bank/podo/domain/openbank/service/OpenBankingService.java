@@ -96,7 +96,7 @@ public class OpenBankingService {
     }
 
 
-    // 사용자 계좌 출금
+    // 사용자 계좌에서 출금
     @Transactional
     public boolean withdrawUserAccount(FintechWithdrawDTO fintechWithdrawDTO) {
         User user = getLoginUser();
@@ -109,13 +109,11 @@ public class OpenBankingService {
 
         BigDecimal transferAmount = fintechWithdrawDTO.getAmount();
 
-        boolean success = transfer(fintechUser.getAccountNumber(), fintechService.getAccountNumber(),
+        return transfer(fintechUser.getAccountNumber(), fintechService.getAccountNumber(),
                 transferAmount, fintechWithdrawDTO.getContent(), fintechUser.getAccountNumber());
-
-        return success;
     }
 
-    // 사용자 계좌 입금
+    // 사용자 계좌에 입금
     @Transactional
     public boolean depositUserAccount(FintechDepositDTO fintechDepositDTO) {
         User user = getLoginUser();
@@ -128,10 +126,8 @@ public class OpenBankingService {
 
         BigDecimal transferAmount = fintechDepositDTO.getAmount();
 
-        boolean success = transfer(fintechService.getAccountNumber(), fintechUser.getAccountNumber(),
+        return transfer(fintechService.getAccountNumber(), fintechUser.getAccountNumber(),
                 transferAmount, fintechDepositDTO.getContent(), fintechService.getServiceName());
-
-        return success;
     }
 
     @Transactional
