@@ -11,9 +11,9 @@ import FooterScreen from "../Components/FooterScreen";
 import { useDispatch, useSelector } from "react-redux";
 export default function PurposeScreen({ navigation }) {
   // 토큰
-  const grantType =  useSelector((state)=>{state.user.grantType})
-  const accessToken =  useSelector((state)=>{state.user.accessToken})
-  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
 
@@ -78,7 +78,11 @@ export default function PurposeScreen({ navigation }) {
         renderItem={({ item }) => {
           const borderColor = getRandomBorderColor();
           return (
-            <View style={[styles.targetContainer, { borderColor }]}>
+            <TouchableOpacity style={[styles.targetContainer, { borderColor }]}
+              onPress={()=>{
+                navigation.navigate("PurposeDetailScreen", {itemId:item.id})
+              }}
+            >
               <Text style={styles.targetName}>{item.name}</Text>
               <View style={styles.rightAlignContainer}>
                 <Text style={styles.currentAmount}>
@@ -93,7 +97,7 @@ export default function PurposeScreen({ navigation }) {
                   </Text>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           );
         }}
         keyExtractor={(item) => item.id}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -13,24 +13,49 @@ import { useDispatch, useSelector } from "react-redux";
 
 export default function PurposeCreate1Screen({ navigation }) {
   // 토큰
-  const grantType =  useSelector((state)=>{state.user.grantType})
-  const accessToken =  useSelector((state)=>{state.user.accessToken})
-  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
+  const purposeTitleRef = useRef()
   
   const [purposeInfo, setPurposeInfo] = useState({
-    purposeName: "",
+    purposeTitle: "",
   });
   const [isValid, setIsValid] = useState(false);
+  const [purposeTitleMessage, setPurposeTitleMessage] = useState("10자 이내로 작성해주세요.")
+
+  const validatePurposeTitle = (text) => {
+    const regex = /^[A-Za-z가-힣\s0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\-]{1,10}$/;
+    return regex.test(text);
+  };
+
   const handleNameChange = (text) => {
-    setPurposeInfo((prev) => ({ ...prev, purposeName: text }));
-    if (text.length > 0 && text.length <= 10) {
+    setPurposeInfo((prev) => ({ ...prev, purposeTitle: text }));
+    if (validatePurposeTitle(text)) {
       setIsValid(true);
+      setPurposeTitleMessage("목표 이름 설정 완료!")
     } else {
       setIsValid(false);
+      setPurposeTitleMessage("10자 이내로 작성해주세요.")
     }
   };
+
+  const goPurposeCreate2Screen = () => {
+    if(isValid){
+      navigation.navigate("PurposeCreate2Screen", {
+        purposeInfo: purposeInfo,
+      })
+    }{
+      
+    }
+  }
+
+  useEffect(()=>{
+    purposeTitleRef.current.focus()
+  })
+
   return (
     <View style={styles.container}>
       <HeaderComponent
@@ -51,25 +76,32 @@ export default function PurposeCreate1Screen({ navigation }) {
 
           <TextInput
             style={styles.input}
-            onChangeText={handleNameChange}
-            multiline={true}
+            onChangeText={(text) => {
+              handleNameChange(text)
+            }}
+            // multiline={true}
+            maxLength={10}
+            value={purposeInfo.purposeTitle}
+            ref={purposeTitleRef}
+            keyboardType="default"
+            returnKeyType="done"
+            onSubmitEditing={()=>{
+              goPurposeCreate2Screen()
+            }}
           />
           <View style={styles.textRight}>
-            <Text style={styles.instructionText}>
-              10자 이내로 작성해주세요.
+            <Text style={[styles.instructionText,{color:isValid?'blue':'gray'}]}>
+              {purposeTitleMessage}
             </Text>
           </View>
         </View>
 
         <TouchableOpacity
-          style={styles.button}
-          onPress={() =>
-            navigation.navigate("PurposeCreate2Screen", {
-              purposeInfo: purposeInfo,
-            })
-          }
-          //TODO: 풀기
-          // disabled={!isValid}
+          style={[styles.button, {backgroundColor: isValid?"#FF965C":"gray"}]}
+          onPress={() =>{
+            goPurposeCreate2Screen()
+          }}
+          disabled={!isValid}
         >
           <Text style={styles.buttonText}>다음</Text>
         </TouchableOpacity>

@@ -38,6 +38,8 @@ import CategorySettingScreen from "../screens/MyPage/CategorySettingScreen";
 import ReceipeSelectScreen from "../screens/MyPage/ReceipeSelectScreen";
 import ReceipeScreen from "../screens/MyPage/ReceipeScreen";
 
+import WithDraw1Screen from "../screens/WithdrawDotoriScreen/WithDraw1Screen"
+
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
@@ -182,6 +184,10 @@ export default function AppNavigator() {
       <Stack.Screen
       name="ReceipeScreen"
       component={ReceipeScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+      name="WithDraw1Screen"
+      component={WithDraw1Screen}
       ></Stack.Screen>
     </Stack.Navigator>
   );
