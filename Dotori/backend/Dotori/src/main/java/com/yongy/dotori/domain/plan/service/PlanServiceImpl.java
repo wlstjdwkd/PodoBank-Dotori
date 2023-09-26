@@ -83,6 +83,8 @@ public class PlanServiceImpl implements PlanService {
             state = State.ACTIVE;
         }
 
+        log.info(state+"");
+
         Plan plan = planRepository.save(Plan.builder()
                 .user(loginUser)
                 .account(accountRepository.findByAccountSeqAndDeleteAtIsNull(planDTO.getAccountSeq()))
