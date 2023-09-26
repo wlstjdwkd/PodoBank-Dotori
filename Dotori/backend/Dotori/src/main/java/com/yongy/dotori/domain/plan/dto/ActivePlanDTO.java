@@ -15,6 +15,7 @@ import java.util.List;
 public class ActivePlanDTO {
     private BigDecimal accountBalance;
     private LocalDateTime endAt;
+    private Long planSeq;
     private Long unclassified; // 미분류 개수
     private List<ActivePlanDetailDTO> activePlanList;
 }
