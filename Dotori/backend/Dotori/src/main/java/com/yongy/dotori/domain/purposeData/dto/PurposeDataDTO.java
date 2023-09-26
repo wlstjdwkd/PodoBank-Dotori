@@ -13,6 +13,6 @@ public class PurposeDataDTO {
     private String dataName;
     private BigDecimal dataAmount;
     private BigDecimal dataCurrentBalance;
-    private LocalDateTime dataCreatedAt;
+    private String dataCreatedAt;
 
 }
