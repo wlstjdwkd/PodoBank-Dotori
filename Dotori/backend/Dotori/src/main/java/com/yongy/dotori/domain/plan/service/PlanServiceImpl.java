@@ -171,7 +171,9 @@ public class PlanServiceImpl implements PlanService {
             // TODO : 미분류 count 넘겨주기
             ActivePlanDTO result = ActivePlanDTO.builder()
                     .accountBalance(accountService.getBalance(accountSeq))
+                    .startedAt(plan.getStartAt())
                     .endAt(plan.getEndAt())
+                    .state(plan.getPlanState())
                     .planSeq(plan.getPlanSeq())
                     //.unclassified() // 미분류 어떻게 할 건지 정해야 됨!
                     .activePlanList(activePlanList)
