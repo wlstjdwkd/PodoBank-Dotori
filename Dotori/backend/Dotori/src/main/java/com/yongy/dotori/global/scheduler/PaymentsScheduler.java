@@ -130,7 +130,5 @@ public class PaymentsScheduler {
                     .payments(chatGPT)
                     .build());
         }
-
-
     }
 }
