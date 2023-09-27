@@ -31,4 +31,8 @@ public class CategoryController {
         List<CategoryDetailDTO> categoryTitles = categoryService.findAllCategory();
         return ResponseEntity.ok(categoryTitles);
     }
+
+
+
+
 }
