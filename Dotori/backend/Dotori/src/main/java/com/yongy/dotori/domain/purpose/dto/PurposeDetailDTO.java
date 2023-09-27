@@ -17,7 +17,7 @@ public class PurposeDetailDTO {
     String purposeTitle;
     BigDecimal currentBalance;
     BigDecimal goalAmount;
-    LocalDate startedAt;
-    LocalDate endAt;
+    String startedAt;
+    String endAt;
     List<PurposeDataDTO> purposeDataList;
 }
