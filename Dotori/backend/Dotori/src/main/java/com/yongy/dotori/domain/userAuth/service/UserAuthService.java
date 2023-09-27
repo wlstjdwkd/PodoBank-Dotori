@@ -111,7 +111,7 @@ public class UserAuthService {
             RestTemplate restTemplate = new RestTemplate();
 
             ResponseEntity<String> response = restTemplate.exchange(
-                    bankInfo.getBankUrl()+"/api/v1/user/login",
+                    bankInfo.getBankUrl()+"/api/v1/auth/login",
                     HttpMethod.POST,
                     httpEntity,
                     String.class
