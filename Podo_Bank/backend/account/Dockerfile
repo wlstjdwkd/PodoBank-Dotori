@@ -8,4 +8,4 @@ WORKDIR /app
 COPY build/libs/PODO-BANK-ACCOUNT-0.0.1-SNAPSHOT.jar /app/PODO-BANK-ACCOUNT-0.0.1-SNAPSHOT.jar
 
 # 애플리케이션 실행 명령어 설정
-CMD ["java", "-jar", "/app/PODO-BANK-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "/app/PODO-BANK-ACCOUNT-0.0.1-SNAPSHOT.jar"]
