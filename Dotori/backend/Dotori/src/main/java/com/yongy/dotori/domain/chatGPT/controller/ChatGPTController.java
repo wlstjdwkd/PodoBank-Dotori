@@ -6,6 +6,8 @@ import com.yongy.dotori.domain.chatGPT.service.ChatGPTService;
 import com.yongy.dotori.domain.payment.entity.Payment;
 import com.yongy.dotori.global.scheduler.PaymentsScheduler;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
@@ -26,12 +28,18 @@ public class ChatGPTController {
     private final PaymentsScheduler paymentsScheduler;
 
     @Operation(summary = "카테고리그룹에 따라 카테고리 분류")
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "카테고리 분류 성공")
+    })
     @PostMapping()
     public ResponseEntity<List<ResultDataDTO>> categoryChatGPT(@RequestBody CategoryDataDTO categoryDataDTO) throws Exception {
         return ResponseEntity.ok().body(chatGPTService.getChatGPTResponse(categoryDataDTO));
     }
 
     @Operation(summary = "카테고리에 따라 payment 분류")
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "payment 분류 성공")
+    })
     @GetMapping("/unclassified")
     public ResponseEntity<Void> unclassifiedChatGPT() throws IOException, ParseException {
         paymentsScheduler.getPayments();

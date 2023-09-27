@@ -3,6 +3,8 @@ package com.yongy.dotori.domain.category.controller;
 import com.yongy.dotori.domain.category.dto.CategoryDetailDTO;
 import com.yongy.dotori.domain.category.service.CategoryServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,9 @@ public class CategoryController {
     private final CategoryServiceImpl categoryService;
 
     @Operation(summary = "카테고리 리스트 조회")
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "카테고리 리스트 조회 성공")
+    })
     @GetMapping("/")
     public ResponseEntity<List<CategoryDetailDTO>> findAllCategoryTitle(){
         List<CategoryDetailDTO> categoryTitles = categoryService.findAllCategory();

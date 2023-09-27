@@ -58,7 +58,6 @@ public class PlanController {
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "저축 성공")
     })
-
     @PostMapping("/saving")
     public ResponseEntity<Void> saving(@RequestBody SavingDTO savingDTO) throws JsonProcessingException {
         planService.saving(savingDTO);
@@ -66,6 +65,10 @@ public class PlanController {
     }
 
     // NOTE : 사용자의 명세서 전체 불러오기
+    @Operation(summary = "전체 명세서 불러오기")
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "전체 명세서 조회")
+    })
     @GetMapping("/specification")
     public ResponseEntity<List<PlanListDto>> planList(){
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -83,11 +86,15 @@ public class PlanController {
     })
     @PatchMapping("/complete")
     public ResponseEntity<Void> updateState(@RequestBody PlanStateDTO planStateDTO){
+        // TODO : COMPLETED, SAVED로 나눠서 저장
         planService.updateState(planStateDTO);
         return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "계좌에 연결된 실행중인 계획 조회")
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "실행 중인 계획 조회 성공")
+    })
     @GetMapping("/{accountSeq}")
     public ResponseEntity<ActivePlanDTO> findAllPlan(@PathVariable Long accountSeq) throws JsonProcessingException {
         ActivePlanDTO result = planService.findAllPlan(accountSeq);
