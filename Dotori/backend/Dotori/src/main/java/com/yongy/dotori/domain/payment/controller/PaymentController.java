@@ -63,13 +63,13 @@ public class PaymentController {
     }
 
     @Operation(summary = "미분류 Payment 리스트 조회")
-    @GetMapping("/unclassified/{planSeq}")
+    @GetMapping("/{planSeq}")
     public ResponseEntity<List<PaymentDetailDTO>> findAllUnclassified(@PathVariable Long planSeq){
         return ResponseEntity.ok().body(paymentService.findAllUnclassified(planSeq));
     }
 
     @Operation(summary = "미분류 Payment category 수정 확인")
-    @PatchMapping("/unclassified/{planSeq}")
+    @PatchMapping("/{planSeq}")
     public ResponseEntity<Void> updateUnclassified(@PathVariable Long planSeq, @RequestBody UpdateUnclassifiedDTO updateUnclassifiedDTO){
         paymentService.updateUnclassified(planSeq, updateUnclassifiedDTO);
         return ResponseEntity.ok().build();

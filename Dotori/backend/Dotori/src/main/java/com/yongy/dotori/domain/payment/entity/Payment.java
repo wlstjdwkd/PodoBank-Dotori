@@ -44,6 +44,9 @@ public class Payment {
     @Column(name = "payment_date", nullable = false)
     private LocalDateTime paymentDate;
 
+    @Column(name = "business_code", nullable = false)
+    private String businessCode;
+
     @Column(name = "checked")
     private boolean checked;
 
