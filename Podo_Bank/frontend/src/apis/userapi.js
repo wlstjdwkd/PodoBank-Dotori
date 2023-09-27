@@ -1,8 +1,8 @@
 // src/api/userApi.js
-import axios from 'axios';
-const apiAddress ="http://j9d107.p.ssafy.io:9000"
+import axios from "axios";
+const apiAddress = "http://j9d107.p.ssafy.io:9600";
 
-// // 사용 예시 
+// // 사용 예시
 // import { useSelector, useDispatch } from 'react-redux';
 // import { decrement, increment, incrementByAmount,changeNameNum } from '../redux/slices/accounts/account'
 // const count = useSelector((state) => state.counter.count);
@@ -15,7 +15,7 @@ const apiAddress ="http://j9d107.p.ssafy.io:9000"
 //   try {
 //     const response = await axios.post(apiAddress+'/api/v1/user/register');
 //     console.log(response.data);
-    
+
 //     // userRegister가 실행되면 decrement 액션을 디스패치
 //     dispatch(decrement());
 
@@ -28,208 +28,255 @@ const apiAddress ="http://j9d107.p.ssafy.io:9000"
 
 export const userRegister = async (userData) => {
   try {
-    const response = await axios.post(apiAddress+'/api/v1/user/register', userData);
-    console.log('회원가입 서버 연결 성공:',response.data)
+    const response = await axios.post(
+      apiAddress + "/api/v1/auth/register",
+      userData
+    );
+    console.log("회원가입 서버 연결 성공:", response.data);
     return response;
   } catch (error) {
-    console.error('회원가입 서버 연결 실패:', error);
-    const response = error.response
-    return response
+    console.error("회원가입 서버 연결 실패:", error);
+    const response = error.response;
+    return response;
     // throw error;
   }
 };
 // refresh토큰을 이용해 access token을 받음
 export const userRefresh = async (refreshToken) => {
   try {
-    console.log('리프레시토큰',refreshToken)
-    const response = await axios.post(apiAddress+`/api/v1/user/refresh?refreshToken=${refreshToken}`);
+    console.log("리프레시토큰", refreshToken);
+    const response = await axios.post(
+      apiAddress + `/api/v1/auth/refresh?refreshToken=${refreshToken}`
+    );
     // const response = await axios.post(apiAddress+'/api/v1/user/refresh', null, {
     //   headers: {
     //     Authorization: `Bearer ${refreshToken}`,
     //   },
     // });
-    console.log('토큰 재발급 성공:', response.data);
-    console.log(response.status)
+    console.log("토큰 재발급 성공:", response.data);
+    console.log(response.status);
     return response;
   } catch (error) {
-    console.error('토큰 재발급 실패:', error);
-    const response = error.response
-    return response
+    console.error("토큰 재발급 실패:", error);
+    const response = error.response;
+    return response;
     // throw error;
   }
 };
 // export const userPasswordChange = async (userPassword, accessToken) => {
-export const userPasswordChange = async (password, newPassword, accessToken) => {
+export const userPasswordChange = async (
+  password,
+  newPassword,
+  accessToken
+) => {
   try {
     // const response = await axios.patch(apiAddress+'/api/v1/user/password/change', userPassword, {
-    const response = await axios.patch(apiAddress+'/api/v1/user/password/change', {password:password, newPassword:newPassword}, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    console.log('비밀번호 변경 성공:',response.data)
+    const response = await axios.patch(
+      apiAddress + "/api/v1/user/password/change",
+      { password: password, newPassword: newPassword },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    console.log("비밀번호 변경 성공:", response.data);
     return response;
   } catch (error) {
-    console.error('비밀번호 변경 실패:', error);
-    const response = error.response
-    return response
+    console.error("비밀번호 변경 실패:", error);
+    const response = error.response;
+    return response;
     // throw error;
   }
 };
 export const userLogout = async (accessToken) => {
   try {
-    console.log('로그아웃중',accessToken)
-    const response = await axios.post(apiAddress+'/api/v1/user/logout', null, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    console.log('로그아웃 성공:',response.data)
+    console.log("로그아웃중", accessToken);
+    const response = await axios.post(
+      apiAddress + "/api/v1/user/logout",
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    console.log("로그아웃 성공:", response.data);
     return response;
   } catch (error) {
-    console.error('로그아웃 실패:', error);
-    const response = error.response
-    return response
+    console.error("로그아웃 실패:", error);
+    const response = error.response;
+    return response;
     // throw error;
   }
 };
 // access token과 refresh token을 받음.
 export const userLogin = async (email, password) => {
   try {
-    const response = await axios.post(apiAddress+'/api/v1/user/login', {email:email, password:password});
-    console.log('로그인 성공:',response.data)
+    const response = await axios.post(apiAddress + "/api/v1/auth/login", {
+      email: email,
+      password: password,
+    });
+    console.log("로그인 성공:", response.data);
     return response;
   } catch (error) {
-    console.error('로그인 실패:', error);
-    const response = error.response
-    return response
+    console.error("로그인 실패:", error);
+    const response = error.response;
+    return response;
     // throw error;
   }
 };
 export const userEmailVerificationCheck = async (code, email, type) => {
-  console.log('코드인증1',code,'and', email)
+  console.log("코드인증1", code, "and", email);
   try {
-    const response = await axios.post(apiAddress+'/api/v1/user/emailVerification/check', {code:code, email:email, type:type});
-    console.log('이메일 인증 코드 확인 성공:', response.data)
+    const response = await axios.post(
+      apiAddress + "/api/v1/auth/emailVerification/check",
+      { code: code, email: email, type: type }
+    );
+    console.log("이메일 인증 코드 확인 성공:", response.data);
     return response;
   } catch (error) {
-    console.error('이메일 인증 코드 확인 실패:', error.response.status);
-    const response = error.response
-    return response
+    console.error("이메일 인증 코드 확인 실패:", error.response.status);
+    const response = error.response;
+    return response;
     // throw error;
   }
 };
 // 이메일 인증 코드 전송 대기시간 1분 response.status 이용, 5분 이내로 인증. 10분이내로 회원가입 완료할 것.
 export const userEmailVerificationSend = async (email) => {
   try {
-    const response = await axios.post(apiAddress+'/api/v1/user/emailVerification', {email:email, type:"REGISTER"});
-    console.log('이메일 인증 코드 전송 성공:',response.status)
+    const response = await axios.post(
+      apiAddress + "/api/v1/auth/emailVerification",
+      { email: email, type: "REGISTER" }
+    );
+    console.log("이메일 인증 코드 전송 성공:", response.status);
     return response;
   } catch (error) {
-    console.error('이메일 인증 코드 전송 실패:', error);
-    const response = error.response
-    return response
+    console.error("이메일 인증 코드 전송 실패:", error);
+    const response = error.response;
+    return response;
     // throw error;
   }
 };
 export const userPWEmailVerificationSend = async (email) => {
   try {
-    const response = await axios.post(apiAddress+'/api/v1/user/emailVerification', {email:email, type:"RESET_PASSWORD"});
-    console.log('PW 이메일 인증 코드 전송 성공:',response.status)
+    const response = await axios.post(
+      apiAddress + "/api/v1/auth/emailVerification",
+      { email: email, type: "RESET_PASSWORD" }
+    );
+    console.log("PW 이메일 인증 코드 전송 성공:", response.status);
     return response;
   } catch (error) {
-    console.error('PW 이메일 인증 코드 전송 실패:', error);
-    const response = error.response
-    return response
+    console.error("PW 이메일 인증 코드 전송 실패:", error);
+    const response = error.response;
+    return response;
     // throw error;
   }
 };
 // 계속 연결-확인하며 회원가입간 이메일 입력시 사용, response.status 이용
 export const userEmailDuplicationCheck = async (email) => {
   try {
-    const response = await axios.get(apiAddress+`/api/v1/user/email/${email}`);
-    console.log('아이디 중복체크 성공:',response.status)
+    const response = await axios.get(
+      apiAddress + `/api/v1/auth/email/${email}`
+    );
+    console.log("아이디 중복체크 성공:", response.status);
     return response;
   } catch (error) {
-    if(error.response.status === 200 || error.response.status === 409 || error.response.status === 422){
-      console.log('아이디 중복 체크 실패:', error);
-    }else{
-      console.error('아이디 중복 체크 실패:', error);
+    if (
+      error.response.status === 200 ||
+      error.response.status === 409 ||
+      error.response.status === 422
+    ) {
+      console.log("아이디 중복 체크 실패:", error);
+    } else {
+      console.error("아이디 중복 체크 실패:", error);
     }
-    const response = error.response
-    return response
+    const response = error.response;
+    return response;
     // throw error;
   }
 };
+
+//회원 탈퇴
 export const userWithdrawal = async (accessToken, password) => {
-  console.log(accessToken)
-  console.log(password)
+  console.log(accessToken);
+  console.log(password);
   try {
-    const response = await axios.post(apiAddress + '/api/v1/user', {password:password}, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    console.log('회원 탈퇴 성공:',response.data)
+    const response = await axios.post(
+      apiAddress + "/api/v1/user",
+      { password: password },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    console.log("회원 탈퇴 성공:", response.data);
     // return response.data;
     return response;
   } catch (error) {
-    console.error('회원 탈퇴 실패:', error); 
-    const response = error.response
-    return response
+    console.error("회원 탈퇴 실패:", error);
+    const response = error.response;
+    return response;
     // throw error;
   }
 };
+
+//회원 정보 조회
 export const userInformationInquiry = async (accessToken) => {
   try {
-    // const response = await axios.get(apiAddress+'/api/v1/user');
-    const response = await axios.get(apiAddress + '/api/v1/user', {
+    const response = await axios.get(apiAddress + "/api/v1/user", {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    console.log('회원 정보 조회 성공:',response.data)
+    console.log("회원 정보 조회 성공:", response.data);
     return response;
   } catch (error) {
-    console.error('회원 정보 조회 실패:', error);
-    const response = error.response
-    return response
+    console.error("회원 정보 조회 실패:", error);
+    const response = error.response;
+    return response;
     // throw error;
   }
 };
+
+//일단 없음
 // 아이디 찾기
 export const userIDfind = async () => {
   try {
-    const response = await axios.get(apiAddress+'/api/v1/user/idFind');
-    console.log(response.data)
-    console.log('아이디 찾기 성공:', response.data);
+    const response = await axios.get(apiAddress + "/api/v1/user/idFind");
+    console.log(response.data);
+    console.log("아이디 찾기 성공:", response.data);
     return response;
   } catch (error) {
-    console.error('아이디 찾기 실패:', error);
-    const response = error.response
-    return response
+    console.error("아이디 찾기 실패:", error);
+    const response = error.response;
+    return response;
     // throw error;
   }
 };
+
+
 // 비밀번호 초기화
 export const userPasswordReset = async (userInfo) => {
-  console.log(userInfo)
+  console.log(userInfo);
   try {
-    const response = await axios.patch(apiAddress+'/api/v1/user/password/reset', userInfo);
-    console.log(response.data)
-    console.log('비밀번호 초기화 성공:', response.data,'and',response);
+    const response = await axios.patch(
+      apiAddress + "/api/v1/auth/password/reset",
+      userInfo
+    );
+    console.log(response.data);
+    console.log("비밀번호 초기화 성공:", response.data, "and", response);
     return response;
   } catch (error) {
-    console.error('비밀번호 초기화 실패:', error);
-    const response = error.response
-    return response
+    console.error("비밀번호 초기화 실패:", error);
+    const response = error.response;
+    return response;
     // throw error;
   }
 };
 
-
 // //예시) 사용시 사용 부분에서 아래처럼 사용
-
 
 // export const dataExam1 = async () => {
 //   try {
