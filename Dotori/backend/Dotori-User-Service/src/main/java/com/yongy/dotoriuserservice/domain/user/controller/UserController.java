@@ -184,6 +184,13 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    // TODO : 통신
+    @ApiResponse(responseCode = "200", description = "사용자의 데이터를 가져오는데 성공함")
+    @Operation(summary = "[통신] 사용자 데이터 가져오기", description = "USER")
+    @GetMapping("/communication/userInfo")
+    public ResponseEntity<User> getUserFromDB(@RequestBody Long userSeq){
+        return ResponseEntity.ok(userService.getUserFromDB(userSeq));
+    }
 
-    // TODO : 명세서 보기
+
 }

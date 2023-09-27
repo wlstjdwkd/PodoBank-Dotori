@@ -86,4 +86,9 @@ public class UserService {
         user.setExpiredAt(LocalDateTime.now());
         this.saveUser(user);
     }
+
+    // TODO : DB에서 사용자의 정보를 가져온다.
+    public User getUserFromDB(Long userSeq){
+        return userRepository.findByUserSeqAndExpiredAtIsNull(userSeq);
+    }
 }

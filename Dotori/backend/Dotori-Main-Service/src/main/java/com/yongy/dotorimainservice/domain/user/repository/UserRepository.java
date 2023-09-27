@@ -1,6 +1,7 @@
 package com.yongy.dotorimainservice.domain.user.repository;
 
 
+import com.yongy.dotorimainservice.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

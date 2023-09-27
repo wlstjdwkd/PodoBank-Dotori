@@ -2,16 +2,16 @@ package com.yongy.dotorimainservice.domain.account.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yongy.dotori.domain.account.dto.AccountDTO;
-import com.yongy.dotori.domain.account.dto.BodyDataDTO;
-import com.yongy.dotori.domain.account.entity.Account;
-import com.yongy.dotori.domain.account.repository.AccountRepository;
-import com.yongy.dotori.domain.bank.entity.Bank;
-import com.yongy.dotori.domain.bank.repository.BankRepository;
-import com.yongy.dotori.domain.user.entity.User;
-import com.yongy.dotori.domain.userAuth.service.UserAuthService;
+import com.yongy.dotorimainservice.domain.account.dto.AccountDTO;
+import com.yongy.dotorimainservice.domain.account.dto.BodyDataDTO;
+import com.yongy.dotorimainservice.domain.account.entity.Account;
+import com.yongy.dotorimainservice.domain.account.repository.AccountRepository;
+import com.yongy.dotorimainservice.domain.bank.entity.Bank;
+import com.yongy.dotorimainservice.domain.bank.repository.BankRepository;
+import com.yongy.dotorimainservice.global.communication.ApiForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -33,35 +33,56 @@ import java.util.Map;
 @Service
 public class AccountServiceImpl implements AccountService{
     private final BankRepository bankRepository;
-    private final UserAuthService userAuthService;
+
+    // private final UserAuthService userAuthService; // TODO : find
     private final AccountRepository accountRepository;
-    // private final FintechTokenRepository fintechTokenRepository;
+
+    private ApiForm apiForm;
+
 
     @Override
     public List<AccountDTO> findAllAccount() throws JsonProcessingException {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Account> accounts = accountRepository.findAllByUserUserSeqAndDeleteAtIsNull(user.getUserSeq());
+            // TODO : find
+//        Map<String, String> bodyData = new HashMap<>();
+//        bodyData.put("id", accountRepositor)
+//
+//        ResponseEntity<String> response = apiForm.sendPostData("/communication/userInfo"
+//        ,)
+//
+//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+
+
+        // TODO : find
+        // List<Account> accounts = accountRepository.findAllByUserUserSeqAndDeleteAtIsNull(user.getUserSeq());
         List<AccountDTO> result = new ArrayList<>();
 
-        for(Account account : accounts){
-            result.add(AccountDTO.builder()
-                    .accountSeq(account.getAccountSeq())
-                    .accountTitle(account.getAccountTitle())
-                    .currentBalance(getBalance(account.getAccountSeq()))
-                    .build());
-        }
+        // TODO : find
+//        for(Account account : accounts){
+//            result.add(AccountDTO.builder()
+//                    .accountSeq(account.getAccountSeq())
+//                    .accountTitle(account.getAccountTitle())
+//                    .currentBalance(getBalance(account.getAccountSeq()))
+//                    .build());
+//        }
 
-        return result;
+        // return result;
+
+        return null;
     }
 
     public BigDecimal getBalance(Long accountSeq) throws JsonProcessingException {
         Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
         Bank bankInfo = bankRepository.findByBankSeq(account.getBank().getBankSeq());
-        String accessToken = userAuthService.getConnectionToken(bankInfo.getBankSeq()); // 은행 accessToken 가져오기
+
+        // TODO : find
+        //String accessToken = userAuthService.getConnectionToken(bankInfo.getBankSeq()); // 은행 accessToken 가져오기
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/json;charset=utf-8");
-        httpHeaders.add("Authorization","Bearer " + accessToken);
+
+        // TODO : find
+        // httpHeaders.add("Authorization","Bearer " + accessToken);
 
         Map<String, String> bodyData = new HashMap<>();
         bodyData.put("serviceCode", bankInfo.getServiceCode());

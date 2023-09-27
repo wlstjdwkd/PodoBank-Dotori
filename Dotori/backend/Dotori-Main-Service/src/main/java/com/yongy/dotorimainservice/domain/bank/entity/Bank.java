@@ -1,6 +1,7 @@
 package com.yongy.dotorimainservice.domain.bank.entity;
 
-import com.yongy.dotori.domain.account.entity.Account;
+
+import com.yongy.dotorimainservice.domain.account.entity.Account;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

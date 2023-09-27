@@ -1,10 +1,6 @@
 package com.yongy.dotorimainservice.domain.user.entity;
 
-import com.yongy.dotorimainservice.domain.account.entity.Account;
-import com.yongy.dotorimainservice.domain.categoryGroup.entity.CategoryGroup;
-import com.yongy.dotorimainservice.domain.payment.entity.Payment;
-import com.yongy.dotorimainservice.domain.plan.entity.Plan;
-import com.yongy.dotorimainservice.domain.reward.entity.Reward;
+
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +9,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -47,26 +42,6 @@ public class User {
 
     @Column(name="expired_at", nullable = true)
     private LocalDateTime expiredAt;
-
-
-    @OneToMany(mappedBy = "user")
-    private List<Account> accountList;
-
-    @OneToMany(mappedBy = "user")
-    private List<Plan> planList;
-
-    @OneToMany(mappedBy = "user")
-    private List<Category> categoryList;
-
-    @OneToMany(mappedBy = "user")
-    private List<CategoryGroup> categoryGroupList;
-
-    @OneToMany(mappedBy = "user")
-    private List<Payment> paymentList;
-
-    @OneToOne(mappedBy = "user")
-    private Reward reward;
-
 
     @Builder
     public User(Long userSeq,Role role, String id, String password, LocalDate birthDate, String userName, String phoneNumber, Provider authProvider, LocalDateTime expiredAt) {
