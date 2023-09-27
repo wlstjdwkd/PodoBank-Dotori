@@ -6,12 +6,17 @@ import com.yongy.dotori.domain.payment.entity.Payment;
 import com.yongy.dotori.domain.plan.entity.Plan;
 //import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 import java.util.List;
 
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity(name="plan_details")
 public class PlanDetail {
@@ -50,5 +55,11 @@ public class PlanDetail {
         this.categoryGroup = categoryGroup;
         this.detailLimit = detailLimit;
         this.detailBalance = detailBalance;
+    }
+
+    @Override
+    public String toString() {
+        return "{ planDetailSeq=" + planDetailSeq +
+                ", " + category+"}";
     }
 }

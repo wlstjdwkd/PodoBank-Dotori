@@ -5,10 +5,20 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
 import FooterScreen from "../Components/FooterScreen";
+import { useDispatch, useSelector } from "react-redux";
+import {accountVerificationsOnecentCheck} from "../../apis/accountapi"
 
 export default function OneCent2Screen({ navigation, route }) {
+  // 토큰
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
+  const dispatch = useDispatch()
+  // 그 외
+  
   const [accountInfo, setAccountInfo] = useState(route.params.accountInfo);
   const [numbers, setNumbers] = useState(["", "", "", ""]);
   const inputRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
@@ -19,6 +29,10 @@ export default function OneCent2Screen({ navigation, route }) {
   };
 
   const handleInputChange = (text, index) => {
+    // 백스페이스시 앞으로 넘어감.
+    if (text === "" && index > 0) {
+      inputRefs[index - 1].current.focus();
+    }
     // 각 텍스트 입력 상자에 입력된 값을 상태에 업데이트합니다.
     const newNumbers = [...numbers];
     newNumbers[index] = text;
@@ -29,6 +43,30 @@ export default function OneCent2Screen({ navigation, route }) {
       inputRefs[index + 1].current.focus();
     }
   };
+
+  const doAccountVerificationsOnecentCheck = async () =>{
+    const data = {
+      bankSeq: accountInfo.bankSeq,
+      accountNumber: accountInfo.accountNumber,
+      verificationCode: numbers.join("")
+    }
+    try{
+      const response = await accountVerificationsOnecentCheck(data, accessToken, grantType)
+      if(response.status === 200){
+        // navigation.navigate("OneCent5Screen", { accountInfo: accountInfo, })
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'OneCent5Screen', params:{ accountInfo: accountInfo, }}],
+        });
+      }else if(response.status === 404){
+        console.log('1원 인증 코드 검증 실패',response.status)
+      }else{
+        console.log('1원 인증 코드 검증 실패',response.status)
+      }
+    }catch(error){
+      console.log('오류 발생 : 1원 인증 코드 검증 실패', error)
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -56,6 +94,8 @@ export default function OneCent2Screen({ navigation, route }) {
               onSubmitEditing={() => {
                 if (index < 3) {
                   inputRefs[index + 1].current.focus();
+                }else if(index === 3){
+                  doAccountVerificationsOnecentCheck()
                 }
               }}
             />
@@ -65,7 +105,9 @@ export default function OneCent2Screen({ navigation, route }) {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate("MainPageScreen")}
+        onPress={() => {
+          doAccountVerificationsOnecentCheck()
+        }}
       >
         <Text style={styles.buttonText}>확인</Text>
       </TouchableOpacity>

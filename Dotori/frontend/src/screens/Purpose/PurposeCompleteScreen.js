@@ -7,10 +7,18 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function PurposeCompleteScreen({ navigation, route }) {
-  const name = route.params.name;
+  // 토큰
+  const grantType =  useSelector((state)=>{state.user.grantType})
+  const accessToken =  useSelector((state)=>{state.user.accessToken})
+  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const dispatch = useDispatch()
+  // 그 외
 
+  // const name = route.params.name;
+  const [name,setName] = useState(route.params.name);
   return (
     <View style={styles.container}>
       <View style={styles.centerContainer}>
@@ -18,7 +26,8 @@ export default function PurposeCompleteScreen({ navigation, route }) {
           style={styles.centerImage}
           source={require("../../assets/images/Hamster/PurposeCompleteHamster.png")}
         />
-        <Text style={styles.boldText}>" {name} "</Text>
+        {/* <Text style={styles.boldText}>" {name} "</Text> */}
+        <Text style={styles.boldText}>{name}</Text>
         <Text style={styles.regularText}>목표를 생성하였습니다!</Text>
       </View>
 

@@ -10,14 +10,16 @@ import com.yongy.dotori.domain.bank.entity.Bank;
 import com.yongy.dotori.domain.bank.repository.BankRepository;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.userAuth.service.UserAuthService;
-import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
+// import com.yongy.dotori.global.redis.repository.FintechTokenRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
@@ -26,18 +28,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RequiredArgsConstructor
+@Transactional
 @Service
 public class AccountServiceImpl implements AccountService{
     private final BankRepository bankRepository;
     private final UserAuthService userAuthService;
     private final AccountRepository accountRepository;
-    private final FintechTokenRepository fintechTokenRepository;
+    // private final FintechTokenRepository fintechTokenRepository;
 
     @Override
     public List<AccountDTO> findAllAccount() throws JsonProcessingException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Account> accounts = user.getAccountList();
+        List<Account> accounts = accountRepository.findAllByUserUserSeqAndDeleteAtIsNull(user.getUserSeq());
         List<AccountDTO> result = new ArrayList<>();
 
         for(Account account : accounts){
@@ -52,7 +56,7 @@ public class AccountServiceImpl implements AccountService{
     }
 
     public BigDecimal getBalance(Long accountSeq) throws JsonProcessingException {
-        Account account = accountRepository.findByAccountSeq(accountSeq);
+        Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
         Bank bankInfo = bankRepository.findByBankSeq(account.getBank().getBankSeq());
         String accessToken = userAuthService.getConnectionToken(bankInfo.getBankSeq()); // 은행 accessToken 가져오기
 
@@ -61,8 +65,8 @@ public class AccountServiceImpl implements AccountService{
         httpHeaders.add("Authorization","Bearer " + accessToken);
 
         Map<String, String> bodyData = new HashMap<>();
-        bodyData.put("serviceCode", accessToken);
-        bodyData.put("fintechCode", fintechTokenRepository.findByAccountNumber(account.getAccountNumber()).getFintechCode());
+        bodyData.put("serviceCode", bankInfo.getServiceCode());
+        bodyData.put("fintechCode", account.getFintechCode());
 
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, httpHeaders);
 
@@ -70,7 +74,7 @@ public class AccountServiceImpl implements AccountService{
 
         ResponseEntity<String> response = restTemplate.exchange(
                 bankInfo.getBankUrl()+"/api/v1/fintech/balance",
-                HttpMethod.GET,
+                HttpMethod.POST,
                 httpEntity,
                 String.class
         );
@@ -86,4 +90,6 @@ public class AccountServiceImpl implements AccountService{
 
         throw new IllegalArgumentException("계좌 정보를 불러오는데 실패했습니다.");
     }
+
+
 }

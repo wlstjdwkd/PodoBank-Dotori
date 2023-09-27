@@ -3,6 +3,8 @@ package com.yongy.dotori.domain.purpose.service;
 import com.yongy.dotori.domain.purpose.dto.*;
 import com.yongy.dotori.domain.purpose.entity.Purpose;
 import com.yongy.dotori.domain.purpose.repository.PurposeRepository;
+import com.yongy.dotori.domain.purposeData.dto.PurposeDataDTO;
+import com.yongy.dotori.domain.purposeData.entity.PurposeData;
 import com.yongy.dotori.domain.purposeData.repository.PurposeDataRepository;
 import com.yongy.dotori.domain.user.entity.User;
 import com.yongy.dotori.domain.user.repository.UserRepository;
@@ -13,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,12 +29,11 @@ public class PurposeServiceImpl implements PurposeService{
 
     private final PurposeRepository purposeRepository;
     private final PurposeDataRepository purposeDataRepository;
-    private final UserRepository userRepository;
-
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     public void createPurpose(PurposeDTO purposeDTO) {
-        User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User loginUser = this.getLoginUser();
         // 새로운 목표 DB에 저장
         purposeRepository.save(Purpose.builder()
                         .user(loginUser)
@@ -39,22 +42,21 @@ public class PurposeServiceImpl implements PurposeService{
                         .currentBalance(BigDecimal.ZERO)
                         .startedAt(purposeDTO.getStartedAt())
                         .endAt(purposeDTO.getEndAt())
-                        .isTerminated(false)
-                        .terminatedAt(purposeDTO.getEndAt())
+                        .terminatedAt(null)
                 .build());
     }
 
     @Override
     public PurposeAllDTO findAllPurpose() {
-        User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Purpose> purposeList = purposeRepository.findAllByUserUserSeq(loginUser.getUserSeq());
+        User loginUser = this.getLoginUser();
+        List<Purpose> purposeList = purposeRepository.findAllByUserUserSeqAndTerminatedAtIsNull(loginUser.getUserSeq());
 
         List<PurposeListDTO> list = new ArrayList<>();
         BigDecimal total = BigDecimal.ZERO;
 
         // 전체 목표에서 title, currentBalance, goalAmount 데이터만 뽑아오기
         for(Purpose p : purposeList){
-            if(p.isTerminated()){
+            if(p.getTerminatedAt() != null){
                 continue;
             }
 
@@ -80,12 +82,26 @@ public class PurposeServiceImpl implements PurposeService{
     public PurposeDetailDTO findPurposeDetail(Long purposeSeq) {
         // 목표 상세 내역 조회
         Purpose purpose = purposeRepository.findByPurposeSeq(purposeSeq);
+        List<PurposeData> list = purposeDataRepository.findAllByPurpose(purpose);
+        log.info(list.size()+"");
+        List<PurposeDataDTO> purposeData = new ArrayList<>();
+
+        for(PurposeData data : list){
+            purposeData.add(PurposeDataDTO.builder()
+                            .dataName(data.getAccount().getAccountTitle())
+                            .dataAmount(data.getDataAmount())
+                            .dataCurrentBalance(data.getDataCurrentBalance())
+                            .dataCreatedAt(data.getDataCreatedAt().format(formatter))
+                    .build());
+        }
 
         PurposeDetailDTO detail = PurposeDetailDTO.builder()
                 .purposeTitle(purpose.getPurposeTitle())
                 .currentBalance(purpose.getCurrentBalance())
                 .goalAmount(purpose.getGoalAmount())
-                .purposeDataList(purposeDataRepository.findAllByPurposeDataSeq(purposeSeq))
+                .startedAt(purpose.getStartedAt())
+                .endAt(purpose.getEndAt())
+                .purposeDataList(purposeData)
                 .build();
 
         return detail;
@@ -98,9 +114,8 @@ public class PurposeServiceImpl implements PurposeService{
         Purpose purpose = purposeRepository.findByPurposeSeq(purposeSeq);
 
         purpose.update(Purpose.builder()
-                .endAt(LocalDateTime.now())
+                .endAt(LocalDate.now())
                 .terminatedAt(LocalDateTime.now())
-                .isTerminated(true)
                 .build());
     }
 
@@ -126,5 +141,9 @@ public class PurposeServiceImpl implements PurposeService{
                 .build();
 
         return summary;
+    }
+
+    public User getLoginUser(){
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

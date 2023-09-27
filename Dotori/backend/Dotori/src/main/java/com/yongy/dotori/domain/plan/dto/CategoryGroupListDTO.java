@@ -10,6 +10,6 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class CategoryGroupListDTO {
-    private String groupTitle;
-    private List<CategoryDTO> categoryDTOList;
+    private String categoryGroupName;
+    private List<ActiveCategoryDTO> categories;
 }

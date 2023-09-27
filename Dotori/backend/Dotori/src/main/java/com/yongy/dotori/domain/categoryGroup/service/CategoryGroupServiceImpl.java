@@ -36,8 +36,4 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
 
         return result;
     }
-
-    //        private User getLoginUser() {
-//        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//    }
 }
