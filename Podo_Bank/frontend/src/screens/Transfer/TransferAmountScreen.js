@@ -11,6 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import HeaderScreen from "../Header/HeaderScreen";
 import AccessTokenRefreshModalScreen from "../Modal/AccessTokenRefreshModalScreen";
+import { useSelector } from "react-redux";
 
 const { width } = Dimensions.get("window");
 
@@ -22,7 +23,7 @@ export default function TransferAmountScreen({ navigation, route }) {
   const [receiverAccount, setReceiverAccount] = useState(route.params.receiverAccount) ;
   const [accountInfo, setAccountInfo] = useState(route.params.accountInfo)
   console.log(accountInfo, receiverBank, receiverAccount)
-  
+
   const [amount, setAmount] = useState(0);
   const [accountBalance] = useState(Math.floor(accountInfo.balance)); // 이 값은 실제 계좌 잔액에 따라 바뀌어야 합니다.
 
