@@ -29,6 +29,7 @@ public class OpenBankingController {
             @ApiResponse(responseCode = "400", description = "1원 송금 실패"),
             @ApiResponse(responseCode = "401", description = "권한 없음"),
             @ApiResponse(responseCode = "404", description = "무언가 존재하지 않습니다(서비스코드, 계좌 등)."),
+            @ApiResponse(responseCode = "409", description = "이미 연결된 계좌 입니다"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PostMapping("/oneCentVerification")
