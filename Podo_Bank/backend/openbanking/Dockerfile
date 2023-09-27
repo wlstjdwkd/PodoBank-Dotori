@@ -5,7 +5,7 @@ FROM openjdk:17-jdk
 WORKDIR /app
 
 # JAR 파일을 컨테이너 안의 /app 디렉토리로 복사
-COPY build/libs/PODO-BANK-0.0.1-SNAPSHOT.jar /app/PODO-BANK-0.0.1-SNAPSHOT.jar
+COPY build/libs/PODO-BANK-OPENBANKING-0.0.1-SNAPSHOT.jar /app/PODO-BANK-OPENBANKING-0.0.1-SNAPSHOT.jar
 
 # 애플리케이션 실행 명령어 설정
 CMD ["java", "-jar", "/app/PODO-BANK-0.0.1-SNAPSHOT.jar"]
