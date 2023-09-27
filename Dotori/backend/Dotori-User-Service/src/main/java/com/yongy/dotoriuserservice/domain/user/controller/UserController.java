@@ -41,7 +41,7 @@ import java.util.HashMap;
 @RestController
 @RequiredArgsConstructor
 @Tag(name= "users", description = "사용자 API")
-@RequestMapping("/v1/user")
+@RequestMapping("/api/v1/user")
 public class UserController {
 
     @Autowired

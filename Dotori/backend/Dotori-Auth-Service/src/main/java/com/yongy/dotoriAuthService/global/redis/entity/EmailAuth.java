@@ -7,7 +7,7 @@ import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
 @Getter
-@RedisHash(value="EmailAuth", timeToLive = 1000L * 60 * 5)
+@RedisHash(value="EmailAuth", timeToLive = 60 * 5)
 public class EmailAuth {
 
     @Id

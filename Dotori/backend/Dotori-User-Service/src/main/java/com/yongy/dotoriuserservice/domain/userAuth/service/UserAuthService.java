@@ -111,7 +111,7 @@ public class UserAuthService {
             RestTemplate restTemplate = new RestTemplate();
 
             ResponseEntity<String> response = restTemplate.exchange(
-                    bankInfo.getBankUrl()+"/api/v1/user/login",
+                    bankInfo.getBankUrl()+"/api/v1/auth/login",
                     HttpMethod.POST,
                     httpEntity,
                     String.class
@@ -149,10 +149,9 @@ public class UserAuthService {
 
         String useToken = null;
 
-
         if(bankAccessToken.isEmpty()){
             if(bankRefreshToken.isEmpty()){
-                this.podoBankLogin(); // accessToken, refreshToken 재발급
+                this.podoBankLogin(); // NOTE : accessToken, refreshToken 재발급
                 log.info("--1--");
                 useToken = bankAccessTokenRepository.findById(bankInfo.getBankName()).get().getToken();
             }else{
@@ -166,6 +165,7 @@ public class UserAuthService {
 
         return useToken;
     }
+
 
     // NOTE : 1원 인증코드를 보낸다.
     public String sendAccountAuthCode(UserAccountDto userAccountDto){

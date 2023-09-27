@@ -1,5 +1,7 @@
 package com.yongy.dotoripurposeservice.domain.purposeData.entity;
 
+
+import com.yongy.dotoripurposeservice.domain.purpose.entity.Purpose;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,8 +22,11 @@ public class PurposeData {
     @Column(name="purpose_data_seq")
     private Long purposeDataSeq;
 
-    private Long purposeSeq;
+    @ManyToOne
+    @JoinColumn(name="purposeSeq")
+    private Purpose purpose;
 
+    @Column(name="account_seq")
     private Long accountSeq;
 
     @Column(name="data_amount", nullable = false)

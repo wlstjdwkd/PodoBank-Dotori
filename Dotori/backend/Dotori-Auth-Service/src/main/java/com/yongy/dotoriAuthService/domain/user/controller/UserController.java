@@ -30,7 +30,7 @@ import java.time.LocalDate;
 @RestController
 @AllArgsConstructor
 @Tag(name= "users", description = "사용자 API")
-@RequestMapping("/v1/user")
+@RequestMapping("/api/v1/auth")
 public class UserController {
 
     @Autowired

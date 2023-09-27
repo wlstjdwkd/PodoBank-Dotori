@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,13 +32,14 @@ public class PurposeServiceImpl implements PurposeService{
     private final PurposeRepository purposeRepository;
     private final PurposeDataRepository purposeDataRepository;
     private final AccountRepository accountRepository;
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     public void createPurpose(PurposeDTO purposeDTO) {
         User loginUser = this.getLoginUser();
         // 새로운 목표 DB에 저장
         purposeRepository.save(Purpose.builder()
-                        .userSeq(loginUser.getUserSeq())
+                        .userSeq(loginUser.getUserSeq()) // TODO : 통신
                         .purposeTitle(purposeDTO.getPurposeTitle())
                         .goalAmount(purposeDTO.getGoalAmount())
                         .currentBalance(BigDecimal.ZERO)
@@ -82,17 +84,18 @@ public class PurposeServiceImpl implements PurposeService{
     @Override
     public PurposeDetailDTO findPurposeDetail(Long purposeSeq) {
         // 목표 상세 내역 조회
-        Purpose purpose = purposeRepository.findByPurposeSeqAndTerminatedAtIsNull(purposeSeq);
-        List<PurposeData> list = purposeDataRepository.findAllByPurposeDataSeq(purposeSeq);
+        Purpose purpose = purposeRepository.findByPurposeSeq(purposeSeq);
+        List<PurposeData> list = purposeDataRepository.findAllByPurpose(purpose);
+        log.info(list.size()+"");
         List<PurposeDataDTO> purposeData = new ArrayList<>();
 
         for(PurposeData data : list){
-            Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(data.getAccountSeq()); // NOTE : 분리
+            Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(data.getAccountSeq());
             purposeData.add(PurposeDataDTO.builder()
-                            .dataName(account.getAccountTitle()) // NOTE : 분리
+                            .dataName(account.getAccountTitle())
                             .dataAmount(data.getDataAmount())
                             .dataCurrentBalance(data.getDataCurrentBalance())
-                            .dataCreatedAt(data.getDataCreatedAt())
+                            .dataCreatedAt(data.getDataCreatedAt().format(formatter))
                     .build());
         }
 
@@ -100,8 +103,8 @@ public class PurposeServiceImpl implements PurposeService{
                 .purposeTitle(purpose.getPurposeTitle())
                 .currentBalance(purpose.getCurrentBalance())
                 .goalAmount(purpose.getGoalAmount())
-                .startedAt(purpose.getStartedAt())
-                .endAt(purpose.getEndAt())
+                .startedAt(purpose.getStartedAt().toString())
+                .endAt(purpose.getEndAt().toString())
                 .purposeDataList(purposeData)
                 .build();
 
@@ -112,7 +115,7 @@ public class PurposeServiceImpl implements PurposeService{
     @Override
     public void terminatePurpose(Long purposeSeq) {
         // 목표 중단
-        Purpose purpose = purposeRepository.findByPurposeSeqAndTerminatedAtIsNull(purposeSeq);
+        Purpose purpose = purposeRepository.findByPurposeSeq(purposeSeq);
 
         purpose.update(Purpose.builder()
                 .endAt(LocalDate.now())
@@ -122,7 +125,7 @@ public class PurposeServiceImpl implements PurposeService{
 
     @Override
     public PurposeSummaryDTO summarizePurpose(Long purposeSeq){
-        Purpose purpose = purposeRepository.findByPurposeSeqAndTerminatedAtIsNull(purposeSeq);
+        Purpose purpose = purposeRepository.findByPurposeSeq(purposeSeq);
         BigDecimal goal = purpose.getGoalAmount();
         BigDecimal current = purpose.getCurrentBalance();
         BigDecimal percentage = BigDecimal.ZERO;
@@ -146,17 +149,5 @@ public class PurposeServiceImpl implements PurposeService{
 
     public User getLoginUser(){
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
-
-    // ---------------------------통신---------------------------
-
-    // NOTE : 목표 계좌에 남아있는 전체 금액을 반환한다.
-    public BigDecimal totalPurposeMoney(Long userSeq){
-        List<Purpose> purposeList = purposeRepository.findAllByUserSeqAndTerminatedAtIsNull(userSeq);
-        BigDecimal result = BigDecimal.ZERO;
-        for(Purpose purpose : purposeList){
-            result = result.add(purpose.getCurrentBalance());
-        }
-        return result;
     }
 }

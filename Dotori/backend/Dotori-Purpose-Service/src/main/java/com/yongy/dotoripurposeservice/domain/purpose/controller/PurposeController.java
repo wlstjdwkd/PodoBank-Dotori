@@ -4,24 +4,20 @@ import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeAllDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeDetailDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeSummaryDTO;
-import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.UserSeqDto;
 import com.yongy.dotoripurposeservice.domain.purpose.service.PurposeServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.math.BigDecimal;
 
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/purpose")
+@RequestMapping("api/v1/purpose")
 public class PurposeController {
     private final PurposeServiceImpl purposeService;
 
@@ -80,16 +76,6 @@ public class PurposeController {
         // 목표 중단하기 눌렀을 때 현재 목표 진행 현황 보여줌
         PurposeSummaryDTO summary = purposeService.summarizePurpose(purposeSeq);
         return ResponseEntity.ok(summary);
-    }
-
-
-    // ---------------------------------통신---------------------------------
-    // NOTE : 사용자의 목표 계좌에 남아있는 전체 금액을 반환한다.
-    @PostMapping("/communication")
-    public ResponseEntity<String> totalPurposeMoney(@RequestBody UserSeqDto userSeqDto){
-        log.info("come");
-        BigDecimal totalMoney = purposeService.totalPurposeMoney(Long.parseLong(userSeqDto.getUserSeq()));
-        return ResponseEntity.ok(totalMoney.toString());
     }
 
 

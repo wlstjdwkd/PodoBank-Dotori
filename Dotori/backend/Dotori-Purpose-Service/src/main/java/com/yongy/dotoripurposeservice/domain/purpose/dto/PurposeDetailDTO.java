@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -16,10 +15,10 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class PurposeDetailDTO {
-    private String purposeTitle;
-    private BigDecimal currentBalance;
-    private BigDecimal goalAmount;
-    private LocalDate startedAt;
-    private LocalDate endAt;
-    private List<PurposeDataDTO> purposeDataList;
+    String purposeTitle;
+    BigDecimal currentBalance;
+    BigDecimal goalAmount;
+    String startedAt;
+    String endAt;
+    List<PurposeDataDTO> purposeDataList;
 }

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/kakao")
+@RequestMapping("/api/v1/auth/kakao")
 public class KakaoController {
 
     @Autowired

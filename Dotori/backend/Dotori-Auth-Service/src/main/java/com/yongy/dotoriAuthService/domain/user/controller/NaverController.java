@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/naver")
+@RequestMapping("/api/v1/auth/naver")
 public class NaverController {
 
     @Autowired
