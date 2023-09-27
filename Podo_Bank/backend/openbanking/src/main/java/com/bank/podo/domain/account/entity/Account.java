@@ -41,9 +41,8 @@ public class Account extends BaseEntity {
     @Column
     private LocalDateTime maturityAt;
 
-    @ManyToOne
-    @JoinColumn(name = "account_category_id")
-    private AccountCategory accountCategory;
+    @Column
+    private String accountCategory;
 
     @Column
     private String loanInfo;
@@ -59,13 +58,5 @@ public class Account extends BaseEntity {
 
     @Column
     private boolean deleted;
-
-    public void deposit(BigDecimal amount) {
-        this.balance = this.balance.add(amount);
-    }
-
-    public void withdraw(BigDecimal amount) {
-        this.balance = this.balance.subtract(amount);
-    }
 
 }
