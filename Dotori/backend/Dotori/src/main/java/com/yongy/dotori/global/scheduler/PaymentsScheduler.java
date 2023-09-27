@@ -87,11 +87,11 @@ public class PaymentsScheduler {
                             .paymentPrice(payment.getAmount())
                             .user(plan.getUser())
                             .checked(false)
+                            .businessCode(payment.getCode())
                             .paymentDate(payment.getTransactionAt())
                             .build());
                     continue;
                 }
-
 
                 // 카테고리 데이터가 이미 있어서 planDetail에 연결 돼있는지 확인 해야하면
                 // 카테고리데이터에 연결된 카테고리로 planDetail 찾기
@@ -106,15 +106,17 @@ public class PaymentsScheduler {
                                     .user(plan.getUser())
                                     .planDetail(planDetail)
                                     .checked(false)
+                                    .businessCode(payment.getCode())
                             .build());
                     continue;
                 }
 
                 chatGPT.add(Payment.builder()
-                        .paymentName(payment.getContent())
-                        .paymentPrice(payment.getAmount())
-                        .user(plan.getUser())
-                        .checked(false)
+                                .paymentName(payment.getContent())
+                                .paymentPrice(payment.getAmount())
+                                .user(plan.getUser())
+                                .checked(false)
+                                .businessCode(payment.getCode())
                         .build());
             }
 
@@ -129,6 +131,4 @@ public class PaymentsScheduler {
                     .build());
         }
     }
-
-
 }
