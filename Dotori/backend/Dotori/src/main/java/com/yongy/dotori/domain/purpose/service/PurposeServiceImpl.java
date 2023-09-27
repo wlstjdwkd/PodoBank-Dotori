@@ -99,8 +99,8 @@ public class PurposeServiceImpl implements PurposeService{
                 .purposeTitle(purpose.getPurposeTitle())
                 .currentBalance(purpose.getCurrentBalance())
                 .goalAmount(purpose.getGoalAmount())
-                .startedAt(purpose.getStartedAt())
-                .endAt(purpose.getEndAt())
+                .startedAt(purpose.getStartedAt().toString())
+                .endAt(purpose.getEndAt().toString())
                 .purposeDataList(purposeData)
                 .build();
 
