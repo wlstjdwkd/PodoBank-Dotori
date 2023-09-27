@@ -138,7 +138,7 @@ export const userCellPhoneNumberChange = async (
 };
 
 // 사용자 탈퇴하기
-export const userExitDotori = async (refreshToken, accessToken, grantType) => {
+export const userWithdrawDotori = async (refreshToken, accessToken, grantType) => {
   try {
     const response = await axios.patch(
       apiAddress + `/v1/user/retire`,

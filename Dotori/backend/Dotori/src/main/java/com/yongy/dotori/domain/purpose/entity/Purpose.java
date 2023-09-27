@@ -5,8 +5,11 @@ import com.yongy.dotori.domain.user.entity.User;
 import lombok.*;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,7 +27,7 @@ public class Purpose {
     private Long purposeSeq;
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "userSeq")
     private User user;
 
     @Column(name="purpose_title", nullable = false)
@@ -37,13 +40,10 @@ public class Purpose {
     private BigDecimal currentBalance;
 
     @Column(name="started_at", nullable = false)
-    private LocalDateTime startedAt;
+    private LocalDate startedAt;
 
     @Column(name="end_at", nullable = false)
-    private LocalDateTime endAt;
-
-    @Column(name="terminate", nullable = false)
-    private boolean terminated;
+    private LocalDate endAt;
 
     @Column(name="terminate_at")
     private LocalDateTime terminatedAt;
@@ -54,9 +54,6 @@ public class Purpose {
     public void update(Purpose purpose){
         if(purpose.endAt != null){
             this.endAt = purpose.endAt;
-        }
-        if(!purpose.terminated){
-            this.terminated = true;
         }
         if(purpose.terminatedAt != null){
             this.terminatedAt = purpose.terminatedAt;

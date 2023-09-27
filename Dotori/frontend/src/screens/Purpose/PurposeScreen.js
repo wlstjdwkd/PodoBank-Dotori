@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,19 +6,23 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-} from "react-native";
-import FooterScreen from "../Components/FooterScreen";
-import { useDispatch, useSelector } from "react-redux";
+} from "react-native"
+import FooterScreen from "../Components/FooterScreen"
+import { useDispatch, useSelector } from "react-redux"
+import { purposeGetList } from "../../apis/purposeapi"
+import { useIsFocused } from "@react-navigation/native"
 export default function PurposeScreen({ navigation }) {
   // 토큰
-  const grantType =  useSelector((state)=>{state.user.grantType})
-  const accessToken =  useSelector((state)=>{state.user.accessToken})
-  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
+  const isFocused = useIsFocused()
 
-  const [nowPurposeAmount, setNowPurposeAmount] = useState(3000000);
-  // 여기서 목표 데이터를 추가하세요
+  const [currentTotalSavings, setcurrentTotalSavings] = useState(0)
+  const [purposeList, setPurposeList] = useState([])
+  
   const data = [
     {
       id: "1",
@@ -45,6 +49,29 @@ export default function PurposeScreen({ navigation }) {
     return colors[randomIndex];
   };
 
+  const doPurposeGetList = async () => {
+    try{
+      const response = await purposeGetList(accessToken, grantType)
+      if(response.status === 200){
+        console.log("목표 리스트 조회 성공")
+        console.log(response.data)
+        setPurposeList(response.data.purposeList)
+        setcurrentTotalSavings(response.data.currentTotalSavings)
+      }else{
+        console.log("목표 리스트 조회 실패", response.status)
+      }
+    }catch(error){
+      console.log('오류 발생: 목표 리스트 조회 실패',error)
+    }
+
+  }
+
+  useEffect(() => {
+    if(isFocused){
+      doPurposeGetList()
+    }
+  }, [isFocused]);
+
   return (
     <View style={styles.container}>
       {/* 상단 이미지 */}
@@ -55,9 +82,11 @@ export default function PurposeScreen({ navigation }) {
 
       {/* 최신순 & 저축액 */}
       <View style={styles.dateAmountContainer}>
-        <Text style={styles.latest}>최신순</Text>
+        <TouchableOpacity>
+          <Text style={styles.latest}>최신순</Text>
+        </TouchableOpacity>
         <View style={styles.colContainer}>
-          <Text style={styles.amount}>{formatNumber(nowPurposeAmount)}원</Text>
+          <Text style={styles.amount}>{currentTotalSavings}원</Text>
           <Text style={styles.currentSavings}>현재 저축액</Text>
         </View>
       </View>
@@ -74,11 +103,55 @@ export default function PurposeScreen({ navigation }) {
 
       {/* 목표 리스트 */}
       <FlatList
+        style={{marginBottom:80}}
+        data={purposeList}
+        renderItem={({ item }) => {
+          const borderColor = getRandomBorderColor();
+          return (
+            <TouchableOpacity style={[styles.targetContainer, { borderColor }]}
+              onPress={()=>{
+                navigation.navigate("PurposeDetailScreen", {purposeSeq:item.purposeSeq})
+              }}
+            >
+              <Text style={styles.targetName}>{item.title}</Text>
+              <View style={styles.rightAlignContainer}>
+                <Text style={styles.currentAmount}>
+                  {item.currentBalance.toLocaleString()}원
+                </Text>
+              </View>
+              <View style={styles.targetAmounts}>
+                <Text style={styles.targetAmountText}>목표 금액</Text>
+                <View style={styles.rightAlignContainer}>
+                  <Text style={styles.targetAmount}>
+                    {item.goalAmount.toLocaleString()}원
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          );
+        }}
+        // keyExtractor={(item) => item.purposeSeq}
+        keyExtractor={(item) => item.purposeSeq}
+        ListFooterComponent={
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => navigation.navigate("PurposeCreate1Screen")}
+          >
+            <Text style={styles.addText}>+</Text>
+          </TouchableOpacity>
+        }
+      />
+      {/* 목표 리스트 */}
+      {/* <FlatList
         data={data}
         renderItem={({ item }) => {
           const borderColor = getRandomBorderColor();
           return (
-            <View style={[styles.targetContainer, { borderColor }]}>
+            <TouchableOpacity style={[styles.targetContainer, { borderColor }]}
+              onPress={()=>{
+                navigation.navigate("PurposeDetailScreen", {itemId:item.id})
+              }}
+            >
               <Text style={styles.targetName}>{item.name}</Text>
               <View style={styles.rightAlignContainer}>
                 <Text style={styles.currentAmount}>
@@ -93,7 +166,7 @@ export default function PurposeScreen({ navigation }) {
                   </Text>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           );
         }}
         keyExtractor={(item) => item.id}
@@ -105,7 +178,7 @@ export default function PurposeScreen({ navigation }) {
             <Text style={styles.addText}>+</Text>
           </TouchableOpacity>
         }
-      />
+      /> */}
       <View style={styles.footer}>
         <FooterScreen navigation={navigation} />
       </View>

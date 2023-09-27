@@ -10,6 +10,6 @@ import java.util.List;
 public interface PurposeRepository extends JpaRepository<Purpose, Long> {
     Purpose findByPurposeSeq(Long purposeSeq);
     List<Purpose> findAllByUserUserSeq(Long userSeq);
-    List<Purpose> findAllByUserUserSeqAndTerminatedIsFalse(Long userSeq);
+    List<Purpose> findAllByUserUserSeqAndTerminatedAtIsNull(Long userSeq);
     List<Purpose> findAllByUserId(String id);
 }

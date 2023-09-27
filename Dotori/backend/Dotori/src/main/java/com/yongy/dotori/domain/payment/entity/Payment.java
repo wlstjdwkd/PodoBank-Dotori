@@ -1,5 +1,6 @@
 package com.yongy.dotori.domain.payment.entity;
 
+import com.yongy.dotori.domain.plan.entity.Plan;
 import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotori.domain.user.entity.User;
 //import jakarta.persistence.Entity;
@@ -7,14 +8,17 @@ import com.yongy.dotori.domain.user.entity.User;
 //import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity(name = "payments")
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 @Builder
 public class Payment {
 
@@ -36,4 +40,21 @@ public class Payment {
 
     @Column(name = "payment_price", nullable = false)
     private BigDecimal paymentPrice;
+
+    @Column(name = "payment_date", nullable = false)
+    private LocalDateTime paymentDate;
+
+    @Column(name = "checked")
+    private boolean checked;
+
+    public Payment updatePlanDetail(PlanDetail planDetailSeq){
+        this.planDetail = planDetailSeq;
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return "{ paymentSeq=" + paymentSeq +
+                ", paymentName='" + paymentName + "'}";
+    }
 }
