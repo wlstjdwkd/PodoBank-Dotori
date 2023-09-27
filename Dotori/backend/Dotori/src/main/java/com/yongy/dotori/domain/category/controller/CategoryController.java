@@ -28,7 +28,7 @@ public class CategoryController {
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "카테고리 리스트 조회 성공")
     })
-    @GetMapping("")
+    @GetMapping()
     public ResponseEntity<List<CategoryDetailDTO>> findAllCategoryTitle(){
         return ResponseEntity.ok(categoryService.findAllCategory());
     }
