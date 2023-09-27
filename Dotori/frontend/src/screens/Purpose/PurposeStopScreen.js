@@ -5,6 +5,8 @@ import { BarChart } from "react-native-gifted-charts";
 import { useDispatch, useSelector } from "react-redux";
 import { purposeQuit } from "../../apis/purposeapi"
 import { useEffect } from "react";
+import { Dimensions } from 'react-native';
+
 
 export default function PurposeDetailScreen({ navigation, route }) {
   // 토큰
@@ -18,6 +20,16 @@ export default function PurposeDetailScreen({ navigation, route }) {
   const [purposeDetailData, setPurposeDetailData] = useState(route.params.purposeDetailData)
   const [isQuitModalVisible, setIsQuitModalVisible] = useState(false)
   const [barData, setbarData] = useState();
+  const [spacingWidth, setSpacingWidth] = useState(20)
+  const [initialSpacingWidth, setInitialSpacingWidth] = useState(3)
+
+
+  // 현재 창의 너비를 가져오기
+  const windowWidth = Dimensions.get('window').width;
+
+  // 화면의 전체 너비를 가져오기
+  const screenWidth = Dimensions.get('screen').width;
+
 
   // const sortedPurposeDataList = data.purposeDataList.sort((a, b) => {
   //   const dateA = new Date(a.month);
@@ -52,7 +64,12 @@ export default function PurposeDetailScreen({ navigation, route }) {
         frontColor: isCurrentYearMonth ? '#31C68F' : (dataAmount === Math.max(...data.map(item => item.dataAmount)) ? '#ED4343' : '#F1F1F1'),
       });
     });
-
+    if(barData.length <= 7){
+      setSpacingWidth(Math.floor(windowWidth * 0.45 / barData.length))
+      setInitialSpacingWidth(Math.floor(windowWidth * 0.45 / barData.length)/2)
+    }
+    if(barData.length <= 6){
+    }
     return barData;
   };
   
@@ -139,35 +156,37 @@ export default function PurposeDetailScreen({ navigation, route }) {
       </View>
 
       {/* 목표 이름 */}
-      <View style={styles.titleContainer}>
+      <View style={[styles.titleContainer, {}]}>
         {/* <Text style={styles.purposeTitle}>{data.purposeTitle}</Text> */}
         <Text style={styles.purposeTitle}>{purposeDetailData.purposeTitle}</Text>
       </View>
 
-      {/* 금액 정보 */}
-      <View style={styles.balanceContainer}>
-        <View style={styles.balanceItem}>
-          <Text style={styles.balanceLabel}>목표 금액</Text>
-          <Text style={styles.balanceValue}>
-            {/* {data.goalAmount.toLocaleString()}원 */}
-            {purposeDetailData.goalAmount.toLocaleString()}원
-          </Text>
-        </View>
-        <View style={styles.balanceItem}>
-          <Text style={styles.balanceLabel}>현재 금액</Text>
-          <Text style={styles.balanceValue}>
-            {/* {data.currentBalance.toLocaleString()}원 */}
-            {purposeDetailData.currentBalance.toLocaleString()}원
-          </Text>
-        </View>
-        <View style={styles.balanceItem}>
-          <Text style={styles.balanceLabel}>남은 금액</Text>
-          <Text style={styles.balanceValue}>
-            {/* {(data.goalAmount - data.currentBalance).toLocaleString()}원 */}
-            {purposeDetailData.goalAmount - purposeDetailData.currentBalance > 0
-              ?(purposeDetailData.goalAmount - purposeDetailData.currentBalance).toLocaleString()
-              : 0}원
-          </Text>
+      <View style={{flexDirection:'row', marginVertical:20}}>
+        {/* 금액 정보 */}
+        <View style={[styles.balanceContainer, {marginVertical:20}]}>
+          <View style={styles.balanceItem}>
+            <Text style={styles.balanceLabel}>목표 금액</Text>
+            <Text style={styles.balanceValue}>
+              {/* {data.goalAmount.toLocaleString()}원 */}
+              {purposeDetailData.goalAmount.toLocaleString()}원
+            </Text>
+          </View>
+          <View style={styles.balanceItem}>
+            <Text style={styles.balanceLabel}>현재 금액</Text>
+            <Text style={styles.balanceValue}>
+              {/* {data.currentBalance.toLocaleString()}원 */}
+              {purposeDetailData.currentBalance.toLocaleString()}원
+            </Text>
+          </View>
+          <View style={styles.balanceItem}>
+            <Text style={styles.balanceLabel}>남은 금액</Text>
+            <Text style={styles.balanceValue}>
+              {/* {(data.goalAmount - data.currentBalance).toLocaleString()}원 */}
+              {purposeDetailData.goalAmount - purposeDetailData.currentBalance > 0
+                ?(purposeDetailData.goalAmount - purposeDetailData.currentBalance).toLocaleString()
+                : 0}원
+            </Text>
+          </View>
         </View>
       </View>
 
@@ -186,7 +205,9 @@ export default function PurposeDetailScreen({ navigation, route }) {
               barWidth={15}
               width={250}
               height={150}
-              initialSpacing={3}
+              initialSpacing={initialSpacingWidth}
+              // spacing={barData.length <= 7 ? Math.floor(windowWidth * 0.5 / barData.length) : 20}
+              spacing={spacingWidth}
               hideRules
               hideYAxisText
               barBorderRadius={4}
@@ -209,33 +230,26 @@ export default function PurposeDetailScreen({ navigation, route }) {
                   </View>
                 );
               }}
-              />
+            />
         </View>
       </View>
       <View style={{ width: "90%", alignItems: "flex-end", justifyContent: "center", margin: 20, }}>
-        <TouchableOpacity>
-          <Text style={{fontSize: 13, color: "#939393",}}>그래프로 보기</Text>
-        </TouchableOpacity>
-      </View>
-      {/* <View style={styles.purposeStopContainer}>
         <TouchableOpacity
-          style={styles.stopPurposeButton}
-          onPress={() => {
-            // navigation.navigate("PurposeStopScreen", {purposeSeq:purposeSeq, purposeDetailData:purposeDetailData})
-            navigation.navigate("PurposeStopScreen", {purposeSeq:purposeSeq, purposeDetailData:tmpData})
+          onPress={()=>{
+            setIsQuitModalVisible(true)
           }}
         >
-          <Text style={styles.stopPurposeText}>그래프로 보기</Text>
+          <Text style={{fontSize: 13, color: "#939393",}}>목표 중단하기</Text>
         </TouchableOpacity>
-      </View> */}
-
-      {/* 중단 확인 문구 */}
-      <View style={styles.stopCheckContainer}>
-        <Text style={styles.stopCheckText}>목표를 중단하시겠습니까?</Text>
       </View>
 
+      {/* 중단 확인 문구 */}
+      {/* <View style={styles.stopCheckContainer}>
+        <Text style={styles.stopCheckText}>목표를 중단하시겠습니까?</Text>
+      </View> */}
+
       {/* 확인 버튼 */}
-      <View style={styles.purposeStopContainer}>
+      {/* <View style={styles.purposeStopContainer}>
         <TouchableOpacity
           style={styles.stopPurposeButtonYes}
           onPress={() => {
@@ -255,7 +269,7 @@ export default function PurposeDetailScreen({ navigation, route }) {
             <Text style={styles.stopPurposeText}>아니오</Text>
           </View>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       
 
@@ -284,8 +298,9 @@ export default function PurposeDetailScreen({ navigation, route }) {
                 <TouchableOpacity
                   style={[styles.button, styles.buttonClose]}
                   onPress={() => {
+                    navigation.navigate("PurposeStop1Screen", {purposeSeq:purposeSeq, purposeDetailData:purposeDetailData})
                     setIsQuitModalVisible(false)
-                    doPurposeQuit()
+                    // doPurposeQuit()
                   }}>
                   <Text style={styles.textStyle}>예</Text>
                 </TouchableOpacity>
@@ -373,10 +388,6 @@ const styles = StyleSheet.create({
     color: "#ED4343",
   },
   chartDataContainer: {
-    
-
-
-
 
   },
   stopCheckContainer: {

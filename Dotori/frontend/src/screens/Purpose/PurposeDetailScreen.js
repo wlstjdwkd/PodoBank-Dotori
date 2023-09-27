@@ -5,7 +5,7 @@ import Feather from "react-native-vector-icons/Feather"; // Feather 아이콘을
 import { useDispatch, useSelector } from "react-redux";
 import { purposeDetail } from "../../apis/purposeapi"
 
-const tmpData = {"currentBalance": 150000, "endAt": "2023-12-14", "goalAmount": 230000, "purposeDataList": [{"dataAmount": 1, "dataCreatedAt": "2023-09-27 23:02:51", "dataCurrentBalance": 1, "dataName": "진성갓2계좌"},
+const tmpData = {"currentBalance": 230, "endAt": "2023-11-28", "goalAmount": 512000, "purposeDataList": [{"dataAmount": 1, "dataCreatedAt": "2023-09-27 23:02:51", "dataCurrentBalance": 1, "dataName": "진성갓2계좌"},
 {"dataAmount": 2, "dataCreatedAt": "2023-09-27 23:03:00", "dataCurrentBalance": 2, "dataName": "진성갓2계좌"},
 {"dataAmount": 3, "dataCreatedAt": "2023-09-30 23:03:09", "dataCurrentBalance": 3, "dataName": "진성갓2계좌"},
 {"dataAmount": 4, "dataCreatedAt": "2023-10-01 23:03:18", "dataCurrentBalance": 4, "dataName": "진성갓2계좌"},
@@ -24,7 +24,14 @@ const tmpData = {"currentBalance": 150000, "endAt": "2023-12-14", "goalAmount": 
 {"dataAmount": 17, "dataCreatedAt": "2023-12-14 23:05:15", "dataCurrentBalance": 17, "dataName": "진성갓2계좌"},
 {"dataAmount": 18, "dataCreatedAt": "2023-12-14 23:05:24", "dataCurrentBalance": 18, "dataName": "진성갓2계좌"},
 {"dataAmount": 19, "dataCreatedAt": "2023-12-14 23:05:33", "dataCurrentBalance": 19, "dataName": "진성갓2계좌"},
-{"dataAmount": 20, "dataCreatedAt": "2023-12-14 23:05:42", "dataCurrentBalance": 20, "dataName": "진성갓2계좌"}
+{"dataAmount": 20, "dataCreatedAt": "2023-12-14 23:05:42", "dataCurrentBalance": 20, "dataName": "진성갓2계좌"},
+{"dataAmount": 21, "dataCreatedAt": "2024-01-14 23:05:42", "dataCurrentBalance": 21, "dataName": "진성갓2계좌"},
+{"dataAmount": 22, "dataCreatedAt": "2024-02-14 23:05:42", "dataCurrentBalance": 22, "dataName": "진성갓2계좌"},
+{"dataAmount": 23, "dataCreatedAt": "2024-03-14 23:05:42", "dataCurrentBalance": 23, "dataName": "진성갓2계좌"},
+{"dataAmount": 24, "dataCreatedAt": "2024-04-14 23:05:42", "dataCurrentBalance": 24, "dataName": "진성갓2계좌"},
+{"dataAmount": 25, "dataCreatedAt": "2024-05-14 23:05:42", "dataCurrentBalance": 50, "dataName": "진성갓2계좌"},
+{"dataAmount": 26, "dataCreatedAt": "2024-06-14 23:05:42", "dataCurrentBalance": 21, "dataName": "진성갓2계좌"},
+{"dataAmount": 27, "dataCreatedAt": "2024-07-14 23:05:42", "dataCurrentBalance": 18, "dataName": "진성갓2계좌"},
 ], "purposeTitle": "노트북구매할거야", "startedAt": "2023-09-27"}
 
 
