@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface PurposeRepository extends JpaRepository<Purpose, Long> {
-    List<Purpose> findAllByUserId(String id);
+    List<Purpose> findAllByUserIdAndTerminatedAtIsNull(String id);
 }

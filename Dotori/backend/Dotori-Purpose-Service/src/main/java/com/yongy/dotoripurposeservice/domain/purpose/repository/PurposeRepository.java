@@ -11,4 +11,5 @@ import java.util.List;
 public interface PurposeRepository extends JpaRepository<Purpose, Long> {
     Purpose findByPurposeSeqAndTerminatedAtIsNull(Long purposeSeq);
     List<Purpose> findAllByUserSeqAndTerminatedAtIsNull(Long userSeq);
+
 }

@@ -5,11 +5,17 @@ import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeDetailDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeSummaryDTO;
 
+import java.math.BigDecimal;
+
 public interface PurposeService {
     void createPurpose(PurposeDTO purposeDTO);
     PurposeAllDTO findAllPurpose();
     PurposeDetailDTO findPurposeDetail(Long purposeSeq);
     void terminatePurpose(Long purposeSeq);
     PurposeSummaryDTO summarizePurpose(Long purposeSeq);
+
+    // ---------------통신--------------
+
+    BigDecimal totalPurposeMoney(Long userSeq);
 
 }

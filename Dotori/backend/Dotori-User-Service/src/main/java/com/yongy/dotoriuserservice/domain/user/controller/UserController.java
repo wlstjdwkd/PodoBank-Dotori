@@ -16,19 +16,30 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 
 @Slf4j
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Tag(name= "users", description = "사용자 API")
 @RequestMapping("/v1/user")
 public class UserController {
@@ -42,6 +53,8 @@ public class UserController {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Value("${dotori.purpose.url}")
+    private String PURPOSE_SERVICE_URL;
 
     // NOTE : 사용자 데이터 가져오기
     @ApiResponse(responseCode = "200", description = "사용자의 데이터를 가져오는데 성공함")
@@ -126,22 +139,47 @@ public class UserController {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // NOTE : 사용자의 통장에 돈이 있으면 탈퇴할 수 없음
-        BigDecimal currentMoney = userService.totalPurposeMoney(user.getId());
+
+        // TODO : dotori-purpose-service와 통신 , http://localhost:9130/
+
+        String accessURL = PURPOSE_SERVICE_URL + "/v1/purpose/communication";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json;charset=utf-8");
+
+        HashMap<String, Object> bodyData = new HashMap<>();
+        bodyData.put("userSeq", user.getUserSeq());
+
+        HttpEntity<HashMap<String, Object>> httpEntity = new HttpEntity<>(bodyData, headers);
+
+        // (3) 호출
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                PURPOSE_SERVICE_URL+"/v1/purpose/communication",
+                HttpMethod.POST,
+                httpEntity,
+                String.class
+        );
+
+
+        BigDecimal currentMoney = new BigDecimal(response.getBody());
+
         if(currentMoney.compareTo(BigDecimal.ZERO) != 0){
             throw new FailedRetiredException("사용자의 목표 통장에 돈이 남아있어서 탈퇴할 수 없습니다.");
         }
 
-        // NOTE : 사용자의 계좌 모두 삭제하기
-        userService.removeUserAccounts(user.getUserSeq());
-
-        // NOTE : 사용자의 진행중인 계획 모두 삭제하기
-        userService.removeUserPlans(user.getUserSeq());
-
-        // NOTE : 사용자의 RefreshToken 삭제하기
-        userService.deleteUserRefreshToken(user.getId());
-
-        // NOTE : 사용자 탈퇴하기
-        userService.removeRetireUser(user);
+//        // NOTE : 사용자의 계좌 모두 삭제하기
+//        userService.removeUserAccounts(user.getUserSeq());
+//
+//        // NOTE : 사용자의 진행중인 계획 모두 삭제하기
+//        userService.removeUserPlans(user.getUserSeq());
+//
+//        // NOTE : 사용자의 RefreshToken 삭제하기
+//        userService.deleteUserRefreshToken(user.getId());
+//
+//        // NOTE : 사용자 탈퇴하기
+//        userService.removeRetireUser(user);
 
         return ResponseEntity.ok().build();
     }

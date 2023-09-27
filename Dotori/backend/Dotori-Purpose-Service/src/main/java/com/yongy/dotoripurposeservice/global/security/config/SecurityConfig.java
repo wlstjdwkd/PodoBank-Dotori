@@ -30,7 +30,6 @@ public class SecurityConfig{
                 .httpBasic().disable()
                 .formLogin().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/v1/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().permitAll()
                 .and()
                 .addFilterBefore(new AuthFilter(authProvider), UsernamePasswordAuthenticationFilter.class)

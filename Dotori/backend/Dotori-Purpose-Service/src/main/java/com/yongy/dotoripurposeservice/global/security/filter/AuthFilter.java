@@ -48,8 +48,8 @@ public class AuthFilter extends GenericFilterBean {
             authentication = authProvider.getAuthentication(user);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }else{ // NOTE : 사용자가 존재하지 않습니다.
-            generalJwtExceptionHandler((HttpServletResponse) response, ErrorType.NOT_FOUND_USER);
-            return;
+            // generalJwtExceptionHandler((HttpServletResponse) response, ErrorType.NOT_FOUND_USER);
+            // return;
         }
         chain.doFilter(request, response);
     }

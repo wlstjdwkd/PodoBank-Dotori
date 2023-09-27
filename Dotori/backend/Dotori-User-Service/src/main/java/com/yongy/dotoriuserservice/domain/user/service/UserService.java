@@ -53,7 +53,7 @@ public class UserService {
 
     // NOTE : 목표 계좌에 남아있는 전체 금액을 반환한다.
     public BigDecimal totalPurposeMoney(String id){
-        List<Purpose> purposeList = purposeRepository.findAllByUserId(id);
+        List<Purpose> purposeList = purposeRepository.findAllByUserIdAndTerminatedAtIsNull(id);
         BigDecimal result = BigDecimal.ZERO;
         for(Purpose purpose : purposeList){
             result = result.add(purpose.getCurrentBalance());

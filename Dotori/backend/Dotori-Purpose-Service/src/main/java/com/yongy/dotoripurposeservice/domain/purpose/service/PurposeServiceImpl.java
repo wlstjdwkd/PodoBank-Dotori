@@ -147,4 +147,16 @@ public class PurposeServiceImpl implements PurposeService{
     public User getLoginUser(){
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
+
+    // ---------------------------통신---------------------------
+
+    // NOTE : 목표 계좌에 남아있는 전체 금액을 반환한다.
+    public BigDecimal totalPurposeMoney(Long userSeq){
+        List<Purpose> purposeList = purposeRepository.findAllByUserSeqAndTerminatedAtIsNull(userSeq);
+        BigDecimal result = BigDecimal.ZERO;
+        for(Purpose purpose : purposeList){
+            result = result.add(purpose.getCurrentBalance());
+        }
+        return result;
+    }
 }

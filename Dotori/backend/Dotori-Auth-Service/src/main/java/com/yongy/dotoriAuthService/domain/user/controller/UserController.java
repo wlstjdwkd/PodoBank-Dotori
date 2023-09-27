@@ -138,3 +138,6 @@ public class UserController {
     }
 
 }
+
+// Auth Server에서 하던 작업을 User Server에서 하도록
+// 인증객체는 다 User인데 그럼
