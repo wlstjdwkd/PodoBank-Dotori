@@ -149,10 +149,11 @@ public class UserAuthService {
 
         String useToken = null;
 
+        this.podoBankLogin();
 
         if(bankAccessToken.isEmpty()){
             if(bankRefreshToken.isEmpty()){
-                this.podoBankLogin(); // accessToken, refreshToken 재발급
+                // this.podoBankLogin(); // NOTE : accessToken, refreshToken 재발급
                 log.info("--1--");
                 useToken = bankAccessTokenRepository.findById(bankInfo.getBankName()).get().getToken();
             }else{
