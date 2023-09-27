@@ -4,6 +4,7 @@ import com.bank.podo.domain.openbank.dto.*;
 import com.bank.podo.domain.openbank.entity.AccountVerificationCode;
 import com.bank.podo.domain.openbank.entity.FintechService;
 import com.bank.podo.domain.openbank.entity.FintechUser;
+import com.bank.podo.domain.openbank.exception.AlreadyExistUserException;
 import com.bank.podo.domain.openbank.exception.FintechServiceNotFoundException;
 import com.bank.podo.domain.openbank.exception.VerificationCodeNotMathchException;
 import com.bank.podo.domain.openbank.repository.AccountVerificationCodeRepository;
@@ -36,9 +37,12 @@ public class OpenBankingService {
 
     @Transactional
     public boolean oneCentVerification(FintechOneCentVerificationDTO fintechOneCentVerificationDTO) {
-        System.out.println(fintechOneCentVerificationDTO.getServiceCode());
         FintechService fintechService = serviceRepository.findByServiceCode(fintechOneCentVerificationDTO.getServiceCode())
                 .orElseThrow(() -> new FintechServiceNotFoundException("존재하지 않는 서비스입니다."));
+
+        // 이미 해당 서비스에 등록한 경우
+        fintechUserRepository.findByFintechServiceAndAccountNumber(fintechService, fintechOneCentVerificationDTO.getAccountNumber())
+                .ifPresent(fintechUser -> {throw new AlreadyExistUserException("이미 해당 서비스에 등록된 계좌입니다.");});
 
         String verificationCode = generateVerificationCode(fintechService.getServiceName());
 
@@ -92,7 +96,7 @@ public class OpenBankingService {
     }
 
 
-    // 사용자 계좌 출금
+    // 사용자 계좌에서 출금
     @Transactional
     public boolean withdrawUserAccount(FintechWithdrawDTO fintechWithdrawDTO) {
         User user = getLoginUser();
@@ -105,13 +109,11 @@ public class OpenBankingService {
 
         BigDecimal transferAmount = fintechWithdrawDTO.getAmount();
 
-        boolean success = transfer(fintechUser.getAccountNumber(), fintechService.getAccountNumber(),
+        return transfer(fintechUser.getAccountNumber(), fintechService.getAccountNumber(),
                 transferAmount, fintechWithdrawDTO.getContent(), fintechUser.getAccountNumber());
-
-        return success;
     }
 
-    // 사용자 계좌 입금
+    // 사용자 계좌에 입금
     @Transactional
     public boolean depositUserAccount(FintechDepositDTO fintechDepositDTO) {
         User user = getLoginUser();
@@ -124,10 +126,8 @@ public class OpenBankingService {
 
         BigDecimal transferAmount = fintechDepositDTO.getAmount();
 
-        boolean success = transfer(fintechService.getAccountNumber(), fintechUser.getAccountNumber(),
+        return transfer(fintechService.getAccountNumber(), fintechUser.getAccountNumber(),
                 transferAmount, fintechDepositDTO.getContent(), fintechService.getServiceName());
-
-        return success;
     }
 
     @Transactional

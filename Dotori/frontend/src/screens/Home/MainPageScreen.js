@@ -11,54 +11,53 @@ import {
 
 import FooterScreen from "../Components/FooterScreen";
 import { useDispatch, useSelector } from "react-redux";
-import {accountWholeInquiry} from "../../apis/accountapi"
-import {userInfoInquiry} from '../../apis/userapi'
+import { accountWholeInquiry } from "../../apis/accountapi";
+import { userInfoInquiry } from "../../apis/userapi";
 import { useIsFocused } from "@react-navigation/native";
 
-const banks = [
-  {
-    id: "1",
-    name: "월급 통장",
-    balance: 10000,
-  },
-  {
-    id: "2",
-    name: "비상금 통장",
-    balance: 20000,
-  },
-  // {
-  //   id: "3",
-  //   name: "비상금 통장",
-  //   balance: "20,000원",
-  // },
-  // {
-  //   id: "4",
-  //   name: "비상금 통장",
-  //   balance: "20,000원",
-  // },
-  // {
-  //   id: "5",
-  //   name: "비상금 통장",
-  //   balance: "20,000원",
-  // },
-  // ... 다른 은행들의 데이터
-];
+// const banks = [
+//   {
+//     id: "1",
+//     name: "월급 통장",
+//     balance: 10000,
+//   },
+//   {
+//     id: "2",
+//     name: "비상금 통장",
+//     balance: 20000,
+//   },
+//   // {
+//   //   id: "3",
+//   //   name: "비상금 통장",
+//   //   balance: "20,000원",
+//   // },
+//   // {
+//   //   id: "4",
+//   //   name: "비상금 통장",
+//   //   balance: "20,000원",
+//   // },
+//   // {
+//   //   id: "5",
+//   //   name: "비상금 통장",
+//   //   balance: "20,000원",
+//   // },
+//   // ... 다른 은행들의 데이터
+// ];
 const formatNumber = (num) => {
   return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 };
 
-
 export default function MainPageScreen({ navigation }) {
   // 토큰
-  const grantType =  useSelector((state)=>state.user.grantType)
-  const accessToken =  useSelector((state)=>state.user.accessToken)
-  const refreshToken =  useSelector((state)=>state.user.refreshToken)
-  const dispatch = useDispatch()
+  const grantType = useSelector((state) => state.user.grantType);
+  const accessToken = useSelector((state) => state.user.accessToken);
+  const refreshToken = useSelector((state) => state.user.refreshToken);
+  const dispatch = useDispatch();
   // 그 외
-  const [accountList, setAccountList] = useState([])
-  const [userInfo, setUserInfo] = useState(null)
-  const isFocused = useIsFocused()
-  
+  const [accountList, setAccountList] = useState([]);
+  const [userInfo, setUserInfo] = useState(null);
+  const isFocused = useIsFocused();
+
   // // 정보조회 함수
   // const do정보조회 = async () => {
   //   const response = await 함수()
@@ -69,45 +68,45 @@ export default function MainPageScreen({ navigation }) {
   //   }
   // }
 
-  const doAccountWholeInquiry = async () =>{
-    try{
-      const response = await accountWholeInquiry(accessToken, grantType)
-      if(response.status === 200){
-        console.log("전체 계좌 리스트 불러오기 성공")
-        setAccountList(response.data)
-      }else{
-        console.log("전체 계좌 리스트 불러오기 실패")
+  const doAccountWholeInquiry = async () => {
+    try {
+      const response = await accountWholeInquiry(accessToken, grantType);
+      if (response.status === 200) {
+        console.log("전체 계좌 리스트 불러오기 성공");
+        setAccountList(response.data);
+      } else {
+        console.log("전체 계좌 리스트 불러오기 실패");
       }
-    }catch(error){
-      console.log(error)
+    } catch (error) {
+      console.log(error);
     }
-  }
+  };
   const doUserInfoInquiry = async () => {
     try {
       const response = await userInfoInquiry(accessToken, grantType);
-      if(response.status===200){
+      if (response.status === 200) {
         setUserInfo(response.data);
-      }else{
-        console.log('사용자 정보 조회 실패',response.status)
+      } else {
+        console.log("사용자 정보 조회 실패", response.status);
       }
     } catch (error) {
-      console.error('오류 발생 : 사용자 정보 조회 실패:', error);
+      console.error("오류 발생 : 사용자 정보 조회 실패:", error);
     }
-  }
+  };
 
-  useEffect(()=>{
-    if(isFocused){
+  useEffect(() => {
+    if (isFocused) {
       // do정보조회()
-      doAccountWholeInquiry()
-      doUserInfoInquiry()
+      doAccountWholeInquiry();
+      doUserInfoInquiry();
     }
-  },[isFocused])
+  }, [isFocused]);
 
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
         <FlatList
-          data={banks}
+          data={accountList}
           showsVerticalScrollIndicator={false} // 수직 스크롤바 숨김
           ListHeaderComponent={
             <>
@@ -136,21 +135,26 @@ export default function MainPageScreen({ navigation }) {
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.bankContainer}
-              onPress={() => navigation.navigate("PlanMainScreen")}
+              onPress={() =>
+                navigation.navigate("PlanMainScreen", {
+                  accountSeq: item.accountSeq,
+                  accountTitle: item.accountTitle,
+                })
+              }
             >
               <View style={styles.imageText}>
                 <Image
                   style={styles.bankIcon}
                   source={require("../../assets/images/logo_podo.png")}
                 />
-                <Text style={styles.bankName}>{item.name}</Text>
+                <Text style={styles.bankName}>{item.accountTitle}</Text>
               </View>
 
               <View style={styles.bankTextContainer}>
                 <View style={styles.balanceRow}>
                   <Text style={styles.bankSubtitle}>잔액</Text>
                   <Text style={styles.bankBalance}>
-                    {formatNumber(item.balance)}원
+                    {formatNumber(item.currentBalance)}원
                   </Text>
                 </View>
               </View>
@@ -161,7 +165,9 @@ export default function MainPageScreen({ navigation }) {
               <TouchableOpacity
                 style={styles.addButton}
                 onPress={() => {
-                  navigation.navigate("OneCent1Screen", {userName:userInfo.userName})
+                  navigation.navigate("OneCent1Screen", {
+                    userName: userInfo.userName,
+                  });
                 }}
               >
                 <Text style={styles.addText}>+</Text>
