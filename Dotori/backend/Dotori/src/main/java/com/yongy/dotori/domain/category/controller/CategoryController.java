@@ -2,12 +2,14 @@ package com.yongy.dotori.domain.category.controller;
 
 import com.yongy.dotori.domain.category.dto.CategoryDetailDTO;
 import com.yongy.dotori.domain.category.service.CategoryServiceImpl;
+import com.yongy.dotori.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,9 +28,12 @@ public class CategoryController {
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "카테고리 리스트 조회 성공")
     })
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<List<CategoryDetailDTO>> findAllCategoryTitle(){
-        List<CategoryDetailDTO> categoryTitles = categoryService.findAllCategory();
-        return ResponseEntity.ok(categoryTitles);
+        return ResponseEntity.ok(categoryService.findAllCategory());
     }
+
+
+
+
 }
