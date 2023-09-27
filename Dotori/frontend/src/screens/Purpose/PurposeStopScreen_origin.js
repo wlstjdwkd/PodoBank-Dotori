@@ -4,7 +4,107 @@ import Feather from "react-native-vector-icons/Feather";
 import { BarChart } from "react-native-gifted-charts";
 import { useDispatch, useSelector } from "react-redux";
 import { purposeQuit } from "../../apis/purposeapi"
-import { useEffect } from "react";
+
+const data = {
+  id: "1",
+  purposeTitle: "로마여행",
+  currentBalance: 2000000,
+  goalAmount: 4000000,
+  purposeDataList: [
+    {
+      month: "2022-11",
+      dataAmount: 300000,
+    },
+    {
+      month: "2023-01",
+      dataAmount: 500000,
+    },
+    {
+      month: "2022-12",
+      dataAmount: 350000,
+    },
+    {
+      month: "2023-03",
+      dataAmount: 50000,
+    },
+    {
+      month: "2023-02",
+      dataAmount: 250000,
+    },
+    {
+      month: "2023-04",
+      dataAmount: 420000,
+    },
+    {
+      month: "2023-05",
+      dataAmount: 360000,
+    },
+    {
+      month: "2023-06",
+      dataAmount: 100000,
+    },
+    {
+      month: "2023-07",
+      dataAmount: 450000,
+    },
+    {
+      month: "2023-08",
+      dataAmount: 240000,
+    },
+    {
+      month: "2023-09",
+      dataAmount: 320000,
+    },
+    {
+      month: "2023-10",
+      dataAmount: 320000,
+    },
+    {
+      month: "2023-11",
+      dataAmount: 320000,
+    },
+    {
+      month: "2023-12",
+      dataAmount: 320000,
+    },
+    {
+      month: "2024-01",
+      dataAmount: 320000,
+    },
+  ]
+};
+
+
+
+const generateBarData = (data) => {
+  const barData = [];
+  const currentDate = new Date();
+
+  if (data.length === 0) {
+    return barData;
+  }
+
+  data.forEach((item) => {
+    const { month, dataAmount } = item;
+    const [ year, monthNumber ] = month.split('-'); // 월과 연도 추출
+
+    let isCurrentYearMonth = false;
+
+    if(currentDate.getFullYear() == year && currentDate.getMonth() + 1 == monthNumber) {
+      isCurrentYearMonth = true;
+    }
+
+    barData.push({
+      value: dataAmount,
+      label: (monthNumber != 1) ? parseInt(monthNumber) : `${year.slice(-2)}/${parseInt(monthNumber)}`, // 월 표시 형식 변경
+      frontColor: isCurrentYearMonth ? '#31C68F' : '#F1F1F1',
+    });
+  });
+
+  return barData;
+};
+
+
 
 export default function PurposeDetailScreen({ navigation, route }) {
   // 토큰
@@ -17,44 +117,14 @@ export default function PurposeDetailScreen({ navigation, route }) {
   const [purposeSeq, setPurposeSeq] = useState(route.params.purposeSeq)
   const [purposeDetailData, setPurposeDetailData] = useState(route.params.purposeDetailData)
   const [isQuitModalVisible, setIsQuitModalVisible] = useState(false)
-  const [barData, setbarData] = useState();
 
-  // const sortedPurposeDataList = data.purposeDataList.sort((a, b) => {
-  //   const dateA = new Date(a.month);
-  //   const dateB = new Date(b.month);
-  //   return dateA - dateB;
-  // });
-  // const barData = generateBarData(sortedPurposeDataList);
+  const sortedPurposeDataList = data.purposeDataList.sort((a, b) => {
+    const dateA = new Date(a.month);
+    const dateB = new Date(b.month);
+    return dateA - dateB;
+  });
+  const barData = generateBarData(sortedPurposeDataList);
 
-  
-  const generateBarData = (data) => {
-    const barData = [];
-    const currentDate = new Date();
-
-    if (data.length === 0) {
-      return barData;
-    }
-
-    data.forEach((item) => {
-      const { month, dataAmount } = item;
-      const [ year, monthNumber ] = month.split('-'); // 월과 연도 추출
-
-      let isCurrentYearMonth = false;
-
-      if(currentDate.getFullYear() == year && currentDate.getMonth() + 1 == monthNumber) {
-        isCurrentYearMonth = true;
-      }
-
-      barData.push({
-        value: dataAmount,
-        label: (monthNumber != 1) ? parseInt(monthNumber) : `${year.slice(-2)}/${parseInt(monthNumber)}`, // 월 표시 형식 변경
-        // frontColor: isCurrentYearMonth ? '#31C68F' : '#F1F1F1',
-        frontColor: isCurrentYearMonth ? '#31C68F' : (dataAmount === Math.max(...data.map(item => item.dataAmount)) ? '#ED4343' : '#F1F1F1'),
-      });
-    });
-
-    return barData;
-  };
   
   const doPurposeQuit = async () => {
     try{
@@ -73,60 +143,6 @@ export default function PurposeDetailScreen({ navigation, route }) {
       console.log('오류 발생: 목표 중단 실패', error)
     }
   }
-  
-  const settingbarData = () =>{
-    // Get the start and end dates from the response
-    const startDate = new Date(purposeDetailData.startedAt);
-    const endDate = new Date(purposeDetailData.endAt);
-  
-    // Create a map to group data by month
-    const monthlyDataMap = {};
-  
-    // Loop through the purposeDataList and group data by month
-    purposeDetailData.purposeDataList.forEach(item => {
-      const dataDate = new Date(item.dataCreatedAt);
-      const monthYearKey = `${dataDate.getFullYear()}-${(dataDate.getMonth() + 1).toString().padStart(2, '0')}`;
-  
-      if (!monthlyDataMap[monthYearKey]) {
-        monthlyDataMap[monthYearKey] = 0;
-      }
-  
-      monthlyDataMap[monthYearKey] += item.dataAmount;
-    });
-    console.log(monthlyDataMap) //{"2023-09": 6, "2023-10": 15, "2023-11": 24, "2023-12": 165}
-    
-    // Create an array of purposeData objects
-    const purposeDataList = [];
-  
-    // Loop through the months in the date range and create purposeData objects
-    let currentDate = new Date(startDate); // startDate 변수를 복사하여 currentDate에 할당
-
-    while (currentDate <= endDate) {
-      const monthYearKey = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
-      const dataAmount = monthlyDataMap[monthYearKey] || 0;
-    
-      purposeDataList.push({
-        month: monthYearKey,
-        dataAmount
-      });
-    
-      // Move to the next month by creating a new date object
-      currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1); // 다음 달의 1일로 설정
-    }
-  
-    console.log(purposeDataList); //[{"dataAmount": 6, "month": "2023-09"}, {"dataAmount": 15, "month": "2023-10"}, {"dataAmount": 24, "month": "2023-11"}]
-    // const barData = generateBarData(purposeDataList);
-    setbarData(generateBarData(purposeDataList))
-  }
-
-  
-
-  
-
-  useEffect(()=>{
-    settingbarData()
-  }, [])
-
 
   return (
     <View style={styles.container}>
@@ -175,7 +191,7 @@ export default function PurposeDetailScreen({ navigation, route }) {
       <View style={styles.chartContainer}>
         <View style={styles.chartInfoContainer}>
           <Text style={styles.chartInfoText}>현재 달성</Text>
-          <Text style={styles.chartInfoPercent}>{(purposeDetailData.currentBalance / purposeDetailData.goalAmount * 100).toFixed(2)}%</Text>
+          <Text style={styles.chartInfoPercent}>{data.currentBalance / data.goalAmount * 100}%</Text>
         </View>
 
         <View style={styles.chartDataContainer}>
@@ -212,22 +228,6 @@ export default function PurposeDetailScreen({ navigation, route }) {
               />
         </View>
       </View>
-      <View style={{ width: "90%", alignItems: "flex-end", justifyContent: "center", margin: 20, }}>
-        <TouchableOpacity>
-          <Text style={{fontSize: 13, color: "#939393",}}>그래프로 보기</Text>
-        </TouchableOpacity>
-      </View>
-      {/* <View style={styles.purposeStopContainer}>
-        <TouchableOpacity
-          style={styles.stopPurposeButton}
-          onPress={() => {
-            // navigation.navigate("PurposeStopScreen", {purposeSeq:purposeSeq, purposeDetailData:purposeDetailData})
-            navigation.navigate("PurposeStopScreen", {purposeSeq:purposeSeq, purposeDetailData:tmpData})
-          }}
-        >
-          <Text style={styles.stopPurposeText}>그래프로 보기</Text>
-        </TouchableOpacity>
-      </View> */}
 
       {/* 중단 확인 문구 */}
       <View style={styles.stopCheckContainer}>
@@ -256,8 +256,6 @@ export default function PurposeDetailScreen({ navigation, route }) {
           </View>
         </TouchableOpacity>
       </View>
-
-      
 
 
       {/* 목표 종료 모달 */}
@@ -316,7 +314,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    width: "90%",
+    width: "100%",
     justifyContent: "flex-end",
     marginTop: 20,
     marginBottom: 20,
@@ -419,7 +417,7 @@ const styles = StyleSheet.create({
     marginVertical: 5
   },
   closeIcon: {
-    // marginRight: 20,
+    marginRight: 20,
   },
 
   // 목표 종료 모달 스타일
