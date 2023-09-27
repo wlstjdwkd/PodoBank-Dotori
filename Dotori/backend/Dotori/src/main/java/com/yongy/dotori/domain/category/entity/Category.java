@@ -41,4 +41,9 @@ public class Category {
         this.user = user;
         this.categoryTitle = categoryTitle;
     }
+
+    @Override
+    public String toString() {
+        return "categoryTitle='" + categoryTitle + '\'';
+    }
 }

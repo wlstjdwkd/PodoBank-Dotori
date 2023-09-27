@@ -27,7 +27,7 @@ public class Purpose {
     private Long purposeSeq;
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "userSeq")
     private User user;
 
     @Column(name="purpose_title", nullable = false)
@@ -45,10 +45,6 @@ public class Purpose {
     @Column(name="end_at", nullable = false)
     private LocalDate endAt;
 
-    @Column(name="terminate", nullable = false)
-    @ColumnDefault("false")
-    private boolean terminated;
-
     @Column(name="terminate_at")
     private LocalDateTime terminatedAt;
 
@@ -58,9 +54,6 @@ public class Purpose {
     public void update(Purpose purpose){
         if(purpose.endAt != null){
             this.endAt = purpose.endAt;
-        }
-        if(!purpose.terminated){
-            this.terminated = true;
         }
         if(purpose.terminatedAt != null){
             this.terminatedAt = purpose.terminatedAt;

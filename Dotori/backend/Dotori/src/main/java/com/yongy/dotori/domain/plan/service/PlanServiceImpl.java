@@ -153,7 +153,7 @@ public class PlanServiceImpl implements PlanService {
         // 플랜이 있고, 시작 전인 플랜이 있으면
         // 플랜이 없으면 : 플랜 만들기 페이지
 
-        if(plan != null && plan.getPlanState().equals(State.ACTIVE)){
+        if((plan != null && plan.getPlanState().equals(State.ACTIVE)) || (plan != null && plan.getPlanState().equals(State.READY))){
             // 실행 중인 카테고리 가져오기
             List<PlanDetail> planDetailList = plan.getPlanDetailList();
             List<ActivePlanDetailDTO> activePlanList = new ArrayList<>();
@@ -168,9 +168,14 @@ public class PlanServiceImpl implements PlanService {
                         .build());
             }
 
+            // TODO : 미분류 count 넘겨주기
             ActivePlanDTO result = ActivePlanDTO.builder()
                     .accountBalance(accountService.getBalance(accountSeq))
+                    .startedAt(plan.getStartAt())
                     .endAt(plan.getEndAt())
+                    .state(plan.getPlanState())
+                    .planSeq(plan.getPlanSeq())
+                    .terminatedAt(plan.getTerminatedAt())
                     //.unclassified() // 미분류 어떻게 할 건지 정해야 됨!
                     .activePlanList(activePlanList)
                 .build();
@@ -178,9 +183,9 @@ public class PlanServiceImpl implements PlanService {
             return result;
         }
 
-        if(plan != null && plan.getPlanState().equals(State.READY)){
-            throw new NotStartedPlanException("아직 예약된 계획이 시작되지 않았습니다.");
-        }
+//        if(plan != null && plan.getPlanState().equals(State.READY)){
+//            throw new NotStartedPlanException("아직 예약된 계획이 시작되지 않았습니다.");
+//        }
 
         return ActivePlanDTO.builder().accountBalance(accountService.getBalance(accountSeq)).build();
     }
@@ -223,7 +228,6 @@ public class PlanServiceImpl implements PlanService {
                     .account(account)
                     .dataAmount(data.getSavingAmount())
                     .purpose(purpose)
-                    .dataName(account.getAccountTitle())
                     .dataCurrentBalance(purpose.getCurrentBalance())
                     .dataCreatedAt(LocalDateTime.now())
                     .build());

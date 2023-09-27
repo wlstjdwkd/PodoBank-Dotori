@@ -6,6 +6,52 @@ import { useDispatch, useSelector } from "react-redux";
 import { purposeDetail } from "../../apis/purposeapi"
 
 
+const data = {
+  id: "1",
+  purposeTitle: "로마여행",
+  currentBalance: 2000000,
+  goalAmount: 10000000,
+  purposeDataList: [
+    {
+      purposeDataSeq: 1,
+      dataName: "시민주의 통장 1",
+      dataAmount: 30000,
+      dataCurrentBalance: 250000,
+      dataCreateAt: "2023-09-10 13:25:00",
+    },
+    {
+      purposeDataSeq: 2,
+      dataName: "시민주의 통장 1",
+      dataAmount: 10000,
+      dataCurrentBalance: 240000,
+      dataCreateAt: "2023-08-02 19:25:00",
+    },
+    {
+      purposeDataSeq: 3,
+      dataName: "시민주의 통장 1",
+      dataAmount: 5000,
+      dataCurrentBalance: 235000,
+      dataCreateAt: "2023-08-02 18:10:00",
+    },
+    {
+      purposeDataSeq: 4,
+      dataName: "시민주의 통장 2",
+      dataAmount: 5000,
+      dataCurrentBalance: 230000,
+      dataCreateAt: "2023-08-02 13:00:00",
+    },
+    {
+      purposeDataSeq: 5,
+      dataName: "시민주의 통장 1",
+      dataAmount: 10000,
+      dataCurrentBalance: 240000,
+      dataCreateAt: "2023-08-01 19:25:00",
+    }
+  ]
+}
+
+
+
 export default function PurposeDetailScreen({ navigation, route }) {
   // 토큰
   const grantType =  useSelector((state)=>state.user.grantType)
@@ -29,50 +75,24 @@ export default function PurposeDetailScreen({ navigation, route }) {
     return `${month}월 ${day}일`;
   };
 
-  // const formatTime = (dateString) => {
-  //   const date = new Date(dateString);
-  //   const hours = date.getHours();
-  //   const minutes = date.getMinutes();
-  //   return `${hours}:${minutes}`;
-  // }
   const formatTime = (dateString) => {
     const date = new Date(dateString);
     const hours = date.getHours();
     const minutes = date.getMinutes();
-    
-    // 시간과 분을 두 자리 숫자로 표시하도록 수정
-    const formattedHours = hours < 10 ? `0${hours}` : hours;
-    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-  
-    return `${formattedHours}:${formattedMinutes}`;
+    return `${hours}:${minutes}`;
   }
 
   // 날짜를 그룹화할 객체 생성
-  // const dateGroups = {};
-  const [dateGroups, setDateGroups] = useState({});
+  const dateGroups = {};
 
-  // 날짜별로 항목을 그룹화하는 함수
-  const groupingDate = (data) => {
-    const newDateGroups = { ...dateGroups }; // 이전 상태를 복사합니다.
-    data.purposeDataList.forEach((item) => {
-      const dateKey = formatDate(item.dataCreatedAt);
-      // 새로운 상태를 업데이트할 때는 이전 상태를 변경하지 않고 복사본을 수정합니다.
-      if (!newDateGroups[dateKey]) {
-        newDateGroups[dateKey] = [];
-      }
-      newDateGroups[dateKey].push(item);
-    });
-
-    // setDateGroups를 사용하여 새로운 상태로 업데이트합니다.
-    setDateGroups(newDateGroups);
-  };
-
-  const handleData = (data) => {
-    setPurposeDetailData(data)
-    if(!purposeDetailData.purposeDataList){
-      groupingDate(data)
+  // 날짜별로 항목을 그룹화
+  data.purposeDataList.forEach((item) => {
+    const dateKey = formatDate(item.dataCreateAt);
+    if (!dateGroups[dateKey]) {
+      dateGroups[dateKey] = [];
     }
-  }
+    dateGroups[dateKey].push(item);
+  });
 
 
   const doPurposeDetail = async () =>{
@@ -80,10 +100,8 @@ export default function PurposeDetailScreen({ navigation, route }) {
       const response = await purposeDetail(purposeSeq, accessToken, grantType)
       if(response.status===200){
         console.log("목표 상세 조회 성공")
-        // setPurposeDetailData(response.data)
-        // // setPurposeDataList(response.data.purposeDataList)
-        // groupingDate()
-        handleData(response.data)
+        setPurposeDetailData(response.data)
+        // setPurposeDataList(response.data.purposeDataList)
       }else{
         console.log("목표 상세 조회 실패", response.status)
       }
@@ -98,10 +116,6 @@ export default function PurposeDetailScreen({ navigation, route }) {
       doPurposeDetail()
     }
   }, [isFocused])
-
-  // useEffect(() => {
-  //   groupingDate();
-  // }, [purposeDetailData]);
 
   return (
     <View style={styles.container}>
@@ -135,9 +149,9 @@ export default function PurposeDetailScreen({ navigation, route }) {
           <View style={styles.dateGroup} key={date}>
             <Text style={styles.dateText}>{date}</Text>
             {items.map((item) => (
-              <View style={styles.dataBox} key={`${item.dataCreatedAt}-${item.dataAmount}-${item.dataCurrentBalance}`}>
-                <View style={styles.dataBoxInTop}key={`${item.dataCreatedAt}-${item.dataAmount}-${item.dataCurrentBalance}`}>
-                  <Text style={styles.timeText}>{formatTime(item.dataCreatedAt)}</Text>
+              <View style={styles.dataBox} key={item.purposeDataSeq}>
+                <View style={styles.dataBoxInTop}key={item.purposeDataSeq}>
+                  <Text style={styles.timeText}>{formatTime(item.dataCreateAt)}</Text>
                   <Text style={styles.dataNameText}>{item.dataName}</Text>
                   <Text style={styles.dataAmountText}>{item.dataAmount ? item.dataAmount.toLocaleString():item.dataAmount}원</Text>
                 </View>
@@ -154,7 +168,7 @@ export default function PurposeDetailScreen({ navigation, route }) {
             style={styles.stopPurposeButton}
             onPress={() => navigation.navigate("PurposeStopScreen", {purposeSeq:purposeSeq, purposeDetailData:purposeDetailData})}
           >
-            <Text style={styles.stopPurposeText}>그래프로 보기</Text>
+            <Text style={styles.stopPurposeText}>목표 중단하기</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

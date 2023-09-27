@@ -3,14 +3,19 @@ package com.yongy.dotori.domain.purposeData.entity;
 import com.yongy.dotori.domain.account.entity.Account;
 import com.yongy.dotori.domain.purpose.entity.Purpose;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Getter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 @Entity(name="purpose_data")
 public class PurposeData {
     @Id
@@ -26,9 +31,6 @@ public class PurposeData {
     @JoinColumn(name="accountSeq")
     private Account account;
 
-    @Column(name="data_name", nullable = false)
-    private String dataName;
-
     @Column(name="data_amount", nullable = false)
     private BigDecimal dataAmount;
 
@@ -38,15 +40,4 @@ public class PurposeData {
     @Column(name="data_created_at", nullable = false)
     private LocalDateTime dataCreatedAt;
 
-    @Builder
-    public PurposeData(Long purposeDataSeq, Purpose purpose, Account account, String dataName,
-                       BigDecimal dataAmount, BigDecimal dataCurrentBalance, LocalDateTime dataCreatedAt) {
-        this.purposeDataSeq = purposeDataSeq;
-        this.purpose = purpose;
-        this.account = account;
-        this.dataName = dataName;
-        this.dataAmount = dataAmount;
-        this.dataCurrentBalance = dataCurrentBalance;
-        this.dataCreatedAt = dataCreatedAt;
-    }
 }
