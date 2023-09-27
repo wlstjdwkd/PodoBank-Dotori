@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
-    Account findByAccountSeq(Long accountSeq);
+    Account findByAccountSeqAndDeleteAtIsNull(Long accountSeq);
     Account findByAccountNumberAndDeleteAtIsNull(String AccountNumber);
-    List<Account> findAllByUserUserSeq(Long userSeq);
+    List<Account> findAllByUserUserSeqAndDeleteAtIsNull(Long userSeq);
 
 }

@@ -9,29 +9,43 @@ import {
 } from "react-native";
 
 import HeaderComponent from "../Components/HeaderScreen";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function PlanCreate2Screen({ navigation, route }) {
+  // 토큰
+  // const grantType = useSelector((state) => {
+  //   state.user.grantType;
+  // });
+  // const accessToken = useSelector((state) => {
+  //   state.user.accessToken;
+  // });
+  // const refreshToken = useSelector((state) => {
+  //   state.user.refreshToken;
+  // });
+  // const dispatch = useDispatch();
+  // 그 외
+
   const [planInfo, setPlanInfo] = useState(route.params.planInfo);
+  console.log(planInfo);
   const [categoryName, setCategoryName] = useState("");
-  const [targetAmount, setTargetAmount] = useState("");
-  const [categories, setCategories] = useState([]);
+  const [targetAmount, setTargetAmount] = useState();
+  const [categorise, setCategorise] = useState([]);
   const formatNumber = (num) => {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
   };
   const handleAddCategory = () => {
     if (categoryName && targetAmount) {
-      setCategories([
-        ...categories,
-        { name: categoryName, amount: targetAmount },
+      setCategorise([
+        ...categorise,
+        { categoryName: categoryName, targetAmount: parseInt(targetAmount) },
       ]);
       setCategoryName("");
-      setTargetAmount("");
+      setTargetAmount();
     }
   };
   const handleNextButton = () => {
-    setPlanInfo({ ...planInfo, categories: categories });
     navigation.navigate("PlanCreate3Screen", {
-      planInfo: planInfo,
+      planInfo: { ...planInfo, categorise: categorise },
     });
   };
 
@@ -81,11 +95,11 @@ export default function PlanCreate2Screen({ navigation, route }) {
 
         <Text style={styles.inputText}>등록된 카테고리</Text>
         <View style={styles.categoriesContainer}>
-          {categories.map((category, index) => (
+          {categorise.map((category, index) => (
             <View key={index} style={styles.categoryBox}>
-              <Text style={styles.categoryText}>{category.name} </Text>
+              <Text style={styles.categoryText}>{category.categoryName} </Text>
               <Text style={styles.categoryText}>
-                {formatNumber(category.amount)}원
+                {formatNumber(category.targetAmount)}원
               </Text>
             </View>
           ))}

@@ -36,12 +36,12 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
     @PostConstruct
     public void init() {
-        log.info("----------------------------INIT_FILTER----------------------------");
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        log.info("----------------------------DO_FILTER----------------------------");
+        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        log.info(httpServletRequest.getRequestURI() + " " + httpServletRequest.getMethod());
 
         String token = resolveToken((HttpServletRequest) request); // token : Bearer [토큰]
 

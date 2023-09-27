@@ -34,7 +34,7 @@ public class Plan {
     private Account account;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="plan_state", nullable = false)
+    @Column(name="plan_state")
     private State planState;
 
     @Column(name="total_savings", nullable = false)
@@ -52,6 +52,9 @@ public class Plan {
     @Column(name="end_at")
     private LocalDateTime endAt;
 
+    @Column(name="terminate_at")
+    private LocalDateTime terminatedAt;
+
     @Column(name="updated_at")
     private LocalDateTime updatedAt;
 
@@ -61,7 +64,7 @@ public class Plan {
     @Builder
     public Plan(Long planSeq, User user, Account account, State planState,
                 BigDecimal totalSavings, BigDecimal additionalSavings, LocalDateTime saveAt,
-                LocalDateTime startAt, LocalDateTime endAt, LocalDateTime updatedAt) {
+                LocalDateTime startAt, LocalDateTime endAt, LocalDateTime terminatedAt, LocalDateTime updatedAt) {
         this.planSeq = planSeq;
         this.user = user;
         this.account = account;
@@ -71,12 +74,18 @@ public class Plan {
         this.saveAt = saveAt;
         this.startAt = startAt;
         this.endAt = endAt;
+        this.terminatedAt = terminatedAt;
         this.updatedAt = updatedAt;
     }
 
     public void update(Plan plan){
-        this.endAt = plan.endAt;
+        this.terminatedAt = plan.terminatedAt;
         this.planState = plan.planState;
+    }
+
+    public Plan terminate(LocalDateTime localDateTime){
+        this.terminatedAt = localDateTime;
+        return this;
     }
 
     public Plan updateState(State state){

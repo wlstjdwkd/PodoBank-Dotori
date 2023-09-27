@@ -1,22 +1,22 @@
 package com.yongy.dotori.domain.user.controller;
 
+import com.yongy.dotori.domain.user.entity.Provider;
 import com.yongy.dotori.domain.user.entity.User;
+import com.yongy.dotori.domain.user.exception.AlreadyExistIdException;
 import com.yongy.dotori.domain.user.exception.FailedSocialAuthException;
-import com.yongy.dotori.domain.user.exception.UserExceptionEnum;
 import com.yongy.dotori.domain.user.repository.UserRepository;
-import com.yongy.dotori.global.redis.entity.RefreshToken;
-import com.yongy.dotori.global.redis.repository.RefreshTokenRepository;
+import com.yongy.dotori.domain.user.service.UserService;
+import com.yongy.dotori.global.redis.entity.UserRefreshToken;
+import com.yongy.dotori.global.redis.repository.UserRefreshTokenRepository;
 import com.yongy.dotori.global.security.dto.JwtToken;
 import com.yongy.dotori.global.security.provider.JwtTokenProvider;
 import com.yongy.dotori.domain.user.service.KakaoService;
-import com.yongy.dotori.global.common.BaseResponseBody;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,13 +29,10 @@ public class KakaoController {
     private KakaoService kakaoService;
 
     @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private UserService userService;
 
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "카카오 회원가입 성공"),
@@ -67,17 +64,23 @@ public class KakaoController {
             throw new FailedSocialAuthException("카카오 인증에 실패했습니다.");
         }else{
             // NOTE : 회원가입
-            if(userRepository.findByIdAndExpiredAtIsNull(user.getId()) == null){
-                userRepository.save(user); // DB에 사용자 저장
+            User userFromDB = userService.getUser(user.getId());
+            if(userFromDB == null){
+                userService.saveUser(user);  // DB에 사용자 저장
                 return ResponseEntity.ok().build();
             }
 
-            // NOTE : 로그인
-            JwtToken jwtToken = jwtTokenProvider.createToken(user.getId(), user.getRole());
+            // NOTE : 카카오 로그인
+            if(userFromDB.getAuthProvider() == Provider.KAKAO){
+                JwtToken jwtToken = jwtTokenProvider.createToken(user.getId(), user.getRole());
 
-            refreshTokenRepository.save(RefreshToken.of(jwtToken.getRefreshToken(), user.getId()));
+                userService.saveUserRefreshToken(UserRefreshToken.of(user.getId(), jwtToken.getRefreshToken()));
 
-            return ResponseEntity.ok().body(jwtToken);
+                return ResponseEntity.ok().body(jwtToken);
+            }
+
+            // NOTE : 도토리 or 네이버로 회원가입이 되어있음
+            throw new AlreadyExistIdException("다른 경로로 회원가입이 되어있습니다.");
         }
     }
 

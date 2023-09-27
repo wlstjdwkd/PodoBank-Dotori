@@ -19,6 +19,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
@@ -29,6 +30,7 @@ import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 @Service
 public class AccountServiceImpl implements AccountService{
     private final BankRepository bankRepository;
@@ -39,7 +41,7 @@ public class AccountServiceImpl implements AccountService{
     @Override
     public List<AccountDTO> findAllAccount() throws JsonProcessingException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Account> accounts = accountRepository.findAllByUserUserSeq(user.getUserSeq());
+        List<Account> accounts = accountRepository.findAllByUserUserSeqAndDeleteAtIsNull(user.getUserSeq());
         List<AccountDTO> result = new ArrayList<>();
 
         for(Account account : accounts){
@@ -54,7 +56,7 @@ public class AccountServiceImpl implements AccountService{
     }
 
     public BigDecimal getBalance(Long accountSeq) throws JsonProcessingException {
-        Account account = accountRepository.findByAccountSeq(accountSeq);
+        Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
         Bank bankInfo = bankRepository.findByBankSeq(account.getBank().getBankSeq());
         String accessToken = userAuthService.getConnectionToken(bankInfo.getBankSeq()); // 은행 accessToken 가져오기
 
@@ -63,7 +65,7 @@ public class AccountServiceImpl implements AccountService{
         httpHeaders.add("Authorization","Bearer " + accessToken);
 
         Map<String, String> bodyData = new HashMap<>();
-        bodyData.put("serviceCode", accessToken);
+        bodyData.put("serviceCode", bankInfo.getServiceCode());
         bodyData.put("fintechCode", account.getFintechCode());
 
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, httpHeaders);

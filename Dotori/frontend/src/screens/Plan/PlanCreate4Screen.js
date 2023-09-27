@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,27 +10,41 @@ import {
 } from "react-native";
 // import DraggableFlatList from "volkeno-react-native-drag-drop";
 import HeaderComponent from "../Components/HeaderScreen";
+import { useDispatch, useSelector } from "react-redux";
+import { useIsFocused } from "@react-navigation/native";
+import { planClassifyChatGpt } from "../../apis/planapi";
 
 export default function PlanCreate4Screen({ navigation, route }) {
-  const [planInfo, setPlanInfo] = useState(route.params.planInfo);
+  // 토큰
+  const grantType = useSelector((state) => state.user.grantType);
+  const accessToken = useSelector((state) => state.user.accessToken);
+  const refreshToken = useSelector((state) => state.user.refreshToken);
+  const dispatch = useDispatch();
+  // 그 외
+  const { categorise, categoryGroups } = route.params.planInfo;
 
-  const [categoryData, setCategoryData] = useState([
-    {
-      categoryGroupName: "식비",
-      categories: [
-        { name: "점심", amount: 5000 },
-        { name: "저녁", amount: 6000 },
-        { name: "간식", amount: 3000 },
-      ],
-    },
-    {
-      categoryGroupName: "교통비",
-      categories: [
-        { name: "버스", amount: 1200 },
-        { name: "택시", amount: 10000 },
-      ],
-    },
-  ]);
+  const [planInfo, setPlanInfo] = useState(route.params.planInfo);
+  console.log(planInfo);
+  const isFocused = useIsFocused();
+
+  const [categoryData, setCategoryData] = useState(null);
+  //   [
+  //   {
+  //     categoryGroupName: "식비",
+  //     categories: [
+  //       { name: "점심", amount: 5000 },
+  //       { name: "저녁", amount: 6000 },
+  //       { name: "간식", amount: 3000 },
+  //     ],
+  //   },
+  //   {
+  //     categoryGroupName: "교통비",
+  //     categories: [
+  //       { name: "버스", amount: 1200 },
+  //       { name: "택시", amount: 10000 },
+  //     ],
+  //   },
+  // ]
   //   const categoryData = [
   //     {
   //       categoryGroupName: "식비",
@@ -51,6 +65,34 @@ export default function PlanCreate4Screen({ navigation, route }) {
   //   ];
   const [data, setData] = useState(categoryData);
 
+  const doPlanClassifyChatGpt = async () => {
+    try {
+      const payload = {
+        categorise: categorise,
+        categoryGroups: categoryGroups,
+      };
+      console.log(payload);
+      const response = await planClassifyChatGpt(
+        payload,
+        accessToken,
+        grantType
+      );
+      if (response.status === 200) {
+        console.log("전체 계좌 리스트 불러오기 성공");
+        setCategoryData(response.data);
+      } else {
+        console.log("전체 계좌 리스트 불러오기 실패");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    if (isFocused) {
+      // do정보조회()
+      doPlanClassifyChatGpt();
+    }
+  }, [isFocused]);
   //드래그앤 드롭.. 대실패 일단 보류
   const renderItem = ({ item, index, drag, isActive }) => {
     return (
@@ -67,7 +109,8 @@ export default function PlanCreate4Screen({ navigation, route }) {
             item.categories.map((category, idx) => (
               <View key={idx} style={styles.categoryBox}>
                 <Text style={styles.categoryText}>
-                  {category.name} {formatNumber(category.amount)}원
+                  {category.categoryName} {formatNumber(category.targetAmount)}
+                  원
                 </Text>
               </View>
             ))}
@@ -131,20 +174,23 @@ export default function PlanCreate4Screen({ navigation, route }) {
           <Text style={styles.moveText}>카테고리를 눌러서 옮겨보세요!</Text>
         </View>
 
-        {categoryData.map((group, index) => (
-          <View key={index} style={styles.categoryGroup}>
-            <Text style={styles.inputText}>{group.categoryGroupName}</Text>
-            <View style={styles.categoriesContainer}>
-              {group.categories.map((category, idx) => (
-                <View key={idx} style={styles.categoryBox}>
-                  <Text style={styles.categoryText}>
-                    {category.name} {formatNumber(category.amount)}원
-                  </Text>
-                </View>
-              ))}
+        {categoryData &&
+          categoryData.map((group, index) => (
+            <View key={index} style={styles.categoryGroup}>
+              <Text style={styles.inputText}>{group.categoryGroupName}</Text>
+              <View style={styles.categoriesContainer}>
+                {group.categories.map((category, idx) => (
+                  <View key={idx} style={styles.categoryBox}>
+                    <Text style={styles.categoryText}>
+                      {category.categoryName}{" "}
+                      {formatNumber(category.targetAmount)}원
+                    </Text>
+                  </View>
+                ))}
+              </View>
             </View>
-          </View>
-        ))}
+          ))}
+
         {/* <DraggableFlatList
           data={data}
           renderItem={renderItem}
