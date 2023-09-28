@@ -145,8 +145,24 @@ export const planCategoryGroupList = async (accessToken, grantType) => {
 };
 
 
-// categorydata(미완성)
-
+// categorydata
+// 계획 카테고리 사용처 목록 가져오기
+export const planCategoryUsingSpot = async (categorySeq, accessToken, grantType) => {
+  try {
+    const response = await axios.get(apiAddress+`/v1/categoryData?categorySeq=${categorySeq}`,  {
+      headers: {
+        Authorization: `${grantType} ${accessToken}`,
+      },
+    });
+    console.log('계획 카테고리 사용처 목록 가져오기 성공:', response.data);
+    return response;
+  } catch (error) {
+    console.error('계획 카테고리 사용처 목록 가져오기 실패:', error.response.status, error.response.data);
+    const response = error.response
+    return response
+    // throw error;
+  }
+};
 
 
 

@@ -10,6 +10,9 @@ import {
 import HeaderComponent from "../Components/HeaderScreen";
 import { AntDesign, Entypo, FontAwesome } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
+import { planCategoryList } from "../../apis/planapi"
+import { useState } from "react";
+import { useEffect } from "react";
 const categorys = [
   {
     categorySeq: "1",
@@ -58,7 +61,23 @@ export default function CategoryScreen({ navigation }) {
   const refreshToken =  useSelector((state)=>{state.user.refreshToken})
   const dispatch = useDispatch()
   // 그 외
+
+  const [categoryList, setCategoryList] = useState()
   
+  const doPlanCategoryList = async () => {
+    try{
+      const response = await planCategoryList(accessToken, grantType)
+      if(response.status === 200){
+        setCategoryList(response.data)
+        console.log('전체 카테고리 목록 가져오기 성공')
+      }else{
+        console.log('전체 카테고리 목록 가져오기 실패', response.status)
+      }
+    }catch(error){
+      console.log('오류 발생 : 전체 카테고리 목록 가져오기 실패', error)
+    }
+  }
+
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={[
@@ -82,6 +101,10 @@ export default function CategoryScreen({ navigation }) {
       />
     </TouchableOpacity>
   );
+
+  useEffect(()=>{
+    doPlanCategoryList()
+  }, [])
 
   return (
     <View style={styles.container}>
@@ -113,6 +136,12 @@ export default function CategoryScreen({ navigation }) {
       {/* 카테고리 목록 */}
       <FlatList
         data={categorys}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.categorySeq}
+        contentContainerStyle={styles.categoryList}
+      />
+      <FlatList
+        data={categoryList}
         renderItem={renderItem}
         keyExtractor={(item) => item.categorySeq}
         contentContainerStyle={styles.categoryList}

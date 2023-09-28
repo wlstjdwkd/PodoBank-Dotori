@@ -84,13 +84,24 @@ export default function CategorySettingScreen({ navigation, route }) {
         data={category.categoryList}
         renderItem={({ item }) => (
           <View style={styles.categoryItem}>
+            <Text style={styles.categoryItemText}>{formatCategoryText(item)}</Text>
+          </View>
+        )}
+        keyExtractor={(item, index) => index.toString()}
+        contentContainerStyle={styles.categoryList}
+        numColumns={3} // 3개의 열로 배치
+      />
+      {/* <FlatList
+        data={category.categoryList}
+        renderItem={({ item }) => (
+          <View style={styles.categoryItem}>
             <Text style={styles.categoryItemText}>{item}</Text>
           </View>
         )}
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.categoryList}
-        numColumns={3} // 2개의 열로 배치
-      />
+        numColumns={3} // 3개의 열로 배치
+      /> */}
       {/* 구분선 */}
       <View style={styles.separator}></View>
       {/* 신규 사용처 */}
