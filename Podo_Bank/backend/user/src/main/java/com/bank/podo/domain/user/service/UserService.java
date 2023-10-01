@@ -25,14 +25,13 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public boolean logout() {
+    public void logout() {
         User user = getLoginUser();
 
-        boolean isLogout = requestUtil.removeRefreshToken(user.getEmail());
+        requestUtil.removeRefreshToken(user.getEmail());
+        requestUtil.deleteFCMToken(user.getEmail());
 
-        logLogout(user.getEmail(), isLogout);
-
-        return isLogout;
+        logLogout(user.getEmail());
     }
 
     @Transactional(readOnly = true)
@@ -138,11 +137,10 @@ public class UserService {
                 .phoneNumber(user.getPhoneNumber())
                 .build();
     }
-    private void logLogout(String email, boolean result) {
+    private void logLogout(String email) {
         log.info("===== " + "\t" +
                 "로그아웃" + "\t" +
                 "이메일: " + email + "\t" +
-                "결과: " + result + "\t" +
                 "=====");
     }
 

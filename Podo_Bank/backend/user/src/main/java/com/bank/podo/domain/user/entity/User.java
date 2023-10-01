@@ -1,7 +1,7 @@
 package com.bank.podo.domain.user.entity;
 
 import com.bank.podo.domain.user.enums.Role;
-import com.bank.podo.global.others.BaseEntity;
+import com.bank.podo.global.others.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

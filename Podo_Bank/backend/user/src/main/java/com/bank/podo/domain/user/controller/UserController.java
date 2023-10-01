@@ -34,13 +34,8 @@ public class UserController {
     })
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
-        boolean success = userService.logout();
-
-        if(success) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
+        userService.logout();
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "회원 정보 조회", description = "USER")
