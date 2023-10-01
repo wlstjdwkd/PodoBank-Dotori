@@ -11,6 +11,7 @@ import com.yongy.dotoriuserservice.domain.userAuth.dto.request.UserAccountDto;
 import com.yongy.dotoriuserservice.domain.userAuth.dto.request.UserAccountNumberTitleReqDto;
 import com.yongy.dotoriuserservice.domain.userAuth.exception.FailedOneReqException;
 import com.yongy.dotoriuserservice.domain.userAuth.service.UserAuthService;
+import com.yongy.dotoriuserservice.domain.userAuth.service.UserAuthServiceImpl;
 import com.yongy.dotoriuserservice.global.common.CallServer;
 import com.yongy.dotoriuserservice.global.redis.entity.PersonalAuth;
 import io.swagger.v3.oas.annotations.Operation;
@@ -92,7 +93,7 @@ public class UserAuthController {
     })
     @Operation(summary = "[포도은행에서 1원 인증] 포도은행에서 계좌의 존재 여부 확인한 후 1원 인증 요청하기", description = "USER")
     @PostMapping("/podoBank/check-account")
-    public ResponseEntity<Void> sendAccountAuthCode(@RequestBody UserAccountDto userAccountDto) {
+    public ResponseEntity<Void> sendAccountAuthCode(@RequestBody UserAccountDto userAccountDto) throws ParseException {
         // Account account = userAuthService.getUserAccount(userAccountDto.getAccountNumber());
 
         bodyData.clear();
@@ -134,9 +135,5 @@ public class UserAuthController {
 
         return ResponseEntity.ok().build();
     }
-
-    // -------------- 통신 ------------
-
-
 
 }

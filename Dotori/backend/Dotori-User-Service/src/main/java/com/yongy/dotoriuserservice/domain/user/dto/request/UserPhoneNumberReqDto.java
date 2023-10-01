@@ -9,7 +9,6 @@ import lombok.Setter;
 @RequiredArgsConstructor
 public class UserPhoneNumberReqDto {
     private String phoneNumber;
-
     public UserPhoneNumberReqDto(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }

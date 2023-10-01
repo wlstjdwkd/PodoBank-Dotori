@@ -9,7 +9,6 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByIdAndExpiredAtIsNull(String id);
-
     User findByUserSeqAndExpiredAtIsNull(Long userSeq);
     List<User> findAll();
 

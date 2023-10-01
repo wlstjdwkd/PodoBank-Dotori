@@ -1,4 +1,4 @@
-package com.yongy.dotoriuserservice.domain.userAuth.dto.request;
+package com.yongy.dotorimainservice.domain.bank.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class BankDto {
-    private Long bankSeq;
     private String bankName;
     private String bankUrl;
     private String bankId;
@@ -15,8 +14,7 @@ public class BankDto {
     private String serviceCode;
 
     @Builder
-    public BankDto(Long bankSeq, String bankName, String bankUrl, String bankId, String bankPwd, String serviceCode) {
-        this.bankSeq = bankSeq;
+    public BankDto(String bankName, String bankUrl, String bankId, String bankPwd, String serviceCode) {
         this.bankName = bankName;
         this.bankUrl = bankUrl;
         this.bankId = bankId;
