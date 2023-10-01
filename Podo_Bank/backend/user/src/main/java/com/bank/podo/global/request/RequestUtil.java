@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RequestUtil {
 
-    @Value("${http.reqeust.firebase.url}")
+    @Value("${http.request.firebase.url}")
     private String firebaseUrl;
 
     @Value("${http.request.account.url}")
