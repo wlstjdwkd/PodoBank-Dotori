@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @Getter
 @RequiredArgsConstructor
-@RedisHash(value="BankAccessToken", timeToLive = 1000L * 60 * 3)
+@RedisHash(value="BankAccessToken", timeToLive = 60 * 3)
 public class BankAccessToken {
 
     @Id
