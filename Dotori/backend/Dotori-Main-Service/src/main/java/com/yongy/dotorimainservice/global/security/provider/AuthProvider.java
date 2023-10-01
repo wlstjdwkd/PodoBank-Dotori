@@ -31,7 +31,7 @@ public class AuthProvider {
         return new UsernamePasswordAuthenticationToken(user, "", Collections.singleton(new SimpleGrantedAuthority(user.getRole().name())));
     }
 
-    // SecurityContextHolder에 저장되어 있는 User 객체 가져오기
+    // SecurityContextHolder에 저장되어 있는 User 객체 가져오기 
     public User getUserFromHeaderId(String id){
         return userRepository.findByIdAndExpiredAtIsNull(id);
     }
