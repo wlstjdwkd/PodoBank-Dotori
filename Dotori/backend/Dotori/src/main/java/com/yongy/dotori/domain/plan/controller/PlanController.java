@@ -8,6 +8,7 @@ import com.yongy.dotori.domain.plan.dto.PlanStateDTO;
 import com.yongy.dotori.domain.plan.dto.SavingDTO;
 import com.yongy.dotori.domain.plan.dto.response.PlanListDto;
 import com.yongy.dotori.domain.plan.entity.Plan;
+import com.yongy.dotori.domain.plan.entity.State;
 import com.yongy.dotori.domain.plan.service.PlanService;
 import com.yongy.dotori.domain.plan.service.PlanServiceImpl;
 import com.yongy.dotori.domain.user.entity.User;
@@ -84,10 +85,9 @@ public class PlanController {
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "COMPLETED 상태 변경 성공")
     })
-    @PatchMapping("/complete")
-    public ResponseEntity<Void> updateState(@RequestBody PlanStateDTO planStateDTO){
-        // TODO : COMPLETED, SAVED로 나눠서 저장
-        planService.updateState(planStateDTO);
+    @PatchMapping("/{state}")
+    public ResponseEntity<Void> updateState(@PathVariable State state, @RequestBody PlanStateDTO planStateDTO){
+        planService.updateState(state, planStateDTO);
         return ResponseEntity.ok().build();
     }
 
