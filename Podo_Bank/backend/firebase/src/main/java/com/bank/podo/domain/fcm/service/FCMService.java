@@ -36,7 +36,7 @@ public class FCMService {
 
     @Transactional(readOnly = true)
     public String sendNotificationByToken(FCMNotificationRequestDTO fcmNotificationRequestDTO) {
-        Optional<FCMToken> fcmToken = fcmRepository.findById(fcmNotificationRequestDTO.getTargetUserId());
+        Optional<FCMToken> fcmToken = fcmRepository.findByEmail(fcmNotificationRequestDTO.getTargetUserEmail());
 
         if(fcmToken.isPresent()) {
             if(fcmToken.get().getToken() != null) {
