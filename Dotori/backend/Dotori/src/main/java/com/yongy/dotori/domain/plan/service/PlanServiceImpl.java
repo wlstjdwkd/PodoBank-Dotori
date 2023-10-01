@@ -92,8 +92,8 @@ public class PlanServiceImpl implements PlanService {
                 .endAt(LocalDateTime.parse(planDTO.getEndAt(), formatter))
                 .planState(state)
                 .updatedAt(LocalDateTime.parse(planDTO.getStartedAt(), formatter)) // 마지막 업데이트 날짜
-                .additionalSavings(BigDecimal.ZERO)
                 .totalSavings(BigDecimal.ZERO)
+                .count(0L)
                 .build());
 
         List<CategoryGroupListDTO> groupList = planDTO.getCategoryGroupList();

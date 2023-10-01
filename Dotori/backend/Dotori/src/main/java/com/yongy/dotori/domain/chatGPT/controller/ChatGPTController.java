@@ -40,7 +40,7 @@ public class ChatGPTController {
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "payment 분류 성공")
     })
-    @GetMapping("/unclassified")
+    @PatchMapping("/unclassified")
     public ResponseEntity<Void> unclassifiedChatGPT() throws IOException, ParseException {
         paymentsScheduler.getPayments();
         return ResponseEntity.ok().build();
