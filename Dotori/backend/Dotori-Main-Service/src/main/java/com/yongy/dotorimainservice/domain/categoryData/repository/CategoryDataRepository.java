@@ -1,6 +1,7 @@
 package com.yongy.dotorimainservice.domain.categoryData.repository;
 
-import com.yongy.dotori.domain.categoryData.entity.CategoryData;
+
+import com.yongy.dotorimainservice.domain.categoryData.entity.CategoryData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

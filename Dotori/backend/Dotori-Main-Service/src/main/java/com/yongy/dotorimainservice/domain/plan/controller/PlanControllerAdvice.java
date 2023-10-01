@@ -1,6 +1,7 @@
 package com.yongy.dotorimainservice.domain.plan.controller;
 
-import com.yongy.dotori.domain.plan.exception.PaymentUpdateBeforeException;
+
+import com.yongy.dotorimainservice.domain.plan.exception.PaymentUpdateBeforeException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

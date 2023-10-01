@@ -3,7 +3,6 @@ package com.yongy.dotorimainservice.domain.plan.entity;
 
 import com.yongy.dotorimainservice.domain.account.entity.Account;
 import com.yongy.dotorimainservice.domain.planDetail.entity.PlanDetail;
-import com.yongy.dotorimainservice.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,9 +23,7 @@ public class Plan {
     @Column(name="plan_seq")
     private Long planSeq;
 
-    @ManyToOne
-    @JoinColumn(name = "userSeq")
-    private User user;
+    private Long userSeq;
 
     @OneToOne
     @JoinColumn(name = "accountSeq")
@@ -61,11 +58,11 @@ public class Plan {
     private List<PlanDetail> planDetailList;
 
     @Builder
-    public Plan(Long planSeq, User user, Account account, State planState,
+    public Plan(Long planSeq, Long userSeq, Account account, State planState,
                 BigDecimal totalSavings, LocalDateTime saveAt,
                 LocalDateTime startAt, LocalDateTime endAt, LocalDateTime terminatedAt, LocalDateTime updatedAt, Long count) {
         this.planSeq = planSeq;
-        this.user = user;
+        this.userSeq = userSeq;
         this.account = account;
         this.planState = planState;
         this.totalSavings = totalSavings;

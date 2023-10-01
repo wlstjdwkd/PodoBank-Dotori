@@ -1,6 +1,7 @@
 package com.yongy.dotorimainservice.domain.plan.dto;
 
-import com.yongy.dotori.domain.plan.entity.State;
+
+import com.yongy.dotorimainservice.domain.plan.entity.State;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

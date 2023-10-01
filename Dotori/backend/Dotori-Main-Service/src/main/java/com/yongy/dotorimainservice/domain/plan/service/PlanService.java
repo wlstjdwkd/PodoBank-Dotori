@@ -17,4 +17,6 @@ public interface PlanService {
     void saving(SavingDTO savingDTO) throws JsonProcessingException;
     List<PlanListDto> getPlanList(Long userSeq);
     ActivePlanDTO findAllPlan(Long accountSeq) throws JsonProcessingException;
+
+    void removeUserPlans(Long userSeq);
 }

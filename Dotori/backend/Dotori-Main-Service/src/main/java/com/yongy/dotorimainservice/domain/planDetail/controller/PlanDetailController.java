@@ -1,9 +1,9 @@
 package com.yongy.dotorimainservice.domain.planDetail.controller;
 
 
-import com.yongy.dotori.domain.plan.service.PlanService;
-import com.yongy.dotori.domain.planDetail.dto.response.PlanDetailListResDto;
-import com.yongy.dotori.domain.planDetail.service.PlanDetailService;
+import com.yongy.dotorimainservice.domain.plan.service.PlanService;
+import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanDetailListResDto;
+import com.yongy.dotorimainservice.domain.planDetail.service.PlanDetailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

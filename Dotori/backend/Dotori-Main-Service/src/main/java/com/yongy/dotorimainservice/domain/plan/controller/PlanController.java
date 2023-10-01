@@ -5,8 +5,11 @@ import com.yongy.dotorimainservice.domain.plan.dto.ActivePlanDTO;
 import com.yongy.dotorimainservice.domain.plan.dto.PlanDTO;
 import com.yongy.dotorimainservice.domain.plan.dto.PlanStateDTO;
 import com.yongy.dotorimainservice.domain.plan.dto.SavingDTO;
+import com.yongy.dotorimainservice.domain.plan.dto.communication.UserSeqDto;
 import com.yongy.dotorimainservice.domain.plan.dto.response.PlanListDto;
+import com.yongy.dotorimainservice.domain.plan.entity.State;
 import com.yongy.dotorimainservice.domain.plan.service.PlanService;
+import com.yongy.dotorimainservice.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -22,7 +25,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/plan")
+@RequestMapping("/api/v1/plan")
 public class PlanController {
 
     @Autowired
@@ -93,5 +96,13 @@ public class PlanController {
     public ResponseEntity<ActivePlanDTO> findAllPlan(@PathVariable Long accountSeq) throws JsonProcessingException {
         ActivePlanDTO result = planService.findAllPlan(accountSeq);
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/communication/delete/all")
+    public ResponseEntity<String> removeUserPlans(@RequestBody UserSeqDto userSeqDto){
+        log.info("check-1");
+        planService.removeUserPlans(userSeqDto.getUserSeq());
+        log.info("check-2");
+        return ResponseEntity.ok().build();
     }
 }

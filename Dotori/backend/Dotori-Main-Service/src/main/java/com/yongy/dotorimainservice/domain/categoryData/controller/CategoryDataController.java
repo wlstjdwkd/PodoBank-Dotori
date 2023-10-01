@@ -1,7 +1,8 @@
 package com.yongy.dotorimainservice.domain.categoryData.controller;
 
-import com.yongy.dotori.domain.categoryData.dto.response.CategoryDataResDto;
-import com.yongy.dotori.domain.categoryData.service.CategoryDataService;
+
+import com.yongy.dotorimainservice.domain.categoryData.dto.response.CategoryDataResDto;
+import com.yongy.dotorimainservice.domain.categoryData.service.CategoryDataService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

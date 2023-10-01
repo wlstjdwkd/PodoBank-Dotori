@@ -1,6 +1,7 @@
 package com.yongy.dotorimainservice.domain.categoryData.entity;
 
-import com.yongy.dotori.domain.category.entity.Category;
+
+import com.yongy.dotorimainservice.domain.category.entity.Category;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

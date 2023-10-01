@@ -19,12 +19,3 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
 
-dotori:
-  auth:
-    url: http://localhost:9110/
-  user:
-    url: http://localhost:9120/
-  purpose:
-    url: http://localhost:9130/
-  main:
-    url: http://localhost:9140/

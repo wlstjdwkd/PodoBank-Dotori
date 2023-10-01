@@ -1,7 +1,7 @@
 package com.yongy.dotorimainservice.domain.planDetail.repository;
 
-import com.yongy.dotori.domain.category.entity.Category;
-import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
+import com.yongy.dotorimainservice.domain.category.entity.Category;
+import com.yongy.dotorimainservice.domain.planDetail.entity.PlanDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

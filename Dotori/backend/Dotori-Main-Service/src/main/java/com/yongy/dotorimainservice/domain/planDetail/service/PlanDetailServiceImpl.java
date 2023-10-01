@@ -1,11 +1,11 @@
 package com.yongy.dotorimainservice.domain.planDetail.service;
 
-import com.yongy.dotori.domain.category.entity.Category;
-import com.yongy.dotori.domain.category.repository.CategoryRepository;
-import com.yongy.dotori.domain.plan.service.PlanService;
-import com.yongy.dotori.domain.planDetail.dto.response.PlanDetailListResDto;
-import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
-import com.yongy.dotori.domain.planDetail.repository.PlanDetailRepository;
+import com.yongy.dotorimainservice.domain.category.entity.Category;
+import com.yongy.dotorimainservice.domain.category.repository.CategoryRepository;
+import com.yongy.dotorimainservice.domain.plan.service.PlanService;
+import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanDetailListResDto;
+import com.yongy.dotorimainservice.domain.planDetail.entity.PlanDetail;
+import com.yongy.dotorimainservice.domain.planDetail.repository.PlanDetailRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

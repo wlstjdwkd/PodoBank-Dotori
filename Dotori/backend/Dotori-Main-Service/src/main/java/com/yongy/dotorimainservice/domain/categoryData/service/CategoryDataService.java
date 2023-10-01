@@ -1,6 +1,7 @@
 package com.yongy.dotorimainservice.domain.categoryData.service;
 
-import com.yongy.dotori.domain.categoryData.dto.response.CategoryDataResDto;
+
+import com.yongy.dotorimainservice.domain.categoryData.dto.response.CategoryDataResDto;
 
 import java.util.List;
 

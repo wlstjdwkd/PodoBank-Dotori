@@ -1,9 +1,9 @@
 package com.yongy.dotorimainservice.domain.categoryData.service;
 
 
-import com.yongy.dotori.domain.categoryData.dto.response.CategoryDataResDto;
-import com.yongy.dotori.domain.categoryData.entity.CategoryData;
-import com.yongy.dotori.domain.categoryData.repository.CategoryDataRepository;
+import com.yongy.dotorimainservice.domain.categoryData.dto.response.CategoryDataResDto;
+import com.yongy.dotorimainservice.domain.categoryData.entity.CategoryData;
+import com.yongy.dotorimainservice.domain.categoryData.repository.CategoryDataRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

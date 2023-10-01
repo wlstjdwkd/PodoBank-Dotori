@@ -167,8 +167,8 @@ public class UserController {
 
 
 
-//        // NOTE : 사용자의 진행중인 계획 모두 삭제하기
-//        userService.removeUserPlans(user.getUserSeq());
+        // NOTE : 사용자의 진행중인 계획 모두 삭제하기
+        userService.removeUserPlans(user.getUserSeq());
 //
 //        // NOTE : 사용자의 RefreshToken 삭제하기
 //        userService.deleteUserRefreshToken(user.getId());

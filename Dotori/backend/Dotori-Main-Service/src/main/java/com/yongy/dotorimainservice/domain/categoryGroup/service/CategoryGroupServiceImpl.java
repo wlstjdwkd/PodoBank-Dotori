@@ -1,11 +1,11 @@
 package com.yongy.dotorimainservice.domain.categoryGroup.service;
 
 
-import com.yongy.dotori.domain.categoryGroup.dto.CategoryGroupDTO;
-import com.yongy.dotori.domain.categoryGroup.entity.CategoryGroup;
-import com.yongy.dotori.domain.categoryGroup.repository.CategoryGroupRepository;
-import com.yongy.dotori.domain.user.entity.User;
-import com.yongy.dotori.domain.user.repository.UserRepository;
+import com.yongy.dotorimainservice.domain.categoryGroup.dto.CategoryGroupDTO;
+import com.yongy.dotorimainservice.domain.categoryGroup.entity.CategoryGroup;
+import com.yongy.dotorimainservice.domain.categoryGroup.repository.CategoryGroupRepository;
+import com.yongy.dotorimainservice.domain.user.entity.User;
+import com.yongy.dotorimainservice.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

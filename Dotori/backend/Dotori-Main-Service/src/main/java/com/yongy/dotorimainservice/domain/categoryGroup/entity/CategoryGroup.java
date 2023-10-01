@@ -1,7 +1,8 @@
 package com.yongy.dotorimainservice.domain.categoryGroup.entity;
 
-import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
-import com.yongy.dotori.domain.user.entity.User;
+
+import com.yongy.dotorimainservice.domain.planDetail.entity.PlanDetail;
+import com.yongy.dotorimainservice.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

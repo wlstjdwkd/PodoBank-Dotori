@@ -1,7 +1,8 @@
 package com.yongy.dotorimainservice.domain.categoryGroup.controller;
 
-import com.yongy.dotori.domain.categoryGroup.dto.CategoryGroupDTO;
-import com.yongy.dotori.domain.categoryGroup.service.CategoryGroupServiceImpl;
+
+import com.yongy.dotorimainservice.domain.categoryGroup.dto.CategoryGroupDTO;
+import com.yongy.dotorimainservice.domain.categoryGroup.service.CategoryGroupServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
