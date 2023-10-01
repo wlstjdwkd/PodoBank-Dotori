@@ -11,7 +11,6 @@ import com.yongy.dotorimainservice.domain.category.repository.CategoryRepository
 import com.yongy.dotorimainservice.domain.categoryGroup.entity.CategoryGroup;
 import com.yongy.dotorimainservice.domain.categoryGroup.repository.CategoryGroupRepository;
 import com.yongy.dotorimainservice.domain.plan.dto.*;
-import com.yongy.dotorimainservice.domain.plan.dto.communication.SavingDataDTO;
 import com.yongy.dotorimainservice.domain.plan.dto.response.PlanListDto;
 import com.yongy.dotorimainservice.domain.plan.entity.Plan;
 import com.yongy.dotorimainservice.domain.plan.entity.State;
@@ -22,10 +21,11 @@ import com.yongy.dotorimainservice.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotorimainservice.domain.planDetail.repository.PlanDetailRepository;
 import com.yongy.dotorimainservice.domain.user.entity.User;
 import com.yongy.dotorimainservice.global.common.CallServer;
+import com.yongy.dotorimainservice.global.common.PodoBankInfo;
+import com.yongy.dotorimainservice.global.redis.entity.BankAccessToken;
 import com.yongy.dotorimainservice.global.redis.repository.BankAccessTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,7 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -57,7 +56,8 @@ public class PlanServiceImpl implements PlanService {
     private final BankAccessTokenRepository bankAccessTokenRepository;
     private final AccountService accountService;
     private final CallServer callServer;
-    @Value("dotori.purpose.url")
+    private final PodoBankInfo podoBankInfo;
+    @Value("${dotori.purpose.url}")
     private String PURPOSE_SERVICE_URL;
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -141,7 +141,8 @@ public class PlanServiceImpl implements PlanService {
 
 
     @Override
-    public void saving(SavingDTO savingDTO) throws JsonProcessingException {
+    public void saving(SavingDTO savingDTO) {
+        log.info(savingDTO.getPlanSeq()+"");
 
         Plan plan = planRepository.findByPlanSeq(savingDTO.getPlanSeq());
         Account account = plan.getAccount();
@@ -150,9 +151,11 @@ public class PlanServiceImpl implements PlanService {
             throw new IllegalArgumentException("실행 중인 계획이 아닙니다.");
         }
 
-        SavingDataDTO savingDataDTO = SavingDataDTO.builder().savingDTO(savingDTO).accountSeq(plan.getAccount().getAccountSeq()).build();
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("accountSeq",plan.getAccount().getAccountSeq());
+        data.put("savingDTO",(savingDTO));
 
-        ResponseEntity<Void> response = callServer.patchHttpBodyAndSend(PURPOSE_SERVICE_URL+"/saving",savingDataDTO);
+        ResponseEntity<Void> response = callServer.patchHttpBodyAndSend(PURPOSE_SERVICE_URL+"/purpose/saving", data);
         if(!response.getStatusCode().equals(HttpStatusCode.valueOf(200))){
             throw new PurposeServiceFailedException("Purpose Service 호출 에러");
         }
@@ -166,8 +169,17 @@ public class PlanServiceImpl implements PlanService {
 
     public void callBankAPI(Account account, SavingDTO savingDTO){
         Bank bankInfo = bankRepository.findByBankSeq(account.getBank().getBankSeq());
-        String accessToken = bankAccessTokenRepository.findByBankName(bankInfo.getBankName()).getToken(); // 은행 accessToken 가져오기
+        log.info(bankInfo.getBankName());
+        BankAccessToken bankAccessToken = bankAccessTokenRepository.findByBankName(bankInfo.getBankName()); // 은행 accessToken 가져오기
+        String accessToken = null;
 
+        if(bankAccessToken != null){ // accessToken이 없으면
+            accessToken = bankAccessToken.getToken();
+        }
+
+        if(bankAccessToken == null){
+            accessToken = podoBankInfo.getConnectionToken(bankInfo.getBankSeq());
+        }
         // NOTE : plan에 연결된 계좌에서 총 금액을 도토리 계좌로 입금 요청하기
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/json;charset=utf-8");

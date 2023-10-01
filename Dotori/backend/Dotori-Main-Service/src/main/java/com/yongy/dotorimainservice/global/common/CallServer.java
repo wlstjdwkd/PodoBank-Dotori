@@ -54,11 +54,11 @@ public class CallServer {
     }
 
 
-    public ResponseEntity<Void> patchHttpBodyAndSend(String url, Object bodyData){
+    public ResponseEntity<Void> patchHttpBodyAndSend(String url, HashMap<String, Object> bodyData){
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json;charset=utf-8");
 
-        HttpEntity<Object> httpEntity = new HttpEntity<>(bodyData, headers);
+        HttpEntity<HashMap<String, Object>> httpEntity = new HttpEntity<>(bodyData, headers);
         RestTemplate restTemplate = new RestTemplate();
 
         ResponseEntity<String> response = restTemplate.exchange(

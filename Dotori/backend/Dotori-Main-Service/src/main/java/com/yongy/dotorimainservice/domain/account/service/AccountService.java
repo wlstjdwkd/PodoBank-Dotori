@@ -6,6 +6,7 @@ import com.yongy.dotorimainservice.domain.account.dto.communication.AccountNumbe
 import com.yongy.dotorimainservice.domain.account.dto.communication.AccountReqDto;
 import com.yongy.dotorimainservice.domain.account.entity.Account;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface AccountService {
@@ -16,4 +17,5 @@ public interface AccountService {
     void saveAccountTitle(AccountNumberTitleReqDto accountNumberTitleReqDto);
 
     void saveAccount(AccountReqDto accountReqDto);
+    BigDecimal getBalance(Long accountSeq) throws JsonProcessingException;
 }

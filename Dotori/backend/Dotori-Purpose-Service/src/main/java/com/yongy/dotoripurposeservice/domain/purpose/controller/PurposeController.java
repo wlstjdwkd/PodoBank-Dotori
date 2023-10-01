@@ -24,7 +24,7 @@ import java.math.BigDecimal;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/purpose")
+@RequestMapping("/api/v1/purpose")
 public class PurposeController {
     private final PurposeServiceImpl purposeService;
 
@@ -96,7 +96,7 @@ public class PurposeController {
         return ResponseEntity.ok(purposeAllDTO.getCurrentTotalSavings());
     }
 
-    @PatchMapping("/saving")
+    @PostMapping("/saving")
     public ResponseEntity<Void> saving(@RequestBody SavingDataDTO savingDataDTO){
         purposeService.saving(savingDataDTO);
         return ResponseEntity.ok().build();

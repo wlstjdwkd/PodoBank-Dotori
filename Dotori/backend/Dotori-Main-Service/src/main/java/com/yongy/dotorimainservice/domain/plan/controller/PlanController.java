@@ -25,7 +25,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/plan")
+@RequestMapping("/api/v1/plan")
 public class PlanController {
 
     @Autowired
@@ -56,7 +56,7 @@ public class PlanController {
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "저축 성공")
     })
-    @PostMapping("/saving")
+    @PatchMapping("/saving")
     public ResponseEntity<Void> saving(@RequestBody SavingDTO savingDTO) throws JsonProcessingException {
         planService.saving(savingDTO);
         return ResponseEntity.ok().build();

@@ -11,6 +11,7 @@ import com.yongy.dotorimainservice.domain.account.repository.AccountRepository;
 import com.yongy.dotorimainservice.domain.bank.entity.Bank;
 import com.yongy.dotorimainservice.domain.bank.repository.BankRepository;
 
+import com.yongy.dotorimainservice.global.redis.repository.BankAccessTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -37,6 +38,7 @@ public class AccountServiceImpl implements AccountService{
 
     // private final UserAuthService userAuthService; // TODO : find
     private final AccountRepository accountRepository;
+    private final BankAccessTokenRepository bankAccessTokenRepository;
 
 
 
@@ -71,18 +73,17 @@ public class AccountServiceImpl implements AccountService{
         return null;
     }
 
+    @Override
     public BigDecimal getBalance(Long accountSeq) throws JsonProcessingException {
         Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
         Bank bankInfo = bankRepository.findByBankSeq(account.getBank().getBankSeq());
 
-        // TODO : find
-        //String accessToken = userAuthService.getConnectionToken(bankInfo.getBankSeq()); // 은행 accessToken 가져오기
+        String accessToken = bankAccessTokenRepository.findByBankName(bankInfo.getBankName()).getToken();// 은행 accessToken 가져오기
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/json;charset=utf-8");
 
-        // TODO : find
-        // httpHeaders.add("Authorization","Bearer " + accessToken);
+        httpHeaders.add("Authorization","Bearer " + accessToken);
 
         Map<String, String> bodyData = new HashMap<>();
         bodyData.put("serviceCode", bankInfo.getServiceCode());
@@ -110,6 +111,7 @@ public class AccountServiceImpl implements AccountService{
 
         throw new IllegalArgumentException("계좌 정보를 불러오는데 실패했습니다.");
     }
+
 
 
     // NOTE : 사용자의 계좌 모두 삭제하기
