@@ -1,5 +1,8 @@
 // src/api/userApi.js
 import axios from "axios";
+// import * as Notifications from "expo-notifications";
+import messaging from "@react-native-firebase/messaging";
+
 const apiAddress = "http://j9d107.p.ssafy.io:9600";
 
 // // 사용 예시
@@ -111,11 +114,33 @@ export const userLogout = async (accessToken) => {
   }
 };
 // access token과 refresh token을 받음.
+
+async function getToken() {
+  const authorized = await messaging().hasPermission();
+  if (!authorized) {
+    await messaging().requestPermission();
+  }
+
+  const token = await messaging().getToken();
+  console.log("FCM Token: ", token);
+  return token;
+}
+
 export const userLogin = async (email, password) => {
   try {
+    // const { status } = await Notifications.requestPermissionsAsync();
+    // if (status !== "granted") {
+    //   console.error("Notification permissions not granted!");
+    //   throw new Error("Permissions not granted");
+    // }
+
+    const token = await getToken();
+    console.log("Token: ", token);
+
     const response = await axios.post(apiAddress + "/api/v1/auth/login", {
       email: email,
       password: password,
+      token: token,
     });
     console.log("로그인 성공:", response.data);
     return response;
@@ -255,7 +280,6 @@ export const userIDfind = async () => {
     // throw error;
   }
 };
-
 
 // 비밀번호 초기화
 export const userPasswordReset = async (userInfo) => {
