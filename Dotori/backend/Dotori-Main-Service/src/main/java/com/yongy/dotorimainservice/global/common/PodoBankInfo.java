@@ -1,12 +1,12 @@
 package com.yongy.dotorimainservice.global.common;
 
 
-import com.yongy.dotoripurposeservice.domain.bank.entity.Bank;
-import com.yongy.dotoripurposeservice.domain.bank.repository.BankRepository;
-import com.yongy.dotoripurposeservice.global.redis.entity.BankAccessToken;
-import com.yongy.dotoripurposeservice.global.redis.entity.BankRefreshToken;
-import com.yongy.dotoripurposeservice.global.redis.repository.BankAccessTokenRepository;
-import com.yongy.dotoripurposeservice.global.redis.repository.BankRefreshTokenRepository;
+import com.yongy.dotorimainservice.domain.bank.entity.Bank;
+import com.yongy.dotorimainservice.domain.bank.repository.BankRepository;
+import com.yongy.dotorimainservice.global.redis.entity.BankAccessToken;
+import com.yongy.dotorimainservice.global.redis.entity.BankRefreshToken;
+import com.yongy.dotorimainservice.global.redis.repository.BankAccessTokenRepository;
+import com.yongy.dotorimainservice.global.redis.repository.BankRefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;

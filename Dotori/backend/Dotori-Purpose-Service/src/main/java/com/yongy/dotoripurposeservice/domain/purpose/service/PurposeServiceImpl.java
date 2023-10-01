@@ -50,9 +50,9 @@ public class PurposeServiceImpl implements PurposeService{
     }
 
     @Override
-    public PurposeAllDTO findAllPurpose() {
-        User loginUser = this.getLoginUser();
-        List<Purpose> purposeList = purposeRepository.findAllByUserSeqAndTerminatedAtIsNull(loginUser.getUserSeq());
+    public PurposeAllDTO findAllPurpose(Long userSeq) {
+
+        List<Purpose> purposeList = purposeRepository.findAllByUserSeqAndTerminatedAtIsNull(userSeq);
 
         List<PurposeListDTO> list = new ArrayList<>();
         BigDecimal total = BigDecimal.ZERO;
@@ -150,4 +150,6 @@ public class PurposeServiceImpl implements PurposeService{
     public User getLoginUser(){
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
+
+
 }

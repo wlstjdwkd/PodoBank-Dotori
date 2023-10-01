@@ -8,6 +8,6 @@ import java.util.List;
 public interface AccountRepository extends JpaRepository<Account, Long> {
     Account findByAccountSeqAndDeleteAtIsNull(Long accountSeq);
     Account findByAccountNumberAndDeleteAtIsNull(String AccountNumber);
-    List<Account> findAllByUserUserSeqAndDeleteAtIsNull(Long userSeq);
+    List<Account> findAllByUserSeqAndDeleteAtIsNull(Long userSeq);
 
 }

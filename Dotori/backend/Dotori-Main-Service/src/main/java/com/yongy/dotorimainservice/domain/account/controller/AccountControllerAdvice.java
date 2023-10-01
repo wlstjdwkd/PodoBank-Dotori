@@ -1,7 +1,7 @@
 package com.yongy.dotorimainservice.domain.account.controller;
 
 
-import com.yongy.dotori.domain.account.exception.ExistAccountNumberException;
+import com.yongy.dotorimainservice.domain.account.exception.ExistAccountNumberException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

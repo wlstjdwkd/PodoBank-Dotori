@@ -8,9 +8,11 @@ import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeSummaryDTO;
 
 public interface PurposeService {
     void createPurpose(PurposeDTO purposeDTO);
-    PurposeAllDTO findAllPurpose();
+    PurposeAllDTO findAllPurpose(Long userSeq);
     PurposeDetailDTO findPurposeDetail(Long purposeSeq);
     void terminatePurpose(Long purposeSeq);
     PurposeSummaryDTO summarizePurpose(Long purposeSeq);
+
+
 
 }

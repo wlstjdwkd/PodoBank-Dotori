@@ -11,17 +11,16 @@ import com.yongy.dotorimainservice.domain.bank.repository.BankRepository;
 import com.yongy.dotorimainservice.global.communication.ApiForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -111,5 +110,15 @@ public class AccountServiceImpl implements AccountService{
         throw new IllegalArgumentException("계좌 정보를 불러오는데 실패했습니다.");
     }
 
+    // /purpose/communication/delete/all
 
+    // NOTE : 사용자의 계좌 모두 삭제하기
+    public void removeUserAccounts(Long userSeq){
+        List<Account> accountList = accountRepository.findAllByUserSeqAndDeleteAtIsNull(userSeq);
+        log.info("size : "+accountList.size());
+        for(Account account : accountList){
+            account.setDeleteAt(LocalDateTime.now());
+        }
+        accountRepository.saveAll(accountList);
+    }
 }

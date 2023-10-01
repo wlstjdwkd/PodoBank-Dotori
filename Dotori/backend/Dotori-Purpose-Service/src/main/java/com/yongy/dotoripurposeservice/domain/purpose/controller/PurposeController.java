@@ -4,14 +4,19 @@ import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeAllDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeDetailDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeSummaryDTO;
+import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.UserSeqDto;
 import com.yongy.dotoripurposeservice.domain.purpose.service.PurposeServiceImpl;
+import com.yongy.dotoripurposeservice.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 
 
 @Slf4j
@@ -20,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/v1/purpose")
 public class PurposeController {
     private final PurposeServiceImpl purposeService;
+
 
     @Operation(summary = "새로운 목표 생성")
     @ApiResponses(value={
@@ -39,7 +45,8 @@ public class PurposeController {
     @GetMapping()
     public ResponseEntity<PurposeAllDTO> findAllPurpose(){
         // 전체 목표 리스트 조회
-        PurposeAllDTO result = purposeService.findAllPurpose();
+        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        PurposeAllDTO result = purposeService.findAllPurpose(user.getUserSeq());
         return ResponseEntity.ok(result);
     }
 
@@ -77,6 +84,18 @@ public class PurposeController {
         PurposeSummaryDTO summary = purposeService.summarizePurpose(purposeSeq);
         return ResponseEntity.ok(summary);
     }
+
+    // ----------- 통신 -----------
+    @PostMapping("/communication")
+    public ResponseEntity<BigDecimal> getUserTotalMoney(@RequestBody UserSeqDto userSeqDto){
+        log.info("--come--");
+        PurposeAllDTO purposeAllDTO = purposeService.findAllPurpose(userSeqDto.getUserSeq());
+        log.info("--test--");
+        return ResponseEntity.ok(purposeAllDTO.getCurrentTotalSavings());
+    }
+
+
+
 
 
 }

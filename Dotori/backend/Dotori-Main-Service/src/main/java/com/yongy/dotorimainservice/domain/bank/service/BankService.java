@@ -1,6 +1,7 @@
 package com.yongy.dotorimainservice.domain.bank.service;
 
-import com.yongy.dotori.domain.bank.dto.response.BankListDto;
+
+import com.yongy.dotorimainservice.domain.bank.dto.response.BankListDto;
 
 import java.util.List;
 

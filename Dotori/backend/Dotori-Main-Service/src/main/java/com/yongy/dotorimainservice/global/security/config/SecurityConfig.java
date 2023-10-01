@@ -1,8 +1,8 @@
 package com.yongy.dotorimainservice.global.security.config;
 
 
-import com.yongy.dotoripurposeservice.global.security.filter.AuthFilter;
-import com.yongy.dotoripurposeservice.global.security.provider.AuthProvider;
+import com.yongy.dotorimainservice.global.security.filter.AuthFilter;
+import com.yongy.dotorimainservice.global.security.provider.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

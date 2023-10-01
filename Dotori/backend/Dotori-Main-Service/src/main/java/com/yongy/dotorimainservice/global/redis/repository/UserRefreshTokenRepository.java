@@ -1,7 +1,7 @@
 package com.yongy.dotorimainservice.global.redis.repository;
 
 
-import com.yongy.dotoripurposeservice.global.redis.entity.UserRefreshToken;
+import com.yongy.dotorimainservice.global.redis.entity.UserRefreshToken;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

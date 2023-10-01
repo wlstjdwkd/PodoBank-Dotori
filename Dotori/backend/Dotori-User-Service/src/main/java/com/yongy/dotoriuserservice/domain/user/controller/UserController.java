@@ -10,6 +10,7 @@ import com.yongy.dotoriuserservice.domain.user.exception.AccessDeniedSocialPwdEx
 import com.yongy.dotoriuserservice.domain.user.exception.FailedRetiredException;
 import com.yongy.dotoriuserservice.domain.user.exception.InvalidPwdException;
 import com.yongy.dotoriuserservice.domain.user.service.UserService;
+import com.yongy.dotoriuserservice.global.common.CallServer;
 import com.yongy.dotoriuserservice.global.security.provider.AuthProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -55,6 +56,16 @@ public class UserController {
 
     @Value("${dotori.purpose.url}")
     private String PURPOSE_SERVICE_URL;
+
+    @Value("${dotori.main.url}")
+    private String MAIN_SERVICE_URL;
+
+    @Autowired
+    private CallServer callServer;
+
+    private HashMap<String, Object> bodyData = new HashMap<>();
+
+    private ResponseEntity<String> response = null;
 
     // NOTE : 사용자 데이터 가져오기
     @ApiResponse(responseCode = "200", description = "사용자의 데이터를 가져오는데 성공함")
@@ -139,39 +150,23 @@ public class UserController {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // NOTE : 사용자의 통장에 돈이 있으면 탈퇴할 수 없음
-
-        // TODO : dotori-purpose-service와 통신 , http://localhost:9130/
-
-        String accessURL = PURPOSE_SERVICE_URL + "/v1/purpose/communication";
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json;charset=utf-8");
-
-        HashMap<String, Object> bodyData = new HashMap<>();
+        // TODO : dotori-purpose-service와 통신
+        bodyData.clear();
         bodyData.put("userSeq", user.getUserSeq());
 
-        HttpEntity<HashMap<String, Object>> httpEntity = new HttpEntity<>(bodyData, headers);
-
-        // (3) 호출
-        RestTemplate restTemplate = new RestTemplate();
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                PURPOSE_SERVICE_URL+"/v1/purpose/communication",
-                HttpMethod.POST,
-                httpEntity,
-                String.class
+        BigDecimal currentMoney = new BigDecimal(
+                callServer.postHttpBodyAndSend(PURPOSE_SERVICE_URL+"/purpose/communication", bodyData).getBody()
         );
-
-
-        BigDecimal currentMoney = new BigDecimal(response.getBody());
 
         if(currentMoney.compareTo(BigDecimal.ZERO) != 0){
             throw new FailedRetiredException("사용자의 목표 통장에 돈이 남아있어서 탈퇴할 수 없습니다.");
         }
 
-//        // NOTE : 사용자의 계좌 모두 삭제하기
-//        userService.removeUserAccounts(user.getUserSeq());
-//
+        // NOTE : 사용자의 계좌 모두 삭제하기
+        response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/delete/all", bodyData);
+
+
+
 //        // NOTE : 사용자의 진행중인 계획 모두 삭제하기
 //        userService.removeUserPlans(user.getUserSeq());
 //
@@ -191,6 +186,7 @@ public class UserController {
     public ResponseEntity<User> getUserFromDB(@RequestBody Long userSeq){
         return ResponseEntity.ok(userService.getUserFromDB(userSeq));
     }
+
 
 
 }

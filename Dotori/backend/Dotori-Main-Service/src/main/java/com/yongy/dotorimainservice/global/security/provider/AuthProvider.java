@@ -1,6 +1,7 @@
 package com.yongy.dotorimainservice.global.security.provider;
 
 
+import com.yongy.dotorimainservice.domain.user.entity.User;
 import com.yongy.dotorimainservice.domain.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

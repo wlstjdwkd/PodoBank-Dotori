@@ -1,10 +1,10 @@
 package com.yongy.dotorimainservice.global.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yongy.dotoripurposeservice.domain.user.entity.User;
-import com.yongy.dotoripurposeservice.global.security.dto.response.MegResDto;
-import com.yongy.dotoripurposeservice.global.security.exception.ErrorType;
-import com.yongy.dotoripurposeservice.global.security.provider.AuthProvider;
+import com.yongy.dotorimainservice.domain.user.entity.User;
+import com.yongy.dotorimainservice.global.security.dto.response.MegResDto;
+import com.yongy.dotorimainservice.global.security.exception.ErrorType;
+import com.yongy.dotorimainservice.global.security.provider.AuthProvider;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -48,8 +48,8 @@ public class AuthFilter extends GenericFilterBean {
             authentication = authProvider.getAuthentication(user);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }else{ // NOTE : 사용자가 존재하지 않습니다.
-            generalJwtExceptionHandler((HttpServletResponse) response, ErrorType.NOT_FOUND_USER);
-            return;
+//            generalJwtExceptionHandler((HttpServletResponse) response, ErrorType.NOT_FOUND_USER);
+//            return;
         }
         chain.doFilter(request, response);
     }

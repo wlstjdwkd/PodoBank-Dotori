@@ -1,8 +1,9 @@
 package com.yongy.dotorimainservice.domain.bank.service;
 
-import com.yongy.dotori.domain.bank.dto.response.BankListDto;
-import com.yongy.dotori.domain.bank.entity.Bank;
-import com.yongy.dotori.domain.bank.repository.BankRepository;
+
+import com.yongy.dotorimainservice.domain.bank.dto.response.BankListDto;
+import com.yongy.dotorimainservice.domain.bank.entity.Bank;
+import com.yongy.dotorimainservice.domain.bank.repository.BankRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

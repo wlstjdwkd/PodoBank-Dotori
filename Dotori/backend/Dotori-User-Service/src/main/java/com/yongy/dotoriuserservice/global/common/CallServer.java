@@ -1,14 +1,21 @@
 package com.yongy.dotoriuserservice.global.common;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Call;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 
+@Slf4j
+@Service
+@AllArgsConstructor
 public class CallServer {
     // NOTE : POST호출 + Param 추가
 
@@ -19,14 +26,16 @@ public class CallServer {
         HttpEntity<HashMap<String, Object>> httpEntity = new HttpEntity<>(bodyData, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-
+        log.info("--test1--");
         ResponseEntity<String> response = restTemplate.exchange(
                 url,
                 HttpMethod.POST,
                 httpEntity,
                 String.class
         );
-
+        log.info("--test2--");
         return response;
     }
+
+
 }
