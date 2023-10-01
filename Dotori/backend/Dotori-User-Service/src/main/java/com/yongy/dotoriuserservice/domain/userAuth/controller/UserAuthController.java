@@ -1,6 +1,6 @@
 package com.yongy.dotoriuserservice.domain.userAuth.controller;
 
-import com.yongy.dotoriuserservice.domain.account.exception.ExistAccountNumberException;
+import com.yongy.dotoriuserservice.domain.userAuth.exception.ExistAccountNumberException;
 import com.yongy.dotoriuserservice.domain.user.dto.request.UserEmailReqDto;
 import com.yongy.dotoriuserservice.domain.user.entity.User;
 import com.yongy.dotoriuserservice.domain.user.exception.ExpiredAuthCodeException;
@@ -100,7 +100,7 @@ public class UserAuthController {
 
         response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication", bodyData);
 
-        if(!response.getStatusCode().toString().split(" ")[0].equals("200")){
+        if(response.getBody().toString().equals("YES")){
             throw new ExistAccountNumberException("이미 연결된 계좌입니다.");
         }
 
@@ -130,7 +130,7 @@ public class UserAuthController {
         bodyData.put("accountNumber", userAccountNumberTitleReqDto.getAccountNumber());
         bodyData.put("accountTitle", userAccountNumberTitleReqDto.getAccountTitle());
 
-        response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/set-name", bodyData);
+        response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/setTitle", bodyData);
 
         return ResponseEntity.ok().build();
     }

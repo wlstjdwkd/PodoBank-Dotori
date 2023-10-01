@@ -5,9 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class AccountReqDto {
+public class AccountNumberTitleReqDto {
     private String accountNumber;
-    private Long userSeq;
-    private Long bankSeq;
-    private String fintechCode;
+    private String accountTitle;
 }
