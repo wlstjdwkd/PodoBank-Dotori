@@ -50,7 +50,7 @@ public class RequestUtil {
 
     @Async
     public void deleteFCMToken(String email) {
-        String url = firebaseUrl + "/api/v1/deleteToken";
+        String url = firebaseUrl + "/api/v1/fcm/deleteToken";
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
