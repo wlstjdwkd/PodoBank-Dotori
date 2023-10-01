@@ -64,6 +64,7 @@ public class User extends BaseEntity {
         birthdate = null;
         phoneNumber = null;
         password = null;
+        expiredAt = LocalDateTime.now();
         role = Role.ROLE_DELETED;
 
         return this;

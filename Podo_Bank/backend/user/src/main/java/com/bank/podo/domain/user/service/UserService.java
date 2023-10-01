@@ -2,7 +2,6 @@ package com.bank.podo.domain.user.service;
 
 import com.bank.podo.domain.user.dto.*;
 import com.bank.podo.domain.user.entity.User;
-import com.bank.podo.domain.user.exception.AlreadyUsedUsernameException;
 import com.bank.podo.domain.user.exception.FromatException;
 import com.bank.podo.domain.user.exception.PasswordNotMatchException;
 import com.bank.podo.domain.user.repository.UserRepository;
@@ -110,15 +109,6 @@ public class UserService {
 
     private User getLoginUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
-
-    public void checkEmailFormat(String email) {
-        String emailPattern =
-                "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-
-        if(!Pattern.compile(emailPattern).matcher(email).matches()) {
-            throw new FromatException("이메일 형식이 올바르지 않습니다.");
-        }
     }
 
     private void checkPasswordFormat(String password) {
