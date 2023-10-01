@@ -14,7 +14,7 @@ public class FCMToken extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(unique = true)
     private String email;
 
     @Column
@@ -23,6 +23,10 @@ public class FCMToken extends BaseEntity {
     @Builder
     public FCMToken(String email, String token) {
         this.email = email;
+        this.token = token;
+    }
+
+    public void updateToken(String token) {
         this.token = token;
     }
 }

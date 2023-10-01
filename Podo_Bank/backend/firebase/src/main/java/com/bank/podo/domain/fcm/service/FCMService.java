@@ -23,10 +23,17 @@ public class FCMService {
 
     @Transactional
     public void addToken(AddFCMTokenDTO addFCMTokenDTO) {
-        fcmRepository.save(FCMToken.builder()
-                .email(addFCMTokenDTO.getEmail())
-                .token(addFCMTokenDTO.getToken())
-                .build());
+        FCMToken fcmToken = fcmRepository.findByEmail(addFCMTokenDTO.getEmail()).orElse(null);
+
+        if(fcmRepository.findByEmail(addFCMTokenDTO.getEmail()).isPresent()) {
+            fcmToken.updateToken(addFCMTokenDTO.getToken());
+            fcmRepository.save(fcmToken);
+        } else {
+            fcmRepository.save(FCMToken.builder()
+                    .email(addFCMTokenDTO.getEmail())
+                    .token(addFCMTokenDTO.getToken())
+                    .build());
+        }
     }
 
     @Transactional
