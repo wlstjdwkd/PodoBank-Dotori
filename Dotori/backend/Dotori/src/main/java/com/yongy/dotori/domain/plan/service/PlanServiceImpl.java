@@ -168,7 +168,6 @@ public class PlanServiceImpl implements PlanService {
                         .build());
             }
 
-            // TODO : 미분류 count 넘겨주기
             ActivePlanDTO result = ActivePlanDTO.builder()
                     .accountBalance(accountService.getBalance(accountSeq))
                     .startedAt(plan.getStartAt())
@@ -182,23 +181,18 @@ public class PlanServiceImpl implements PlanService {
 
             return result;
         }
-
-//        if(plan != null && plan.getPlanState().equals(State.READY)){
-//            throw new NotStartedPlanException("아직 예약된 계획이 시작되지 않았습니다.");
-//        }
-
         return ActivePlanDTO.builder().accountBalance(accountService.getBalance(accountSeq)).build();
     }
 
     @Override
-    public void updateState(PlanStateDTO planStateDTO) {
+    public void updateState(State state, PlanStateDTO planStateDTO) {
         Plan plan = planRepository.findByPlanSeq(planStateDTO.getPlanSeq());
 
         if(!plan.getPlanState().equals(State.ACTIVE)){
             throw new NotActivePlanException("실행 중인 계획이 아닙니다.");
         }
 
-        plan.updateState(State.COMPLETED);
+        plan.updateState(state);
     }
 
     @Override
