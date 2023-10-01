@@ -259,6 +259,9 @@ public class AccountService {
         deposit(receiverAccount, transferAmount, transferDTO.getReceiverContent());
         withdraw(senderAccount, transferAmount, transferDTO.getSenderContent());
 
+        FCMService.sendNotification(receiverAccount.getUser().getEmail(), "입금", transferAmount.toString() + "원이 입금되었습니다.");
+        FCMService.sendNotification(senderAccount.getUser().getEmail(), "출금", transferAmount.toString() + "원이 출금되었습니다.");
+
         logTransfer(senderAccount, receiverAccount, transferAmount);
     }
 
