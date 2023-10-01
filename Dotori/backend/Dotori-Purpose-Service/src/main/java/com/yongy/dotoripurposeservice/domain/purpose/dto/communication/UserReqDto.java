@@ -4,6 +4,6 @@ import lombok.*;
 
 @Data
 @NoArgsConstructor
-public class UserSeqDto {
+public class UserReqDto {
     private Long userSeq;
 }

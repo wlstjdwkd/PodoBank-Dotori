@@ -2,7 +2,10 @@ package com.yongy.dotorimainservice.domain.account.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotorimainservice.domain.account.dto.AccountDTO;
-import com.yongy.dotorimainservice.domain.account.dto.communication.UserSeqDto;
+import com.yongy.dotorimainservice.domain.account.dto.communication.AccountNumberReqDto;
+import com.yongy.dotorimainservice.domain.account.dto.communication.AccountReqDto;
+import com.yongy.dotorimainservice.domain.account.dto.communication.UserReqDto;
+import com.yongy.dotorimainservice.domain.account.entity.Account;
 import com.yongy.dotorimainservice.domain.account.service.AccountServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -30,11 +33,26 @@ public class AccountController {
     // ------- 통신 --------
     // NOTE : 사용자의 계좌를 삭제한다.
     @PostMapping("/communication/delete/all")
-    public ResponseEntity<String> deleteUserAccount(@RequestBody UserSeqDto userSeqDto){
-        accountService.removeUserAccounts(userSeqDto.getUserSeq());
+    public ResponseEntity<String> deleteUserAccount(@RequestBody UserReqDto userReqDto){
+        accountService.removeUserAccounts(userReqDto.getUserSeq());
+        return ResponseEntity.ok().build();
+    }
+
+    // NOTE : 사용자의 계좌가 존재하는 확인한다.
+    @PostMapping("/communication")
+    public ResponseEntity<String> accountVisibleCheck(@RequestBody AccountNumberReqDto accountNumberReqDto){
+        Account account = accountService.getUserAccount(accountNumberReqDto.getAccountNumber());
+        if(account == null)
+            return ResponseEntity.status(404).build();
         return ResponseEntity.ok().build();
     }
 
     // NOTE : 사용자의 계좌 이름을 설정한다.
+    @PostMapping("/communication/set-name")
+    public ResponseEntity<String> setAccountName(@RequestBody AccountReqDto accountReqDto){
+        accountService.saveUserAccount(accountReqDto);
+        return ResponseEntity.ok().build();
+    }
+
 
 }

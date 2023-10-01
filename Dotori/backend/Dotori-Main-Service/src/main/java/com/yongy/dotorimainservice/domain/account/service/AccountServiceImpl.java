@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yongy.dotorimainservice.domain.account.dto.AccountDTO;
 import com.yongy.dotorimainservice.domain.account.dto.BodyDataDTO;
+import com.yongy.dotorimainservice.domain.account.dto.communication.AccountReqDto;
 import com.yongy.dotorimainservice.domain.account.entity.Account;
 import com.yongy.dotorimainservice.domain.account.repository.AccountRepository;
 import com.yongy.dotorimainservice.domain.bank.entity.Bank;
@@ -110,15 +111,24 @@ public class AccountServiceImpl implements AccountService{
         throw new IllegalArgumentException("계좌 정보를 불러오는데 실패했습니다.");
     }
 
-    // /purpose/communication/delete/all
 
     // NOTE : 사용자의 계좌 모두 삭제하기
     public void removeUserAccounts(Long userSeq){
         List<Account> accountList = accountRepository.findAllByUserSeqAndDeleteAtIsNull(userSeq);
-        log.info("size : "+accountList.size());
         for(Account account : accountList){
             account.setDeleteAt(LocalDateTime.now());
         }
         accountRepository.saveAll(accountList);
+    }
+
+    // NOTE : 존재하는 계좌번호인지 확인하기
+    public Account getUserAccount(String accountNumber){
+        return accountRepository.findByAccountNumberAndDeleteAtIsNull(accountNumber);
+    }
+
+    public void saveUserAccount(AccountReqDto accountReqDto){
+        Account account = accountRepository.findByAccountNumberAndDeleteAtIsNull(accountReqDto.getAccountNumber());
+        account.setAccountTitle(accountReqDto.getAccountTitle());
+        accountRepository.save(account);
     }
 }

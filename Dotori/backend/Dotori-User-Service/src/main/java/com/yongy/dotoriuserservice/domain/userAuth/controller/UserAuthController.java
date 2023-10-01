@@ -1,7 +1,5 @@
 package com.yongy.dotoriuserservice.domain.userAuth.controller;
 
-
-import com.yongy.dotoriuserservice.domain.account.entity.Account;
 import com.yongy.dotoriuserservice.domain.account.exception.ExistAccountNumberException;
 import com.yongy.dotoriuserservice.domain.user.dto.request.UserEmailReqDto;
 import com.yongy.dotoriuserservice.domain.user.entity.User;
@@ -22,10 +20,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 @Slf4j
 @RestController
@@ -38,6 +39,17 @@ public class UserAuthController {
 
     @Autowired
     private CallServer callServer;
+
+    private final HashMap<String, Object> bodyData = new HashMap<>();
+
+    private ResponseEntity<String> response;
+
+    @Value("${dotori.purpose.url}")
+    private String PURPOSE_SERVICE_URL;
+
+    @Value("${dotori.main.url}")
+    private String MAIN_SERVICE_URL;
+
 
     @ApiResponse(responseCode = "404", description = "사용자의 정보의 이메일과 정보가 일치하지 않습니다.")
     @Operation(summary = "[1원 인증의 본인인증] 사용자 이메일에 인증번호 보내기", description = "USER")
@@ -81,8 +93,14 @@ public class UserAuthController {
     @Operation(summary = "[포도은행에서 1원 인증] 포도은행에서 계좌의 존재 여부 확인한 후 1원 인증 요청하기", description = "USER")
     @PostMapping("/podoBank/check-account")
     public ResponseEntity<Void> sendAccountAuthCode(@RequestBody UserAccountDto userAccountDto) {
-        Account account = userAuthService.getUserAccount(userAccountDto.getAccountNumber());
-        if(account != null){
+        // Account account = userAuthService.getUserAccount(userAccountDto.getAccountNumber());
+
+        bodyData.clear();
+        bodyData.put("accountNumber", userAccountDto.getAccountNumber());
+
+        response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication", bodyData);
+
+        if(!response.getStatusCode().toString().split(" ")[0].equals("200")){
             throw new ExistAccountNumberException("이미 연결된 계좌입니다.");
         }
 
@@ -108,11 +126,11 @@ public class UserAuthController {
     @Operation(summary = "계좌의 이름 설정하기", description = "USER")
     @PostMapping("/account/title")
     public ResponseEntity<Void> setAccountName(@RequestBody UserAccountNumberTitleReqDto userAccountNumberTitleReqDto){
-        Account account = userAuthService.getUserAccount(userAccountNumberTitleReqDto.getAccountNumber());
+        bodyData.clear();
+        bodyData.put("accountNumber", userAccountNumberTitleReqDto.getAccountNumber());
+        bodyData.put("accountTitle", userAccountNumberTitleReqDto.getAccountTitle());
 
-        account.setAccountTitle(userAccountNumberTitleReqDto.getAccountTitle());
-
-        userAuthService.saveUserAccount(account);
+        response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/set-name", bodyData);
 
         return ResponseEntity.ok().build();
     }

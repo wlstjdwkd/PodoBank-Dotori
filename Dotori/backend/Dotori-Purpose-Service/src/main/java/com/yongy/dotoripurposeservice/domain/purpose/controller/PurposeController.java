@@ -4,7 +4,7 @@ import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeAllDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeDetailDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeSummaryDTO;
-import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.UserSeqDto;
+import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.UserReqDto;
 import com.yongy.dotoripurposeservice.domain.purpose.service.PurposeServiceImpl;
 import com.yongy.dotoripurposeservice.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -87,9 +87,9 @@ public class PurposeController {
 
     // ----------- 통신 -----------
     @PostMapping("/communication")
-    public ResponseEntity<BigDecimal> getUserTotalMoney(@RequestBody UserSeqDto userSeqDto){
+    public ResponseEntity<BigDecimal> getUserTotalMoney(@RequestBody UserReqDto userReqDto){
         log.info("--come--");
-        PurposeAllDTO purposeAllDTO = purposeService.findAllPurpose(userSeqDto.getUserSeq());
+        PurposeAllDTO purposeAllDTO = purposeService.findAllPurpose(userReqDto.getUserSeq());
         log.info("--test--");
         return ResponseEntity.ok(purposeAllDTO.getCurrentTotalSavings());
     }

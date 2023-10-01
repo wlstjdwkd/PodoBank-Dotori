@@ -63,9 +63,9 @@ public class UserController {
     @Autowired
     private CallServer callServer;
 
-    private HashMap<String, Object> bodyData = new HashMap<>();
+    private final HashMap<String, Object> bodyData;
 
-    private ResponseEntity<String> response = null;
+    private ResponseEntity<String> response;
 
     // NOTE : 사용자 데이터 가져오기
     @ApiResponse(responseCode = "200", description = "사용자의 데이터를 가져오는데 성공함")

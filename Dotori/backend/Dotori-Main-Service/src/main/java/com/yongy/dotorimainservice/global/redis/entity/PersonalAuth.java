@@ -8,7 +8,7 @@ import org.springframework.data.redis.core.index.Indexed;
 
 @Getter
 @RequiredArgsConstructor
-@RedisHash(value="PersonalAuth", timeToLive = 1000L * 60 * 3)
+@RedisHash(value="PersonalAuth", timeToLive = 60 * 5)
 public class PersonalAuth {
 
     @Id
