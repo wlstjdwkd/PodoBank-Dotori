@@ -165,16 +165,14 @@ public class UserController {
         // NOTE : 사용자의 계좌 모두 삭제하기
         response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/delete/all", bodyData);
 
-
-
         // NOTE : 사용자의 진행중인 계획 모두 삭제하기
-        userService.removeUserPlans(user.getUserSeq());
-//
-//        // NOTE : 사용자의 RefreshToken 삭제하기
-//        userService.deleteUserRefreshToken(user.getId());
-//
-//        // NOTE : 사용자 탈퇴하기
-//        userService.removeRetireUser(user);
+        response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/plan/communication/delete/all", bodyData);
+
+        // NOTE : 사용자의 RefreshToken 삭제하기
+        userService.deleteUserRefreshToken(user.getId());
+
+        // NOTE : 사용자 탈퇴하기
+        userService.removeRetireUser(user);
 
         return ResponseEntity.ok().build();
     }

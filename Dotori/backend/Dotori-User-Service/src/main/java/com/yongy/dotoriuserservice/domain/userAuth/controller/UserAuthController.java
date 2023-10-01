@@ -1,5 +1,6 @@
 package com.yongy.dotoriuserservice.domain.userAuth.controller;
 
+
 import com.yongy.dotoriuserservice.domain.account.entity.Account;
 import com.yongy.dotoriuserservice.domain.account.exception.ExistAccountNumberException;
 import com.yongy.dotoriuserservice.domain.user.dto.request.UserEmailReqDto;
@@ -12,6 +13,7 @@ import com.yongy.dotoriuserservice.domain.userAuth.dto.request.UserAccountDto;
 import com.yongy.dotoriuserservice.domain.userAuth.dto.request.UserAccountNumberTitleReqDto;
 import com.yongy.dotoriuserservice.domain.userAuth.exception.FailedOneReqException;
 import com.yongy.dotoriuserservice.domain.userAuth.service.UserAuthService;
+import com.yongy.dotoriuserservice.global.common.CallServer;
 import com.yongy.dotoriuserservice.global.redis.entity.PersonalAuth;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,6 +35,9 @@ public class UserAuthController {
 
     @Autowired
     private UserAuthService userAuthService;
+
+    @Autowired
+    private CallServer callServer;
 
     @ApiResponse(responseCode = "404", description = "사용자의 정보의 이메일과 정보가 일치하지 않습니다.")
     @Operation(summary = "[1원 인증의 본인인증] 사용자 이메일에 인증번호 보내기", description = "USER")
@@ -111,6 +116,9 @@ public class UserAuthController {
 
         return ResponseEntity.ok().build();
     }
+
+    // -------------- 통신 ------------
+
 
 
 }

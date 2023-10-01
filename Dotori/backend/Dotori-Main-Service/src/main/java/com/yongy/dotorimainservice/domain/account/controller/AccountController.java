@@ -31,12 +31,10 @@ public class AccountController {
     // NOTE : 사용자의 계좌를 삭제한다.
     @PostMapping("/communication/delete/all")
     public ResponseEntity<String> deleteUserAccount(@RequestBody UserSeqDto userSeqDto){
-        log.info("--come--");
         accountService.removeUserAccounts(userSeqDto.getUserSeq());
-        log.info("--test--");
         return ResponseEntity.ok().build();
     }
 
-    // NOTE :
+    // NOTE : 사용자의 계좌 이름을 설정한다.
 
 }
