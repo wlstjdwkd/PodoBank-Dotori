@@ -1,6 +1,7 @@
 package com.yongy.dotorimainservice.domain.bank.service;
 
 
+import com.yongy.dotorimainservice.domain.bank.dto.response.BankDto;
 import com.yongy.dotorimainservice.domain.bank.dto.response.BankListDto;
 import com.yongy.dotorimainservice.domain.bank.entity.Bank;
 import com.yongy.dotorimainservice.domain.bank.repository.BankRepository;
@@ -26,5 +27,15 @@ public class BankServiceImpl implements BankService{
             bankListDto.add(BankListDto.builder().bankSeq(bank.getBankSeq()).bankName(bank.getBankName()).build());
         }
         return bankListDto;
+    }
+
+    public BankDto bankDtoFromBank(Long bankSeq){
+        Bank bank = bankRepository.findByBankSeq(bankSeq);
+        return BankDto.builder()
+                .bankName(bank.getBankName())
+                .bankUrl(bank.getBankUrl())
+                .bankId(bank.getBankId())
+                .bankPwd(bank.getBankPwd())
+                .serviceCode(bank.getServiceCode()).build();
     }
 }

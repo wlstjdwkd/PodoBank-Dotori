@@ -9,30 +9,26 @@ import com.yongy.dotoriuserservice.domain.user.entity.User;
 import com.yongy.dotoriuserservice.domain.user.exception.AccessDeniedSocialPwdException;
 import com.yongy.dotoriuserservice.domain.user.exception.FailedRetiredException;
 import com.yongy.dotoriuserservice.domain.user.exception.InvalidPwdException;
-import com.yongy.dotoriuserservice.domain.user.service.UserService;
+import com.yongy.dotoriuserservice.domain.user.service.UserServiceImpl;
 import com.yongy.dotoriuserservice.global.common.CallServer;
 import com.yongy.dotoriuserservice.global.security.provider.AuthProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -46,10 +42,7 @@ import java.util.HashMap;
 public class UserController {
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
-    private AuthProvider authProvider;
+    private UserServiceImpl userService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -177,7 +170,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    // TODO : 통신
+
     @ApiResponse(responseCode = "200", description = "사용자의 데이터를 가져오는데 성공함")
     @Operation(summary = "[통신] 사용자 데이터 가져오기", description = "USER")
     @GetMapping("/communication/userInfo")
