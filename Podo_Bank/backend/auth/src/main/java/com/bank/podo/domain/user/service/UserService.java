@@ -10,6 +10,7 @@ import com.bank.podo.global.email.entity.VerificationSuccess;
 import com.bank.podo.global.email.enums.VerificationType;
 import com.bank.podo.global.email.repository.VerificationSuccessRepository;
 import com.bank.podo.global.others.service.RequestHelper;
+import com.bank.podo.global.request.RequestUtil;
 import com.bank.podo.global.security.entity.RefreshToken;
 import com.bank.podo.global.security.entity.Token;
 import com.bank.podo.global.security.repository.RefreshTokenRedisRepository;
@@ -32,6 +33,8 @@ import java.util.regex.Pattern;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+    private final RequestUtil requestUtil;
 
     private final JwtProvider jwtProvider;
 
@@ -89,6 +92,8 @@ public class UserService {
                         .build());
 
         logLogin(user);
+
+        requestUtil.addFCMToken(user.getEmail(), loginDTO.getToken());
 
         return ResponseEntity.ok(token);
     }
