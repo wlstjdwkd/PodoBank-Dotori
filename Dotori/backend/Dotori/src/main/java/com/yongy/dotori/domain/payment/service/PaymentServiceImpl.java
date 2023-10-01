@@ -15,6 +15,8 @@ import com.yongy.dotori.domain.payment.dto.UpdateUnclassifiedDTO;
 import com.yongy.dotori.domain.payment.dto.response.PaymentPodoResDto;
 import com.yongy.dotori.domain.payment.entity.Payment;
 import com.yongy.dotori.domain.payment.repository.PaymentRepository;
+import com.yongy.dotori.domain.plan.entity.Plan;
+import com.yongy.dotori.domain.plan.repository.PlanRepository;
 import com.yongy.dotori.domain.plan.service.PlanService;
 import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotori.domain.planDetail.repository.PlanDetailRepository;
@@ -60,6 +62,7 @@ public class PaymentServiceImpl implements PaymentService{
     private PodoBankInfo podoBankInfo;
     private final PlanDetailRepository planDetailRepository;
     private final CategoryDataRepository categoryDataRepository;
+    private final PlanRepository planRepository;
 
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -145,7 +148,7 @@ public class PaymentServiceImpl implements PaymentService{
 
     @Override
     public void updateUnclassified(Long planSeq, UpdateUnclassifiedDTO updateUnclassifiedDTO) {
-
+        Plan plan = planRepository.findByPlanSeq(planSeq);
         List<UpdateDataDTO> payments = updateUnclassifiedDTO.getUpdateData();
         List<Payment> result = new ArrayList<>();
         Set<CategoryData> categoryDataSet = new HashSet<>(); // 저장할 CategoryData
@@ -170,6 +173,7 @@ public class PaymentServiceImpl implements PaymentService{
             categoryDataSet.add(categoryData.updateCount());
         }
 
+        planRepository.save(plan.updateCount((long) -(updateUnclassifiedDTO.getUpdateData().size())));
         paymentRepository.saveAll(result);
         categoryDataRepository.saveAll(categoryDataSet);
     }

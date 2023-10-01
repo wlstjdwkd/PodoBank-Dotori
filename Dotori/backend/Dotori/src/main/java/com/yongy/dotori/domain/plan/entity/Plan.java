@@ -40,9 +40,6 @@ public class Plan {
     @Column(name="total_savings", nullable = false)
     private BigDecimal totalSavings;
 
-    @Column(name="additional_savings", nullable = false)
-    private BigDecimal additionalSavings;
-
     @Column(name="save_at")
     private LocalDateTime saveAt;
 
@@ -58,24 +55,27 @@ public class Plan {
     @Column(name="updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "unclassified_count", nullable = false)
+    private Long count;
+
     @OneToMany(mappedBy = "plan")
     private List<PlanDetail> planDetailList;
 
     @Builder
     public Plan(Long planSeq, User user, Account account, State planState,
-                BigDecimal totalSavings, BigDecimal additionalSavings, LocalDateTime saveAt,
-                LocalDateTime startAt, LocalDateTime endAt, LocalDateTime terminatedAt, LocalDateTime updatedAt) {
+                BigDecimal totalSavings, LocalDateTime saveAt,
+                LocalDateTime startAt, LocalDateTime endAt, LocalDateTime terminatedAt, LocalDateTime updatedAt, Long count) {
         this.planSeq = planSeq;
         this.user = user;
         this.account = account;
         this.planState = planState;
         this.totalSavings = totalSavings;
-        this.additionalSavings = additionalSavings;
         this.saveAt = saveAt;
         this.startAt = startAt;
         this.endAt = endAt;
         this.terminatedAt = terminatedAt;
         this.updatedAt = updatedAt;
+        this.count = count;
     }
 
     public void update(Plan plan){
@@ -90,6 +90,11 @@ public class Plan {
 
     public Plan updateState(State state){
         this.planState = state;
+        return this;
+    }
+
+    public Plan updateCount(Long count){
+        this.count += count;
         return this;
     }
 }
