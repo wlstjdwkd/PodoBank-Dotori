@@ -23,6 +23,7 @@ public class Plan {
     @Column(name="plan_seq")
     private Long planSeq;
 
+    @Column(name = "user_seq")
     private Long userSeq;
 
     @OneToOne
