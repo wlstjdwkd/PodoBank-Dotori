@@ -18,7 +18,7 @@ public class RequestUtil {
     private final RequestApi requestApi;
 
     @Async
-    public void addFCMToken(String token, String email) {
+    public void addFCMToken(String email, String token) {
         String url = firebaseUrl + "/api/v1/fcm/addToken";
 
         try {
