@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AccountAdminService {
 
+    private final AccountService accountService;
+
     private final AccountRepository accountRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
 
@@ -36,33 +38,8 @@ public class AccountAdminService {
 
         BigDecimal transferAmount = transferDTO.getAmount();
 
-        if(senderAccount.getBalance().compareTo(transferAmount) < 0) {
-            throw new InsufficientBalanceException("잔액이 부족합니다.");
-        }
-
-        senderAccount.withdraw(transferAmount);
-        receiverAccount.deposit(transferAmount);
-
-        accountRepository.saveAll(Arrays.asList(senderAccount, receiverAccount));
-
-        TransactionHistory senderAccountHistory = TransactionHistory.builder()
-                .transactionType(TransactionType.WITHDRAWAL)
-                .amount(transferAmount)
-                .balanceAfter(senderAccount.getBalance())
-                .counterAccount(receiverAccount)
-                .account(senderAccount)
-                .content(transferDTO.getSenderContent())
-                .build();
-        TransactionHistory receiverAccountHistory = TransactionHistory.builder()
-                .transactionType(TransactionType.DEPOSIT)
-                .amount(transferAmount)
-                .balanceAfter(receiverAccount.getBalance())
-                .counterAccount(senderAccount)
-                .account(receiverAccount)
-                .content(transferDTO.getReceiverContent())
-                .build();
-
-        transactionHistoryRepository.saveAll(Arrays.asList(senderAccountHistory, receiverAccountHistory));
+        accountService.deposit(senderAccount, transferAmount, transferDTO.getSenderContent());
+        accountService.withdraw(receiverAccount, transferAmount, transferDTO.getReceiverContent());
 
         logTransfer(senderAccount, receiverAccount, transferAmount);
     }

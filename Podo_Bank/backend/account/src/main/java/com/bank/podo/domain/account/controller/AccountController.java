@@ -143,7 +143,7 @@ public class AccountController {
     })
     @PatchMapping("/deposit")
     public ResponseEntity<AccountDTO> deposit(@RequestBody DepositDTO depositDTO) {
-        accountService.deposit(depositDTO, passwordEncoder);
+        accountService.userDeposit(depositDTO, passwordEncoder);
         return ResponseEntity.ok().build();
     }
 
@@ -158,7 +158,7 @@ public class AccountController {
     })
     @PatchMapping("/withdraw")
     public ResponseEntity<AccountDTO> withdraw(@RequestBody WithdrawDTO withdrawDTO) {
-        accountService.withdraw(withdrawDTO, passwordEncoder);
+        accountService.userWithdraw(withdrawDTO, passwordEncoder);
         return ResponseEntity.ok().build();
     }
 
