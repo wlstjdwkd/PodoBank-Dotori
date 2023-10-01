@@ -24,7 +24,7 @@ public class JwtTokenProvider {
     @Value("${jwt.secret.key}")
     private String salt;
 
-    private final long exp = 3600; // 1시간
+    private final long exp = 1000L * 60 * 60;
 
     private Key secretKey;
 

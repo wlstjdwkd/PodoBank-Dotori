@@ -40,7 +40,7 @@ public class UserAuthController {
     @Autowired
     private CallServer callServer;
 
-    private final HashMap<String, Object> bodyData = new HashMap<>();
+    private final HashMap<String, Object> bodyData;
 
     private ResponseEntity<String> response;
 
