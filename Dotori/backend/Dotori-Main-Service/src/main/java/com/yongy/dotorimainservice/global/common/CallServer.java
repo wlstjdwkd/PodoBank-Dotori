@@ -52,22 +52,4 @@ public class CallServer {
         log.info("--test2--");
         return response;
     }
-
-
-    public ResponseEntity<Void> patchHttpBodyAndSend(String url, HashMap<String, Object> bodyData){
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json;charset=utf-8");
-
-        HttpEntity<HashMap<String, Object>> httpEntity = new HttpEntity<>(bodyData, headers);
-        RestTemplate restTemplate = new RestTemplate();
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                url,
-                HttpMethod.PATCH,
-                httpEntity,
-                String.class
-        );
-
-        return ResponseEntity.ok().build();
-    }
 }
