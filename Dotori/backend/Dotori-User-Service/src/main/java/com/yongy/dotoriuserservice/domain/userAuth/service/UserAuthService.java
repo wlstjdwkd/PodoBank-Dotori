@@ -1,13 +1,13 @@
 package com.yongy.dotoriuserservice.domain.userAuth.service;
 
 
-import com.yongy.dotoriuserservice.domain.account.entity.Account;
-import com.yongy.dotoriuserservice.domain.account.repository.AccountRepository;
+
 import com.yongy.dotoriuserservice.domain.bank.entity.Bank;
 import com.yongy.dotoriuserservice.domain.bank.repository.BankRepository;
 import com.yongy.dotoriuserservice.domain.user.entity.User;
 import com.yongy.dotoriuserservice.domain.userAuth.dto.request.UserAccountCodeDto;
 import com.yongy.dotoriuserservice.domain.userAuth.dto.request.UserAccountDto;
+import com.yongy.dotoriuserservice.global.common.CallServer;
 import com.yongy.dotoriuserservice.global.email.EmailUtil;
 import com.yongy.dotoriuserservice.global.redis.entity.BankAccessToken;
 import com.yongy.dotoriuserservice.global.redis.entity.BankRefreshToken;
@@ -21,6 +21,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -46,8 +47,8 @@ public class UserAuthService {
     @Autowired
     private BankRepository bankRepository;
 
-    @Autowired
-    private AccountRepository accountRepository;
+//    @Autowired
+//    private AccountRepository accountRepository;
 
     @Autowired
     private PersonalAuthRepository personalAuthRepository;
@@ -58,7 +59,17 @@ public class UserAuthService {
     @Autowired
     private BankRefreshTokenRepository bankRefreshTokenRepository;
 
+    @Value("${dotori.main.url}")
+    private String MAIN_SERVICE_URL;
+
+    @Autowired
+    private CallServer callServer;
+
     private static Bank bankInfo;
+
+    public final HashMap<String, Object> bodyData;
+
+    public ResponseEntity<String> response;
 
     // NOTE : PersonalAuth 반환
     public PersonalAuth getPersonalAuth(String authCode) {
@@ -70,15 +81,15 @@ public class UserAuthService {
         personalAuthRepository.deleteById(email);
     }
 
-    // NOTE : 사용자의 계좌 반환
-    public Account getUserAccount(String accountNumber){
-        return accountRepository.findByAccountNumberAndDeleteAtIsNull(accountNumber);
-    }
+//    // NOTE : 사용자의 계좌 반환
+//    public Account getUserAccount(String accountNumber){
+//        return accountRepository.findByAccountNumberAndDeleteAtIsNull(accountNumber);
+//    }
 
-    // NOTE : 사용자의 계좌 저장
-    public void saveUserAccount(Account account){
-        accountRepository.save(account);
-    }
+//    // NOTE : 사용자의 계좌 저장
+//    public void saveUserAccount(Account account){
+//        accountRepository.save(account);
+//    }
 
     // NOTE : [본인인증]이메일 인증코드를 생성한다.
     public void emailCertification(String id){
@@ -135,7 +146,13 @@ public class UserAuthService {
 
     // NOTE : accessToken이나 refreshToken을 세팅한다.(없으면 podoBankLogin을 호출해서 새로 발급해서 세팅함)
     public String getConnectionToken(Long bankSeq){
-        bankInfo = bankRepository.findByBankSeq(bankSeq);
+         bankInfo = bankRepository.findByBankSeq(bankSeq);
+
+        // TODO : BankDto 정보 가져오기
+        bodyData.clear();
+        bodyData.put("bankSeq", bankSeq);
+
+        //response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"")
 
         log.info(bankInfo.getBankName()+"--1");
 
@@ -167,7 +184,6 @@ public class UserAuthService {
     }
 
 
-    // NOTE : 1원 인증코드를 보낸다.
     public String sendAccountAuthCode(UserAccountDto userAccountDto){
         String useToken = this.getConnectionToken(userAccountDto.getBankSeq());
 
@@ -184,10 +200,10 @@ public class UserAuthService {
         RestTemplate restTemplate = new RestTemplate();
 
         ResponseEntity<String> response = restTemplate.exchange(
-                    bankInfo.getBankUrl() + "/api/v1/fintech/oneCentVerification",
-                    HttpMethod.POST,
-                    httpEntity,
-                    String.class
+                bankInfo.getBankUrl() + "/api/v1/fintech/oneCentVerification",
+                HttpMethod.POST,
+                httpEntity,
+                String.class
         );
 
         String responseCode = response.getStatusCode().toString().split(" ")[0]; // 200
@@ -203,12 +219,12 @@ public class UserAuthService {
         headers.add("Authorization", "Bearer " + useToken);
         headers.add("Content-Type", "application/json;charset=utf-8");
 
-        Map<String, String> bodyData = new HashMap<>();
+        bodyData.clear();
         bodyData.put("serviceCode", bankInfo.getServiceCode());
         bodyData.put("accountNumber", userAccountCodeDto.getAccountNumber());
         bodyData.put("verificationCode", "도토리"+userAccountCodeDto.getVerificationCode());
 
-        HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, headers);
+        HttpEntity<HashMap<String, Object>> httpEntity = new HttpEntity<>(bodyData, headers);
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -229,14 +245,22 @@ public class UserAuthService {
 
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-            Account account = Account.builder()
-                    .accountNumber(userAccountCodeDto.getAccountNumber())
-                    .userSeq(user.getUserSeq())
-                    .bankSeq(bankInfo.getBankSeq())
-                    .fintechCode(fintechCode) // NOTE : fintech 코드를 계좌에 등록한다.
-                    .build();
+            bodyData.clear();
+            bodyData.put("accountNumber", userAccountCodeDto.getAccountNumber());
+            bodyData.put("userSeq", user.getUserSeq());
+            bodyData.put("bankSeq", bankInfo.getBankSeq());
+            bodyData.put("fintechCode", fintechCode);
 
-            accountRepository.save(account);
+            response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/save", bodyData);
+
+//            Account account = Account.builder()
+//                    .accountNumber(userAccountCodeDto.getAccountNumber())
+//                    .userSeq(user.getUserSeq())
+//                    .bankSeq(bankInfo.getBankSeq())
+//                    .fintechCode(fintechCode) // NOTE : fintech 코드를 계좌에 등록한다.
+//                    .build();
+//
+//            accountRepository.save(account);
 
             return ResponseEntity.ok().build();
         }

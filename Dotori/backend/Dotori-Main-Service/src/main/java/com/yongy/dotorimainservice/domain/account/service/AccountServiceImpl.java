@@ -4,12 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yongy.dotorimainservice.domain.account.dto.AccountDTO;
 import com.yongy.dotorimainservice.domain.account.dto.BodyDataDTO;
+import com.yongy.dotorimainservice.domain.account.dto.communication.AccountNumberTitleReqDto;
 import com.yongy.dotorimainservice.domain.account.dto.communication.AccountReqDto;
 import com.yongy.dotorimainservice.domain.account.entity.Account;
 import com.yongy.dotorimainservice.domain.account.repository.AccountRepository;
 import com.yongy.dotorimainservice.domain.bank.entity.Bank;
 import com.yongy.dotorimainservice.domain.bank.repository.BankRepository;
-import com.yongy.dotorimainservice.global.communication.ApiForm;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -37,7 +38,6 @@ public class AccountServiceImpl implements AccountService{
     // private final UserAuthService userAuthService; // TODO : find
     private final AccountRepository accountRepository;
 
-    private ApiForm apiForm;
 
 
     @Override
@@ -126,9 +126,20 @@ public class AccountServiceImpl implements AccountService{
         return accountRepository.findByAccountNumberAndDeleteAtIsNull(accountNumber);
     }
 
-    public void saveUserAccount(AccountReqDto accountReqDto){
-        Account account = accountRepository.findByAccountNumberAndDeleteAtIsNull(accountReqDto.getAccountNumber());
-        account.setAccountTitle(accountReqDto.getAccountTitle());
+    public void saveAccount(AccountReqDto accountReqDto){
+        Account account = Account.builder()
+                .accountNumber(accountReqDto.getAccountNumber())
+                .userSeq(accountReqDto.getUserSeq())
+                .bank(bankRepository.findByBankSeq(accountReqDto.getBankSeq()))
+                .fintechCode(accountReqDto.getFintechCode()).build();
         accountRepository.save(account);
     }
+
+    public void saveAccountTitle(AccountNumberTitleReqDto accountNumberTitleReqDto){
+        Account account = accountRepository.findByAccountNumberAndDeleteAtIsNull(accountNumberTitleReqDto.getAccountNumber());
+        account.setAccountTitle(accountNumberTitleReqDto.getAccountTitle());
+        accountRepository.save(account);
+    }
+
+
 }
