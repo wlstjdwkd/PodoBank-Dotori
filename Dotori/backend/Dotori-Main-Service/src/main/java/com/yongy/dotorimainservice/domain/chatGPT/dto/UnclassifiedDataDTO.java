@@ -1,7 +1,7 @@
 package com.yongy.dotorimainservice.domain.chatGPT.dto;
 
-import com.yongy.dotori.domain.payment.entity.Payment;
-import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
+import com.yongy.dotorimainservice.domain.payment.entity.Payment;
+import com.yongy.dotorimainservice.domain.planDetail.entity.PlanDetail;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

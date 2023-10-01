@@ -76,7 +76,7 @@ public class PaymentsScheduler {
                     chatGPT.add(Payment.builder()
                             .paymentName(payment.getContent())
                             .paymentPrice(payment.getAmount())
-                            .user(plan.getUser())
+                            .userSeq(plan.getUserSeq())
                             .checked(false)
                             .businessCode(payment.getCode())
                             .paymentDate(payment.getTransactionAt())
@@ -94,8 +94,8 @@ public class PaymentsScheduler {
                     existPayment.add(Payment.builder()
                                     .paymentName(payment.getContent())
                                     .paymentPrice(payment.getAmount())
-                                    .user(plan.getUser())
-                                    .planDetail(planDetail)
+                                    .userSeq(plan.getUserSeq())
+                                    .planDetailSeq(planDetail.getPlanDetailSeq())
                                     .checked(false)
                                     .businessCode(payment.getCode())
                             .build());
@@ -105,7 +105,7 @@ public class PaymentsScheduler {
                 chatGPT.add(Payment.builder()
                                 .paymentName(payment.getContent())
                                 .paymentPrice(payment.getAmount())
-                                .user(plan.getUser())
+                                .userSeq(plan.getUserSeq())
                                 .checked(false)
                                 .businessCode(payment.getCode())
                         .build());

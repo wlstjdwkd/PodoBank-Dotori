@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
     Payment findByPaymentSeq(Long paymentSeq);
-    List<Payment> findAllByPlanDetailAndChecked(PlanDetail planDetail, boolean checked);
+    List<Payment> findAllByPlanDetailSeqAndChecked(Long planDetailSeq, boolean checked);
 
 }

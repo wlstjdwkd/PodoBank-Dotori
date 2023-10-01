@@ -124,15 +124,16 @@ public class PaymentServiceImpl implements PaymentService{
         List<Payment> unclassifiedData = new ArrayList<>();
 
         for(PlanDetail planDetail : planDetails){
-            unclassifiedData.addAll(paymentRepository.findAllByPlanDetailAndChecked(planDetail, false));
+            unclassifiedData.addAll(paymentRepository.findAllByPlanDetailSeqAndChecked(planDetail.getPlanDetailSeq(), false));
         }
 
         // 반환할 데이터 형식으로 변환
         List<PaymentDetailDTO> result = new ArrayList<>();
         for(Payment payment : unclassifiedData){
+            PlanDetail planDetail = planDetailRepository.findByPlanDetailSeq(payment.getPlanDetailSeq());
             result.add(PaymentDetailDTO.builder()
-                            .planDetailSeq(payment.getPlanDetail().getPlanDetailSeq())
-                            .categoryName(payment.getPlanDetail().getCategory().getCategoryTitle())
+                            .planDetailSeq(payment.getPlanDetailSeq())
+                            .categoryName(planDetail.getCategory().getCategoryTitle())
                             .paymentSeq(payment.getPaymentSeq())
                             .paymentName(payment.getPaymentName())
                             .paymentPrice(payment.getPaymentPrice())
@@ -155,8 +156,9 @@ public class PaymentServiceImpl implements PaymentService{
             CategoryData categoryData = categoryDataRepository.findByDataCode(payment.getBusinessCode());
 
             if(categoryData == null){ // 이전에 저장된 데이터가 없으면
+                PlanDetail planDetail = planDetailRepository.findByPlanDetailSeq(payment.getPlanDetailSeq());
                 categoryDataSet.add(CategoryData.builder()
-                        .category(payment.getPlanDetail().getCategory())
+                        .category(planDetail.getCategory())
                         .dataName(payment.getPaymentName())
                         .dataCode(payment.getBusinessCode())
                         .count(1) // 한 번 결제된 사용처니까 1로 초기화

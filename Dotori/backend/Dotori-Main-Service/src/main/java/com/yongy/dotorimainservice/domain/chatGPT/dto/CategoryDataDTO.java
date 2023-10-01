@@ -1,6 +1,6 @@
 package com.yongy.dotorimainservice.domain.chatGPT.dto;
 
-import com.yongy.dotori.domain.plan.dto.ActiveCategoryDTO;
+import com.yongy.dotorimainservice.domain.plan.dto.ActiveCategoryDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

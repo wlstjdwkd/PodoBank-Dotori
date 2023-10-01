@@ -29,7 +29,6 @@ import java.util.Map;
 @Service
 public class ChatGPTService {
     private final PaymentRepository paymentRepository;
-    private final PlanDetailRepository planDetailRepository;
 
     @Value("${chatGPT.api-key}")
     private String API_KEY;
@@ -152,7 +151,7 @@ public class ChatGPTService {
         for(UnclassifiedResponseDTO temp : data){
             for(Long paymentSeq : temp.getPaymentSeqs()){
                 Payment tempPayment = paymentRepository.findByPaymentSeq(paymentSeq);
-                tempPayment.updatePlanDetail(planDetailRepository.findByPlanDetailSeq(temp.getPlanDetailSeq()));
+                tempPayment.updatePlanDetail(temp.getPlanDetailSeq());
                 result.add(tempPayment);
             }
             count += temp.getPaymentSeqs().size();

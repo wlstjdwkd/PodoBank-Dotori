@@ -23,13 +23,11 @@ public class Payment {
     @Column(name = "payment_seq")
     private Long paymentSeq;
 
-    @ManyToOne
-    @JoinColumn(name = "userSeq")
-    private User user;
+    @Column(name="user_seq")
+    private Long userSeq;
 
-    @ManyToOne
-    @JoinColumn(name = "planDetailSeq")
-    private PlanDetail planDetail;
+    @Column(name="planDetail_seq")
+    private Long planDetailSeq;
 
     @Column(name = "payment_name", nullable = false)
     private String paymentName;
@@ -46,8 +44,8 @@ public class Payment {
     @Column(name = "checked")
     private boolean checked;
 
-    public Payment updatePlanDetail(PlanDetail planDetailSeq){
-        this.planDetail = planDetailSeq;
+    public Payment updatePlanDetail(Long planDetailSeq){
+        this.planDetailSeq = planDetailSeq;
         return this;
     }
 

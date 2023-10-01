@@ -35,8 +35,6 @@ public class PaymentController {
     @Autowired
     private PlanRepository planRepository;
 
-    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
     // NOTE : 결제내역 가져오기
     @PostMapping("/listAll")
     public ResponseEntity<List<PaymentPodoResDto>> updatePayments(@RequestBody PaymentPodoReqDto paymentPodoReqDto) throws ParseException, JsonProcessingException {
