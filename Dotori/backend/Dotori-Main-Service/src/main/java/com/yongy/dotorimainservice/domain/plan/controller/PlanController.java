@@ -25,7 +25,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/plan")
+@RequestMapping("/plan")
 public class PlanController {
 
     @Autowired

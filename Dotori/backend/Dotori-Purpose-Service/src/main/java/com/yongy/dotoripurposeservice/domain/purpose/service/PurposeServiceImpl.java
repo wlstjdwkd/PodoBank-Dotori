@@ -4,6 +4,9 @@ package com.yongy.dotoripurposeservice.domain.purpose.service;
 import com.yongy.dotoripurposeservice.domain.account.entity.Account;
 import com.yongy.dotoripurposeservice.domain.account.repository.AccountRepository;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.*;
+import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.PurposeSavingDTO;
+import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.SavingDTO;
+import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.SavingDataDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.entity.Purpose;
 import com.yongy.dotoripurposeservice.domain.purpose.repository.PurposeRepository;
 import com.yongy.dotoripurposeservice.domain.purposeData.dto.PurposeDataDTO;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -145,6 +149,41 @@ public class PurposeServiceImpl implements PurposeService{
                 .build();
 
         return summary;
+    }
+
+    @Override
+    public void saving(SavingDataDTO savingDataDTO) {
+
+        List<PurposeData> purposeDataList = new ArrayList<>();
+        BigDecimal totalSaving = new BigDecimal(BigInteger.ZERO);
+
+        // 1. 각 목표에 따라 저축 금액 update 하기
+        for (PurposeSavingDTO data : savingDataDTO.getSavingDTO().getPurposeSavingList()) {
+            Purpose purpose = purposeRepository.findByPurposeSeq(data.getPurposeSeq());
+
+            // 현재 금액에 저축 금액 더하기
+            purpose.addCurrentBalance(data.getSavingAmount());
+            purposeRepository.save(purpose);
+            log.info(purpose.getCurrentBalance()+"");
+
+            // 1-2. purpose_data 저장하기
+            // 각 purpose에 연결된 purpose_data에 저장
+            purposeDataList.add(PurposeData.builder()
+                    .accountSeq(savingDataDTO.getAccountSeq())
+                    .dataAmount(data.getSavingAmount())
+                    .purpose(purpose)
+                    .dataCurrentBalance(purpose.getCurrentBalance())
+                    .dataCreatedAt(LocalDateTime.now())
+                    .build());
+
+            totalSaving = totalSaving.add(data.getSavingAmount());
+        }
+
+        if(!totalSaving.equals(savingDataDTO.getSavingDTO().getTotalSaving())){
+            throw new IllegalArgumentException("총 저축 금액이 일치하지 않습니다.");
+        }
+
+        purposeDataRepository.saveAll(purposeDataList);
     }
 
     public User getLoginUser(){

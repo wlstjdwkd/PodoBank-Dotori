@@ -4,6 +4,8 @@ import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeAllDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeDetailDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeSummaryDTO;
+import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.SavingDTO;
+import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.SavingDataDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.UserReqDto;
 import com.yongy.dotoripurposeservice.domain.purpose.service.PurposeServiceImpl;
 import com.yongy.dotoripurposeservice.domain.user.entity.User;
@@ -22,7 +24,7 @@ import java.math.BigDecimal;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/purpose")
+@RequestMapping("/purpose")
 public class PurposeController {
     private final PurposeServiceImpl purposeService;
 
@@ -94,6 +96,11 @@ public class PurposeController {
         return ResponseEntity.ok(purposeAllDTO.getCurrentTotalSavings());
     }
 
+    @PatchMapping("/saving")
+    public ResponseEntity<Void> saving(@RequestBody SavingDataDTO savingDataDTO){
+        purposeService.saving(savingDataDTO);
+        return ResponseEntity.ok().build();
+    }
 
 
 

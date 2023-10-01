@@ -3,6 +3,7 @@ package com.yongy.dotorimainservice.domain.plan.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotorimainservice.domain.account.entity.Account;
 import com.yongy.dotorimainservice.domain.account.repository.AccountRepository;
+import com.yongy.dotorimainservice.domain.account.service.AccountService;
 import com.yongy.dotorimainservice.domain.bank.entity.Bank;
 import com.yongy.dotorimainservice.domain.bank.repository.BankRepository;
 import com.yongy.dotorimainservice.domain.category.entity.Category;
@@ -10,21 +11,23 @@ import com.yongy.dotorimainservice.domain.category.repository.CategoryRepository
 import com.yongy.dotorimainservice.domain.categoryGroup.entity.CategoryGroup;
 import com.yongy.dotorimainservice.domain.categoryGroup.repository.CategoryGroupRepository;
 import com.yongy.dotorimainservice.domain.plan.dto.*;
+import com.yongy.dotorimainservice.domain.plan.dto.communication.SavingDataDTO;
 import com.yongy.dotorimainservice.domain.plan.dto.response.PlanListDto;
 import com.yongy.dotorimainservice.domain.plan.entity.Plan;
 import com.yongy.dotorimainservice.domain.plan.entity.State;
 import com.yongy.dotorimainservice.domain.plan.exception.NotActivePlanException;
+import com.yongy.dotorimainservice.domain.plan.exception.PurposeServiceFailedException;
 import com.yongy.dotorimainservice.domain.plan.repository.PlanRepository;
 import com.yongy.dotorimainservice.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotorimainservice.domain.planDetail.repository.PlanDetailRepository;
 import com.yongy.dotorimainservice.domain.user.entity.User;
+import com.yongy.dotorimainservice.global.common.CallServer;
+import com.yongy.dotorimainservice.global.redis.repository.BankAccessTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +54,11 @@ public class PlanServiceImpl implements PlanService {
     private final CategoryRepository categoryRepository;
     private final AccountRepository accountRepository;
     private final BankRepository bankRepository;
+    private final BankAccessTokenRepository bankAccessTokenRepository;
+    private final AccountService accountService;
+    private final CallServer callServer;
+    @Value("dotori.purpose.url")
+    private String PURPOSE_SERVICE_URL;
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
@@ -131,45 +139,23 @@ public class PlanServiceImpl implements PlanService {
         plan.updateState(state);
     }
 
+
     @Override
     public void saving(SavingDTO savingDTO) throws JsonProcessingException {
 
         Plan plan = planRepository.findByPlanSeq(savingDTO.getPlanSeq());
         Account account = plan.getAccount();
 
-        List<PurposeData> purposeDataList = new ArrayList<>();
-        BigDecimal totalSaving = new BigDecimal(BigInteger.ZERO);
-
         if(!plan.getPlanState().equals(State.ACTIVE)){
             throw new IllegalArgumentException("실행 중인 계획이 아닙니다.");
         }
 
-        // 1. 각 목표에 따라 저축 금액 update 하기
-        for (PurposeSavingDTO data : savingDTO.getPurposeSavingList()) {
-            Purpose purpose = purposeRepository.findByPurposeSeq(data.getPurposeSeq());
+        SavingDataDTO savingDataDTO = SavingDataDTO.builder().savingDTO(savingDTO).accountSeq(plan.getAccount().getAccountSeq()).build();
 
-            // 현재 금액에 저축 금액 더하기
-            purpose.addCurrentBalance(data.getSavingAmount());
-            purposeRepository.save(purpose);
-            log.info(purpose.getCurrentBalance()+"");
-
-            // 1-2. purpose_data 저장하기
-            // 각 purpose에 연결된 purpose_data에 저장
-            purposeDataList.add(PurposeData.builder()
-                    .account(account)
-                    .dataAmount(data.getSavingAmount())
-                    .purpose(purpose)
-                    .dataCurrentBalance(purpose.getCurrentBalance())
-                    .dataCreatedAt(LocalDateTime.now())
-                    .build());
-
-            totalSaving = totalSaving.add(data.getSavingAmount());
+        ResponseEntity<Void> response = callServer.patchHttpBodyAndSend(PURPOSE_SERVICE_URL+"/saving",savingDataDTO);
+        if(!response.getStatusCode().equals(HttpStatusCode.valueOf(200))){
+            throw new PurposeServiceFailedException("Purpose Service 호출 에러");
         }
-
-        if(!totalSaving.equals(savingDTO.getTotalSaving())){
-            throw new IllegalArgumentException("총 저축 금액이 일치하지 않습니다.");
-        }
-        purposeDataRepository.saveAll(purposeDataList);
 
         // 2. 계획 종료 표시하기
         planRepository.save(plan.updateState(State.SAVED));
@@ -180,7 +166,7 @@ public class PlanServiceImpl implements PlanService {
 
     public void callBankAPI(Account account, SavingDTO savingDTO){
         Bank bankInfo = bankRepository.findByBankSeq(account.getBank().getBankSeq());
-        String accessToken = userAuthService.getConnectionToken(bankInfo.getBankSeq()); // 은행 accessToken 가져오기
+        String accessToken = bankAccessTokenRepository.findByBankName(bankInfo.getBankName()).getToken(); // 은행 accessToken 가져오기
 
         // NOTE : plan에 연결된 계좌에서 총 금액을 도토리 계좌로 입금 요청하기
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -212,12 +198,56 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     public List<PlanListDto> getPlanList(Long userSeq) {
-        return null;
+        List<Plan> planList = planRepository.findAllByUserSeqAndTerminatedAtIsNull(userSeq);
+        List<PlanListDto> planListDtoList = new ArrayList<>();
+        for(Plan plan : planList){
+            planListDtoList.add(PlanListDto.builder().planSeq(plan.getPlanSeq())
+                    .startAt(plan.getStartAt().format(formatter))
+                    .endAt(plan.getEndAt().format(formatter)).build());
+        }
+        return planListDtoList;
     }
 
     @Override
     public ActivePlanDTO findAllPlan(Long accountSeq) throws JsonProcessingException {
-        return null;
+//         실행중인 계획 리스트 조회
+        Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
+        Plan plan = planRepository.findByAccountAccountSeq(accountSeq);
+
+        // Plan이 있는 지 확인, 실행중인 Plan인지 확인
+        // 플랜이 있고, 실행중이면 : 로직 처리
+        // 플랜이 있고, 시작 전인 플랜이 있으면
+        // 플랜이 없으면 : 플랜 만들기 페이지
+
+        if((plan != null && plan.getPlanState().equals(State.ACTIVE)) || (plan != null && plan.getPlanState().equals(State.READY))){
+            // 실행 중인 카테고리 가져오기
+            List<PlanDetail> planDetailList = plan.getPlanDetailList();
+            List<ActivePlanDetailDTO> activePlanList = new ArrayList<>();
+
+            for(int i = 0; i < planDetailList.size(); i++){
+                PlanDetail planDetail = planDetailList.get(i);
+                activePlanList.add(ActivePlanDetailDTO.builder()
+                                .title(planDetail.getCategory().getCategoryTitle())
+                                .groupTitle(planDetail.getCategoryGroup().getGroupTitle())
+                                .goalAmount(planDetail.getDetailLimit())
+                                .currentBalance(planDetail.getDetailBalance())
+                        .build());
+            }
+
+            ActivePlanDTO result = ActivePlanDTO.builder()
+                    .accountBalance(accountService.getBalance(accountSeq))
+                    .startedAt(plan.getStartAt())
+                    .endAt(plan.getEndAt())
+                    .state(plan.getPlanState())
+                    .planSeq(plan.getPlanSeq())
+                    .terminatedAt(plan.getTerminatedAt())
+                    .unclassified(plan.getCount())
+                    .activePlanList(activePlanList)
+                .build();
+
+            return result;
+        }
+        return ActivePlanDTO.builder().accountBalance(accountService.getBalance(accountSeq)).build();
     }
 
     @Override

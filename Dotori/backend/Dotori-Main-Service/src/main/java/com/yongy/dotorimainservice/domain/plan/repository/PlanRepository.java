@@ -14,7 +14,6 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
 //
 //    List<Plan> findAllByEndAt(LocalDateTime endAt);
 //    List<Plan> findAllByPlanStateAndTerminatedAtIsNull(State state);
-//    List<Plan> findAllByUserUserSeqAndTerminatedAtIsNull(Long userSeq);
 
     List<Plan> findAllByUserSeqAndTerminatedAtIsNull(Long userSeq);
 
