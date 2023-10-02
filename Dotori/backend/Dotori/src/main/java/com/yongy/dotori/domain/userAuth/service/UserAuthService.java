@@ -111,7 +111,7 @@ public class UserAuthService {
             RestTemplate restTemplate = new RestTemplate();
 
             ResponseEntity<String> response = restTemplate.exchange(
-                    bankInfo.getBankUrl()+"/api/v1/user/login",
+                    bankInfo.getBankUrl()+"/api/v1/auth/login",
                     HttpMethod.POST,
                     httpEntity,
                     String.class
@@ -149,10 +149,11 @@ public class UserAuthService {
 
         String useToken = null;
 
+//        this.podoBankLogin();
 
         if(bankAccessToken.isEmpty()){
             if(bankRefreshToken.isEmpty()){
-                this.podoBankLogin(); // accessToken, refreshToken 재발급
+                this.podoBankLogin(); // NOTE : accessToken, refreshToken 재발급
                 log.info("--1--");
                 useToken = bankAccessTokenRepository.findById(bankInfo.getBankName()).get().getToken();
             }else{
@@ -182,7 +183,7 @@ public class UserAuthService {
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-
+// http://j9d107.p.ssafy.io:9600
         ResponseEntity<String> response = restTemplate.exchange(
                     bankInfo.getBankUrl() + "/api/v1/fintech/oneCentVerification",
                     HttpMethod.POST,

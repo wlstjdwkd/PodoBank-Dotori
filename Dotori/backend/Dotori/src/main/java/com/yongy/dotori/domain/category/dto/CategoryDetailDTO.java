@@ -12,5 +12,4 @@ import lombok.NoArgsConstructor;
 public class CategoryDetailDTO {
     private Long categorySeq;
     private String categoryTitle;
-    private Long categoryGroup;
 }

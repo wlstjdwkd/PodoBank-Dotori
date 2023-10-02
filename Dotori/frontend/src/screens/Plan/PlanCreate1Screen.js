@@ -14,48 +14,59 @@ import { Calendar, markedDates } from "react-native-calendars";
 import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux";
 
-export default function PlanCreate1Screen({ navigation }) {
+export default function PlanCreate1Screen({ navigation, route }) {
   // 토큰
-  const grantType =  useSelector((state)=>{state.user.grantType})
-  const accessToken =  useSelector((state)=>{state.user.accessToken})
-  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
-  const dispatch = useDispatch()
+  // const grantType = useSelector((state) => {
+  //   state.user.grantType;
+  // });
+  // const accessToken = useSelector((state) => {
+  //   state.user.accessToken;
+  // });
+  // const refreshToken = useSelector((state) => {
+  //   state.user.refreshToken;
+  // });
+  // const dispatch = useDispatch();
   // 그 외
-  
+
   const [planInfo, setPlanInfo] = useState({
-    startDate: null,
-    endDate: null,
+    startedAt: null,
+    endAt: null,
+    accountSeq: route.params.accountSeq,
   });
+
   const [isCalendarVisible, setCalendarVisible] = useState(false);
   const [isValid, setIsValid] = useState(false);
-
+  console.log(planInfo);
   const markedDates = {
-    ...(planInfo.startDate
+    ...(planInfo.startedAt
       ? {
-          [planInfo.startDate]: { selected: true, color: "blue" },
+          [planInfo.startedAt]: { selected: true, color: "blue" },
         }
       : {}),
-    ...(planInfo.endDate
+    ...(planInfo.endAt
       ? {
-          [planInfo.endDate]: { selected: true, color: "red" },
+          [planInfo.endAt]: { selected: true, color: "red" },
         }
       : {}),
   };
 
   const handleDateChange = (day) => {
-    if (!planInfo.startDate) {
-      setPlanInfo({
-        ...planInfo,
-        startDate: day.dateString,
-      });
-    } else if (!planInfo.endDate) {
-      setPlanInfo({
-        ...planInfo,
-        endDate: day.dateString,
-      });
-      console.log(planInfo);
-      setIsValid(true);
-    }
+    setPlanInfo((prevPlanInfo) => {
+      if (!prevPlanInfo.startedAt) {
+        return {
+          ...prevPlanInfo,
+          startedAt: day.dateString,
+        };
+      } else if (!prevPlanInfo.endAt) {
+        return {
+          ...prevPlanInfo,
+          endAt: day.dateString,
+        };
+      }
+      return prevPlanInfo;
+    });
+    console.log(planInfo);
+    setIsValid(true);
   };
 
   const handleConfirmDates = () => {
@@ -79,8 +90,9 @@ export default function PlanCreate1Screen({ navigation }) {
           <TouchableWithoutFeedback
             onPress={() => {
               setPlanInfo({
-                startDate: null,
-                endDate: null,
+                ...planInfo,
+                startedAt: null,
+                endAt: null,
               });
               setCalendarVisible(true);
             }}
@@ -88,7 +100,7 @@ export default function PlanCreate1Screen({ navigation }) {
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                value={planInfo.startDate}
+                value={planInfo.startedAt}
                 multiline={true}
               />
               <AntDesign name="calendar" size={24} color="black" />
@@ -100,7 +112,7 @@ export default function PlanCreate1Screen({ navigation }) {
             onPress={() => {
               setPlanInfo({
                 ...planInfo,
-                endDate: null,
+                endAt: null,
               });
               setCalendarVisible(true);
             }}
@@ -108,7 +120,7 @@ export default function PlanCreate1Screen({ navigation }) {
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                value={planInfo.endDate}
+                value={planInfo.endAt}
                 multiline={true}
               />
               <AntDesign name="calendar" size={24} color="black" />

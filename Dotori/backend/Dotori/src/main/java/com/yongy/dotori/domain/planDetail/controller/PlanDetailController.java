@@ -7,6 +7,9 @@ import com.yongy.dotori.domain.plan.service.PlanService;
 import com.yongy.dotori.domain.planDetail.dto.response.PlanDetailListResDto;
 import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotori.domain.planDetail.service.PlanDetailService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import kotlinx.serialization.Required;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +34,14 @@ public class PlanDetailController {
     @Autowired
     private PlanService planService;
 
-
+    @Operation(summary = "명세서 상세 조회")
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "명세서 상세 조회 성공")
+    })
     @GetMapping("/specification")
     public ResponseEntity<List<PlanDetailListResDto>> getPlanDetail(Long planSeq){
         List<PlanDetailListResDto> planDetailList = planDetailService.getPlanDetail(planSeq);
         return ResponseEntity.ok().body(planDetailList);
     }
+
 }
