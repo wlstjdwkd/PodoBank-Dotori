@@ -41,7 +41,11 @@ public class UserServiceImpl implements UserService{
     }
 
     // TODO : DB에서 사용자의 정보를 가져온다.
-    public User getUserFromDB(Long userSeq){
+    public User getUserByUserSeq(Long userSeq){
         return userRepository.findByUserSeqAndExpiredAtIsNull(userSeq);
+    }
+
+    public User getUserById(String id){
+        return userRepository.findByIdAndExpiredAtIsNull(id);
     }
 }

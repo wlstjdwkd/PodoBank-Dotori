@@ -1,5 +1,7 @@
 package com.yongy.dotoriuserservice.domain.user.controller;
 
+import com.yongy.dotoriuserservice.domain.user.dto.communication.UserDto;
+import com.yongy.dotoriuserservice.domain.user.dto.communication.UserIdDto;
 import com.yongy.dotoriuserservice.domain.user.dto.request.UserBirthDateReqDto;
 import com.yongy.dotoriuserservice.domain.user.dto.request.UserPhoneNumberReqDto;
 import com.yongy.dotoriuserservice.domain.user.dto.request.UserUpdatePasswordReqDto;
@@ -9,6 +11,7 @@ import com.yongy.dotoriuserservice.domain.user.entity.User;
 import com.yongy.dotoriuserservice.domain.user.exception.AccessDeniedSocialPwdException;
 import com.yongy.dotoriuserservice.domain.user.exception.FailedRetiredException;
 import com.yongy.dotoriuserservice.domain.user.exception.InvalidPwdException;
+import com.yongy.dotoriuserservice.domain.user.service.UserService;
 import com.yongy.dotoriuserservice.domain.user.service.UserServiceImpl;
 import com.yongy.dotoriuserservice.global.common.CallServer;
 import com.yongy.dotoriuserservice.global.security.provider.AuthProvider;
@@ -32,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 @Slf4j
@@ -42,7 +46,7 @@ import java.util.HashMap;
 public class UserController {
 
     @Autowired
-    private UserServiceImpl userService;
+    private UserService userService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -173,9 +177,9 @@ public class UserController {
 
     @ApiResponse(responseCode = "200", description = "사용자의 데이터를 가져오는데 성공함")
     @Operation(summary = "[통신] 사용자 데이터 가져오기", description = "USER")
-    @GetMapping("/communication/userInfo")
-    public ResponseEntity<User> getUserFromDB(@RequestBody Long userSeq){
-        return ResponseEntity.ok(userService.getUserFromDB(userSeq));
+    @PostMapping("/communication/userById")
+    public ResponseEntity<User> getUserById(@RequestBody UserIdDto userIdDto){
+        return ResponseEntity.ok(userService.getUserById(userIdDto.getId()));
     }
 
 

@@ -8,15 +8,16 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class CallServer {
-    // NOTE : POST호출 + Param 추가
-
+    // NOTE : requestBody로 데이터 보낼 때
     public ResponseEntity<String> postHttpBodyAndSend(String url, HashMap<String, Object> bodyData){
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json;charset=utf-8");
@@ -24,32 +25,12 @@ public class CallServer {
         HttpEntity<HashMap<String, Object>> httpEntity = new HttpEntity<>(bodyData, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        log.info("--test1--");
         ResponseEntity<String> response = restTemplate.exchange(
                 url,
                 HttpMethod.POST,
                 httpEntity,
                 String.class
         );
-        log.info("--test2--");
-        return response;
-    }
-
-    public ResponseEntity<String> getHttpBodyAndSend(String url, HashMap<String, Object> bodyData){
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json;charset=utf-8");
-
-        HttpEntity<HashMap<String, Object>> httpEntity = new HttpEntity<>(bodyData, headers);
-        RestTemplate restTemplate = new RestTemplate();
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                httpEntity,
-                String.class
-        );
-
-        log.info("--test2--");
         return response;
     }
 }

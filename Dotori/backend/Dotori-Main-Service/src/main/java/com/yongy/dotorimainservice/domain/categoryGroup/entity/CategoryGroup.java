@@ -2,7 +2,6 @@ package com.yongy.dotorimainservice.domain.categoryGroup.entity;
 
 
 import com.yongy.dotorimainservice.domain.planDetail.entity.PlanDetail;
-import com.yongy.dotorimainservice.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,9 +19,7 @@ public class CategoryGroup {
     @Column(name = "category_group_seq")
     private Long categoryGroupSeq;
 
-    @ManyToOne
-    @JoinColumn(name = "userSeq")
-    private User user;
+    private Long userSeq;
 
     @Column(name = "group_title", nullable = false)
     private String groupTitle;
@@ -32,9 +29,9 @@ public class CategoryGroup {
 
 
     @Builder
-    public CategoryGroup(Long categoryGroupSeq, User user, String groupTitle) {
+    public CategoryGroup(Long categoryGroupSeq, Long userSeq, String groupTitle) {
         this.categoryGroupSeq = categoryGroupSeq;
-        this.user = user;
+        this.userSeq = userSeq;
         this.groupTitle = groupTitle;
     }
 }

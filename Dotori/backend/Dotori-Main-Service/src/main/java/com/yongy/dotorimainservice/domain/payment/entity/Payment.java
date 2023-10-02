@@ -1,7 +1,5 @@
 package com.yongy.dotorimainservice.domain.payment.entity;
 
-import com.yongy.dotorimainservice.domain.planDetail.entity.PlanDetail;
-import com.yongy.dotorimainservice.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +21,6 @@ public class Payment {
     @Column(name = "payment_seq")
     private Long paymentSeq;
 
-    @Column(name="user_seq")
     private Long userSeq;
 
     @Column(name="planDetail_seq")

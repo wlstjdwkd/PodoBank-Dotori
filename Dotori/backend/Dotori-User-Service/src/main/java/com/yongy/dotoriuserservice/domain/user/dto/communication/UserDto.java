@@ -1,18 +1,17 @@
-package com.yongy.dotorimainservice.domain.user.entity;
+package com.yongy.dotoriuserservice.domain.user.dto.communication;
 
-import com.yongy.dotorimainservice.domain.user.entity.Provider;
-import com.yongy.dotorimainservice.domain.user.entity.Role;
+import com.yongy.dotoriuserservice.domain.user.entity.Provider;
+import com.yongy.dotoriuserservice.domain.user.entity.Role;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
-@ToString
 @NoArgsConstructor
-public class User {
+public class UserDto {
 
     private Long userSeq;
 
@@ -30,8 +29,10 @@ public class User {
 
     private Provider authProvider;
 
+    private LocalDateTime expiredAt;
+
     @Builder
-    public User(Long userSeq, Role role, String id, String password, LocalDate birthDate, String userName, String phoneNumber, Provider authProvider) {
+    public UserDto(Long userSeq, Role role, String id, String password, LocalDate birthDate, String userName, String phoneNumber, Provider authProvider, LocalDateTime expiredAt) {
         this.userSeq = userSeq;
         this.role = role;
         this.id = id;
@@ -40,7 +41,6 @@ public class User {
         this.userName = userName;
         this.phoneNumber = phoneNumber;
         this.authProvider = authProvider;
+        this.expiredAt = expiredAt;
     }
-
-
 }

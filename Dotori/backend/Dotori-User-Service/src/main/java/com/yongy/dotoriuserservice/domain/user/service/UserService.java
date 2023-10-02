@@ -9,5 +9,7 @@ public interface UserService {
 
     public void removeRetireUser(User user);
 
-    public User getUserFromDB(Long userSeq);
+    public User getUserByUserSeq(Long userSeq);
+
+    public User getUserById(String id);
 }

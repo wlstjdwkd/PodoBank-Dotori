@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface CategoryGroupRepository extends JpaRepository<CategoryGroup, Long> {
     CategoryGroup findByCategoryGroupSeq(Long categoryGroupSeq);
-    List<CategoryGroup> findAllByUserUserSeq(Long userSeq);
+    List<CategoryGroup> findAllByUserSeq(Long userSeq);
 }

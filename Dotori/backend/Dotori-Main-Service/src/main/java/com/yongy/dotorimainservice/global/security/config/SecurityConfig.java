@@ -1,6 +1,7 @@
 package com.yongy.dotorimainservice.global.security.config;
 
 
+import com.yongy.dotorimainservice.domain.user.CallUser;
 import com.yongy.dotorimainservice.global.security.filter.AuthFilter;
 import com.yongy.dotorimainservice.global.security.provider.AuthProvider;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,8 @@ public class SecurityConfig{
 
     private final AuthProvider authProvider;
 
+    private final CallUser callUser;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -31,7 +34,7 @@ public class SecurityConfig{
                 .authorizeHttpRequests()
                 .anyRequest().permitAll()
                 .and()
-                .addFilterBefore(new AuthFilter(authProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new AuthFilter(authProvider, callUser), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .logout().disable();

@@ -87,7 +87,7 @@ public class PlanServiceImpl implements PlanService {
         for (CategoryGroupListDTO group : groupList) {
             // 카테고리 그룹 만들기
             CategoryGroup categoryGroup = categoryGroupRepository.save(CategoryGroup.builder()
-                    .user(loginUser)
+                    .userSeq(loginUser.getUserSeq())
                     .groupTitle(group.getCategoryGroupName()).build());
 
             // 카테고리 만들기 +  Plan에 딸린 실행중인 카테고리인 PlanDetail 생성
@@ -96,7 +96,7 @@ public class PlanServiceImpl implements PlanService {
             List<PlanDetail> planDetailList = new ArrayList<>();
             for (ActiveCategoryDTO data : categorise) {
                 Category category = categoryRepository.save(Category.builder()
-                        .user(loginUser)
+                        .userSeq(loginUser.getUserSeq())
                         .categoryTitle(data.getCategoryName())
                         .build());
 

@@ -3,7 +3,6 @@ package com.yongy.dotorimainservice.domain.category.entity;
 
 import com.yongy.dotorimainservice.domain.categoryData.entity.CategoryData;
 import com.yongy.dotorimainservice.domain.planDetail.entity.PlanDetail;
-import com.yongy.dotorimainservice.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,9 +20,7 @@ public class Category {
     @Column(name = "category_seq")
     private Long categorySeq;
 
-    @ManyToOne
-    @JoinColumn(name = "userSeq")
-    private User user;
+    private Long userSeq;
 
     @Column(name = "category_title", nullable = false)
     private String categoryTitle;
@@ -35,9 +32,9 @@ public class Category {
     private List<CategoryData> categoryDataList;
 
     @Builder
-    public Category(Long categorySeq, User user, String categoryTitle) {
+    public Category(Long categorySeq, Long userSeq, String categoryTitle) {
         this.categorySeq = categorySeq;
-        this.user = user;
+        this.userSeq = userSeq;
         this.categoryTitle = categoryTitle;
     }
 

@@ -4,7 +4,6 @@ import com.yongy.dotorimainservice.domain.category.dto.CategoryDetailDTO;
 import com.yongy.dotorimainservice.domain.category.entity.Category;
 import com.yongy.dotorimainservice.domain.category.repository.CategoryRepository;
 import com.yongy.dotorimainservice.domain.user.entity.User;
-import com.yongy.dotorimainservice.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -17,13 +16,13 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService{
 
     private final CategoryRepository categoryRepository;
-    private final UserRepository userRepository;
 
     @Override
     public List<CategoryDetailDTO> findAllCategory(){
         // 카테고리 리스트 반환
         User loginUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Category> categories = categoryRepository.findAllByUserUserSeq(loginUser.getUserSeq());
+
+        List<Category> categories = categoryRepository.findAllByUserSeq(loginUser.getUserSeq());
         List<CategoryDetailDTO> result = new ArrayList<>();
         for(Category c : categories){
             result.add(CategoryDetailDTO.builder()

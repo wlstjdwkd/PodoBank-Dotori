@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    List<Category> findAllByUserUserSeq(Long userSeq);
+    List<Category> findAllByUserSeq(Long userSeq);
     Category findByCategorySeq(Long categorySeq);
 }
