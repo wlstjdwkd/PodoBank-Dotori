@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,7 +34,7 @@ public class PlanDetailController {
             @ApiResponse(responseCode = "200", description = "명세서 상세 조회 성공")
     })
     @GetMapping("/specification")
-    public ResponseEntity<SpecificationDTO> getPlanDetail(PlanSeqDTO planSeq){
+    public ResponseEntity<SpecificationDTO> getPlanDetail(@RequestBody PlanSeqDTO planSeq){
         SpecificationDTO specificationDTO = planDetailService.getPlanDetail(planSeq.getPlanSeq());
         return ResponseEntity.ok().body(specificationDTO);
     }
