@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity,Modal, Alert } from "re
 import FooterScreen from "../Components/FooterScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { userWithdrawDotori } from "../../apis/userapi"
+import { purposeQuit } from "../../apis/purposeapi"
 import {inputgrantType, inputAccessToken, inputRefreshToken} from "../../redux/slices/auth/user"
 
 export default function WithDraw1Screen({ navigation, route }) {
@@ -12,56 +13,37 @@ export default function WithDraw1Screen({ navigation, route }) {
   const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
-  const [userInfo, setUserInfo] = useState(route.params.userInfo)
-  const [userWithdrawModalVisible, setUserWithdrawModalVisible] = useState(false);
+  // const [userInfo, setUserInfo] = useState(route.params.userInfo)
+  const [purposeQuitModalVisible, setPurposeQuitModalVisible] = useState(false);
+  const [purposeSeq] = useState(route.params.purposeSeq)
+  const [purposeDetailData] = useState(route.params.purposeDetailData)
 
-  const handleUserWithdrawDotori = () => {
-    setUserWithdrawModalVisible(true)
+  const handlePurposeQuit = () => {
+    setPurposeQuitModalVisible(true)
   }
 
-  const doUserWithdrawDotori = async () => {
+
+  const doPurposeQuit = async () => {
     try{
-      const response = await userWithdrawDotori(refreshToken, accessToken, grantType)
+      const response = await purposeQuit(purposeSeq, accessToken, grantType)
       if(response.status === 200){
-        console.log('회원탈퇴 성공')
-        dispatch(inputgrantType(null))
-        dispatch(inputAccessToken(null))
-        dispatch(inputRefreshToken(null))
-        Alert.alert('', `${userInfo.userName}님 탈퇴가 완료되었습니다.`, [
-          {
-            text: '확인',
-            onPress: () => {
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'LoginScreen' }],
-              });
-            },
-          },
-        ]);
+        console.log('목표 중단 완료')
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'PurposeScreen' }],
+        });
       }else{
-        console.log("오류 발생: 회원탈퇴 실패", response.status)
+        console.log('목표 중단 실패', response.status)
       }
+      // console.log("테스트")
     }catch(error){
-      console.log("오류 발생: 회원탈퇴 실패", error)
+      console.log('오류 발생: 목표 중단 실패', error)
     }
   }
 
-  // const doUserWithdrawDotori = async () => {
-  //   Alert.alert('', `${userInfo.userName}님 탈퇴가 완료되었습니다.`, [
-  //     {
-  //       text: '확인',
-  //       onPress: () => {
-  //         navigation.reset({
-  //           index: 0,
-  //           routes: [{ name: 'MainPageScreen' }],
-  //         });
-  //       },
-  //     },
-  //   ]);
-  // }
 
-  const cancelUserWithdrawDotori = () => {
-    navigation.navigate("MyPageScreen")
+  const cancelPurposeQuitDotori = () => {
+    navigation.navigate("PurposeScreen")
   }
 
   useEffect(() => {
@@ -80,28 +62,28 @@ export default function WithDraw1Screen({ navigation, route }) {
           style={styles.leftImage}
           source={require("../../assets/images/logo_podo.png")}
         /> */}
-        <Text style={styles.text}>{userInfo.userName}님 가실거에요?</Text>
+        <Text style={styles.text}>목표가 필요 없어진 거예요?</Text>
       </View>
 
-      <Text style={styles.text}>{userInfo.userName}님</Text>
-      <Text style={styles.text}>정말로</Text>
+      {/* <Text style={styles.text}>{userInfo.userName}님</Text> */}
+      <Text style={styles.text}>정말로{"\n"}목표 : "{purposeDetailData.purposeTitle}" 를</Text>
       <Text style={{ fontSize: 18 }}>
-        <Text style={{ color: "#FF965C" }}>탈퇴</Text>하실건가요?
+        <Text style={{ color: "#FF965C" }}>중단</Text>할까요?
       </Text>
       {/* 위치 맞추기 위한 View */}
       <View style={{margin:25}}></View>
 
-      <TouchableOpacity style={styles.button1}
+      <TouchableOpacity style={[styles.button1, {backgroundColor:'lightgray'}]}
         onPress={() =>{
-          handleUserWithdrawDotori()
+          handlePurposeQuit()
         }}
       >
-        <Text style={styles.buttonText}>네, 탈퇴할 거에요.</Text>
+        <Text style={styles.buttonText}>그래, 진행시켜!</Text>
       </TouchableOpacity>
       <View style={{margin: 10}}></View>
       <TouchableOpacity style={styles.button2}
         onPress={() =>{
-          cancelUserWithdrawDotori()
+          cancelPurposeQuitDotori()
         }}
       >
         <Text style={styles.buttonText}>아니요, 잘못 눌렀어요.</Text>
@@ -112,28 +94,28 @@ export default function WithDraw1Screen({ navigation, route }) {
         <Modal
           animationType="none"
           transparent={true}
-          visible={userWithdrawModalVisible}
+          visible={purposeQuitModalVisible}
           onRequestClose={() => {
             // Alert.alert('Modal has been closed.');
-            setUserWithdrawModalVisible(false);
+            setPurposeQuitModalVisible(false);
           }}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <Text style={styles.modalText}>마지막 확인입니다.{"\n"}회원탈퇴를 진행 하시겠습니까?</Text>
+              <Text style={styles.modalText}>마지막 확인입니다.{"\n"}묙표를 중단 하시겠습니까?</Text>
               <View style={{flexDirection:'row', justifyContent:'space-around'}}>
                 <TouchableOpacity
                   style={[styles.button, styles.buttonClose]}
                   onPress={() => {
-                    setUserWithdrawModalVisible(false)
-                    doUserWithdrawDotori()
+                    setPurposeQuitModalVisible(false)
+                    doPurposeQuit()
                   }}>
                   <Text style={styles.textStyle}>예</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.button, styles.buttonClose]}
                   onPress={() => {
-                    setUserWithdrawModalVisible(false)
-                    cancelUserWithdrawDotori()
+                    setPurposeQuitModalVisible(false)
+                    cancelPurposeQuitDotori()
                   }}>
                   <Text style={styles.textStyle}>아니오</Text>
                 </TouchableOpacity>
@@ -182,6 +164,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   text: {
+    textAlign:'center',
     fontSize: 18,
     color: "#000000",
   },

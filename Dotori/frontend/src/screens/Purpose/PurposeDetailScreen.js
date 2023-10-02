@@ -5,6 +5,37 @@ import Feather from "react-native-vector-icons/Feather"; // Feather 아이콘을
 import { useDispatch, useSelector } from "react-redux";
 import { purposeDetail } from "../../apis/purposeapi"
 
+const tmpData = {"currentBalance": 230, "endAt": "2024-05-28", "goalAmount": 512000, "purposeDataList": [{"dataAmount": 1, "dataCreatedAt": "2023-09-27 23:02:51", "dataCurrentBalance": 1, "dataName": "진성갓2계좌"},
+{"dataAmount": 2, "dataCreatedAt": "2023-09-27 23:03:00", "dataCurrentBalance": 2, "dataName": "진성갓2계좌"},
+{"dataAmount": 3, "dataCreatedAt": "2023-09-30 23:03:09", "dataCurrentBalance": 3, "dataName": "진성갓2계좌"},
+{"dataAmount": 4, "dataCreatedAt": "2023-10-01 23:03:18", "dataCurrentBalance": 4, "dataName": "진성갓2계좌"},
+{"dataAmount": 5, "dataCreatedAt": "2023-10-25 23:03:27", "dataCurrentBalance": 5, "dataName": "진성갓2계좌"},
+{"dataAmount": 6, "dataCreatedAt": "2023-10-28 23:03:36", "dataCurrentBalance": 6, "dataName": "진성갓2계좌"},
+{"dataAmount": 7, "dataCreatedAt": "2023-11-05 23:03:45", "dataCurrentBalance": 7, "dataName": "진성갓2계좌"},
+{"dataAmount": 8, "dataCreatedAt": "2023-11-09 23:03:54", "dataCurrentBalance": 8, "dataName": "진성갓2계좌"},
+{"dataAmount": 9, "dataCreatedAt": "2023-11-24 23:04:03", "dataCurrentBalance": 9, "dataName": "진성갓2계좌"},
+{"dataAmount": 10, "dataCreatedAt": "2023-12-01 23:04:12", "dataCurrentBalance": 10, "dataName": "진성갓2계좌"},
+{"dataAmount": 11, "dataCreatedAt": "2023-12-02 23:04:21", "dataCurrentBalance": 11, "dataName": "진성갓2계좌"},
+{"dataAmount": 12, "dataCreatedAt": "2023-12-05 23:04:30", "dataCurrentBalance": 12, "dataName": "진성갓2계좌"},
+{"dataAmount": 13, "dataCreatedAt": "2023-12-07 23:04:39", "dataCurrentBalance": 13, "dataName": "진성갓2계좌"},
+{"dataAmount": 14, "dataCreatedAt": "2023-12-14 23:04:48", "dataCurrentBalance": 14, "dataName": "진성갓2계좌"},
+{"dataAmount": 15, "dataCreatedAt": "2023-12-14 23:04:57", "dataCurrentBalance": 15, "dataName": "진성갓2계좌"},
+{"dataAmount": 16, "dataCreatedAt": "2023-12-14 23:05:06", "dataCurrentBalance": 16, "dataName": "진성갓2계좌"},
+{"dataAmount": 17, "dataCreatedAt": "2023-12-14 23:05:15", "dataCurrentBalance": 17, "dataName": "진성갓2계좌"},
+{"dataAmount": 18, "dataCreatedAt": "2023-12-14 23:05:24", "dataCurrentBalance": 18, "dataName": "진성갓2계좌"},
+{"dataAmount": 19, "dataCreatedAt": "2023-12-14 23:05:33", "dataCurrentBalance": 19, "dataName": "진성갓2계좌"},
+{"dataAmount": 20, "dataCreatedAt": "2023-12-14 23:05:42", "dataCurrentBalance": 20, "dataName": "진성갓2계좌"},
+{"dataAmount": 21, "dataCreatedAt": "2024-01-14 23:05:42", "dataCurrentBalance": 21, "dataName": "진성갓2계좌"},
+{"dataAmount": 22, "dataCreatedAt": "2024-02-14 23:05:42", "dataCurrentBalance": 22, "dataName": "진성갓2계좌"},
+{"dataAmount": 23, "dataCreatedAt": "2024-03-14 23:05:42", "dataCurrentBalance": 23, "dataName": "진성갓2계좌"},
+{"dataAmount": 24, "dataCreatedAt": "2024-04-14 23:05:42", "dataCurrentBalance": 24, "dataName": "진성갓2계좌"},
+{"dataAmount": 25, "dataCreatedAt": "2024-05-14 23:05:42", "dataCurrentBalance": 50, "dataName": "진성갓2계좌"},
+{"dataAmount": 26, "dataCreatedAt": "2024-06-14 23:05:42", "dataCurrentBalance": 21, "dataName": "진성갓2계좌"},
+{"dataAmount": 27, "dataCreatedAt": "2024-07-14 23:05:42", "dataCurrentBalance": 18, "dataName": "진성갓2계좌"},
+], "purposeTitle": "노트북구매할거야", "startedAt": "2023-09-27"}
+
+
+
 
 export default function PurposeDetailScreen({ navigation, route }) {
   // 토큰
@@ -152,7 +183,11 @@ export default function PurposeDetailScreen({ navigation, route }) {
         <View style={styles.purposeStopContainer}>
           <TouchableOpacity
             style={styles.stopPurposeButton}
-            onPress={() => navigation.navigate("PurposeStopScreen", {purposeSeq:purposeSeq, purposeDetailData:purposeDetailData})}
+            onPress={() => {
+              // navigation.navigate("PurposeStopScreen", {purposeSeq:purposeSeq, purposeDetailData:purposeDetailData})
+              navigation.navigate("PurposeStopScreen", {purposeSeq:purposeSeq, purposeDetailData:tmpData})
+            }}
+            
           >
             <Text style={styles.stopPurposeText}>그래프로 보기</Text>
           </TouchableOpacity>
