@@ -11,6 +11,7 @@ import FooterScreen from "../Components/FooterScreen"
 import { useDispatch, useSelector } from "react-redux"
 import { purposeGetList } from "../../apis/purposeapi"
 import { useIsFocused } from "@react-navigation/native"
+
 export default function PurposeScreen({ navigation }) {
   // 토큰
   const grantType =  useSelector((state)=>state.user.grantType)
