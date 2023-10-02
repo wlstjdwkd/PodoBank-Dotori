@@ -157,6 +157,9 @@ public class PlanServiceImpl implements PlanService {
             throw new IllegalArgumentException("실행 중인 계획이 아닙니다.");
         }
 
+        // 출금이 완료되면 금액 정보 갱신
+        callBankAPI(account, savingDTO);
+
         for(PlanDetail planDetail : planDetailList){ // 전체 planDetail 저축액 구하기
             totalSaving = totalSaving.add(planDetail.getDetailBalance());
         }
@@ -175,9 +178,6 @@ public class PlanServiceImpl implements PlanService {
 
         // 2. 계획 종료 표시하기
         planRepository.save(plan.updateState(State.SAVED));
-
-        // NOTE : 모든 확인이 되면 은행에 출금 요청 보내기
-        callBankAPI(account, savingDTO);
     }
 
     public void callBankAPI(Account account, SavingDTO savingDTO){
