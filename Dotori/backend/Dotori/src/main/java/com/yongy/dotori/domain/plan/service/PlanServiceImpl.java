@@ -278,6 +278,7 @@ public class PlanServiceImpl implements PlanService {
         List<PlanListDto> planListDtoList = null;
         for(Plan plan : planList){
             planListDtoList.add(PlanListDto.builder().planSeq(plan.getPlanSeq())
+                    .accountTitle(accountRepository.findByUserUserSeqAndDeleteAtIsNull(userSeq).getAccountTitle())
                     .startAt(plan.getStartAt().format(formatter))
                     .endAt(plan.getEndAt().format(formatter)).build());
         }
