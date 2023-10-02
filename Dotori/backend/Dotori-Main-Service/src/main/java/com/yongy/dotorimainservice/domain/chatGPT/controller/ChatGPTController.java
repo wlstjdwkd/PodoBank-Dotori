@@ -39,7 +39,6 @@ public class ChatGPTController {
     })
     @PatchMapping("/unclassified")
     public ResponseEntity<Void> unclassifiedChatGPT() throws IOException, ParseException {
-        log.info("들어오니?");
         chatGPTService.getPayments();
         return ResponseEntity.ok().build();
     }
