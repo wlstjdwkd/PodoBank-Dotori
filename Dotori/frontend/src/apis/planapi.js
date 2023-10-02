@@ -2,7 +2,7 @@
 
 import axios from "axios";
 // apiAddress는 수정 필요
-const apiAddress = "http://j9d107.p.ssafy.io:9100";
+const apiAddress = "http://j9d107.p.ssafy.io:9200";
 
 // PLAN
 // 계획 종료 후 저축하기
@@ -24,7 +24,7 @@ const apiAddress = "http://j9d107.p.ssafy.io:9100";
 export const planSaving = async (savingData, accessToken, grantType) => {
   try {
     const response = await axios.post(
-      apiAddress + `/v1/plan/saving`,
+      apiAddress + `/api/v1/plan/saving`,
       savingData,
       {
         headers: {
@@ -49,7 +49,7 @@ export const planSaving = async (savingData, accessToken, grantType) => {
 export const planStop = async (planSeq, accessToken, grantType) => {
   try {
     const response = await axios.patch(
-      apiAddress + `/v1/plan/stop/${planSeq}`,
+      apiAddress + `/api/v1/plan/stop/${planSeq}`,
       null,
       {
         headers: {
@@ -99,7 +99,7 @@ export const planNewRegister = async (
     console.log("accessToken: " + accessToken + " " + grantType);
     console.log("newRegisterData: " + newRegisterData);
     const response = await axios.post(
-      apiAddress + `/v1/plan`,
+      apiAddress + `/api/v1/plan`,
       newRegisterData,
       {
         headers: {
@@ -144,7 +144,7 @@ export const planClassifyChatGpt = async (
 ) => {
   try {
     const response = await axios.post(
-      apiAddress + `/v1/chatgpt`,
+      apiAddress + `/api/v1/chatgpt`,
       classifyChatGptData,
       {
         headers: {
@@ -171,7 +171,7 @@ export const planClassifyChatGpt = async (
 // 계획 전체 카테고리 그룹 가져오기
 export const planCategoryGroupList = async (accessToken, grantType) => {
   try {
-    const response = await axios.get(apiAddress + `/v1/categoryGroup`, null, {
+    const response = await axios.get(apiAddress + `/api/v1/categoryGroup`, null, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -202,7 +202,7 @@ export const planCategoryGroupList = async (accessToken, grantType) => {
 // ]
 export const planCategoryUsingSpot = async (categorySeq, accessToken, grantType) => {
   try {
-    const response = await axios.get(apiAddress+`/v1/categoryData?categorySeq=${categorySeq}`,  {
+    const response = await axios.get(apiAddress+`/api/v1/categoryData?categorySeq=${categorySeq}`,  {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -218,7 +218,7 @@ export const planCategoryUsingSpot = async (categorySeq, accessToken, grantType)
 };
 export const planCategoryDeleteSpot = async (dataCode, accessToken, grantType) => {
   try {
-    const response = await axios.delete(apiAddress+`/v1/categoryData`, {dataCode:dataCode}, {
+    const response = await axios.delete(apiAddress+`/api/v1/categoryData`, {dataCode:dataCode}, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -240,7 +240,7 @@ export const planCategoryDeleteSpot = async (dataCode, accessToken, grantType) =
 // 계획 전체 카테고리 목록 가져오기
 export const planCategoryList = async (accessToken, grantType) => {
   try {
-    const response = await axios.get(apiAddress+`/v1/category`, {
+    const response = await axios.get(apiAddress+`/api/v1/category`, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -287,7 +287,7 @@ export const planInProgress = async (
     console.log(inProgressData);
     console.log(accessToken + " " + grantType);
     const response = await axios.get(
-      apiAddress + `/v1/plan/${inProgressData}`,
+      apiAddress + `/api/v1/plan/${inProgressData}`,
       // newRegisterData,
       {
         headers: {
@@ -319,7 +319,7 @@ export const unclassifiedList = async (
     console.log(inProgressData);
     console.log(accessToken + " " + grantType);
     const response = await axios.get(
-      apiAddress + `/v1/payment/${inProgressData}`,
+      apiAddress + `/api/v1/payment/${inProgressData}`,
       {
         headers: {
           Authorization: `${grantType} ${accessToken}`,
@@ -351,7 +351,7 @@ export const unClassifiedUpdate = async (
     console.log(inProgressData);
     console.log(accessToken + " " + grantType);
     const response = await axios.patch(
-      apiAddress + `/v1/payment/${planSeq}`,
+      apiAddress + `/api/v1/payment/${planSeq}`,
       inProgressData,
       {
         headers: {

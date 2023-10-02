@@ -29,17 +29,18 @@ import OneCent2Screen from "../screens/OneCent/OneCent2Screen";
 import OneCent3Screen from "../screens/OneCent/OneCent3Screen";
 import OneCent4Screen from "../screens/OneCent/OneCent4Screen";
 import OneCent5Screen from "../screens/OneCent/OneCent5Screen";
+import RewardScreen from "../screens/Reward/RewardScreen";
 
-import MyPageScreen from "../screens/MyPage/MyPageScreen"
-import PasswordChangeScreen from "../screens/MyPage/PasswordChangeScreen"
-import EditPhoneNumberScreen from "../screens/MyPage/EditPhoneNumberScreen"
-import EditBirthDateScreen from "../screens/MyPage/EditBirthDateScreen"
-import CategoryScreen from "../screens/MyPage/CategoryScreen"
+import MyPageScreen from "../screens/MyPage/MyPageScreen";
+import PasswordChangeScreen from "../screens/MyPage/PasswordChangeScreen";
+import EditPhoneNumberScreen from "../screens/MyPage/EditPhoneNumberScreen";
+import EditBirthDateScreen from "../screens/MyPage/EditBirthDateScreen";
+import CategoryScreen from "../screens/MyPage/CategoryScreen";
 import CategorySettingScreen from "../screens/MyPage/CategorySettingScreen";
 import ReceipeSelectScreen from "../screens/MyPage/ReceipeSelectScreen";
 import ReceipeScreen from "../screens/MyPage/ReceipeScreen";
 
-import WithDraw1Screen from "../screens/WithdrawDotoriScreen/WithDraw1Screen"
+import WithDraw1Screen from "../screens/WithdrawDotoriScreen/WithDraw1Screen";
 
 const Stack = createStackNavigator();
 
@@ -158,41 +159,39 @@ export default function AppNavigator() {
         name="OneCent5Screen"
         component={OneCent5Screen}
       ></Stack.Screen>
+      <Stack.Screen name="RewardScreen" component={RewardScreen}></Stack.Screen>
+      <Stack.Screen name="MyPageScreen" component={MyPageScreen}></Stack.Screen>
       <Stack.Screen
-      name="MyPageScreen"
-      component={MyPageScreen}
+        name="PasswordChangeScreen"
+        component={PasswordChangeScreen}
       ></Stack.Screen>
       <Stack.Screen
-      name="PasswordChangeScreen"
-      component={PasswordChangeScreen}
+        name="EditPhoneNumberScreen"
+        component={EditPhoneNumberScreen}
       ></Stack.Screen>
       <Stack.Screen
-      name="EditPhoneNumberScreen"
-      component={EditPhoneNumberScreen}
+        name="EditBirthDateScreen"
+        component={EditBirthDateScreen}
       ></Stack.Screen>
       <Stack.Screen
-      name="EditBirthDateScreen"
-      component={EditBirthDateScreen}
+        name="CategoryScreen"
+        component={CategoryScreen}
       ></Stack.Screen>
       <Stack.Screen
-      name="CategoryScreen"
-      component={CategoryScreen}
+        name="CategorySettingScreen"
+        component={CategorySettingScreen}
       ></Stack.Screen>
       <Stack.Screen
-      name="CategorySettingScreen"
-      component={CategorySettingScreen}
+        name="ReceipeSelectScreen"
+        component={ReceipeSelectScreen}
       ></Stack.Screen>
       <Stack.Screen
-      name="ReceipeSelectScreen"
-      component={ReceipeSelectScreen}
+        name="ReceipeScreen"
+        component={ReceipeScreen}
       ></Stack.Screen>
       <Stack.Screen
-      name="ReceipeScreen"
-      component={ReceipeScreen}
-      ></Stack.Screen>
-      <Stack.Screen
-      name="WithDraw1Screen"
-      component={WithDraw1Screen}
+        name="WithDraw1Screen"
+        component={WithDraw1Screen}
       ></Stack.Screen>
     </Stack.Navigator>
   );
