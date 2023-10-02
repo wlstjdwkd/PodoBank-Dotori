@@ -25,10 +25,12 @@ public class User {
 
     private String phoneNumber;
 
+    private String securityNumber;
+
     private Provider authProvider;
 
     @Builder
-    public User(Long userSeq,Role role, String id, String password, LocalDate birthDate, String userName, String phoneNumber, Provider authProvider) {
+    public User(Long userSeq,Role role, String id, String password, LocalDate birthDate, String userName, String phoneNumber, String securityNumber, Provider authProvider) {
         this.userSeq = userSeq;
         this.role = role;
         this.id = id;
@@ -36,6 +38,7 @@ public class User {
         this.birthDate = birthDate;
         this.userName = userName;
         this.phoneNumber = phoneNumber;
+        this.securityNumber = securityNumber;
         this.authProvider = authProvider;
     }
 }
