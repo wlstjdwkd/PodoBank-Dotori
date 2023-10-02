@@ -121,4 +121,12 @@ public class OpenBankingController {
         List<TransactionHistoryDTO> transactionHistoryDTOList = openBankingService.getUserAccountTransactionHistory(fintechUserHistoryDTO);
         return ResponseEntity.ok(transactionHistoryDTOList);
     }
+
+    @Operation(summary = "사용자 계좌 해지", description = "MANAGER")
+    @ApiResponses()
+    @PostMapping("/delete")
+    public ResponseEntity<Void> deleteFintechCode(@RequestBody FintechUserDTO fintechUserDTO) {
+        openBankingService.deleteFintechCode(fintechUserDTO);
+        return ResponseEntity.ok().build();
+    }
 }
