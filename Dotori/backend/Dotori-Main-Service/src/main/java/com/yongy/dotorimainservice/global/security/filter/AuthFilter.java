@@ -34,17 +34,20 @@ public class AuthFilter extends GenericFilterBean {
 
         String id = httpServletRequest.getHeader("id");
 
-        Authentication authentication = null;
-        User user = null;
-        try {
-            user = callUser.getUserDtoById(id);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
 
-        if(user != null){
-            authentication = authProvider.getAuthentication(user);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        if(id != null){
+            Authentication authentication = null;
+            User user = null;
+            try {
+                user = callUser.getUserDtoById(id);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+
+            if(user != null){
+                authentication = authProvider.getAuthentication(user);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
 
         chain.doFilter(request, response);

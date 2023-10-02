@@ -39,14 +39,14 @@ public class Purpose {
     private LocalDate endAt;
 
     @Column(name="terminate_at")
-    private LocalDateTime terminatedAt;
+    private LocalDateTime terminateAt;
 
     public void update(Purpose purpose){
         if(purpose.endAt != null){
             this.endAt = purpose.endAt;
         }
-        if(purpose.terminatedAt != null){
-            this.terminatedAt = purpose.terminatedAt;
+        if(purpose.terminateAt != null){
+            this.terminateAt = purpose.terminateAt;
         }
         if(purpose.currentBalance != null){
             this.currentBalance = purpose.currentBalance;
