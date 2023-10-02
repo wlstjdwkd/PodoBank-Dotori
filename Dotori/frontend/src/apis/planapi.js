@@ -147,6 +147,13 @@ export const planCategoryGroupList = async (accessToken, grantType) => {
 
 // categorydata
 // 계획 카테고리 사용처 목록 가져오기
+// [
+//   {
+//     "dataCode": "string",
+//     "dataName": "string",
+//     "count": 0
+//   }
+// ]
 export const planCategoryUsingSpot = async (categorySeq, accessToken, grantType) => {
   try {
     const response = await axios.get(apiAddress+`/v1/categoryData?categorySeq=${categorySeq}`,  {
@@ -163,6 +170,22 @@ export const planCategoryUsingSpot = async (categorySeq, accessToken, grantType)
     // throw error;
   }
 };
+export const planCategoryDeleteSpot = async (dataCode, accessToken, grantType) => {
+  try {
+    const response = await axios.delete(apiAddress+`/v1/categoryData`, {dataCode:dataCode}, {
+      headers: {
+        Authorization: `${grantType} ${accessToken}`,
+      },
+    });
+    console.log('계획 카테고리 사용처 목록 제거하기 성공:', response.data);
+    return response;
+  } catch (error) {
+    console.error('계획 카테고리 사용처 목록 제거하기 실패:', error.response.status, error.response.data);
+    const response = error.response
+    return response
+    // throw error;
+  }
+};
 
 
 
@@ -171,7 +194,7 @@ export const planCategoryUsingSpot = async (categorySeq, accessToken, grantType)
 // 계획 전체 카테고리 목록 가져오기
 export const planCategoryList = async (accessToken, grantType) => {
   try {
-    const response = await axios.get(apiAddress+`/v1/category`, null, {
+    const response = await axios.get(apiAddress+`/v1/category`, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },

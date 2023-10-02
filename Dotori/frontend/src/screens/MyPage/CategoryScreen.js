@@ -56,9 +56,9 @@ const randomColors = [
 
 export default function CategoryScreen({ navigation }) {
   // 토큰
-  const grantType =  useSelector((state)=>{state.user.grantType})
-  const accessToken =  useSelector((state)=>{state.user.accessToken})
-  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
 
@@ -90,6 +90,7 @@ export default function CategoryScreen({ navigation }) {
       onPress={() =>
         navigation.navigate("CategorySettingScreen", {
           categorySeq: item.categorySeq,
+          categoryTitle: item.categoryTitle,
         })
       }
     >
