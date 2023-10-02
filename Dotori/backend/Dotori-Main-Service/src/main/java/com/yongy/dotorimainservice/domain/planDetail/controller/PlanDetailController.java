@@ -3,6 +3,8 @@ package com.yongy.dotorimainservice.domain.planDetail.controller;
 
 import com.yongy.dotorimainservice.domain.plan.service.PlanService;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanDetailListResDto;
+import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanSeqDTO;
+import com.yongy.dotorimainservice.domain.planDetail.dto.response.SpecificationDTO;
 import com.yongy.dotorimainservice.domain.planDetail.service.PlanDetailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,17 +28,13 @@ public class PlanDetailController {
     @Autowired
     private PlanDetailService planDetailService;
 
-    @Autowired
-    private PlanService planService;
-
     @Operation(summary = "명세서 상세 조회")
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "명세서 상세 조회 성공")
     })
     @GetMapping("/specification")
-    public ResponseEntity<List<PlanDetailListResDto>> getPlanDetail(Long planSeq){
-        List<PlanDetailListResDto> planDetailList = planDetailService.getPlanDetail(planSeq);
-        return ResponseEntity.ok().body(planDetailList);
+    public ResponseEntity<SpecificationDTO> getPlanDetail(PlanSeqDTO planSeq){
+        SpecificationDTO specificationDTO = planDetailService.getPlanDetail(planSeq.getPlanSeq());
+        return ResponseEntity.ok().body(specificationDTO);
     }
-
 }

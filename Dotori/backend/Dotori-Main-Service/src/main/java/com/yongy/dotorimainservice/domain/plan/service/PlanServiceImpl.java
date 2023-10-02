@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -149,10 +150,19 @@ public class PlanServiceImpl implements PlanService {
 
         Plan plan = planRepository.findByPlanSeq(savingDTO.getPlanSeq());
         Account account = plan.getAccount();
+        List<PlanDetail> planDetailList = planDetailRepository.findAllByPlanPlanSeq(savingDTO.getPlanSeq());
+        BigDecimal totalSaving = new BigDecimal(BigInteger.ZERO);
 
         if(!plan.getPlanState().equals(State.ACTIVE)){
             throw new IllegalArgumentException("실행 중인 계획이 아닙니다.");
         }
+
+        for(PlanDetail planDetail : planDetailList){ // 전체 planDetail 저축액 구하기
+            totalSaving = totalSaving.add(planDetail.getDetailBalance());
+        }
+
+        // 추가 저축액 저장
+        planRepository.save(plan.updateAdditionalSaving(savingDTO.getTotalSaving().subtract(totalSaving)));
 
         HashMap<String, Object> data = new HashMap<>();
         data.put("accountSeq",plan.getAccount().getAccountSeq());

@@ -2,8 +2,10 @@ package com.yongy.dotorimainservice.domain.planDetail.service;
 
 import com.yongy.dotorimainservice.domain.category.entity.Category;
 import com.yongy.dotorimainservice.domain.category.repository.CategoryRepository;
+import com.yongy.dotorimainservice.domain.plan.repository.PlanRepository;
 import com.yongy.dotorimainservice.domain.plan.service.PlanService;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanDetailListResDto;
+import com.yongy.dotorimainservice.domain.planDetail.dto.response.SpecificationDTO;
 import com.yongy.dotorimainservice.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotorimainservice.domain.planDetail.repository.PlanDetailRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,23 +20,16 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class PlanDetailServiceImpl implements PlanDetailService{
+    private final PlanRepository planRepository;
+    private final PlanDetailRepository planDetailRepository;
+    private final CategoryRepository categoryRepository;
 
-
-    @Autowired
-    private PlanService planService;
-
-    @Autowired
-    private PlanDetailRepository planDetailRepository;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
-
-    public List<PlanDetailListResDto> getPlanDetail(Long planSeq){
+    public SpecificationDTO getPlanDetail(Long planSeq) {
         List<PlanDetail> planDetailList = planDetailRepository.findAllByPlanPlanSeq(planSeq);
 
         List<PlanDetailListResDto> resultPlanDetailList = new ArrayList<>();
 
-        for(PlanDetail planDetail : planDetailList){
+        for (PlanDetail planDetail : planDetailList) {
             Category category = categoryRepository.findByCategorySeq(planDetail.getCategory().getCategorySeq());
             resultPlanDetailList.add(PlanDetailListResDto.builder()
                     .categoryTitle(category.getCategoryTitle()) // 카테고리 이름
@@ -42,6 +37,9 @@ public class PlanDetailServiceImpl implements PlanDetailService{
                     .savings(planDetail.getDetailBalance()).build()); // 저축
         }
 
-        return resultPlanDetailList;
+        return SpecificationDTO.builder()
+                .planDetailList(resultPlanDetailList)
+                .additionalSaving(planRepository.findByPlanSeq(planSeq).getAdditionalSaving()) // 저축전이면 null
+                .build();
     }
 }
