@@ -12,4 +12,5 @@ public class WithdrawDTO {
     private String password;
     private BigDecimal amount;
     private String content;
+    private String businessCode;
 }

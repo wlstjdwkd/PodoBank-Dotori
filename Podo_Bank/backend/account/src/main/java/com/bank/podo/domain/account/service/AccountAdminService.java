@@ -38,8 +38,8 @@ public class AccountAdminService {
 
         BigDecimal transferAmount = transferDTO.getAmount();
 
-        accountService.deposit(senderAccount, transferAmount, transferDTO.getSenderContent());
-        accountService.withdraw(receiverAccount, transferAmount, transferDTO.getReceiverContent());
+        accountService.deposit(senderAccount, transferAmount, transferDTO.getSenderContent(), null);
+        accountService.withdraw(receiverAccount, transferAmount, transferDTO.getReceiverContent(), null);
 
         logTransfer(senderAccount, receiverAccount, transferAmount);
     }
@@ -79,6 +79,7 @@ public class AccountAdminService {
                 .transactionAt(transactionHistory.getCreatedAt())
                 .amount(transactionHistory.getAmount())
                 .balanceAfter(transactionHistory.getBalanceAfter())
+                .businessCode(transactionHistory.getBusinessCode())
                 .content(transactionHistory.getContent());
 
         if (transactionHistory.getCounterAccount() != null) {

@@ -183,7 +183,7 @@ public class AccountService {
 
         BigDecimal depositAmount = depositDTO.getAmount();
 
-        deposit(account, depositAmount, depositDTO.getContent());
+        deposit(account, depositAmount, depositDTO.getContent(), depositDTO.getBusinessCode());
 
         FCMService.sendNotification(account.getUser().getEmail(), "입금", depositAmount.toString() + "원이 입금되었습니다.");
 
@@ -191,7 +191,7 @@ public class AccountService {
     }
 
     @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
-    public void deposit(Account account, BigDecimal depositAmount, String content) {
+    public void deposit(Account account, BigDecimal depositAmount, String content, String businessCode) {
         account.deposit(depositAmount);
 
         accountRepository.save(account);
@@ -202,6 +202,7 @@ public class AccountService {
                 .balanceAfter(account.getBalance())
                 .account(account)
                 .content(content)
+                .businessCode(businessCode)
                 .build();
         transactionHistoryRepository.save(depositHistory);
     }
@@ -217,7 +218,7 @@ public class AccountService {
 
         BigDecimal withdrawalAmount = withdrawDTO.getAmount();
 
-        withdraw(account, withdrawalAmount, withdrawDTO.getContent());
+        withdraw(account, withdrawalAmount, withdrawDTO.getContent(), withdrawDTO.getBusinessCode());
 
         FCMService.sendNotification(account.getUser().getEmail(), "출금", withdrawalAmount.toString() + "원이 출금되었습니다.");
 
@@ -225,7 +226,7 @@ public class AccountService {
     }
 
     @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
-    public void withdraw(Account account, BigDecimal withdrawalAmount, String content) {
+    public void withdraw(Account account, BigDecimal withdrawalAmount, String content, String businessCode) {
         if(account.getBalance().compareTo(withdrawalAmount) < 0) {
             throw new InsufficientBalanceException("잔액이 부족합니다.");
         }
@@ -240,6 +241,7 @@ public class AccountService {
                 .balanceAfter(account.getBalance())
                 .account(account)
                 .content(content)
+                .businessCode(businessCode)
                 .build();
         transactionHistoryRepository.save(withdrawalHistory);
     }
@@ -256,8 +258,8 @@ public class AccountService {
 
         BigDecimal transferAmount = transferDTO.getAmount();
 
-        deposit(receiverAccount, transferAmount, transferDTO.getReceiverContent());
-        withdraw(senderAccount, transferAmount, transferDTO.getSenderContent());
+        deposit(receiverAccount, transferAmount, transferDTO.getReceiverContent(), null);
+        withdraw(senderAccount, transferAmount, transferDTO.getSenderContent(), null);
 
         FCMService.sendNotification(receiverAccount.getUser().getEmail(), "입금", transferAmount.toString() + "원이 입금되었습니다.");
         FCMService.sendNotification(senderAccount.getUser().getEmail(), "출금", transferAmount.toString() + "원이 출금되었습니다.");
