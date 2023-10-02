@@ -4,16 +4,21 @@ import com.yongy.dotoriuserservice.domain.user.dto.communication.UserDto;
 import com.yongy.dotoriuserservice.domain.user.dto.communication.UserIdDto;
 import com.yongy.dotoriuserservice.domain.user.dto.request.UserBirthDateReqDto;
 import com.yongy.dotoriuserservice.domain.user.dto.request.UserPhoneNumberReqDto;
+import com.yongy.dotoriuserservice.domain.user.dto.request.UserRefreshTokenDto;
 import com.yongy.dotoriuserservice.domain.user.dto.request.UserUpdatePasswordReqDto;
 import com.yongy.dotoriuserservice.domain.user.dto.response.UserInfoResDto;
 import com.yongy.dotoriuserservice.domain.user.entity.Provider;
+import com.yongy.dotoriuserservice.domain.user.entity.Role;
 import com.yongy.dotoriuserservice.domain.user.entity.User;
 import com.yongy.dotoriuserservice.domain.user.exception.AccessDeniedSocialPwdException;
+import com.yongy.dotoriuserservice.domain.user.exception.ExpiredAuthCodeException;
 import com.yongy.dotoriuserservice.domain.user.exception.FailedRetiredException;
 import com.yongy.dotoriuserservice.domain.user.exception.InvalidPwdException;
 import com.yongy.dotoriuserservice.domain.user.service.UserService;
 import com.yongy.dotoriuserservice.domain.user.service.UserServiceImpl;
 import com.yongy.dotoriuserservice.global.common.CallServer;
+import com.yongy.dotoriuserservice.global.redis.dto.JwtToken;
+import com.yongy.dotoriuserservice.global.redis.entity.UserRefreshToken;
 import com.yongy.dotoriuserservice.global.security.provider.AuthProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -63,6 +68,9 @@ public class UserController {
     private final HashMap<String, Object> bodyData;
 
     private ResponseEntity<String> response;
+
+    @Autowired
+    private AuthProvider authProvider;
 
     // NOTE : 사용자 데이터 가져오기
     @ApiResponse(responseCode = "200", description = "사용자의 데이터를 가져오는데 성공함")
@@ -175,6 +183,8 @@ public class UserController {
     }
 
 
+
+    // ------------통신--------------
     @ApiResponse(responseCode = "200", description = "사용자의 데이터를 가져오는데 성공함")
     @Operation(summary = "[통신] 사용자 데이터 가져오기", description = "USER")
     @PostMapping("/communication/userById")

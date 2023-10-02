@@ -3,6 +3,7 @@ package com.yongy.dotoriuserservice.domain.user.service;
 
 import com.yongy.dotoriuserservice.domain.user.entity.User;
 import com.yongy.dotoriuserservice.domain.user.repository.UserRepository;
+import com.yongy.dotoriuserservice.global.redis.entity.UserRefreshToken;
 import com.yongy.dotoriuserservice.global.redis.repository.UserRefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,12 +41,8 @@ public class UserServiceImpl implements UserService{
         this.saveUser(user);
     }
 
-    // TODO : DB에서 사용자의 정보를 가져온다.
-    public User getUserByUserSeq(Long userSeq){
-        return userRepository.findByUserSeqAndExpiredAtIsNull(userSeq);
-    }
-
     public User getUserById(String id){
         return userRepository.findByIdAndExpiredAtIsNull(id);
     }
+
 }
