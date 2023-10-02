@@ -20,7 +20,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @AllArgsConstructor
-@RequestMapping("/v1/planDetail")
+@RequestMapping("/api/v1/planDetail")
 public class PlanDetailController {
 
     @Autowired

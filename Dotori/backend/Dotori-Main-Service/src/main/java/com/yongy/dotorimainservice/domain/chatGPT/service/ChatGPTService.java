@@ -201,6 +201,10 @@ public class ChatGPTService {
 
             for(PaymentPodoResDto payment : paymentResDto){
                 // 카테고리 데이터에 정보가 없으면 최초로 들어온 정보이므로 GPT 분류
+                if(payment.getCode() == null){
+                    continue;
+                }
+
                 CategoryData categoryData = categoryDataRepository.findByDataCode(payment.getCode());
                 log.info("사업자코드"+payment.getCode());
 
@@ -211,8 +215,7 @@ public class ChatGPTService {
                             .paymentPrice(payment.getAmount())
                             .userSeq(plan.getUserSeq())
                             .checked(false)
-                            .businessCode("dddddd")
-                            //.businessCode(payment.getCode())
+                            .businessCode(payment.getCode())
                             .paymentDate(payment.getTransactionAt())
                             .build());
                     continue;
@@ -231,8 +234,7 @@ public class ChatGPTService {
                             .userSeq(plan.getUserSeq())
                             .planDetailSeq(planDetail.getPlanDetailSeq())
                             .checked(false)
-                            .businessCode("cccccc")
-                            //.businessCode(payment.getCode())
+                            .businessCode(payment.getCode())
                             .build());
                     continue;
                 }
@@ -242,8 +244,7 @@ public class ChatGPTService {
                         .paymentPrice(payment.getAmount())
                         .userSeq(plan.getUserSeq())
                         .checked(false)
-                        //.businessCode(payment.getCode())
-                        .businessCode("wwwwww")
+                        .businessCode(payment.getCode())
                         .build());
             }
 

@@ -10,6 +10,8 @@ import com.yongy.dotorimainservice.domain.category.entity.Category;
 import com.yongy.dotorimainservice.domain.category.repository.CategoryRepository;
 import com.yongy.dotorimainservice.domain.categoryGroup.entity.CategoryGroup;
 import com.yongy.dotorimainservice.domain.categoryGroup.repository.CategoryGroupRepository;
+import com.yongy.dotorimainservice.domain.payment.entity.Payment;
+import com.yongy.dotorimainservice.domain.payment.repository.PaymentRepository;
 import com.yongy.dotorimainservice.domain.plan.dto.*;
 import com.yongy.dotorimainservice.domain.plan.dto.response.PlanListDto;
 import com.yongy.dotorimainservice.domain.plan.entity.Plan;
@@ -57,6 +59,7 @@ public class PlanServiceImpl implements PlanService {
     private final AccountService accountService;
     private final CallServer callServer;
     private final PodoBankInfo podoBankInfo;
+    private final PaymentRepository paymentRepository;
     @Value("${dotori.purpose.url}")
     private String PURPOSE_SERVICE_URL;
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -222,7 +225,7 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     public ActivePlanDTO findAllPlan(Long accountSeq) throws JsonProcessingException {
-//         실행중인 계획 리스트 조회
+         // 실행중인 계획 조회
         Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
         Plan plan = planRepository.findByAccountAccountSeq(accountSeq);
 
@@ -232,18 +235,37 @@ public class PlanServiceImpl implements PlanService {
         // 플랜이 없으면 : 플랜 만들기 페이지
 
         if((plan != null && plan.getPlanState().equals(State.ACTIVE)) || (plan != null && plan.getPlanState().equals(State.READY))){
+
+
+            // TODO : 종료 됐는지 확인하고 종료 됐으면 terminateAt 변경하고 미분류 checked true로 변경
+            if(plan.getPlanState().equals(State.ACTIVE) && checkTerminate(plan.getEndAt())){
+                planRepository.save(plan.terminate(plan.getEndAt()));
+            }
+
             // 실행 중인 카테고리 가져오기
             List<PlanDetail> planDetailList = plan.getPlanDetailList();
             List<ActivePlanDetailDTO> activePlanList = new ArrayList<>();
 
-            for(int i = 0; i < planDetailList.size(); i++){
-                PlanDetail planDetail = planDetailList.get(i);
-                activePlanList.add(ActivePlanDetailDTO.builder()
-                                .title(planDetail.getCategory().getCategoryTitle())
-                                .groupTitle(planDetail.getCategoryGroup().getGroupTitle())
-                                .goalAmount(planDetail.getDetailLimit())
-                                .currentBalance(planDetail.getDetailBalance())
-                        .build());
+            for (PlanDetail detail : planDetailList) {
+                if (plan.getTerminatedAt() != null) { // 끝난 계획의 카테고리면 미분류 확인됨으로 바꿈
+                    List<Payment> unclassified = paymentRepository.findAllByPlanDetailSeqAndChecked(detail.getPlanDetailSeq(), false);
+                    List<Payment> checked = new ArrayList<>();
+                    for (Payment p : unclassified) {
+                        checked.add(p.updateChecked());
+                    }
+                    paymentRepository.saveAll(checked);
+                }
+
+                if(plan.getTerminatedAt() == null){
+                    PlanDetail planDetail = detail;
+                    activePlanList.add(ActivePlanDetailDTO.builder()
+                            .title(planDetail.getCategory().getCategoryTitle())
+                            .groupTitle(planDetail.getCategoryGroup().getGroupTitle())
+                            .goalAmount(planDetail.getDetailLimit())
+                            .currentBalance(planDetail.getDetailBalance())
+                            .build());
+                }
+
             }
 
             ActivePlanDTO result = ActivePlanDTO.builder()
@@ -270,6 +292,13 @@ public class PlanServiceImpl implements PlanService {
             plan.setEndAt(LocalDateTime.now());
         }
         planRepository.saveAll(planList);
+    }
+
+    public boolean checkTerminate(LocalDateTime endAt){
+        if(endAt.isBefore(LocalDateTime.now())){
+            return true;
+        }
+        return false;
     }
 
     public User getLoginUser(){
