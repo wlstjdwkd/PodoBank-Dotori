@@ -4,7 +4,6 @@ import com.yongy.dotorimainservice.domain.plan.dto.ActiveCategoryDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import java.util.List;
 
 @Getter
