@@ -38,8 +38,8 @@ public class AccountAdminService {
 
         BigDecimal transferAmount = transferDTO.getAmount();
 
-        accountService.deposit(senderAccount, transferAmount, transferDTO.getSenderContent(), null);
-        accountService.withdraw(receiverAccount, transferAmount, transferDTO.getReceiverContent(), null);
+        accountService.withdraw(senderAccount, transferAmount, transferDTO.getSenderContent(), null);
+        accountService.deposit(receiverAccount, transferAmount, transferDTO.getReceiverContent(), null);
 
         logTransfer(senderAccount, receiverAccount, transferAmount);
     }
