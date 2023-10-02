@@ -19,7 +19,7 @@ import java.util.Map;
 public class CallServer {
 
     // NOTE : requestBody로 데이터 보낼 때
-    public ResponseEntity<String> postHttpBodyAndSend(String url, HashMap<String, Object> bodyData){
+    public ResponseEntity<String> getHttpBodyAndSend(String url, HashMap<String, Object> bodyData){
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json;charset=utf-8");
 
@@ -29,7 +29,7 @@ public class CallServer {
         log.info("------START------");
         ResponseEntity<String> response = restTemplate.exchange(
                 url,
-                HttpMethod.POST,
+                HttpMethod.GET,
                 httpEntity,
                 String.class
         );
@@ -38,7 +38,7 @@ public class CallServer {
     }
 
     // NOTE : parameter로 데이터 보낼 때
-    public ResponseEntity<String> postHttpWithParamsAndSend(String url, HashMap<String, Object> params){
+    public ResponseEntity<String> getHttpWithParamsAndSend(String url, HashMap<String, Object> params){
         // HTTP 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json;charset=utf-8");

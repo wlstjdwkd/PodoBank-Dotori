@@ -2,6 +2,7 @@ package com.yongy.dotorimainservice.domain.payment.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.yongy.dotorimainservice.domain.account.entity.Account;
 import com.yongy.dotorimainservice.domain.account.repository.AccountRepository;
 import com.yongy.dotorimainservice.domain.bank.entity.Bank;
@@ -97,7 +98,7 @@ public class PaymentServiceImpl implements PaymentService{
             JSONArray jsonArray = (JSONArray) jsonParser.parse(response.getBody());
 
             ObjectMapper objectMapper = new ObjectMapper();
-            List<TransactionHistoryDTO> payments = objectMapper.readValue(jsonArray.toString(), objectMapper.getTypeFactory().constructCollectionType(List.class, TransactionHistoryDTO.class));
+            List<TransactionHistoryDTO> payments = objectMapper.registerModule(new JavaTimeModule()).readValue(jsonArray.toString(), objectMapper.getTypeFactory().constructCollectionType(List.class, TransactionHistoryDTO.class));
             payments = payments.stream().filter(TransactionHistoryDTO -> TransactionHistoryDTO.getTransactionType().equals("WITHDRAWAL")).toList();
 
             return payments.stream()
