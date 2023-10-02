@@ -1,16 +1,13 @@
 package com.yongy.dotorimainservice.domain.user.entity;
 
-import com.yongy.dotorimainservice.domain.user.entity.Provider;
-import com.yongy.dotorimainservice.domain.user.entity.Role;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
-@ToString
 @NoArgsConstructor
 public class User {
 
@@ -31,7 +28,7 @@ public class User {
     private Provider authProvider;
 
     @Builder
-    public User(Long userSeq, Role role, String id, String password, LocalDate birthDate, String userName, String phoneNumber, Provider authProvider) {
+    public User(Long userSeq,Role role, String id, String password, LocalDate birthDate, String userName, String phoneNumber, Provider authProvider) {
         this.userSeq = userSeq;
         this.role = role;
         this.id = id;
@@ -41,6 +38,4 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.authProvider = authProvider;
     }
-
-
 }
