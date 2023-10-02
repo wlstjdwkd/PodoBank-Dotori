@@ -11,6 +11,9 @@ import com.yongy.dotorimainservice.domain.account.repository.AccountRepository;
 import com.yongy.dotorimainservice.domain.bank.entity.Bank;
 import com.yongy.dotorimainservice.domain.bank.repository.BankRepository;
 
+import com.yongy.dotorimainservice.domain.user.entity.User;
+import com.yongy.dotorimainservice.global.common.CallServer;
+import com.yongy.dotorimainservice.global.common.PodoBankInfo;
 import com.yongy.dotorimainservice.global.redis.repository.BankAccessTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +21,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -39,6 +43,13 @@ public class AccountServiceImpl implements AccountService{
     // private final UserAuthService userAuthService; // TODO : find
     private final AccountRepository accountRepository;
     private final BankAccessTokenRepository bankAccessTokenRepository;
+
+    private final CallServer callServer;
+
+    private final HashMap<String, Object> bodyData;
+    private ResponseEntity<String> response;
+
+    private final PodoBankInfo podoBankInfo;
 
 
 
@@ -112,14 +123,55 @@ public class AccountServiceImpl implements AccountService{
         throw new IllegalArgumentException("계좌 정보를 불러오는데 실패했습니다.");
     }
 
+    // NOTE : 포도은행 호출해서 삭제하기
+    public void podoBankRemoveAccount(Bank bank){
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + podoBankInfo.getConnectionToken(bank.getBankSeq()));
+        headers.add("Content-Type", "application/json;charset=utf-8");
+
+        bodyData.clear();
+        bodyData.put("serviceCode", bank.getServiceCode());
+        bodyData.put("fintechCode", bank.getServiceCode());
+
+        HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(bodyData, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                bank.getBankUrl() + "/api/v1/fintech/delete",
+                HttpMethod.POST,
+                httpEntity,
+                String.class
+        );
+
+        log.info("Delete state : "+ response.getBody());
+    }
+
+
+    // NOTE : 사용자의 계좌 1개 삭제하기
+    public void removeUserAccount(Long accountSeq){
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
+
+        podoBankRemoveAccount(account.getBank());
+    }
 
 
     // NOTE : 사용자의 계좌 모두 삭제하기
-    public void removeUserAccounts(Long userSeq){
+    public void removeUserAllAccounts(Long userSeq){
         List<Account> accountList = accountRepository.findAllByUserSeqAndDeleteAtIsNull(userSeq);
+
+        Bank bank = null;
+
         for(Account account : accountList){
-            account.setDeleteAt(LocalDateTime.now());
+            bank = account.getBank();
+
+            podoBankRemoveAccount(bank);
+
+            account.setDeleteAt(LocalDateTime.now()); // 종료날짜
         }
+
         accountRepository.saveAll(accountList);
     }
 
@@ -128,6 +180,7 @@ public class AccountServiceImpl implements AccountService{
         return accountRepository.findByAccountNumberAndDeleteAtIsNull(accountNumber);
     }
 
+    // NOTE : 계좌 등록하기
     public void saveAccount(AccountReqDto accountReqDto){
         Account account = Account.builder()
                 .accountNumber(accountReqDto.getAccountNumber())
@@ -137,6 +190,7 @@ public class AccountServiceImpl implements AccountService{
         accountRepository.save(account);
     }
 
+    // NOTE : 계좌의 이름 설정하기
     public void saveAccountTitle(AccountNumberTitleReqDto accountNumberTitleReqDto){
         Account account = accountRepository.findByAccountNumberAndDeleteAtIsNull(accountNumberTitleReqDto.getAccountNumber());
         account.setAccountTitle(accountNumberTitleReqDto.getAccountTitle());

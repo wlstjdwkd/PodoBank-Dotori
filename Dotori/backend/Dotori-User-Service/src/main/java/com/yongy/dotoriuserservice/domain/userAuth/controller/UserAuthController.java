@@ -95,10 +95,10 @@ public class UserAuthController {
     @PostMapping("/podoBank/check-account")
     public ResponseEntity<Void> sendAccountAuthCode(@RequestBody UserAccountDto userAccountDto) throws ParseException {
         // Account account = userAuthService.getUserAccount(userAccountDto.getAccountNumber());
-        log.info("--1--");
+
         bodyData.clear();
         bodyData.put("accountNumber", userAccountDto.getAccountNumber());
-        log.info("--2--");
+
         response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication", bodyData);
 
         if(response.getBody().toString().equals("YES")){
@@ -135,5 +135,6 @@ public class UserAuthController {
 
         return ResponseEntity.ok().build();
     }
+
 
 }

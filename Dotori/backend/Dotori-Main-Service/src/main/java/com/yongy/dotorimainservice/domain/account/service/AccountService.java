@@ -11,11 +11,13 @@ import java.util.List;
 
 public interface AccountService {
     List<AccountDTO> findAllAccount() throws JsonProcessingException;
-    void removeUserAccounts(Long userSeq);
+    void removeUserAllAccounts(Long userSeq);
     Account getUserAccount(String accountNumber);
 
     void saveAccountTitle(AccountNumberTitleReqDto accountNumberTitleReqDto);
 
     void saveAccount(AccountReqDto accountReqDto);
     BigDecimal getBalance(Long accountSeq) throws JsonProcessingException;
+
+    void removeUserAccount(Long accountSeq);
 }

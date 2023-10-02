@@ -8,10 +8,12 @@ import com.yongy.dotorimainservice.domain.account.dto.communication.AccountReqDt
 import com.yongy.dotorimainservice.domain.account.dto.communication.UserReqDto;
 import com.yongy.dotorimainservice.domain.account.entity.Account;
 import com.yongy.dotorimainservice.domain.account.service.AccountService;
+import com.yongy.dotorimainservice.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,11 +33,18 @@ public class AccountController {
         return ResponseEntity.ok(result);
     }
 
+    // NOTE : 사용자의 계좌 1개를 삭제함
+    @PostMapping("/delete")
+    public ResponseEntity<String> deleteUserOneAccount(@RequestParam Long accountSeq){
+        accountService.removeUserAccount(accountSeq);
+        return ResponseEntity.ok().build();
+    }
+
     // ------- 통신 --------
-    // NOTE : 사용자의 계좌를 삭제한다.
+    // NOTE : 사용자의 계좌 전체를 삭제한다.
     @PostMapping("/communication/delete/all")
     public ResponseEntity<String> deleteUserAccount(@RequestBody UserReqDto userReqDto){
-        accountService.removeUserAccounts(userReqDto.getUserSeq());
+        accountService.removeUserAllAccounts(userReqDto.getUserSeq());
         return ResponseEntity.ok().build();
     }
 

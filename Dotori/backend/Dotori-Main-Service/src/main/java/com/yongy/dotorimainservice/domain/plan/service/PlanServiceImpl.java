@@ -208,12 +208,12 @@ public class PlanServiceImpl implements PlanService {
         }
     }
 
-    @Override
-    public List<PlanListDto> getPlanList(Long userSeq) {
+    public List<PlanListDto> getPlanList(Long userSeq){
         List<Plan> planList = planRepository.findAllByUserSeqAndTerminatedAtIsNull(userSeq);
-        List<PlanListDto> planListDtoList = new ArrayList<>();
+        List<PlanListDto> planListDtoList = null;
         for(Plan plan : planList){
             planListDtoList.add(PlanListDto.builder().planSeq(plan.getPlanSeq())
+                    .accountTitle(accountRepository.findByUserSeqAndDeleteAtIsNull(userSeq).getAccountTitle())
                     .startAt(plan.getStartAt().format(formatter))
                     .endAt(plan.getEndAt().format(formatter)).build());
         }
