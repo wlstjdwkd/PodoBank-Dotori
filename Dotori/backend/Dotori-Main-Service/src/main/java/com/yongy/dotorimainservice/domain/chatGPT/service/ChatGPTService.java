@@ -159,5 +159,6 @@ public class ChatGPTService {
 
         log.info("결제 내역 개수 : "+count);
         paymentRepository.saveAll(result);
+
     }
 }

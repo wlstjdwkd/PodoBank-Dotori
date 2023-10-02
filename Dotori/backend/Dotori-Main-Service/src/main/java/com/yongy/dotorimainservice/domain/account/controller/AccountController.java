@@ -2,7 +2,10 @@ package com.yongy.dotorimainservice.domain.account.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotorimainservice.domain.account.dto.AccountDTO;
-import com.yongy.dotorimainservice.domain.account.dto.communication.*;
+import com.yongy.dotorimainservice.domain.account.dto.communication.AccountNumberReqDto;
+import com.yongy.dotorimainservice.domain.account.dto.communication.AccountNumberTitleReqDto;
+import com.yongy.dotorimainservice.domain.account.dto.communication.AccountReqDto;
+import com.yongy.dotorimainservice.domain.account.dto.communication.UserReqDto;
 import com.yongy.dotorimainservice.domain.account.entity.Account;
 import com.yongy.dotorimainservice.domain.account.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,14 +60,9 @@ public class AccountController {
 
     // NOTE : 사용자의 계좌 이름을 설정한다.
     @PostMapping("/communication/setTitle")
-    public ResponseEntity<String> setAccountTitle(@RequestBody AccountNumberTitleReqDto accountNumberTitleReqDto){
+    public ResponseEntity<String> setAccountName(@RequestBody AccountNumberTitleReqDto accountNumberTitleReqDto){
         accountService.saveAccountTitle(accountNumberTitleReqDto);
         return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/communication/getTitle")
-    public ResponseEntity<String> getAccountTitle(@RequestBody AccountSeqDto accountSeqDto){
-        return ResponseEntity.ok(accountService.getAccountTitle(accountSeqDto.getAccountSeq()));
     }
 
 
