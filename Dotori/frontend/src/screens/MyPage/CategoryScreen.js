@@ -62,14 +62,15 @@ export default function CategoryScreen({ navigation }) {
   const dispatch = useDispatch()
   // 그 외
 
-  const [categoryList, setCategoryList] = useState()
+  const [categoryList, setCategoryList] = useState([])
+  // const [categoryList, setCategoryList] = useState(categorys)
   
   const doPlanCategoryList = async () => {
     try{
       const response = await planCategoryList(accessToken, grantType)
       if(response.status === 200){
         setCategoryList(response.data)
-        console.log('전체 카테고리 목록 가져오기 성공')
+        console.log('전체 카테고리 목록 가져오기 성공:', response.data)
       }else{
         console.log('전체 카테고리 목록 가져오기 실패', response.status)
       }
@@ -109,7 +110,7 @@ export default function CategoryScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <HeaderComponent title="카테고리 보기" />
+      <HeaderComponent title="카테고리 보기" navigation={navigation}/>
 
       {/* 상단 작은 사각형 4개 */}
       <View style={styles.titleContainer}>
@@ -135,18 +136,36 @@ export default function CategoryScreen({ navigation }) {
       </View>
 
       {/* 카테고리 목록 */}
-      <FlatList
+      {/* <FlatList
         data={categorys}
         renderItem={renderItem}
         keyExtractor={(item) => item.categorySeq}
         contentContainerStyle={styles.categoryList}
-      />
-      <FlatList
-        data={categoryList}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.categorySeq}
-        contentContainerStyle={styles.categoryList}
-      />
+      /> */}
+      {categoryList.length
+        ?(<FlatList
+          data={categoryList}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.categorySeq}
+          contentContainerStyle={styles.categoryList}
+          />)
+        :(<View
+          style={[
+            styles.categoryItem,
+            {
+              backgroundColor:
+                randomColors[Math.floor(Math.random() * randomColors.length)],
+            },
+          ]}
+        >
+          <Text style={styles.categoryTitle}>현재 등록된 카테고리가 없습니다.</Text>
+          {/* <Text style={styles.categoryGroup}>메롱</Text> */}
+          {/* <Image
+            style={styles.arrowIcon}
+            source={require("../../assets/icon/forward_arrow.png")} // 화살표 아이콘 이미지 경로
+          /> */}
+        </View>)
+      }
     </View>
   );
 }

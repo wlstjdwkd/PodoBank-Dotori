@@ -138,7 +138,7 @@ export default function CategorySettingScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <HeaderComponent title="카테고리 세부 내용"></HeaderComponent>
+      <HeaderComponent title="카테고리 세부 내용" navigation={navigation}></HeaderComponent>
 
       <View style={styles.topContainer}>
         {/* 페이지 상단 좌측에 categoryTitle 출력 */}
