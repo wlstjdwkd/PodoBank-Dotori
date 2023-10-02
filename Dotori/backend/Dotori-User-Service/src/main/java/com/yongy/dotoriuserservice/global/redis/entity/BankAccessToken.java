@@ -8,7 +8,7 @@ import org.springframework.data.redis.core.index.Indexed;
 
 @Getter
 @RequiredArgsConstructor
-@RedisHash(value="BankAccessToken", timeToLive = 60 * 30)
+@RedisHash(value="BankAccessToken", timeToLive = 60 * 30) // 30분
 public class BankAccessToken {
 
     @Id

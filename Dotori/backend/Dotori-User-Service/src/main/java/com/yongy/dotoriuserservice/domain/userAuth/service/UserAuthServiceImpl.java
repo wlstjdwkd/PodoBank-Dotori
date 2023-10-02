@@ -29,6 +29,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -128,15 +130,32 @@ public class UserAuthServiceImpl implements UserAuthService{
         }
     }
 
+    public void podoTokenUpdate(String refreshToken) throws ParseException {
+
+        MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+        parameters.add("refreshToken", refreshToken);
+
+        response = callServer.postHttpWithParamsAndSend(bankInfo.getBankUrl()+"/api/v1/auth/refresh", parameters);
+
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(response.getBody());
+
+        String newAccessToken = (String) jsonObject.get("accessToken");
+        String newRefreshToken = (String) jsonObject.get("refreshToken");
+
+        log.info("1- newAccessToken : "+ newAccessToken);
+        log.info("2- newRefreshToken : "+ newRefreshToken);
+
+        bankAccessTokenRepository.save(BankAccessToken.of(bankInfo.getBankName(), newAccessToken));
+        bankRefreshTokenRepository.save(BankRefreshToken.of(bankInfo.getBankName(), newRefreshToken));
+    }
+
     // NOTE : accessToken이나 refreshToken을 세팅한다.(없으면 podoBankLogin을 호출해서 새로 발급해서 세팅함)
     public String getConnectionToken(Long bankSeq) throws ParseException {
-         // bankInfo = bankRepository.findByBankSeq(bankSeq);
-
-        // TODO : BankDto 정보 가져오기
         bodyData.clear();
         bodyData.put("bankSeq", bankSeq);
 
-        response = callServer.postHttpWithParamsAndSend(MAIN_SERVICE_URL+"/bank/communication/bankInfo", bodyData);
+        response = callServer.getHttpWithParamsAndSend(MAIN_SERVICE_URL+"/bank/communication/bankInfo",  HttpMethod.GET, bodyData);
 
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject)jsonParser.parse(response.getBody());
@@ -149,32 +168,26 @@ public class UserAuthServiceImpl implements UserAuthService{
                         .bankPwd(String.valueOf(jsonObject.get("bankPwd")))
                         .serviceCode(String.valueOf(jsonObject.get("serviceCode"))).build();
 
-        log.info(bankInfo.getBankName()+"--1");
 
         Optional<BankAccessToken> bankAccessToken = bankAccessTokenRepository.findById(bankInfo.getBankName());
 
         Optional<BankRefreshToken> bankRefreshToken = bankRefreshTokenRepository.findById(bankInfo.getBankName());
 
-        log.info("1- accessToken : "+ bankAccessToken);
-        log.info("2- refreshToken : "+ bankRefreshToken);
-
-
         String useToken = null;
 
         if(bankAccessToken.isEmpty()){
             if(bankRefreshToken.isEmpty()){
-                this.podoBankLogin(); // NOTE : accessToken, refreshToken 재발급
                 log.info("--1--");
-                useToken = bankAccessTokenRepository.findById(bankInfo.getBankName()).get().getToken();
+                this.podoBankLogin();
             }else{
                 log.info("--2--");
-                useToken = bankRefreshToken.get().getToken();
+                this.podoTokenUpdate(bankRefreshToken.get().getToken());
             }
+            useToken = bankAccessTokenRepository.findById(bankInfo.getBankName()).get().getToken();
         }else{
             log.info("--3--");
             useToken = bankAccessToken.get().getToken();
         }
-
         return useToken;
     }
 

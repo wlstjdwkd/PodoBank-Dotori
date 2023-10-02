@@ -1,14 +1,15 @@
 package com.yongy.dotoriuserservice.global.common;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.weaver.ast.Call;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -39,29 +40,31 @@ public class CallServer {
         return response;
     }
 
-    // NOTE : parameter로 데이터 보낼 때
-    public ResponseEntity<String> postHttpWithParamsAndSend(String url, HashMap<String, Object> params){
-        // HTTP 헤더 설정
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json;charset=utf-8");
+    // NOTE : parameter로 데이터 보낼 때(POST)
+    public ResponseEntity<String> postHttpWithParamsAndSend(String url, MultiValueMap<String, String> parameters){
 
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<String> response = restTemplate.postForEntity(url, parameters, String.class);
+
+        return response;
+    }
+
+    // NOTE : parameter로 데이터 보낼 때(GET)
+    public ResponseEntity<String> getHttpWithParamsAndSend(String url, HttpMethod method, HashMap<String, Object> params){
         // URL 매개변수를 이용한 요청 URL 생성
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
         for (Map.Entry<String, Object> entity : params.entrySet()) {
             builder.queryParam(entity.getKey(), entity.getValue());
         }
-
         String finalUrl = builder.build().toUriString();
-        log.info("------START------");
-
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(
                 finalUrl,
-                HttpMethod.GET,
+                method,
                 null,
                 String.class
         );
-        log.info("------END------");
         return response;
     }
 

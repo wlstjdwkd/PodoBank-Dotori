@@ -97,6 +97,8 @@ public class UserAuthController {
         bodyData.clear();
         bodyData.put("accountNumber", userAccountDto.getAccountNumber());
 
+        log.info("--1원인증 들어옴--");
+
         response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication", bodyData);
 
         if(response.getBody().toString().equals("YES")){
