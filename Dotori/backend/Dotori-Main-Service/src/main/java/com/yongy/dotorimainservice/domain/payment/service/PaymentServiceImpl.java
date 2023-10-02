@@ -107,7 +107,7 @@ public class PaymentServiceImpl implements PaymentService{
                             .amount(transactionHistoryDTO.getAmount())
                             .balanceAfter(transactionHistoryDTO.getBalanceAfter())
                             .content(transactionHistoryDTO.getContent())
-                            .code(null) // 사업자 코드를 설정해야 합니다.
+                            .code(transactionHistoryDTO.getBusinessCode()) // 사업자 코드를 설정해야 합니다.
                             .build())
                     .collect(Collectors.toList());
 
