@@ -36,12 +36,16 @@ public class User {
 
     private String phoneNumber;
 
+    @Column(name="security_number")
+    private String securityNumber;
+
     @Enumerated(EnumType.STRING)
     @Column(name="auth_provider", nullable = false)
     private Provider authProvider;
 
     @Column(name="expired_at", nullable = true)
     private LocalDateTime expiredAt;
+
 
     @Builder
     public User(Long userSeq,Role role, String id, String password, LocalDate birthDate, String userName, String phoneNumber, Provider authProvider, LocalDateTime expiredAt) {
