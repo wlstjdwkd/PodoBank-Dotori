@@ -25,8 +25,9 @@ public class PlanDetailServiceImpl implements PlanDetailService{
     private final CategoryRepository categoryRepository;
 
     public SpecificationDTO getPlanDetail(Long planSeq) {
-        List<PlanDetail> planDetailList = planDetailRepository.findAllByPlanPlanSeq(planSeq);
+        log.info(planSeq+"");
 
+        List<PlanDetail> planDetailList = planDetailRepository.findAllByPlanPlanSeq(planSeq);
         List<PlanDetailListResDto> resultPlanDetailList = new ArrayList<>();
 
         for (PlanDetail planDetail : planDetailList) {
