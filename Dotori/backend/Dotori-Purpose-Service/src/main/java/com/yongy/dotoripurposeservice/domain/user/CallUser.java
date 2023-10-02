@@ -42,7 +42,7 @@ public class CallUser {
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(response.getBody());
 
-        return User.builder()
+        User user = User.builder()
                 .userSeq(Long.parseLong(jsonObject.get("userSeq").toString()))
                 .role(Role.valueOf(jsonObject.get("role").toString()))
                 .id(id)
@@ -51,6 +51,11 @@ public class CallUser {
                 .userName((String)jsonObject.get("userName"))
                 .phoneNumber((String)jsonObject.get("phoneNumber"))
                 .authProvider(Provider.valueOf(jsonObject.get("authProvider").toString())).build();
+
+        if((String)jsonObject.get("securityNumber") != null)
+            user.setSecurityNumber((String)jsonObject.get("securityNumber"));
+
+        return user;
 
     }
 
