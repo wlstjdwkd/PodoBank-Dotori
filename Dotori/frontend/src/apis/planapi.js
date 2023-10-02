@@ -373,6 +373,42 @@ export const unClassifiedUpdate = async (
   }
 };
 
+//명세서 전체 조회하기
+export const planSpecificationList = async (accessToken, grantType) => {
+  try {
+    const response = await axios.get(apiAddress+`/v1/plan/specification`,  {
+      headers: {
+        Authorization: `${grantType} ${accessToken}`,
+      },
+    });
+    console.log('계획 명세서 전체 조회하기 성공:', response.data);
+    return response;
+  } catch (error) {
+    console.error('계획 명세서 전체 조회하기 실패:', error.response.status, error.response.data);
+    const response = error.response
+    return response
+    // throw error;
+  }
+};
+
+//명세서 상세 조회하기
+export const planSpecificationDetail = async (planSeq, accessToken, grantType) => {
+  try {
+    const response = await axios.get(apiAddress+`/v1/planDetail/specification?planSeq=${planSeq}`,  {
+      headers: {
+        Authorization: `${grantType} ${accessToken}`,
+      },
+    });
+    console.log('계획 명세서 상세 조회하기 성공:', response.data);
+    return response;
+  } catch (error) {
+    console.error('계획 명세서 상세 조회하기 실패:', error.response.status, error.response.data);
+    const response = error.response
+    return response
+    // throw error;
+  }
+};
+
 // // 계획 중단하기
 // export const planTerminate = async (terminateData, accessToken) => {
 //   try {

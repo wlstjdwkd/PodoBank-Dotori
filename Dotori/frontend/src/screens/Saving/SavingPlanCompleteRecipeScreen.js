@@ -12,7 +12,7 @@ import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { planSpecificationDetail } from "../../apis/planapi"
 
-export default function ReceipeScreen({ route, navigation }) {
+export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
   // 토큰
   const grantType =  useSelector((state)=>state.user.grantType)
   const accessToken =  useSelector((state)=>state.user.accessToken)
@@ -21,8 +21,9 @@ export default function ReceipeScreen({ route, navigation }) {
   // 그 외
   
   // route.params에서 선택한 계좌와 명세서 번호(receipeSeq)를 가져옴
-  const [selectedAccount, setSelectedAccount] = useState(route.params.selectedAccount)
-  const [planSeq, setPlanSeq] = useState(route.params.selectedReceipe)
+  const [accountName, setAccountName] = useState(route.params.accountName)
+  const [planSeq, setPlanSeq] = useState(route.params.planSeq)
+  const [accountSeq, setAccountSeq] = useState(route.params.accountSeq)
 
   // 가상 데이터 - 명세서 항목들
   const [receipeItems, setReceipeItems] = useState([
@@ -40,7 +41,7 @@ export default function ReceipeScreen({ route, navigation }) {
   ])
 
   // 추가 저축 항목
-  const additionalSavings = { categoryTitle: "추가 저축", savings: 15000 };
+  // const additionalSavings = { categoryTitle: "추가 저축", savings: 15000 };
 
   // 총계 계산
   const totalExpense = receipeItems.reduce(
@@ -51,7 +52,7 @@ export default function ReceipeScreen({ route, navigation }) {
     (acc, item) => acc + item.savings,
     0
   );
-  const totalAdditionalSavings = additionalSavings.savings;
+  // const totalAdditionalSavings = additionalSavings.savings;
 
 
   const doPlanSpecificationDetail = async () =>{
@@ -85,9 +86,10 @@ export default function ReceipeScreen({ route, navigation }) {
         <View style={styles.receipeTable}>
           {/* 계좌 별칭 */}
           <View style={styles.topContainer}>
-            <Text style={styles.label}>{selectedAccount}</Text>
+            <Text style={styles.label}>{accountName}</Text>
             <Text style={styles.amount}>
-              {(totalSavings + additionalSavings.savings).toLocaleString()}원
+              {/* {(totalSavings + additionalSavings.savings).toLocaleString()}원 */}
+              {(totalSavings).toLocaleString()}원
             </Text>
           </View>
 
@@ -132,17 +134,18 @@ export default function ReceipeScreen({ route, navigation }) {
           </View>
 
           {/* 추가 저축 항목 */}
-          <View style={styles.tableRow}>
+          {/* <View style={styles.tableRow}>
             <Text style={styles.tableIndexCell}></Text>
             <Text style={styles.tableCell}>{additionalSavings.categoryTitle}</Text>
             <Text style={styles.tableCell}></Text>
             <Text style={styles.tableCell}>
               {additionalSavings.savings.toLocaleString()}
+              {additionalSavings.savings.toLocaleString()}
             </Text>
-          </View>
+          </View> */}
 
           {/* 구분선 */}
-          <View style={styles.tableDotLine} />
+          {/* <View style={styles.tableDotLine} /> */}
 
           {/* 총계 행 */}
           <View style={styles.tableRow}>
@@ -152,12 +155,36 @@ export default function ReceipeScreen({ route, navigation }) {
               {totalExpense.toLocaleString()}
             </Text>
             <Text style={styles.tableCell}>
-              {(totalSavings + additionalSavings.savings).toLocaleString()}
+              {/* {(totalSavings + additionalSavings.savings).toLocaleString()} */}
+              {(totalSavings).toLocaleString()}
             </Text>
           </View>
           <View style={styles.tableLine} />
         </View>
       </ScrollView>
+
+      {/* 저축하기 버튼 */}
+      <View style={{flexDirection:'row', justifyContent:"space-between"}}>
+        <TouchableOpacity
+          style={[styles.button, {backgroundColor:"#FF965C"}]}
+          onPress={() => {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'MainPageScreen' }],
+            });
+          }}
+        >
+          <Text style={styles.buttonText}>종료하기</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, {backgroundColor:"#FF965C"}]}
+          onPress={() => {
+            navigation.navigate("",{})
+          }}
+        >
+          <Text style={styles.buttonText}>저축하기</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -257,5 +284,16 @@ const styles = StyleSheet.create({
   totalCell: {
     fontWeight: "bold",
     backgroundColor: "#F5F5F5",
+  },
+  button: {
+    height: 40,
+    backgroundColor: "#FF965C",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 18,
   },
 });
