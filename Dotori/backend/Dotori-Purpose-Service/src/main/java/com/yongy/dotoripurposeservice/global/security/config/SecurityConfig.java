@@ -1,6 +1,7 @@
 package com.yongy.dotoripurposeservice.global.security.config;
 
 
+import com.yongy.dotoripurposeservice.domain.user.CallUser;
 import com.yongy.dotoripurposeservice.global.security.filter.AuthFilter;
 import com.yongy.dotoripurposeservice.global.security.provider.AuthProvider;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 @Slf4j
 @Configuration
 @EnableWebSecurity
@@ -21,6 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig{
 
     private final AuthProvider authProvider;
+
+    private final CallUser callUser;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -32,7 +34,7 @@ public class SecurityConfig{
                 .authorizeHttpRequests()
                 .anyRequest().permitAll()
                 .and()
-                .addFilterBefore(new AuthFilter(authProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new AuthFilter(authProvider, callUser), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .logout().disable();

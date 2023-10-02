@@ -182,6 +182,8 @@ public class UserAuthServiceImpl implements UserAuthService{
     public String sendAccountAuthCode(UserAccountDto userAccountDto) throws ParseException {
         String useToken = this.getConnectionToken(userAccountDto.getBankSeq());
 
+        log.info("useToken : "+ useToken);
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + useToken);
         headers.add("Content-Type", "application/json;charset=utf-8");

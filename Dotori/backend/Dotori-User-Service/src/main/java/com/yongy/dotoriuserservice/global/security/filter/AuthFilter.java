@@ -40,33 +40,14 @@ public class AuthFilter extends GenericFilterBean {
 
         String id = httpServletRequest.getHeader("id");
 
-        log.info("id : "+ id);
-
         Authentication authentication = null;
         User user = authProvider.getUserFromHeaderId(id);
         if(user != null){
             authentication = authProvider.getAuthentication(user);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        }else{ // NOTE : 사용자가 존재하지 않습니다.
-            //generalJwtExceptionHandler((HttpServletResponse) response, ErrorType.NOT_FOUND_USER);
-            //return;
         }
+
         chain.doFilter(request, response);
-    }
-
-    public void generalJwtExceptionHandler(HttpServletResponse response, ErrorType error) {
-        response.setStatus(error.getCode());
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        MegResDto dto = new MegResDto(error.getCode(), error.getMessage());
-
-        try {
-            String json = new ObjectMapper().writeValueAsString(dto);
-            response.getWriter().write(json);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
     }
 
 

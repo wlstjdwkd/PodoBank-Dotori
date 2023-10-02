@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -61,21 +62,21 @@ public class PurposeServiceImpl implements PurposeService{
                         .currentBalance(BigDecimal.ZERO)
                         .startedAt(purposeDTO.getStartedAt())
                         .endAt(purposeDTO.getEndAt())
-                        .terminatedAt(null)
+                        .terminateAt(null)
                 .build());
     }
 
     @Override
     public PurposeAllDTO findAllPurpose(Long userSeq) {
 
-        List<Purpose> purposeList = purposeRepository.findAllByUserSeqAndTerminatedAtIsNull(userSeq);
+        List<Purpose> purposeList = purposeRepository.findAllByUserSeqAndTerminateAtIsNull(userSeq);
 
         List<PurposeListDTO> list = new ArrayList<>();
         BigDecimal total = BigDecimal.ZERO;
 
         // 전체 목표에서 title, currentBalance, goalAmount 데이터만 뽑아오기
         for(Purpose p : purposeList){
-            if(p.getTerminatedAt() != null){
+            if(p.getTerminateAt() != null){
                 continue;
             }
 
@@ -110,7 +111,7 @@ public class PurposeServiceImpl implements PurposeService{
             bodyData.clear();
             bodyData.put("accountSeq", data.getAccountSeq());
 
-            response = callServer.getHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/getTitle", bodyData);
+            response = callServer.getHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/getTitle", HttpMethod.GET, bodyData);
             log.info("TEST - 1 : "+ response.getBody().toString());
             purposeData.add(PurposeDataDTO.builder()
                             .dataName(response.getBody().toString())
@@ -140,7 +141,7 @@ public class PurposeServiceImpl implements PurposeService{
 
         purpose.update(Purpose.builder()
                 .endAt(LocalDate.now())
-                .terminatedAt(LocalDateTime.now())
+                .terminateAt(LocalDateTime.now())
                 .build());
     }
 
