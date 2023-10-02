@@ -11,7 +11,9 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:9761/eureka/
+      defaultZone: http://j9d107.p.ssafy.io:9761/eureka/
+  instance:
+    hostname: j9d107.p.ssafy.io
 
-#encrypt:
-#  key: ${ENCRYPT_KEY}
+encrypt:
+  key: ${ENCRYPT_KEY}
