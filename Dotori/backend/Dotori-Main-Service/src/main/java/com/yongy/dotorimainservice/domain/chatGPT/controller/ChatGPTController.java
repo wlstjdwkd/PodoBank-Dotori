@@ -3,7 +3,6 @@ package com.yongy.dotorimainservice.domain.chatGPT.controller;
 import com.yongy.dotorimainservice.domain.chatGPT.dto.CategoryDataDTO;
 import com.yongy.dotorimainservice.domain.chatGPT.dto.ResultDataDTO;
 import com.yongy.dotorimainservice.domain.chatGPT.service.ChatGPTService;
-import com.yongy.dotorimainservice.global.scheduler.PaymentsScheduler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -19,11 +18,10 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/chatgpt")
+@RequestMapping("/api/v1/chatgpt")
 public class ChatGPTController {
 
     private final ChatGPTService chatGPTService;
-    private final PaymentsScheduler paymentsScheduler;
 
     @Operation(summary = "카테고리그룹에 따라 카테고리 분류")
     @ApiResponses(value={
@@ -40,7 +38,8 @@ public class ChatGPTController {
     })
     @PatchMapping("/unclassified")
     public ResponseEntity<Void> unclassifiedChatGPT() throws IOException, ParseException {
-        paymentsScheduler.getPayments();
+        log.info("들어오니?");
+        chatGPTService.getPayments();
         return ResponseEntity.ok().build();
     }
 }
