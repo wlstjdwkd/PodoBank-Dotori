@@ -2,23 +2,25 @@ package com.yongy.dotoriAuthService.global.security.provider;
 
 import com.yongy.dotoriAuthService.domain.user.entity.Role;
 import com.yongy.dotoriAuthService.global.security.dto.JwtToken;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
 @Slf4j
-@Component
+@Service
+@RequiredArgsConstructor
 public class JwtTokenProvider {
 
     @Value("${jwt.secret.key}")
@@ -66,5 +68,30 @@ public class JwtTokenProvider {
                 .build();
 
     }
+
+    public Claims getClaims(String token){
+        Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        try{
+            claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        }catch (ExpiredJwtException e) {
+            log.info("만료된 토큰");
+            throw new BadCredentialsException("만료된 토큰", e);
+        } catch (MalformedJwtException e) {
+            log.info("유효하지 않은 구성의 토큰");
+            throw new BadCredentialsException("유효하지 않은 구성의 토큰", e);
+        } catch (UnsupportedJwtException e) {
+            log.info("지원되지 않는 형식이나 구성의 토큰");
+            throw new BadCredentialsException("지원되지 않는 형식이나 구성의 토큰", e);
+        } catch (IllegalArgumentException e) {
+            log.info("잘못된 입력값");
+            throw new BadCredentialsException("잘못된 입력값", e);
+        }
+        return claims;
+    }
+
+    public String getUserIdFromToken(String token){
+        return this.getClaims(token).getSubject();
+    }
+
 
 }

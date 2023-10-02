@@ -4,6 +4,7 @@ package com.yongy.dotoriAuthService.domain.user.controller;
 import com.yongy.dotoriAuthService.domain.user.dto.request.UserEmailReqDto;
 import com.yongy.dotoriAuthService.domain.user.dto.request.UserInfoReqDto;
 import com.yongy.dotoriAuthService.domain.user.dto.request.UserLoginReqDto;
+import com.yongy.dotoriAuthService.domain.user.dto.request.UserRefreshTokenDto;
 import com.yongy.dotoriAuthService.domain.user.entity.Provider;
 import com.yongy.dotoriAuthService.domain.user.entity.Role;
 import com.yongy.dotoriAuthService.domain.user.entity.User;
@@ -137,7 +138,32 @@ public class UserController {
         return ResponseEntity.ok().body(jwtToken);
     }
 
+    // NOTE : RefreshToken이 유효하면 accessToken, refreshToken을 재발급
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "토큰 재발급 성공"),
+            @ApiResponse(responseCode = "404", description = "다시 로그인 해주세요.")
+    })
+    @Operation(summary = "새로운 토큰 발급", description = "ALL")
+    @PostMapping("/new-token")
+    public ResponseEntity<JwtToken> generateNewToken(@RequestBody UserRefreshTokenDto userRefreshTokenDto){
+
+        // refreshToken이 유효한 경우
+        if(userService.getUserRefreshToken(userRefreshTokenDto.getRefreshToken()) != null){
+
+            String id = jwtTokenProvider.getUserIdFromToken(userRefreshTokenDto.getRefreshToken());
+
+            JwtToken jwtToken = jwtTokenProvider.createToken(id , Role.ROLE_USER);
+
+            // refreshToken 저장하기
+            userService.saveUserRefreshToken(UserRefreshToken.of(id, jwtToken.getRefreshToken()));
+
+            return ResponseEntity.ok().body(jwtToken);
+        }
+
+        throw new ExpiredAuthCodeException("다시 로그인 해주세요.");
+    }
+
+
 }
 
-// Auth Server에서 하던 작업을 User Server에서 하도록
-// 인증객체는 다 User인데 그럼
+

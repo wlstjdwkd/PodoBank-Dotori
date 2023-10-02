@@ -72,4 +72,10 @@ public class UserService {
         userRefreshTokenRepository.save(userRefreshToken);
     }
 
+    // NOTE : 사용자의 RefreshToken에 맞는 UserRefreshToken을 가져온다.
+    public UserRefreshToken getUserRefreshToken(String refreshToken){
+        return userRefreshTokenRepository.findByRefreshToken(refreshToken);
+    }
+
+
 }
