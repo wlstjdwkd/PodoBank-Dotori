@@ -94,8 +94,6 @@ public class UserAuthController {
     @Operation(summary = "[포도은행에서 1원 인증] 포도은행에서 계좌의 존재 여부 확인한 후 1원 인증 요청하기", description = "USER")
     @PostMapping("/podoBank/check-account")
     public ResponseEntity<Void> sendAccountAuthCode(@RequestBody UserAccountDto userAccountDto) throws ParseException {
-        // Account account = userAuthService.getUserAccount(userAccountDto.getAccountNumber());
-
         bodyData.clear();
         bodyData.put("accountNumber", userAccountDto.getAccountNumber());
 
@@ -104,7 +102,7 @@ public class UserAuthController {
         if(response.getBody().toString().equals("YES")){
             throw new ExistAccountNumberException("이미 연결된 계좌입니다.");
         }
-        log.info("--3--");
+
         String responseCode = userAuthService.sendAccountAuthCode(userAccountDto);
         if(responseCode.equals("200"))
             return ResponseEntity.ok().build();
