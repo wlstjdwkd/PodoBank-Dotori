@@ -24,7 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Slf4j
-@RequestMapping("/v1/payment")
+@RequestMapping("/api/v1/payment")
 @RequiredArgsConstructor
 @RestController
 public class PaymentController {

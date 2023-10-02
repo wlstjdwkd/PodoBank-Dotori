@@ -18,7 +18,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/categoryGroup")
+@RequestMapping("/api/v1/categoryGroup")
 public class CategoryGroupController {
 
     private final CategoryGroupServiceImpl categoryGroupService;
@@ -27,7 +27,7 @@ public class CategoryGroupController {
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "카테고리 그룹 리스트 조회 성공")
     })
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<List<CategoryGroupDTO>> findAllCategoryGroup(){
         List<CategoryGroupDTO> result = categoryGroupService.findAllCategoryGroup();
         return ResponseEntity.ok(result);

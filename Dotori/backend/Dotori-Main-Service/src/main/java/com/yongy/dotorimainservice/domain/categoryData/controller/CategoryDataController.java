@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/categoryData")
+@RequestMapping("/api/v1/categoryData")
 public class CategoryDataController {
 
     @Autowired
