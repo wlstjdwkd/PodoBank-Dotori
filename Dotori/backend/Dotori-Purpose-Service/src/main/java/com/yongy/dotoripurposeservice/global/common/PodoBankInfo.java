@@ -9,10 +9,12 @@ import com.yongy.dotoripurposeservice.global.redis.repository.BankAccessTokenRep
 import com.yongy.dotoripurposeservice.global.redis.repository.BankRefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Call;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -31,14 +33,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PodoBankInfo {
 
-    @Autowired
-    private BankAccessTokenRepository bankAccessTokenRepository;
-
-    @Autowired
-    private BankRefreshTokenRepository bankRefreshTokenRepository;
-
-    @Autowired
-    private BankRepository bankRepository;
+    private final BankAccessTokenRepository bankAccessTokenRepository;
+    private final BankRefreshTokenRepository bankRefreshTokenRepository;
+    private final BankRepository bankRepository;
+    private final CallServer callServer;
+    @Value("${dotori.main.url}")
+    private String MAIN_SERVICE_URL;
 
 
     public void podoBankLogin(Bank bankInfo){
@@ -89,6 +89,8 @@ public class PodoBankInfo {
         if(dotoriAccessToken.isEmpty()){
             if(dotoriRefreshToken.isEmpty()){
                 log.info("accessToken, refreshToken 재발급");
+                HashMap<String, String> body = new HashMap<>();
+                callServer.getHttpBodyAndSend("MAIN_SERVICE_URL"+"/communication/bankInfo",);
                 bankInfo = bankRepository.findByBankSeq(bankSeq);
                 this.podoBankLogin(bankInfo); // accessToken, refreshToken 재발급
                 useToken = bankAccessTokenRepository.findById("accessToken").get().getToken();
