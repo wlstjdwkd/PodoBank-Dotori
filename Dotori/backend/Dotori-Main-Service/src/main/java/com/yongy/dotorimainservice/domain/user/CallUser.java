@@ -42,7 +42,7 @@ public class CallUser {
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(response.getBody());
 
-        return User.builder()
+        User user = User.builder()
                 .userSeq(Long.parseLong(jsonObject.get("userSeq").toString()))
                 .role(Role.valueOf(jsonObject.get("role").toString()))
                 .id(id)
@@ -52,33 +52,11 @@ public class CallUser {
                 .phoneNumber((String)jsonObject.get("phoneNumber"))
                 .authProvider(Provider.valueOf(jsonObject.get("authProvider").toString())).build();
 
-    }
+        if((String)jsonObject.get("securityNumber") != null)
+            user.setSecurityNumber((String)jsonObject.get("securityNumber"));
 
-
-    public User getUserDtoByUserSeq(Long userSeq) throws ParseException {
-
-        bodyData.put("userSeq", userSeq);
-
-        response = callServer.postHttpBodyAndSend(USER_SERVICE_URL+"/user/communication/userInfo", bodyData);
-
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(response.getBody());
-
-        return User.builder()
-                .userSeq(userSeq)
-                .role(Role.valueOf(jsonObject.get("role").toString()))
-                .id((String)jsonObject.get("id"))
-                .password((String)jsonObject.get("password"))
-                .birthDate(LocalDate.parse((String)jsonObject.get("birthDate")))
-                .userName((String)jsonObject.get("userName"))
-                .phoneNumber((String)jsonObject.get("phoneNumber"))
-                .authProvider(Provider.valueOf((jsonObject).get("authProvider").toString())).build();
-    }
-
-
-    public void saveUserInfo(){
+        return user;
 
     }
-
 
 }
