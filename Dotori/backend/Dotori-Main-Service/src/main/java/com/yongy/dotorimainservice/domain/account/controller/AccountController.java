@@ -26,7 +26,7 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    @Operation(summary = "전체 계좌 조회")
+    @Operation(summary = "전체 계좌 조회", description = "USER")
     @GetMapping()
     public ResponseEntity<List<AccountDTO>> findAllAccount() throws JsonProcessingException {
         List<AccountDTO> result = accountService.findAllAccount();
@@ -34,6 +34,7 @@ public class AccountController {
     }
 
     // NOTE : 사용자의 계좌 1개를 삭제함
+    @Operation(summary = "사용자의 계좌 삭제(1개)", description = "USER")
     @PostMapping("/delete")
     public ResponseEntity<String> deleteUserOneAccount(@RequestParam Long accountSeq){
         accountService.removeUserAccount(accountSeq);
@@ -57,7 +58,6 @@ public class AccountController {
             return ResponseEntity.ok("NO"); // 존재하지않음
         return ResponseEntity.ok("YES"); // 존재함
     }
-
 
 
     // NOTE : Account 객체를 저장한다.
