@@ -17,8 +17,7 @@ import com.yongy.dotoriuserservice.domain.user.exception.InvalidPwdException;
 import com.yongy.dotoriuserservice.domain.user.service.UserService;
 import com.yongy.dotoriuserservice.domain.user.service.UserServiceImpl;
 import com.yongy.dotoriuserservice.global.common.CallServer;
-import com.yongy.dotoriuserservice.global.redis.dto.JwtToken;
-import com.yongy.dotoriuserservice.global.redis.entity.UserRefreshToken;
+
 import com.yongy.dotoriuserservice.global.security.provider.AuthProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
