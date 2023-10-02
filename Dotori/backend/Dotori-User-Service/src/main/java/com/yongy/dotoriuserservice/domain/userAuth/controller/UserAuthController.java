@@ -106,6 +106,7 @@ public class UserAuthController {
         }
 
         String responseCode = userAuthService.sendAccountAuthCode(userAccountDto);
+        log.info(responseCode);
         if(responseCode.equals("200"))
             return ResponseEntity.ok().build();
         throw new FailedOneReqException("포도은행에 1원 인증 실패");
