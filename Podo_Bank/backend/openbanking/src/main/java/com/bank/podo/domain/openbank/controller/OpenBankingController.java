@@ -123,7 +123,13 @@ public class OpenBankingController {
     }
 
     @Operation(summary = "사용자 계좌 해지", description = "MANAGER")
-    @ApiResponses()
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 계좌 해지 성공"),
+            @ApiResponse(responseCode = "400", description = "사용자 계좌 해지 실패(잘못된 요청, 잔액 부족 등)"),
+            @ApiResponse(responseCode = "401", description = "권한 없음"),
+            @ApiResponse(responseCode = "404", description = "무언가 존재하지 않습니다(서비스코드, 계좌 등)."),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @PostMapping("/delete")
     public ResponseEntity<Void> deleteFintechCode(@RequestBody FintechUserDTO fintechUserDTO) {
         openBankingService.deleteFintechCode(fintechUserDTO);
