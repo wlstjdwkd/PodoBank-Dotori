@@ -1,6 +1,8 @@
 # 베이스 이미지로 OpenJDK 11을 사용
 FROM openjdk:17-jdk
 
+ENV TZ=Asia/Seoul
+
 # 작업 디렉토리 설정
 WORKDIR /app
 
