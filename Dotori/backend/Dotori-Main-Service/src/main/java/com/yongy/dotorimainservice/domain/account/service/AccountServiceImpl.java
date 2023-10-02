@@ -12,7 +12,6 @@ import com.yongy.dotorimainservice.domain.bank.entity.Bank;
 import com.yongy.dotorimainservice.domain.bank.repository.BankRepository;
 
 import com.yongy.dotorimainservice.domain.user.entity.User;
-import com.yongy.dotorimainservice.global.common.CallServer;
 import com.yongy.dotorimainservice.global.common.PodoBankInfo;
 import com.yongy.dotorimainservice.global.redis.repository.BankAccessTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,48 +39,31 @@ import java.util.Map;
 public class AccountServiceImpl implements AccountService{
     private final BankRepository bankRepository;
 
-    // private final UserAuthService userAuthService; // TODO : find
     private final AccountRepository accountRepository;
+
     private final BankAccessTokenRepository bankAccessTokenRepository;
 
-    private final CallServer callServer;
-
     private final HashMap<String, Object> bodyData;
-    private ResponseEntity<String> response;
 
     private final PodoBankInfo podoBankInfo;
 
 
-
     @Override
     public List<AccountDTO> findAllAccount() throws JsonProcessingException {
-            // TODO : find
-//        Map<String, String> bodyData = new HashMap<>();
-//        bodyData.put("id", accountRepositor)
-//
-//        ResponseEntity<String> response = apiForm.sendPostData("/communication/userInfo"
-//        ,)
-//
-//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-
-
-        // TODO : find
-        // List<Account> accounts = accountRepository.findAllByUserUserSeqAndDeleteAtIsNull(user.getUserSeq());
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<Account> accounts = accountRepository.findAllByUserSeqAndDeleteAtIsNull(user.getUserSeq());
         List<AccountDTO> result = new ArrayList<>();
 
-        // TODO : find
-//        for(Account account : accounts){
-//            result.add(AccountDTO.builder()
-//                    .accountSeq(account.getAccountSeq())
-//                    .accountTitle(account.getAccountTitle())
-//                    .currentBalance(getBalance(account.getAccountSeq()))
-//                    .build());
-//        }
+        for(Account account : accounts){
+            result.add(AccountDTO.builder()
+                    .accountSeq(account.getAccountSeq())
+                    .accountTitle(account.getAccountTitle())
+                    .currentBalance(this.getBalance(account.getAccountSeq()))
+                    .build());
+        }
 
-        // return result;
+        return result;
 
-        return null;
     }
 
     @Override
@@ -143,7 +125,6 @@ public class AccountServiceImpl implements AccountService{
                 httpEntity,
                 String.class
         );
-
         log.info("Delete state : "+ response.getBody());
     }
 
@@ -151,9 +132,7 @@ public class AccountServiceImpl implements AccountService{
     // NOTE : 사용자의 계좌 1개 삭제하기
     public void removeUserAccount(Long accountSeq){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
-
         podoBankRemoveAccount(account.getBank());
     }
 
@@ -161,17 +140,12 @@ public class AccountServiceImpl implements AccountService{
     // NOTE : 사용자의 계좌 모두 삭제하기
     public void removeUserAllAccounts(Long userSeq){
         List<Account> accountList = accountRepository.findAllByUserSeqAndDeleteAtIsNull(userSeq);
-
         Bank bank = null;
-
         for(Account account : accountList){
             bank = account.getBank();
-
             podoBankRemoveAccount(bank);
-
             account.setDeleteAt(LocalDateTime.now()); // 종료날짜
         }
-
         accountRepository.saveAll(accountList);
     }
 
