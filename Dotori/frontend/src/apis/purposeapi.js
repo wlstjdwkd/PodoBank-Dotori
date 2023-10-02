@@ -2,14 +2,14 @@
 
 import axios from 'axios';
 // apiAddress는 수정 필요
-const apiAddress ="http://j9d107.p.ssafy.io:9100"
+const apiAddress ="http://j9d107.p.ssafy.io:9200"
 
 // Purpose
 // 목표 상세 조회
 export const purposeDetail = async (purposeSeq, accessToken, grantType) => {
   console.log(purposeSeq)
   try {
-    const response = await axios.get(apiAddress+`/v1/purpose/${purposeSeq}`, {
+    const response = await axios.get(apiAddress+`/api/v1/purpose/${purposeSeq}`, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -27,7 +27,7 @@ export const purposeDetail = async (purposeSeq, accessToken, grantType) => {
 // 목표 중단하기
 export const purposeQuit = async (purposeSeq, accessToken, grantType) => {
   try {
-    const response = await axios.patch(apiAddress+`/v1/purpose/terminate/${purposeSeq}`, null, {
+    const response = await axios.patch(apiAddress+`/api/v1/purpose/terminate/${purposeSeq}`, null, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -45,7 +45,7 @@ export const purposeQuit = async (purposeSeq, accessToken, grantType) => {
 // 목표 진행 현황 조회
 export const purposeStatusInquiry = async (purposeSeq, accessToken, grantType) => {
   try {
-    const response = await axios.get(apiAddress+`/v1/purpose/terminate/${purposeSeq}`, null, {
+    const response = await axios.get(apiAddress+`/api/v1/purpose/terminate/${purposeSeq}`, null, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -80,7 +80,7 @@ export const purposeStatusInquiry = async (purposeSeq, accessToken, grantType) =
 export const purposeNewRegister = async (newRegisterData, accessToken, grantType) => {
   console.log(newRegisterData)
   try {
-    const response = await axios.post(apiAddress+`/v1/purpose`, newRegisterData, {
+    const response = await axios.post(apiAddress+`/api/v1/purpose`, newRegisterData, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -98,7 +98,7 @@ export const purposeNewRegister = async (newRegisterData, accessToken, grantType
 // 전체 목표 조회
 export const purposeGetList = async (accessToken, grantType) => {
   try {
-    const response = await axios.get(apiAddress+`/v1/purpose`, {
+    const response = await axios.get(apiAddress+`/api/v1/purpose`, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
