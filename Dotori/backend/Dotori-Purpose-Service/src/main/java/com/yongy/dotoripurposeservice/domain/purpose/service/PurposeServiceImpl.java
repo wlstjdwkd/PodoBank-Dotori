@@ -1,11 +1,8 @@
 package com.yongy.dotoripurposeservice.domain.purpose.service;
 
 
-import com.yongy.dotoripurposeservice.domain.account.entity.Account;
-import com.yongy.dotoripurposeservice.domain.account.repository.AccountRepository;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.*;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.PurposeSavingDTO;
-import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.SavingDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.SavingDataDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.entity.Purpose;
 import com.yongy.dotoripurposeservice.domain.purpose.repository.PurposeRepository;
@@ -13,8 +10,12 @@ import com.yongy.dotoripurposeservice.domain.purposeData.dto.PurposeDataDTO;
 import com.yongy.dotoripurposeservice.domain.purposeData.entity.PurposeData;
 import com.yongy.dotoripurposeservice.domain.purposeData.repository.PurposeDataRepository;
 import com.yongy.dotoripurposeservice.domain.user.entity.User;
+import com.yongy.dotoripurposeservice.global.common.CallServer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -35,7 +37,17 @@ public class PurposeServiceImpl implements PurposeService{
 
     private final PurposeRepository purposeRepository;
     private final PurposeDataRepository purposeDataRepository;
-    private final AccountRepository accountRepository;
+
+    @Value("${dotori.main.url}")
+    private String MAIN_SERVICE_URL;
+
+    @Autowired
+    private CallServer callServer;
+
+    private static HashMap<String, Object> bodyData;
+
+    private ResponseEntity<String> response;
+
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
@@ -94,9 +106,14 @@ public class PurposeServiceImpl implements PurposeService{
         List<PurposeDataDTO> purposeData = new ArrayList<>();
 
         for(PurposeData data : list){
-            Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(data.getAccountSeq());
+            //Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(data.getAccountSeq());
+            bodyData.clear();
+            bodyData.put("accountSeq", data.getAccountSeq());
+
+            response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/getTitle", bodyData);
+            log.info("TEST - 1 : "+ response.getBody().toString());
             purposeData.add(PurposeDataDTO.builder()
-                            .dataName(account.getAccountTitle())
+                            .dataName(response.getBody().toString())
                             .dataAmount(data.getDataAmount())
                             .dataCurrentBalance(data.getDataCurrentBalance())
                             .dataCreatedAt(data.getDataCreatedAt().format(formatter))

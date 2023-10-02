@@ -18,4 +18,6 @@ public interface AccountService {
 
     void saveAccount(AccountReqDto accountReqDto);
     BigDecimal getBalance(Long accountSeq) throws JsonProcessingException;
+
+    String getAccountTitle(Long accountSeq);
 }

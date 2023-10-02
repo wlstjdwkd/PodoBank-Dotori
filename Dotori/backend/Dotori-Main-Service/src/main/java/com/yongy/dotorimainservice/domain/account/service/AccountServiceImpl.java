@@ -143,5 +143,10 @@ public class AccountServiceImpl implements AccountService{
         accountRepository.save(account);
     }
 
+    public String getAccountTitle(Long accountSeq){
+        Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
+        return account.getAccountTitle();
+    }
+
 
 }
