@@ -1,19 +1,16 @@
 package com.yongy.dotoripurposeservice.global.common;
 
 
-import com.yongy.dotoripurposeservice.domain.bank.entity.Bank;
-import com.yongy.dotoripurposeservice.domain.bank.repository.BankRepository;
+import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.BankDTO;
 import com.yongy.dotoripurposeservice.global.redis.entity.BankAccessToken;
 import com.yongy.dotoripurposeservice.global.redis.entity.BankRefreshToken;
 import com.yongy.dotoripurposeservice.global.redis.repository.BankAccessTokenRepository;
 import com.yongy.dotoripurposeservice.global.redis.repository.BankRefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.ast.Call;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -35,13 +32,12 @@ public class PodoBankInfo {
 
     private final BankAccessTokenRepository bankAccessTokenRepository;
     private final BankRefreshTokenRepository bankRefreshTokenRepository;
-    private final BankRepository bankRepository;
     private final CallServer callServer;
     @Value("${dotori.main.url}")
     private String MAIN_SERVICE_URL;
 
 
-    public void podoBankLogin(Bank bankInfo){
+    public void podoBankLogin(BankDTO bankInfo){
         try{
 
             HttpHeaders headers = new HttpHeaders();
@@ -78,22 +74,34 @@ public class PodoBankInfo {
 
 
     // NOTE : accessToken이나 refreshToken을 세팅한다.(없으면 podoBankLogin을 호출해서 새로 발급해서 세팅함)
-    public String getConnectionToken(Long bankSeq){
+    public String getConnectionToken(Long bankSeq) throws ParseException {
         Optional<BankAccessToken> dotoriAccessToken = bankAccessTokenRepository.findById("accessToken");
         Optional<BankRefreshToken> dotoriRefreshToken = bankRefreshTokenRepository.findById("refreshToken");
 
         String useToken = null;
-
-        Bank bankInfo = null;
+        BankDTO bankInfo = null;
 
         if(dotoriAccessToken.isEmpty()){
             if(dotoriRefreshToken.isEmpty()){
                 log.info("accessToken, refreshToken 재발급");
-                HashMap<String, String> body = new HashMap<>();
-                callServer.getHttpBodyAndSend("MAIN_SERVICE_URL"+"/communication/bankInfo",);
-                bankInfo = bankRepository.findByBankSeq(bankSeq);
+
+                HashMap<String, Object> body = new HashMap<>();
+                body.put("bankSeq",bankSeq);
+                ResponseEntity<String> response = callServer.getHttpWithParamsAndSend(MAIN_SERVICE_URL+"/communication/bankInfo",body);
+
+                JSONParser jsonParser = new JSONParser();
+                JSONObject jsonObject = (JSONObject)jsonParser.parse(response.getBody());
+
+                bankInfo = BankDTO.builder()
+                        .bankSeq(bankSeq)
+                        .bankName(String.valueOf(jsonObject.get("bankName")))
+                        .bankUrl(String.valueOf(jsonObject.get("bankUrl")))
+                        .bankId(String.valueOf(jsonObject.get("bankId")))
+                        .bankPwd(String.valueOf(jsonObject.get("bankPwd")))
+                        .serviceCode(String.valueOf(jsonObject.get("serviceCode"))).build();
+
                 this.podoBankLogin(bankInfo); // accessToken, refreshToken 재발급
-                useToken = bankAccessTokenRepository.findById("accessToken").get().getToken();
+                useToken = bankAccessTokenRepository.findByBankName(bankInfo.getBankName()).getToken();
             }else{
                 log.info("refreshToken 사용");
                 useToken = dotoriRefreshToken.get().getToken();

@@ -110,7 +110,7 @@ public class PurposeServiceImpl implements PurposeService{
             bodyData.clear();
             bodyData.put("accountSeq", data.getAccountSeq());
 
-            response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/getTitle", bodyData);
+            response = callServer.getHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/getTitle", bodyData);
             log.info("TEST - 1 : "+ response.getBody().toString());
             purposeData.add(PurposeDataDTO.builder()
                             .dataName(response.getBody().toString())
