@@ -1,5 +1,8 @@
 // src/api/userApi.js
 import axios from "axios";
+import * as Notifications from "expo-notifications";
+// import { Constants } from "expo-constants";
+// const projectId = Constants.expoConfig.extra.eas.projectId;
 const apiAddress = "http://j9d107.p.ssafy.io:9600";
 
 // // 사용 예시
@@ -113,17 +116,31 @@ export const userLogout = async (accessToken) => {
 // access token과 refresh token을 받음.
 export const userLogin = async (email, password) => {
   try {
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status !== "granted") {
+      console.error("Notification permissions not granted!");
+      throw new Error("Permissions not granted");
+    }
+
+    const token = (
+      await Notifications.getExpoPushTokenAsync({
+        projectId: "87dc9661-bf07-4673-b9e6-dc5bcda7ea11",
+      })
+    ).data;
+    console.log("Token:", token);
+
     const response = await axios.post(apiAddress + "/api/v1/auth/login", {
       email: email,
       password: password,
+      token: token, // 토큰을 함께 보냅니다.
     });
+
     console.log("로그인 성공:", response.data);
     return response;
   } catch (error) {
     console.error("로그인 실패:", error);
     const response = error.response;
     return response;
-    // throw error;
   }
 };
 export const userEmailVerificationCheck = async (code, email, type) => {
@@ -255,7 +272,6 @@ export const userIDfind = async () => {
     // throw error;
   }
 };
-
 
 // 비밀번호 초기화
 export const userPasswordReset = async (userInfo) => {
