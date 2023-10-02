@@ -183,7 +183,7 @@ public class UserAuthService {
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-// http://j9d107.p.ssafy.io:9600
+
         ResponseEntity<String> response = restTemplate.exchange(
                     bankInfo.getBankUrl() + "/api/v1/fintech/oneCentVerification",
                     HttpMethod.POST,
