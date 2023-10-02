@@ -37,6 +37,9 @@ public class User {
 
     private String phoneNumber;
 
+    @Column(name="security_number")
+    private String securityNumber;
+
     @Enumerated(EnumType.STRING)
     @Column(name="auth_provider", nullable = false)
     private Provider authProvider;
