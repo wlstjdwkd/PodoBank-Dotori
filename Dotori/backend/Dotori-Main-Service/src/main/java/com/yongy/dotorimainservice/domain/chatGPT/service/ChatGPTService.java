@@ -200,6 +200,7 @@ public class ChatGPTService {
             List<Payment> existPayment = new ArrayList<>();
 
             for(PaymentPodoResDto payment : paymentResDto){
+                log.info("Title : "+payment.getContent()+"Code :"+payment.getCode());
                 // 카테고리 데이터에 정보가 없으면 최초로 들어온 정보이므로 GPT 분류
                 if(payment.getCode() == null){
                     continue;
