@@ -18,4 +18,7 @@ eureka:
   client:
     service-url:
       defaultZone: http://j9d107.p.ssafy.io:8761/eureka
+  instance:
+    hostname: j9d107.p.ssafy.io
+
 
