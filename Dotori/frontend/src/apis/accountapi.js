@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 // apiAddress는 수정 필요
-const apiAddress ="http://j9d107.p.ssafy.io:9100"
+const apiAddress ="http://j9d107.p.ssafy.io:9200"
 
 // userauth
 // 계좌 이름 설정
@@ -14,9 +14,10 @@ const apiAddress ="http://j9d107.p.ssafy.io:9100"
 //     "type" : "string"
 //   }
 // }
+//1원 인증 후 계좌 이름 설정
 export const accountNicknameRegist = async (nicknameRegistData, accessToken, grantType) => {
   try {
-    const response = await axios.post(apiAddress+`/v1/auth/account/title`, nicknameRegistData, {
+    const response = await axios.post(apiAddress+`/api/v1/oneCent/account/title`, nicknameRegistData, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -34,7 +35,7 @@ export const accountNicknameRegist = async (nicknameRegistData, accessToken, gra
 // 1원 인증 전 본인확인 이메일 전송
 export const accountEmailSendOneCent = async (id, accessToken, grantType) => {
   try {
-    const response = await axios.post(apiAddress+`/v1/auth/own/check-code?id=${id}`, null, {
+    const response = await axios.post(apiAddress+`/api/v1/oneCent/own/check-id?id=${id}`, null, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -57,9 +58,11 @@ export const accountEmailSendOneCent = async (id, accessToken, grantType) => {
 //     "type" : "string"
 //   }
 // }
+
+//1원 인증 전 본인확인 이메일 전송 코드 검사 성공 -- id가 바디가 들어감 -- 기존 code에서 id추가 -- 안씀
 export const accountEmailCodeVerificationOneCent = async (emailCodeVerificationOneCentData, accessToken, grantType) => {
   try {
-    const response = await axios.post(apiAddress+`/v1/auth/own/check-code?id=${id}`, emailCodeVerificationOneCentData, {
+    const response = await axios.post(apiAddress+`/api/v1/oneCent/own/check-code?id=${id}`, emailCodeVerificationOneCentData, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -90,7 +93,7 @@ export const accountEmailCodeVerificationOneCent = async (emailCodeVerificationO
 // }
 export const accountVerificationsOnecentCheck = async (verificationsOnecentCheckData, accessToken, grantType) => {
   try {
-    const response = await axios.post(apiAddress+`/v1/auth/podoBank/check-code`, verificationsOnecentCheckData, {
+    const response = await axios.post(apiAddress+`/api/v1/oneCent/podoBank/check-code`, verificationsOnecentCheckData, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -117,7 +120,7 @@ export const accountVerificationsOnecentCheck = async (verificationsOnecentCheck
 // }
 export const accountVerificationsOnecentSend = async (verificationsOnecentSendData, accessToken, grantType) => {
   try {
-    const response = await axios.post(apiAddress+`/v1/auth/podoBank/check-account`, verificationsOnecentSendData, {
+    const response = await axios.post(apiAddress+`/api/v1/oneCent/podoBank/check-account`, verificationsOnecentSendData, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -136,7 +139,7 @@ export const accountVerificationsOnecentSend = async (verificationsOnecentSendDa
 // 모든 은행 정보 불러오기
 export const accountWholeBank = async (accessToken, grantType) => {
   try {
-    const response = await axios.get(apiAddress+`/v1/bank`, {
+    const response = await axios.get(apiAddress+`/api/v1/bank`, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -157,7 +160,7 @@ export const accountWholeInquiry = async (accessToken, grantType) => {
   console.log(accessToken)
   console.log(grantType)
   try {
-    const response = await axios.get(apiAddress+`/v1/account`, {
+    const response = await axios.get(apiAddress+`/api/v1/account`, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },

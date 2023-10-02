@@ -2,13 +2,13 @@
 
 import axios from "axios";
 // apiAddress는 수정 필요
-const apiAddress = "http://j9d107.p.ssafy.io:9100";
+const apiAddress = "http://j9d107.p.ssafy.io:9200";
 
 //USERS
 // 사용자 데이터 가져오기
 export const userInfoInquiry = async (accessToken, grantType) => {
   try {
-    const response = await axios.get(apiAddress + `/v1/user`, {
+    const response = await axios.get(apiAddress + `/api/v1/user`, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -31,7 +31,7 @@ export const userBirthdateChange = async (
 ) => {
   try {
     const response = await axios.patch(
-      apiAddress + `/v1/user/birthDate`,
+      apiAddress + `/api/v1/user/birthDate`,
       { birthDate: birthDate },
       {
         headers: {
@@ -56,7 +56,7 @@ export const userLogout = async (refreshToken, accessToken, grantType) => {
     console.log(accessToken);
     console.log(grantType);
     const response = await axios.patch(
-      apiAddress + `/v1/user/logout`,
+      apiAddress + `/api/v1/user/logout`,
       { refreshToken: refreshToken },
       {
         headers: {
@@ -84,6 +84,7 @@ export const userLogout = async (refreshToken, accessToken, grantType) => {
 //     "type" : "string"
 //   }
 // }
+//비밀번호 변경
 export const userPasswordChange = async (
   pwChangeData,
   accessToken,
@@ -92,7 +93,7 @@ export const userPasswordChange = async (
   console.log(pwChangeData);
   try {
     const response = await axios.patch(
-      apiAddress + `/v1/user/password`,
+      apiAddress + `/api/v1/user/password`,
       pwChangeData,
       {
         // const response = await axios.patch(apiAddress+`/v1/user/password`, {beforePassword: pwChangeData.beforePassword, afterPassword:pwChangeData.afterPassword}, {
@@ -119,7 +120,7 @@ export const userCellPhoneNumberChange = async (
 ) => {
   try {
     const response = await axios.patch(
-      apiAddress + `/v1/user/phoneNumber`,
+      apiAddress + `/api/v1/user/phoneNumber`,
       { phoneNumber: phoneNumber },
       {
         headers: {
@@ -141,7 +142,7 @@ export const userCellPhoneNumberChange = async (
 export const userWithdrawDotori = async (refreshToken, accessToken, grantType) => {
   try {
     const response = await axios.patch(
-      apiAddress + `/v1/user/retire`,
+      apiAddress + `/api/v1/user/retire`,
       { refreshToken: refreshToken },
       {
         headers: {
@@ -163,7 +164,7 @@ export const userWithdrawDotori = async (refreshToken, accessToken, grantType) =
 export const userEmailCodeVerificate = async (email, emailVerificationCode) => {
   try {
     const response = await axios.post(
-      apiAddress + `/v1/user/email/check-code`,
+      apiAddress + `/api/v1/auth/email/check-code`,
       { id: email, code: emailVerificationCode }
     );
     console.log("사용자 이메일 인증코드 검증 성공:", response);
@@ -181,7 +182,7 @@ export const userSendEmail = async (email) => {
   try {
     // const response = await axios.post(apiAddress+`/v1/user/email/check-id`, {param: {id:email}});
     const response = await axios.post(
-      apiAddress + `/v1/user/email/check-id?id=${email}`
+      apiAddress + `/api/v1/auth/email/check-id?id=${email}`
     );
     console.log("사용자 이메일 인증코드 전송 성공:", response.data);
     return response;
@@ -193,7 +194,7 @@ export const userSendEmail = async (email) => {
   }
 };
 
-// 사용자 토큰 갱신
+// 사용자 토큰 갱신 -- 보류
 export const userTokenRefresh = async (
   refreshToken,
   accessToken,
@@ -201,7 +202,7 @@ export const userTokenRefresh = async (
 ) => {
   try {
     const response = await axios.post(
-      apiAddress + `/v1/user/new-token`,
+      apiAddress + `/api/v1/user/new-token`,
       { refreshToken: refreshToken },
       {
         headers: {
@@ -223,7 +224,7 @@ export const userTokenRefresh = async (
 export const userLogin = async (loginData) => {
   try {
     const response = await axios.post(
-      apiAddress + `/v1/user/signin`,
+      apiAddress + `/api/v1/auth/signin`,
       loginData
     );
     console.log("사용자 로그인 성공:", response.data);
@@ -242,7 +243,7 @@ export const userSignup = async (signupData) => {
   console.log(signupData);
   try {
     const response = await axios.post(
-      apiAddress + `/v1/user/signup`,
+      apiAddress + `/api/v1/auth/signup`,
       signupData
     );
     console.log("사용자 회원가입 성공:", response.data);
