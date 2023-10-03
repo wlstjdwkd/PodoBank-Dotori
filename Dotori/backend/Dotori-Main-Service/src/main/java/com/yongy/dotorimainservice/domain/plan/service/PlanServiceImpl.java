@@ -144,7 +144,7 @@ public class PlanServiceImpl implements PlanService {
             throw new NotActivePlanException("진행 중인 계획이 아닙니다.");
         }
 
-        plan.updateState(State.COMPLETED);
+        planRepository.save(plan.updateState(State.COMPLETED));
     }
 
 
