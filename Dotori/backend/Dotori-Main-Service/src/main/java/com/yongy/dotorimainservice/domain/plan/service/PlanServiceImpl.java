@@ -28,6 +28,7 @@ import com.yongy.dotorimainservice.global.redis.entity.BankAccessToken;
 import com.yongy.dotorimainservice.global.redis.repository.BankAccessTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -145,7 +146,7 @@ public class PlanServiceImpl implements PlanService {
 
 
     @Override
-    public void saving(SavingDTO savingDTO) {
+    public void saving(SavingDTO savingDTO) throws ParseException {
         log.info(savingDTO.getPlanSeq()+"");
 
         Plan plan = planRepository.findByPlanSeq(savingDTO.getPlanSeq());
@@ -180,7 +181,7 @@ public class PlanServiceImpl implements PlanService {
         planRepository.save(plan.updateState(State.SAVED));
     }
 
-    public void callBankAPI(Account account, SavingDTO savingDTO){
+    public void callBankAPI(Account account, SavingDTO savingDTO) throws ParseException {
         Bank bankInfo = bankRepository.findByBankSeq(account.getBank().getBankSeq());
         log.info(bankInfo.getBankName());
         BankAccessToken bankAccessToken = bankAccessTokenRepository.findByBankName(bankInfo.getBankName()); // 은행 accessToken 가져오기

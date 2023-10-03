@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -57,7 +58,7 @@ public class PlanController {
             @ApiResponse(responseCode = "200", description = "저축 성공")
     })
     @PatchMapping("/saving")
-    public ResponseEntity<Void> saving(@RequestBody SavingDTO savingDTO) throws JsonProcessingException {
+    public ResponseEntity<Void> saving(@RequestBody SavingDTO savingDTO) throws JsonProcessingException, ParseException {
         planService.saving(savingDTO);
         return ResponseEntity.ok().build();
     }

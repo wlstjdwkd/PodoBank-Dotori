@@ -16,6 +16,7 @@ import com.yongy.dotorimainservice.global.common.PodoBankInfo;
 import com.yongy.dotorimainservice.global.redis.repository.BankAccessTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -106,14 +107,16 @@ public class AccountServiceImpl implements AccountService{
     }
 
     // NOTE : 포도은행 호출해서 삭제하기
-    public void podoBankRemoveAccount(Bank bank){
+    public void podoBankRemoveAccount(Account account) throws ParseException {
+        Bank bank = account.getBank();
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + podoBankInfo.getConnectionToken(bank.getBankSeq()));
         headers.add("Content-Type", "application/json;charset=utf-8");
 
         bodyData.clear();
         bodyData.put("serviceCode", bank.getServiceCode());
-        bodyData.put("fintechCode", bank.getServiceCode());
+        bodyData.put("fintechCode", account.getFintechCode());
 
         HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(bodyData, headers);
 
@@ -130,20 +133,20 @@ public class AccountServiceImpl implements AccountService{
 
 
     // NOTE : 사용자의 계좌 1개 삭제하기
-    public void removeUserAccount(Long accountSeq){
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public void removeUserAccount(Long accountSeq) throws ParseException {
+//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
-        podoBankRemoveAccount(account.getBank());
+        podoBankRemoveAccount(account);
     }
 
 
     // NOTE : 사용자의 계좌 모두 삭제하기
-    public void removeUserAllAccounts(Long userSeq){
+    public void removeUserAllAccounts(Long userSeq) throws ParseException {
         List<Account> accountList = accountRepository.findAllByUserSeqAndDeleteAtIsNull(userSeq);
         Bank bank = null;
         for(Account account : accountList){
             bank = account.getBank();
-            podoBankRemoveAccount(bank);
+            podoBankRemoveAccount(account);
             account.setDeleteAt(LocalDateTime.now()); // 종료날짜
         }
         accountRepository.saveAll(accountList);

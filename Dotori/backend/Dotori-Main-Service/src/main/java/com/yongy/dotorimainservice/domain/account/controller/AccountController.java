@@ -12,6 +12,7 @@ import com.yongy.dotorimainservice.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.parser.ParseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +37,7 @@ public class AccountController {
     // NOTE : 사용자의 계좌 1개를 삭제함
     @Operation(summary = "사용자의 계좌 삭제(1개)", description = "USER")
     @PostMapping("/delete")
-    public ResponseEntity<String> deleteUserOneAccount(@RequestParam Long accountSeq){
+    public ResponseEntity<String> deleteUserOneAccount(@RequestParam Long accountSeq) throws ParseException {
         accountService.removeUserAccount(accountSeq);
         return ResponseEntity.ok().build();
     }
@@ -44,7 +45,7 @@ public class AccountController {
     // ------- 통신 --------
     // NOTE : 사용자의 계좌 전체를 삭제한다.
     @PostMapping("/communication/delete/all")
-    public ResponseEntity<String> deleteUserAccount(@RequestBody UserReqDto userReqDto){
+    public ResponseEntity<String> deleteUserAccount(@RequestBody UserReqDto userReqDto) throws ParseException {
         accountService.removeUserAllAccounts(userReqDto.getUserSeq());
         return ResponseEntity.ok().build();
     }
