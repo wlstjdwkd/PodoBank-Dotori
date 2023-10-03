@@ -6,6 +6,7 @@ import com.yongy.dotorimainservice.domain.plan.dto.PlanDTO;
 import com.yongy.dotorimainservice.domain.plan.dto.PlanStateDTO;
 import com.yongy.dotorimainservice.domain.plan.dto.SavingDTO;
 import com.yongy.dotorimainservice.domain.plan.dto.response.PlanListDto;
+import com.yongy.dotorimainservice.domain.plan.entity.Plan;
 import com.yongy.dotorimainservice.domain.plan.entity.State;
 import org.json.simple.parser.ParseException;
 
@@ -18,6 +19,6 @@ public interface PlanService {
     void saving(SavingDTO savingDTO) throws JsonProcessingException, ParseException;
     List<PlanListDto> getPlanList(Long userSeq);
     ActivePlanDTO findAllPlan(Long accountSeq) throws JsonProcessingException, ParseException;
-
+    Plan findByPlanSeq(Long planSeq);
     void removeUserPlans(Long userSeq);
 }

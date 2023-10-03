@@ -1,5 +1,6 @@
 package com.yongy.dotorimainservice.domain.plan.repository;
 
+import com.yongy.dotorimainservice.domain.account.entity.Account;
 import com.yongy.dotorimainservice.domain.plan.entity.Plan;
 import com.yongy.dotorimainservice.domain.plan.entity.State;
 import org.springframework.data.jpa.repository.JpaRepository;

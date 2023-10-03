@@ -1,10 +1,16 @@
 package com.yongy.dotorimainservice.domain.planDetail.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.yongy.dotorimainservice.domain.account.entity.Account;
+import com.yongy.dotorimainservice.domain.account.service.AccountService;
 import com.yongy.dotorimainservice.domain.category.entity.Category;
 import com.yongy.dotorimainservice.domain.category.repository.CategoryRepository;
 import com.yongy.dotorimainservice.domain.payment.entity.Payment;
 import com.yongy.dotorimainservice.domain.payment.repository.PaymentRepository;
+import com.yongy.dotorimainservice.domain.plan.entity.Plan;
+import com.yongy.dotorimainservice.domain.plan.entity.State;
 import com.yongy.dotorimainservice.domain.plan.repository.PlanRepository;
+import com.yongy.dotorimainservice.domain.plan.service.PlanService;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.ConsumeListDTO;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanDetailDataDTO;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanDetailListResDto;
@@ -14,8 +20,10 @@ import com.yongy.dotorimainservice.domain.planDetail.exception.NotFoundPlanDetai
 import com.yongy.dotorimainservice.domain.planDetail.repository.PlanDetailRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,11 +32,14 @@ import java.util.List;
 @Slf4j
 public class PlanDetailServiceImpl implements PlanDetailService{
     private final PlanRepository planRepository;
+    private final PlanService planService;
     private final PlanDetailRepository planDetailRepository;
     private final CategoryRepository categoryRepository;
     private final PaymentRepository paymentRepository;
+    private final AccountService accountService;
 
-    public SpecificationDTO getPlanDetail(Long planSeq) {
+    // NOTE : 명세서 가져오기
+    public SpecificationDTO getPlanDetail(Long planSeq) throws ParseException, JsonProcessingException {
 
         List<PlanDetail> planDetailList = planDetailRepository.findAllByPlanPlanSeq(planSeq);
         List<PlanDetailListResDto> resultPlanDetailList = new ArrayList<>();
@@ -41,9 +52,18 @@ public class PlanDetailServiceImpl implements PlanDetailService{
                     .savings(planDetail.getDetailBalance()).build()); // 저축
         }
 
+        // NOTE : [종료하기] or [저축하기] 버튼을 누르지 않았으면 포도은행의 계좌의 전체 금액을 가져온다.
+        BigDecimal currentAmount = BigDecimal.ZERO;
+        Plan plan = planService.findByPlanSeq(planSeq);
+        if(plan.getPlanState().equals(State.ACTIVE) && plan.getTerminatedAt() != null){
+            currentAmount = accountService.getBalance(plan.getAccount().getAccountSeq());
+        }
+
+
         return SpecificationDTO.builder()
                 .planDetailList(resultPlanDetailList)
                 .additionalSaving(planRepository.findByPlanSeq(planSeq).getAdditionalSaving()) // 저축전이면 null
+                .currentAmount(currentAmount)
                 .build();
     }
 

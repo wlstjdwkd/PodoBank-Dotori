@@ -1,6 +1,7 @@
 package com.yongy.dotorimainservice.domain.planDetail.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanDetailDataDTO;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanSeqDTO;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.SpecificationDTO;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,12 +26,13 @@ public class PlanDetailController {
     @Autowired
     private PlanDetailService planDetailService;
 
+    // NOTE : 명세서 가져오기
     @Operation(summary = "명세서 상세 조회")
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "명세서 상세 조회 성공")
     })
     @GetMapping("/specification")
-    public ResponseEntity<SpecificationDTO> getPlanDetail(@RequestBody PlanSeqDTO planSeq){
+    public ResponseEntity<SpecificationDTO> getPlanDetail(@RequestBody PlanSeqDTO planSeq) throws ParseException, JsonProcessingException {
         SpecificationDTO specificationDTO = planDetailService.getPlanDetail(planSeq.getPlanSeq());
         return ResponseEntity.ok().body(specificationDTO);
     }

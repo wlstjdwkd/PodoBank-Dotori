@@ -9,6 +9,7 @@ import java.util.List;
 @Builder
 @Data
 public class SpecificationDTO {
+    BigDecimal currentAmount; // 현재 금액
     BigDecimal additionalSaving;
     List<PlanDetailListResDto> planDetailList;
 }

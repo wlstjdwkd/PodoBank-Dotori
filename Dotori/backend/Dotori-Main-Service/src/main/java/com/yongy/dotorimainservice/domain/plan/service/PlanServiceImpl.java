@@ -323,4 +323,9 @@ public class PlanServiceImpl implements PlanService {
     public User getLoginUser(){
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
+
+
+    public Plan findByPlanSeq(Long planSeq){
+        return planRepository.findByPlanSeq(planSeq);
+    }
 }

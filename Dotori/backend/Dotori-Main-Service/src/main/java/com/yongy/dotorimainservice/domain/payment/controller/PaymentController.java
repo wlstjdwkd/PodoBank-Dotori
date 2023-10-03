@@ -1,6 +1,7 @@
 package com.yongy.dotorimainservice.domain.payment.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.yongy.dotorimainservice.domain.account.service.AccountService;
 import com.yongy.dotorimainservice.domain.payment.dto.PaymentDetailDTO;
 import com.yongy.dotorimainservice.domain.payment.dto.UpdateUnclassifiedDTO;
 import com.yongy.dotorimainservice.domain.payment.dto.request.PaymentPodoReqDto;
@@ -34,6 +35,9 @@ public class PaymentController {
 
     @Autowired
     private PlanRepository planRepository;
+
+    @Autowired
+    private AccountService accountService;
 
     // NOTE : 결제내역 가져오기
     @PostMapping("/listAll")
