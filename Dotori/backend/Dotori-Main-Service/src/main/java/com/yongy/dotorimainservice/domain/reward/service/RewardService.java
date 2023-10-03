@@ -1,7 +1,8 @@
 package com.yongy.dotorimainservice.domain.reward.service;
 
-import org.springframework.stereotype.Service;
+import com.yongy.dotorimainservice.domain.reward.dto.DotoriDTO;
 
-@Service
 public interface RewardService {
+
+    DotoriDTO getDotori();
 }

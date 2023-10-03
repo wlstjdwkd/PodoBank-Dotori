@@ -21,6 +21,8 @@ import com.yongy.dotorimainservice.domain.plan.exception.PurposeServiceFailedExc
 import com.yongy.dotorimainservice.domain.plan.repository.PlanRepository;
 import com.yongy.dotorimainservice.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotorimainservice.domain.planDetail.repository.PlanDetailRepository;
+import com.yongy.dotorimainservice.domain.reward.entity.Reward;
+import com.yongy.dotorimainservice.domain.reward.repository.RewardRepository;
 import com.yongy.dotorimainservice.domain.user.entity.User;
 import com.yongy.dotorimainservice.global.common.CallServer;
 import com.yongy.dotorimainservice.global.common.PodoBankInfo;
@@ -62,6 +64,7 @@ public class PlanServiceImpl implements PlanService {
     private final CallServer callServer;
     private final PodoBankInfo podoBankInfo;
     private final PaymentRepository paymentRepository;
+    private final RewardRepository rewardRepository;
     @Value("${dotori.purpose.url}")
     private String PURPOSE_SERVICE_URL;
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -179,6 +182,10 @@ public class PlanServiceImpl implements PlanService {
 
         // 2. 계획 종료 표시하기
         planRepository.save(plan.updateState(State.SAVED));
+
+        // 3. 도토리 1개 얻기
+        Reward reward = rewardRepository.findByUserSeq(plan.getUserSeq());
+        rewardRepository.save(reward.updateDotori());
     }
 
     public void callBankAPI(Account account, SavingDTO savingDTO) throws ParseException {
