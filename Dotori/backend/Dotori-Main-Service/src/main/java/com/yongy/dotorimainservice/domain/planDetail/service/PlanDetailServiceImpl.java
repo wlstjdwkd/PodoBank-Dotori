@@ -5,7 +5,6 @@ import com.yongy.dotorimainservice.domain.category.repository.CategoryRepository
 import com.yongy.dotorimainservice.domain.payment.entity.Payment;
 import com.yongy.dotorimainservice.domain.payment.repository.PaymentRepository;
 import com.yongy.dotorimainservice.domain.plan.repository.PlanRepository;
-import com.yongy.dotorimainservice.domain.plan.service.PlanService;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.ConsumeListDTO;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanDetailDataDTO;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanDetailListResDto;
@@ -15,7 +14,6 @@ import com.yongy.dotorimainservice.domain.planDetail.exception.NotFoundPlanDetai
 import com.yongy.dotorimainservice.domain.planDetail.repository.PlanDetailRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

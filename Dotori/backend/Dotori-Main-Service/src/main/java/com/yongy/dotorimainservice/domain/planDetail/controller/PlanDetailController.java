@@ -1,9 +1,7 @@
 package com.yongy.dotorimainservice.domain.planDetail.controller;
 
 
-import com.yongy.dotorimainservice.domain.plan.service.PlanService;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanDetailDataDTO;
-import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanDetailListResDto;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanSeqDTO;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.SpecificationDTO;
 import com.yongy.dotorimainservice.domain.planDetail.service.PlanDetailService;
