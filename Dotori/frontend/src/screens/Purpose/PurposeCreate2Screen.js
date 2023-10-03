@@ -177,7 +177,7 @@ export default function PurposeCreate2Screen({ navigation, route }) {
                 // multiline={true}
                 editable={false}
               />
-              <AntDesign name="calendar" size={24} color="black" />
+              <AntDesign name="calendar" size={24} color={!purposeInfo.startedAt || (purposeInfo.startedAt && purposeInfo.endAt)?"#7B7B7B":"black"} />
             </View>
           </TouchableOpacity>
 
