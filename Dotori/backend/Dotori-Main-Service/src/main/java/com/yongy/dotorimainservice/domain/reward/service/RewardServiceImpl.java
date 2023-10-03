@@ -34,4 +34,9 @@ public class RewardServiceImpl implements RewardService{
                 .coin(0L).build();
         rewardRepository.save(reward);
     }
+
+    // NOTE : 리워드 삭제하기
+    public void deleteUserReward(Long userSeq){
+        rewardRepository.deleteByUserSeq(userSeq);
+    }
 }
