@@ -77,9 +77,6 @@ public class PurposeServiceImpl implements PurposeService{
 
         // 전체 목표에서 title, currentBalance, goalAmount 데이터만 뽑아오기
         for(Purpose p : purposeList){
-            if(p.getTerminateAt() != null){
-                continue;
-            }
 
             list.add(PurposeListDTO.builder()
                             .purposeSeq(p.getPurposeSeq())
