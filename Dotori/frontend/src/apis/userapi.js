@@ -262,11 +262,7 @@ export const userSignup = async (signupData) => {
 
 // reward
 // 사용자 현재 도토리 갯수 조회
-export const userDotoriValueCheck = async (
-  dotoriValueCheckData,
-  accessToken,
-  grantType
-) => {
+export const userDotoriValueCheck = async (accessToken, grantType) => {
   try {
     const response = await axios.get(
       apiAddress + `/v1/reward/dotori`,

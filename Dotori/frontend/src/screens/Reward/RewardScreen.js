@@ -22,7 +22,7 @@ export default function RewardScreen({ navigation }) {
 
   const doUserDotoriValueCheck = async () => {
     try {
-      const response = await userDotoriValueCheck("", accessToken, grantType);
+      const response = await userDotoriValueCheck(accessToken, grantType);
       if (response.status === 200) {
         setDotoriCount(response.data);
       } else {
