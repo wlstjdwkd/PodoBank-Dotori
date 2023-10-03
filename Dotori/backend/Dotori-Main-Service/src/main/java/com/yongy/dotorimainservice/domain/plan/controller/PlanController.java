@@ -84,9 +84,9 @@ public class PlanController {
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "COMPLETED 상태 변경 성공")
     })
-    @PatchMapping("/completed")
-    public ResponseEntity<Void> updateState(@RequestBody PlanStateDTO planStateDTO){
-        planService.updateState(planStateDTO);
+    @PatchMapping("/completed/{planSeq}")
+    public ResponseEntity<Void> updateState(@PathVariable Long planSeq){
+        planService.updateState(planSeq);
         return ResponseEntity.ok().build();
     }
 
