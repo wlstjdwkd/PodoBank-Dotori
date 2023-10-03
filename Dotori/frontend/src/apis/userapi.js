@@ -139,7 +139,11 @@ export const userCellPhoneNumberChange = async (
 };
 
 // 사용자 탈퇴하기
-export const userWithdrawDotori = async (refreshToken, accessToken, grantType) => {
+export const userWithdrawDotori = async (
+  refreshToken,
+  accessToken,
+  grantType
+) => {
   try {
     const response = await axios.patch(
       apiAddress + `/api/v1/user/retire`,
@@ -202,7 +206,7 @@ export const userTokenRefresh = async (
 ) => {
   try {
     const response = await axios.post(
-      apiAddress + `/api/v1/user/new-token`,
+      apiAddress + `/api/v1/auth/new-token`,
       { refreshToken: refreshToken },
       {
         headers: {
@@ -250,6 +254,33 @@ export const userSignup = async (signupData) => {
     return response;
   } catch (error) {
     console.error("사용자 회원가입 실패:", error);
+    const response = error.response;
+    return response;
+    // throw error;
+  }
+};
+
+// reward
+// 사용자 현재 도토리 갯수 조회
+export const userDotoriValueCheck = async (
+  dotoriValueCheckData,
+  accessToken,
+  grantType
+) => {
+  try {
+    const response = await axios.get(
+      apiAddress + `/v1/reward/dotori`,
+      dotoriValueCheckData,
+      {
+        headers: {
+          Authorization: `${grantType} ${accessToken}`,
+        },
+      }
+    );
+    console.log("사용자 현재 도토리 갯수 조회 성공:", response.data);
+    return response;
+  } catch (error) {
+    console.error("사용자 현재 도토리 갯수 조회 실패:", error);
     const response = error.response;
     return response;
     // throw error;
@@ -437,24 +468,6 @@ export const userSignup = async (signupData) => {
 //   }
 // };
 
-// // reward
-// // 사용자 현재 도토리 갯수 조회
-// export const userDotoriValueCheck = async (dotoriValueCheckData, accessToken) => {
-//   try {
-//     const response = await axios.get(apiAddress+`/v1/reward/dotori`, dotoriValueCheckData, {
-//       headers: {
-//           Authorization: `Bearer ${accessToken}`,
-//         },
-//     });
-//     console.log('사용자 현재 도토리 갯수 조회 성공:', response.data);
-//     return response;
-//   } catch (error) {
-//     console.error('사용자 현재 도토리 갯수 조회 실패:', error);
-//     const response = error.response
-//     return response
-//     // throw error;
-//   }
-// };
 // // 사용자 현재 코인 갯수 조회
 // export const userCoinValueCheck = async (coinValueCheckData, accessToken) => {
 //   try {

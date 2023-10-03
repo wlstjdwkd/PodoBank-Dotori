@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from "react-native";
 import {
   AntDesign,
   FontAwesome5,
@@ -33,10 +40,7 @@ export default function FooterScreen({ navigation }) {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.iconContainer}
-        onPress={() => {
-          // navigation.navigate("")
-          Alert.alert("", "차후 추가할 예정입니다. 기대해주세요.♥️")
-        }}
+        onPress={() => navigation.navigate("RewardScreen")}
       >
         <SimpleLineIcons name="present" size={24}></SimpleLineIcons>
         <Text style={styles.iconText}>도토리</Text>
