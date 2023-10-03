@@ -53,7 +53,7 @@ public class PlanDetailServiceImpl implements PlanDetailService{
         }
 
         // NOTE : [종료하기] or [저축하기] 버튼을 누르지 않았으면 포도은행의 계좌의 전체 금액을 가져온다.
-        BigDecimal currentAmount = BigDecimal.ZERO;
+        BigDecimal currentAmount = new BigDecimal(-1);
         Plan plan = planService.findByPlanSeq(planSeq);
         if(plan.getPlanState().equals(State.ACTIVE) && plan.getTerminatedAt() != null){
             currentAmount = accountService.getBalance(plan.getAccount().getAccountSeq());
