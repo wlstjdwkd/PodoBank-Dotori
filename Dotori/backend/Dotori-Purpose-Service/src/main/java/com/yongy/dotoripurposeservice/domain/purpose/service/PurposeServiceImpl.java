@@ -70,7 +70,7 @@ public class PurposeServiceImpl implements PurposeService{
     @Override
     public PurposeAllDTO findAllPurpose(Long userSeq) {
 
-        List<Purpose> purposeList = purposeRepository.findAllByUserSeqAndTerminateAtIsNullAAndFinishedIsFalse(userSeq);
+        List<Purpose> purposeList = purposeRepository.findAllByUserSeqAndTerminateAtIsNullAndFinishedIsFalse(userSeq);
 
         List<PurposeListDTO> list = new ArrayList<>();
         BigDecimal total = BigDecimal.ZERO;
