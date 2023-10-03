@@ -24,7 +24,7 @@ public class FCMService {
 
     @Async
     public void sendNotification(String targetUserEmail, String title, String body) {
-        String url = firebaseUrl + "/api/v1/send";
+        String url = firebaseUrl + "/api/v1/fcm/send";
         FCMNotificationRequestDTO fcmNotificationRequestDTO = FCMNotificationRequestDTO.builder()
                 .targetUserEmail(targetUserEmail)
                 .title(title)
