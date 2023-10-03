@@ -25,4 +25,13 @@ public class RewardServiceImpl implements RewardService{
 
         return DotoriDTO.builder().dotori(reward.getDotori()).build();
     }
+
+    // NOTE : 리워드 생성하기
+    public void createUserReward(Long userSeq){
+        Reward reward = Reward.builder()
+                .userSeq(userSeq)
+                .dotori(0L)
+                .coin(0L).build();
+        rewardRepository.save(reward);
+    }
 }

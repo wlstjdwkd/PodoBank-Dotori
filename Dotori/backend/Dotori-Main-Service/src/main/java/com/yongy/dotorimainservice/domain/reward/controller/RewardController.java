@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -25,5 +26,13 @@ public class RewardController {
     @GetMapping()
     ResponseEntity<DotoriDTO> getUserDotori(){
         return ResponseEntity.ok(rewardService.getDotori());
+    }
+
+
+    // ----------통신----------
+    @GetMapping("/communication/enroll")
+    public ResponseEntity<String> createUserReward(@RequestParam Long userSeq){
+        rewardService.createUserReward(userSeq);
+        return ResponseEntity.ok().build();
     }
 }
