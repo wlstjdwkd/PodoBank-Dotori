@@ -23,7 +23,8 @@ export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
   // route.params에서 선택한 계좌와 명세서 번호(receipeSeq)를 가져옴
   const [accountName, setAccountName] = useState(route.params.accountName)
   const [planSeq, setPlanSeq] = useState(route.params.planSeq)
-  const [accountSeq, setAccountSeq] = useState(route.params.accountSeq)
+  // const [accountSeq, setAccountSeq] = useState(route.params.accountSeq)
+  const [accountSeq, setAccountSeq] = useState(2)
 
   // 가상 데이터 - 명세서 항목들
   const [receipeItems, setReceipeItems] = useState([
@@ -31,7 +32,7 @@ export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
     { categoryTitle: "주거", expense: 30000, savings: 10000 },
     { categoryTitle: "주거", expense: 30000, savings: 10000 },
     { categoryTitle: "주거", expense: 30000, savings: 10000 },
-    { categoryTitle: "주거", expense: 30000, savings: 10000 },
+    { categoryTitle: "어디까지올라가는거에요", expense: 30000, savings: 10000 },
     { categoryTitle: "주거", expense: 30000, savings: 10000 },
     { categoryTitle: "주거", expense: 30000, savings: 10000 },
     { categoryTitle: "주거", expense: 30000, savings: 10000 },
@@ -41,25 +42,33 @@ export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
   ])
 
   // 추가 저축 항목
-  // const additionalSavings = { categoryTitle: "추가 저축", savings: 15000 };
+  const [additionalSavings, setAdditionalSavings] = useState(null)
 
+  const [totalExpense, setTotalExpense] = useState(null)
+  const [totalSavings, setTotalSavings] = useState(null)
+  
   // 총계 계산
-  const totalExpense = receipeItems.reduce(
-    (acc, item) => acc + item.expense,
-    0
-  );
-  const totalSavings = receipeItems.reduce(
-    (acc, item) => acc + item.savings,
-    0
-  );
-  // const totalAdditionalSavings = additionalSavings.savings;
-
+  const funcTotalExpense = (counting) => {
+    return counting.reduce(
+      (acc, item) => acc + item.expense,
+      0
+    )
+  }
+  const funcTotalSavings = (counting) => {
+    return counting.reduce(
+      (acc, item) => acc + item.savings,
+      0
+    )
+  }
 
   const doPlanSpecificationDetail = async () =>{
     try{
       const response = await planSpecificationDetail(planSeq, accessToken, grantType)
       if(response.status === 200){
-        setReceipeItems(response.data)
+        setReceipeItems(response.data.planDetailList)
+        setAdditionalSavings(response.data.additionalSaving)
+        setTotalExpense(funcTotalExpense(response.data.planDetailList))
+        setTotalSavings(funcTotalSavings(response.data.planDetailList))
         console.log("명세서 상세 조회하기 성공", response.data)
       }else{
         console.log("명세서 상세 조회하기 실패", response.status)
@@ -71,6 +80,8 @@ export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
 
   useEffect(()=>{
     // doPlanSpecificationDetail()
+    setTotalExpense(funcTotalExpense(receipeItems))
+    setTotalSavings(funcTotalSavings(receipeItems))
   },[])
 
   return (
@@ -88,8 +99,11 @@ export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
           <View style={styles.topContainer}>
             <Text style={styles.label}>{accountName}</Text>
             <Text style={styles.amount}>
-              {/* {(totalSavings + additionalSavings.savings).toLocaleString()}원 */}
-              {(totalSavings).toLocaleString()}원
+              {additionalSavings!=null
+                ? (totalSavings + additionalSavings)?(totalSavings + additionalSavings).toLocaleString():(totalSavings + additionalSavings)
+                : totalSavings?totalSavings.toLocaleString():totalSavings
+              }원
+              
             </Text>
           </View>
 
@@ -126,65 +140,70 @@ export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
             <Text style={styles.tableIndexCell}></Text>
             <Text style={styles.tableCell}></Text>
             <Text style={styles.tableCell}>
-              {totalExpense.toLocaleString()}
+              {totalExpense ? totalExpense.toLocaleString() : totalExpense}
             </Text>
             <Text style={styles.tableCell}>
-              {totalSavings.toLocaleString()}
+              {totalSavings ? totalSavings.toLocaleString() : totalSavings}
             </Text>
           </View>
 
           {/* 추가 저축 항목 */}
-          {/* <View style={styles.tableRow}>
-            <Text style={styles.tableIndexCell}></Text>
-            <Text style={styles.tableCell}>{additionalSavings.categoryTitle}</Text>
-            <Text style={styles.tableCell}></Text>
-            <Text style={styles.tableCell}>
-              {additionalSavings.savings.toLocaleString()}
-              {additionalSavings.savings.toLocaleString()}
-            </Text>
-          </View> */}
+          {additionalSavings!=null
+            ?
+            (<View style={styles.tableRow}>
+              <Text style={styles.tableIndexCell}></Text>
+              <Text style={styles.tableCell}>추가 저축</Text>
+              <Text style={styles.tableCell}></Text>
+              <Text style={styles.tableCell}>
+                {additionalSavings ? additionalSavings.toLocaleString() : additionalSavings}
+              </Text>
+            </View>)
+            : null
+          }
 
           {/* 구분선 */}
-          {/* <View style={styles.tableDotLine} /> */}
+          {additionalSavings!=null
+            ?
+            <View style={styles.tableDotLine} />
+            :null
+          }
 
           {/* 총계 행 */}
           <View style={styles.tableRow}>
             <Text style={styles.tableIndexCell}></Text>
             <Text style={styles.tableCell}>총계</Text>
             <Text style={styles.tableCell}>
-              {totalExpense.toLocaleString()}
+              {totalExpense?totalExpense.toLocaleString():totalExpense}
             </Text>
             <Text style={styles.tableCell}>
-              {/* {(totalSavings + additionalSavings.savings).toLocaleString()} */}
-              {(totalSavings).toLocaleString()}
+              {additionalSavings
+                ?(totalSavings + additionalSavings)?(totalSavings + additionalSavings).toLocaleString():(totalSavings + additionalSavings)
+                :totalSavings?totalSavings.toLocaleString():totalSavings
+              }
             </Text>
           </View>
           <View style={styles.tableLine} />
         </View>
-      </ScrollView>
 
-      {/* 저축하기 버튼 */}
-      <View style={{flexDirection:'row', justifyContent:"space-between"}}>
-        <TouchableOpacity
-          style={[styles.button, {backgroundColor:"#FF965C"}]}
-          onPress={() => {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'MainPageScreen' }],
-            });
-          }}
-        >
-          <Text style={styles.buttonText}>종료하기</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, {backgroundColor:"#FF965C"}]}
-          onPress={() => {
-            navigation.navigate("",{})
-          }}
-        >
-          <Text style={styles.buttonText}>저축하기</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={{width:"100%", margin:50, flexDirection:"row", justifyContent: "space-evenly"}}>
+          <TouchableOpacity
+            style={[styles.button, {backgroundColor:"#FF965C"}]}
+            onPress={() => {
+              navigation.navigate("MainPageScreen")
+            }}
+          >
+            <Text style={styles.buttonText}>취소하기</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, {backgroundColor:"#FF965C"}]}
+            onPress={() => {
+              navigation.navigate("SavingMoneyScreen", {accountName:accountName, accountSeq:accountSeq, planSeq:planSeq, totalSavings: totalSavings})
+            }}
+          >
+            <Text style={styles.buttonText}>저축하기</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -287,6 +306,7 @@ const styles = StyleSheet.create({
   },
   button: {
     height: 40,
+    width: '40%',
     backgroundColor: "#FF965C",
     borderRadius: 8,
     justifyContent: "center",
