@@ -41,16 +41,20 @@ export default function ReceipeSelectScreen({ navigation }) {
   // 그 외
   
   const [specificationList, setSpecificationList] = useState([])
+  // const [specificationList, setSpecificationList] = useState(specifications)
   const [selectedAccount, setSelectedAccount] = useState(null)
   const [selectedReceipe, setSelectedReceipe] = useState(null)
 
   const handleViewReceipe = () => {
     // 명세서 보기 화면으로 이동하면서 선택한 계좌와 명세서 번호(receipeSeq)를 전달
-    if(selectedAccount && selectedReceipe){
+    if(selectedAccount && (selectedReceipe != null)){
+      // 나중에 원상복귀 시켜야함.
       navigation.navigate("ReceipeScreen", {
         selectedAccount,
         selectedReceipe,
       });
+      // 잠깐 쓰고 나중에 삭제할네비게이션임.
+      // navigation.navigate("SavingPlanCompleteRecipeScreen", {selectedAccount:selectedAccount, selectedReceipe:selectedReceipe, })
     }else{
       Alert.alert('','확인할 수 있는 명세서가 없습니다.')
     }
@@ -83,12 +87,11 @@ export default function ReceipeSelectScreen({ navigation }) {
   }
 
   useEffect(()=>{
-    // doPlanSpecificationList()
-    setSpecificationList(specifications)
-    if(specifications.length>0){
-      setSelectedAccount(specificationList[0].accountName)
-      setSelectedReceipe(specificationList[0].planSeq)
-    }
+    doPlanSpecificationList()
+    // if(specificationList.length>0){
+    //   setSelectedAccount(specificationList[0].accountName)
+    //   setSelectedReceipe(specificationList[0].planSeq)
+    // }
   }, [])
 
   return (
