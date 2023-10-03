@@ -63,6 +63,7 @@ public class PurposeServiceImpl implements PurposeService{
                         .startedAt(purposeDTO.getStartedAt())
                         .endAt(purposeDTO.getEndAt())
                         .terminateAt(null)
+                        .finished(false)
                 .build());
     }
 
