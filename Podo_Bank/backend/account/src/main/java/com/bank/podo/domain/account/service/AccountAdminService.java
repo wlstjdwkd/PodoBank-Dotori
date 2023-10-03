@@ -9,6 +9,7 @@ import com.bank.podo.domain.account.exception.InsufficientBalanceException;
 import com.bank.podo.domain.account.exception.PasswordRetryCountExceededException;
 import com.bank.podo.domain.account.repository.AccountRepository;
 import com.bank.podo.domain.account.repository.TransactionHistoryRepository;
+import com.bank.podo.global.others.service.FCMService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 public class AccountAdminService {
 
     private final AccountService accountService;
+    private final FCMService fcmService;
 
     private final AccountRepository accountRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
@@ -40,6 +42,9 @@ public class AccountAdminService {
 
         accountService.withdraw(senderAccount, transferAmount, transferDTO.getSenderContent(), null);
         accountService.deposit(receiverAccount, transferAmount, transferDTO.getReceiverContent(), null);
+
+        fcmService.sendNotification(receiverAccount.getUser().getEmail(), "입금", transferAmount.toString() + "원이 입금되었습니다."+"\n"+transferDTO.getReceiverContent());
+        fcmService.sendNotification(senderAccount.getUser().getEmail(), "출금", transferAmount.toString() + "원이 출금되었습니다."+ "\n"+transferDTO.getSenderContent());
 
         logTransfer(senderAccount, receiverAccount, transferAmount);
     }
