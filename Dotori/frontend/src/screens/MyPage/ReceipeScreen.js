@@ -21,44 +21,61 @@ export default function ReceipeScreen({ route, navigation }) {
   // 그 외
   
   // route.params에서 선택한 계좌와 명세서 번호(receipeSeq)를 가져옴
-  const [selectedAccount, setSelectedAccount] = useState(route.params.selectedAccount)
+  const [accountName, setAccountName] = useState(route.params.selectedAccount)
   const [planSeq, setPlanSeq] = useState(route.params.selectedReceipe)
 
   // 가상 데이터 - 명세서 항목들
-  const [receipeItems, setReceipeItems] = useState([
-    { categoryTitle: "식비", expense: 50000, savings: 20000 },
-    { categoryTitle: "주거", expense: 30000, savings: 10000 },
-    { categoryTitle: "주거", expense: 30000, savings: 10000 },
-    { categoryTitle: "주거", expense: 30000, savings: 10000 },
-    { categoryTitle: "주거", expense: 30000, savings: 10000 },
-    { categoryTitle: "주거", expense: 30000, savings: 10000 },
-    { categoryTitle: "주거", expense: 30000, savings: 10000 },
-    { categoryTitle: "주거", expense: 30000, savings: 10000 },
-    { categoryTitle: "주거", expense: 30000, savings: 10000 },
-
-    // 다른 항목들 추가
-  ])
+  // const [receipeItems, setReceipeItems] = useState([
+  //   { categoryTitle: "식비", expense: 50000, savings: 20000 },
+  //   { categoryTitle: "주거", expense: 30000, savings: 10000 },
+  //   { categoryTitle: "주거", expense: 30000, savings: 10000 },
+  //   { categoryTitle: "주거", expense: 30000, savings: 10000 },
+  //   { categoryTitle: "어디까지올라가는거에요", expense: 30000, savings: 10000 },
+  //   { categoryTitle: "주거", expense: 30000, savings: 10000 },
+  //   { categoryTitle: "주거", expense: 30000, savings: 10000 },
+  //   { categoryTitle: "주거", expense: 30000, savings: 10000 },
+  //   { categoryTitle: "주거", expense: 30000, savings: 10000 },
+  //   // 다른 항목들 추가
+  // ])
+  const [receipeItems, setReceipeItems] = useState([])
 
   // 추가 저축 항목
-  const additionalSavings = { categoryTitle: "추가 저축", savings: 15000 };
+  const [additionalSavings, setAdditionalSavings] = useState(null)
 
   // 총계 계산
-  const totalExpense = receipeItems.reduce(
-    (acc, item) => acc + item.expense,
-    0
-  );
-  const totalSavings = receipeItems.reduce(
-    (acc, item) => acc + item.savings,
-    0
-  );
-  const totalAdditionalSavings = additionalSavings.savings;
+  const funcTotalExpense = (counting) => {
+    return counting.reduce(
+      (acc, item) => acc + item.expense,
+      0
+    )
+  }
+  const funcTotalSavings = (counting) => {
+    return counting.reduce(
+      (acc, item) => acc + item.savings,
+      0
+    )
+  }
+  const [totalExpense, setTotalExpense] = useState(null)
+  const [totalSavings, setTotalSavings] = useState(null)
+  // const totalExpense = receipeItems.reduce(
+  //   (acc, item) => acc + item.expense,
+  //   0
+  // );
+  // const totalSavings = receipeItems.reduce(
+  //   (acc, item) => acc + item.savings,
+  //   0
+  // );
+  const totalAdditionalSavings = additionalSavings;
 
 
   const doPlanSpecificationDetail = async () =>{
     try{
       const response = await planSpecificationDetail(planSeq, accessToken, grantType)
       if(response.status === 200){
-        setReceipeItems(response.data)
+        setReceipeItems(response.data.planDetailList)
+        setAdditionalSavings(response.data.additionalSaving)
+        setTotalExpense(funcTotalExpense(response.data.planDetailList))
+        setTotalSavings(funcTotalSavings(response.data.planDetailList))
         console.log("명세서 상세 조회하기 성공", response.data)
       }else{
         console.log("명세서 상세 조회하기 실패", response.status)
@@ -69,7 +86,9 @@ export default function ReceipeScreen({ route, navigation }) {
   }
 
   useEffect(()=>{
-    // doPlanSpecificationDetail()
+    doPlanSpecificationDetail()
+    setTotalExpense(funcTotalExpense(receipeItems))
+    setTotalSavings(funcTotalSavings(receipeItems))
   },[])
 
   return (
@@ -85,9 +104,13 @@ export default function ReceipeScreen({ route, navigation }) {
         <View style={styles.receipeTable}>
           {/* 계좌 별칭 */}
           <View style={styles.topContainer}>
-            <Text style={styles.label}>{selectedAccount}</Text>
+            <Text style={styles.label}>{accountName}</Text>
             <Text style={styles.amount}>
-              {(totalSavings + additionalSavings.savings).toLocaleString()}원
+              {additionalSavings!=null
+                ? (totalSavings + additionalSavings)?(totalSavings + additionalSavings).toLocaleString():(totalSavings + additionalSavings)
+                : totalSavings?totalSavings.toLocaleString():totalSavings
+              }원
+              
             </Text>
           </View>
 
@@ -124,35 +147,46 @@ export default function ReceipeScreen({ route, navigation }) {
             <Text style={styles.tableIndexCell}></Text>
             <Text style={styles.tableCell}></Text>
             <Text style={styles.tableCell}>
-              {totalExpense.toLocaleString()}
+              {totalExpense ? totalExpense.toLocaleString() : totalExpense}
             </Text>
             <Text style={styles.tableCell}>
-              {totalSavings.toLocaleString()}
+              {totalSavings ? totalSavings.toLocaleString() : totalSavings}
             </Text>
           </View>
 
           {/* 추가 저축 항목 */}
-          <View style={styles.tableRow}>
-            <Text style={styles.tableIndexCell}></Text>
-            <Text style={styles.tableCell}>{additionalSavings.categoryTitle}</Text>
-            <Text style={styles.tableCell}></Text>
-            <Text style={styles.tableCell}>
-              {additionalSavings.savings.toLocaleString()}
-            </Text>
-          </View>
+          {additionalSavings!=null
+            ?
+            (<View style={styles.tableRow}>
+              <Text style={styles.tableIndexCell}></Text>
+              <Text style={styles.tableCell}>추가 저축</Text>
+              <Text style={styles.tableCell}></Text>
+              <Text style={styles.tableCell}>
+                {additionalSavings ? additionalSavings.toLocaleString() : additionalSavings}
+              </Text>
+            </View>)
+            : null
+          }
 
           {/* 구분선 */}
-          <View style={styles.tableDotLine} />
+          {additionalSavings!=null
+            ?
+            <View style={styles.tableDotLine} />
+            :null
+          }
 
           {/* 총계 행 */}
           <View style={styles.tableRow}>
             <Text style={styles.tableIndexCell}></Text>
             <Text style={styles.tableCell}>총계</Text>
             <Text style={styles.tableCell}>
-              {totalExpense.toLocaleString()}
+              {totalExpense?totalExpense.toLocaleString():totalExpense}
             </Text>
             <Text style={styles.tableCell}>
-              {(totalSavings + additionalSavings.savings).toLocaleString()}
+              {additionalSavings
+                ?(totalSavings + additionalSavings)?(totalSavings + additionalSavings).toLocaleString():(totalSavings + additionalSavings)
+                :totalSavings?totalSavings.toLocaleString():totalSavings
+              }
             </Text>
           </View>
           <View style={styles.tableLine} />

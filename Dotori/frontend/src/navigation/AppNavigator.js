@@ -27,6 +27,7 @@ import PlanNotClassifyScreen from "../screens/Plan/PlanNotClassifyScreen";
 
 import SavingPlanCompleteRecipeScreen from "../screens/Saving/SavingPlanCompleteRecipeScreen";
 import SavingMoneyScreen from "../screens/Saving/SavingMoneyScreen";
+import SavingCompleteScreen from "../screens/Saving/SavingCompleteScreen";
 
 
 import OneCent1Screen from "../screens/OneCent/OneCent1Screen";
@@ -205,6 +206,10 @@ export default function AppNavigator() {
       <Stack.Screen
       name="SavingMoneyScreen"
       component={SavingMoneyScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+      name="SavingCompleteScreen"
+      component={SavingCompleteScreen}
       ></Stack.Screen>
     </Stack.Navigator>
   );
