@@ -137,14 +137,14 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public void updateState(State state, PlanStateDTO planStateDTO) {
-        Plan plan = planRepository.findByPlanSeq(planStateDTO.getPlanSeq());
+    public void updateState(Long planSeq) {
+        Plan plan = planRepository.findByPlanSeq(planSeq);
 
         if(!plan.getPlanState().equals(State.ACTIVE)){
             throw new NotActivePlanException("진행 중인 계획이 아닙니다.");
         }
 
-        plan.updateState(state);
+        planRepository.save(plan.updateState(State.COMPLETED));
     }
 
 
