@@ -6,4 +6,6 @@ public interface RewardService {
 
     DotoriDTO getDotori();
     void createUserReward(Long userSeq);
+
+    void deleteUserReward(Long userSeq);
 }

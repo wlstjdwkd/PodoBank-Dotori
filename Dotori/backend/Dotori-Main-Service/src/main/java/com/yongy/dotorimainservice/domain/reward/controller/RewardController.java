@@ -30,9 +30,17 @@ public class RewardController {
 
 
     // ----------통신----------
+    // NOTE : 사용자 리워드 등록
     @GetMapping("/communication/enroll")
     public ResponseEntity<String> createUserReward(@RequestParam Long userSeq){
         rewardService.createUserReward(userSeq);
+        return ResponseEntity.ok().build();
+    }
+
+    // NOTE : 사용자 리워드 삭제
+    @GetMapping("/communication/delete")
+    public ResponseEntity<String> deleteUserReward(@RequestParam Long userSeq){
+        rewardService.deleteUserReward(userSeq);
         return ResponseEntity.ok().build();
     }
 }
