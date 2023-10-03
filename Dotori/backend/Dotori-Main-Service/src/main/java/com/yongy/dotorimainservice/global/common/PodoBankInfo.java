@@ -47,9 +47,6 @@ public class PodoBankInfo {
     @Autowired
     private CallServer callServer;
 
-    @Value("${dotori.main.url}")
-    private String MAIN_SERVICE_URL;
-
     private static Bank bank;
 
     public final HashMap<String, Object> bodyData;
@@ -98,6 +95,10 @@ public class PodoBankInfo {
 
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("refreshToken", refreshToken);
+
+        log.info("RefreshToken : "+ refreshToken);
+
+        log.info(bank.getBankUrl()+"/api/v1/auth/refresh");
 
         response = callServer.postHttpWithParamsAndSend(bank.getBankUrl()+"/api/v1/auth/refresh", parameters);
 

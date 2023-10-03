@@ -134,9 +134,12 @@ public class AccountServiceImpl implements AccountService{
 
     // NOTE : 사용자의 계좌 1개 삭제하기
     public void removeUserAccount(Long accountSeq) throws ParseException {
-//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
-        podoBankRemoveAccount(account);
+
+        podoBankRemoveAccount(account); // 포도은행에서 계좌를 삭제함
+
+        account.setDeleteAt(LocalDateTime.now()); // 도토리에서 계좌를 삭제함
+        accountRepository.save(account);
     }
 
 
@@ -146,10 +149,10 @@ public class AccountServiceImpl implements AccountService{
         Bank bank = null;
         for(Account account : accountList){
             bank = account.getBank();
-            podoBankRemoveAccount(account);
+            podoBankRemoveAccount(account); // 포도은행에서 계좌를 삭제함
             account.setDeleteAt(LocalDateTime.now()); // 종료날짜
         }
-        accountRepository.saveAll(accountList);
+        accountRepository.saveAll(accountList); // 도토리에서 계좌를 삭제함
     }
 
     // NOTE : 존재하는 계좌번호인지 확인하기
