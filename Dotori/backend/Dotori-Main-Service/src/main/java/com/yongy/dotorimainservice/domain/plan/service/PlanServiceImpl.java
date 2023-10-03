@@ -281,6 +281,7 @@ public class PlanServiceImpl implements PlanService {
                             .groupTitle(planDetail.getCategoryGroup().getGroupTitle())
                             .goalAmount(planDetail.getDetailLimit())
                             .currentBalance(planDetail.getDetailBalance())
+                            .planDetailSeq(detail.getPlanDetailSeq())
                             .build());
                 }
 

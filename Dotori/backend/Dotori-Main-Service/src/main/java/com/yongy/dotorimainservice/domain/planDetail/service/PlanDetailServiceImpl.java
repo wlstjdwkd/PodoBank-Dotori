@@ -4,6 +4,7 @@ import com.yongy.dotorimainservice.domain.category.entity.Category;
 import com.yongy.dotorimainservice.domain.category.repository.CategoryRepository;
 import com.yongy.dotorimainservice.domain.plan.repository.PlanRepository;
 import com.yongy.dotorimainservice.domain.plan.service.PlanService;
+import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanDetailDataDTO;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanDetailListResDto;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.SpecificationDTO;
 import com.yongy.dotorimainservice.domain.planDetail.entity.PlanDetail;
@@ -25,7 +26,6 @@ public class PlanDetailServiceImpl implements PlanDetailService{
     private final CategoryRepository categoryRepository;
 
     public SpecificationDTO getPlanDetail(Long planSeq) {
-        log.info(planSeq+"");
 
         List<PlanDetail> planDetailList = planDetailRepository.findAllByPlanPlanSeq(planSeq);
         List<PlanDetailListResDto> resultPlanDetailList = new ArrayList<>();
@@ -42,5 +42,11 @@ public class PlanDetailServiceImpl implements PlanDetailService{
                 .planDetailList(resultPlanDetailList)
                 .additionalSaving(planRepository.findByPlanSeq(planSeq).getAdditionalSaving()) // 저축전이면 null
                 .build();
+    }
+
+    @Override
+    public PlanDetailDataDTO findActiveCategoryDetail(Long planDetailSeq) {
+
+        return null;
     }
 }

@@ -2,6 +2,7 @@ package com.yongy.dotorimainservice.domain.planDetail.controller;
 
 
 import com.yongy.dotorimainservice.domain.plan.service.PlanService;
+import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanDetailDataDTO;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanDetailListResDto;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.PlanSeqDTO;
 import com.yongy.dotorimainservice.domain.planDetail.dto.response.SpecificationDTO;
@@ -13,10 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,5 +35,12 @@ public class PlanDetailController {
     public ResponseEntity<SpecificationDTO> getPlanDetail(@RequestBody PlanSeqDTO planSeq){
         SpecificationDTO specificationDTO = planDetailService.getPlanDetail(planSeq.getPlanSeq());
         return ResponseEntity.ok().body(specificationDTO);
+    }
+
+    @Operation(summary = "실행 중인 카테고리 상세 조회")
+    @GetMapping("/{planDetailSeq}")
+    public ResponseEntity<PlanDetailDataDTO> findActiveCategoryDetail(@RequestParam Long planDetailSeq){
+        PlanDetailDataDTO result = planDetailService.findActiveCategoryDetail(planDetailSeq);
+        return ResponseEntity.ok(result);
     }
 }

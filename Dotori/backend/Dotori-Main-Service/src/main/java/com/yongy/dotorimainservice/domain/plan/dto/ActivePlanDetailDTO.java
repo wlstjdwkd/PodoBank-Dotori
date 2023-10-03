@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class ActivePlanDetailDTO {
+    private Long planDetailSeq;
     private String title;
     private String groupTitle;
     private BigDecimal currentBalance;
