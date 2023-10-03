@@ -87,6 +87,7 @@ public class PurposeServiceImpl implements PurposeService{
                             .currentBalance(p.getCurrentBalance())
                             .goalAmount(p.getGoalAmount())
                             .terminatedAt(p.getTerminateAt())
+                            .startedAt(p.getStartedAt())
                     .build());
             total.add(p.getCurrentBalance()); // 현재 총 저축액 구하기 위해서 각 목표의 currentBalance 합 구하기
         }
