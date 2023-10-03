@@ -5,6 +5,7 @@ import com.bank.podo.domain.fcm.dto.DeleteFCMTokenDTO;
 import com.bank.podo.domain.fcm.dto.FCMNotificationRequestDTO;
 import com.bank.podo.domain.fcm.entity.FCMToken;
 import com.bank.podo.domain.fcm.repository.FCMRepository;
+import com.bank.podo.domain.fcm.util.FCMUtil;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
@@ -18,7 +19,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class FCMService {
-    private final FirebaseMessaging firebaseMessaging;
+    private final FCMUtil fcmUtil;
     private final FCMRepository fcmRepository;
 
     @Transactional
@@ -47,27 +48,13 @@ public class FCMService {
 
         if(fcmToken.isPresent()) {
             if(fcmToken.get().getToken() != null) {
-                Notification notification = Notification.builder()
-                        .setTitle(fcmNotificationRequestDTO.getTitle())
-                        .setBody(fcmNotificationRequestDTO.getBody())
-                        .build();
-
-                Message message = Message.builder()
-                        .setToken(fcmToken.get().getToken())
-                        .setNotification(notification)
-                        .build();
-                try {
-                    firebaseMessaging.send(message);
-                    return "success";
-                } catch (FirebaseMessagingException e) {
-                    e.printStackTrace();
-                    return "fail";
-                }
+                fcmUtil.requestAlert(fcmToken.get().getToken(), fcmNotificationRequestDTO.getTitle(), fcmNotificationRequestDTO.getBody());
             } else {
                 return "no token";
             }
         } else {
             return "no user";
         }
+        return "success";
     }
 }
