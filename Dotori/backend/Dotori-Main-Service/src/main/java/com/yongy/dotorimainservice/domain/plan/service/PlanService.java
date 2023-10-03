@@ -14,7 +14,7 @@ import java.util.List;
 public interface PlanService {
     void createPlan(PlanDTO planDTO);
     void terminatePlan(Long planSeq);
-    void updateState(State state, PlanStateDTO planStateDTO);
+    void updateState(PlanStateDTO planStateDTO);
     void saving(SavingDTO savingDTO) throws JsonProcessingException, ParseException;
     List<PlanListDto> getPlanList(Long userSeq);
     ActivePlanDTO findAllPlan(Long accountSeq) throws JsonProcessingException, ParseException;
