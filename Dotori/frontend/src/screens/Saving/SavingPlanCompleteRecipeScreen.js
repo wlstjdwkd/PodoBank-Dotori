@@ -27,19 +27,19 @@ export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
   const [accountSeq, setAccountSeq] = useState(2)
 
   // 가상 데이터 - 명세서 항목들
-  const [receipeItems, setReceipeItems] = useState([
-    { categoryTitle: "식비", expense: 50000, savings: 20000 },
-    { categoryTitle: "주거", expense: 30000, savings: 10000 },
-    { categoryTitle: "주거", expense: 30000, savings: 10000 },
-    { categoryTitle: "주거", expense: 30000, savings: 10000 },
-    { categoryTitle: "어디까지올라가는거에요", expense: 30000, savings: 10000 },
-    { categoryTitle: "주거", expense: 30000, savings: 10000 },
-    { categoryTitle: "주거", expense: 30000, savings: 10000 },
-    { categoryTitle: "주거", expense: 30000, savings: 10000 },
-    { categoryTitle: "주거", expense: 30000, savings: 10000 },
-
-    // 다른 항목들 추가
-  ])
+  const [receipeItems, setReceipeItems] = useState([])
+  // const [receipeItems, setReceipeItems] = useState([
+  //   { categoryTitle: "식비", expense: 50000, savings: 20000 },
+  //   { categoryTitle: "주거", expense: 30000, savings: 10000 },
+  //   { categoryTitle: "주거", expense: 30000, savings: 10000 },
+  //   { categoryTitle: "주거", expense: 30000, savings: 10000 },
+  //   { categoryTitle: "어디까지올라가는거에요", expense: 30000, savings: 10000 },
+  //   { categoryTitle: "주거", expense: 30000, savings: 10000 },
+  //   { categoryTitle: "주거", expense: 30000, savings: 10000 },
+  //   { categoryTitle: "주거", expense: 30000, savings: 10000 },
+  //   { categoryTitle: "주거", expense: 30000, savings: 10000 },
+  //   // 다른 항목들 추가
+  // ])
 
   // 추가 저축 항목
   const [additionalSavings, setAdditionalSavings] = useState(null)
@@ -79,9 +79,9 @@ export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
   }
 
   useEffect(()=>{
-    // doPlanSpecificationDetail()
-    setTotalExpense(funcTotalExpense(receipeItems))
-    setTotalSavings(funcTotalSavings(receipeItems))
+    doPlanSpecificationDetail()
+    // setTotalExpense(funcTotalExpense(receipeItems))
+    // setTotalSavings(funcTotalSavings(receipeItems))
   },[])
 
   return (
