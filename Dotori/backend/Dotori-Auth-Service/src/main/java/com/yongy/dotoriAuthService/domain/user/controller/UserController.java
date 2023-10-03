@@ -10,6 +10,7 @@ import com.yongy.dotoriAuthService.domain.user.entity.Role;
 import com.yongy.dotoriAuthService.domain.user.entity.User;
 import com.yongy.dotoriAuthService.domain.user.exception.*;
 import com.yongy.dotoriAuthService.domain.user.service.UserService;
+import com.yongy.dotoriAuthService.global.common.CallServer;
 import com.yongy.dotoriAuthService.global.redis.entity.EmailAuth;
 import com.yongy.dotoriAuthService.global.redis.entity.UserRefreshToken;
 import com.yongy.dotoriAuthService.global.security.dto.JwtToken;
@@ -19,17 +20,21 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 
 @Slf4j
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Tag(name= "users", description = "사용자 API")
 @RequestMapping("/api/v1/auth")
 public class UserController {
@@ -42,6 +47,14 @@ public class UserController {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+
+    @Value("${dotori.main.url}")
+    private String MAIN_SERVICE_URL;
+
+    private final CallServer callServer;
+
+    private final HashMap<String, Object> bodyData;
+    private ResponseEntity<String> response;
 
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "이메일 인증코드 전송"),
@@ -88,17 +101,15 @@ public class UserController {
     public ResponseEntity<Void> signup(@RequestBody UserInfoReqDto userInfoReqDto){
 
         try{
-            User user = User.builder()
-                    .id(userInfoReqDto.getId())
-                    .password(passwordEncoder.encode(userInfoReqDto.getPassword())) // 비밀번호 암호화해서 저장하기
-                    .userName(userInfoReqDto.getUserName())
-                    .birthDate(LocalDate.parse(userInfoReqDto.getBirthDate()))
-                    .phoneNumber(userInfoReqDto.getPhoneNumber())
-                    .authProvider(Provider.DOTORI)
-                    .role(Role.ROLE_USER)
-                    .build();
+            User user = userService.userSingup(userInfoReqDto); // 사용자 회원가입
 
-            userService.saveUser(user);
+            // NOTE : 리워드 생성하기
+            bodyData.clear();
+            bodyData.put("userSeq", user.getUserSeq());
+
+            response = callServer.getHttpWithParamsAndSend(MAIN_SERVICE_URL+"/reward/communication/enroll", HttpMethod.GET, bodyData);
+
+            log.info("리워드 결과 : "+ response.getStatusCode());
 
             return ResponseEntity.ok().build();
         }catch(Exception e){

@@ -6,6 +6,7 @@ import com.yongy.dotoriAuthService.domain.user.exception.AlreadyExistIdException
 import com.yongy.dotoriAuthService.domain.user.exception.FailedSocialAuthException;
 import com.yongy.dotoriAuthService.domain.user.service.NaverService;
 import com.yongy.dotoriAuthService.domain.user.service.UserService;
+import com.yongy.dotoriAuthService.global.common.CallServer;
 import com.yongy.dotoriAuthService.global.redis.entity.UserRefreshToken;
 import com.yongy.dotoriAuthService.global.security.dto.JwtToken;
 import com.yongy.dotoriAuthService.global.security.provider.JwtTokenProvider;
@@ -16,10 +17,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
 
 @Slf4j
 @RestController
@@ -35,6 +40,14 @@ public class NaverController {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
+    @Value("${dotori.main.url}")
+    private String MAIN_SERVICE_URL;
+
+    private final CallServer callServer;
+
+    private final HashMap<String, Object> bodyData;
+    private ResponseEntity<String> response;
 
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "네이버 회원가입 성공"),
@@ -67,7 +80,16 @@ public class NaverController {
             // NOTE : 회원가입
             User userFromDB = userService.getUser(user.getId());
             if(userFromDB == null){
-                userService.saveUser(user);  // DB에 사용자 저장
+                user = userService.saveUser(user);  // DB에 사용자 저장
+
+                // NOTE : 리워드 생성하기
+                bodyData.clear();
+                bodyData.put("userSeq", user.getUserSeq());
+
+                response = callServer.getHttpWithParamsAndSend(MAIN_SERVICE_URL+"/reward/communication/enroll", HttpMethod.GET, bodyData);
+
+                log.info("리워드 결과 : "+ response.getStatusCode());
+
                 return ResponseEntity.ok().build();
             }
 

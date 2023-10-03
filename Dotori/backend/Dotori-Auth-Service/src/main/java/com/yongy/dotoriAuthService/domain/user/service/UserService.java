@@ -1,6 +1,9 @@
 package com.yongy.dotoriAuthService.domain.user.service;
 
 
+import com.yongy.dotoriAuthService.domain.user.dto.request.UserInfoReqDto;
+import com.yongy.dotoriAuthService.domain.user.entity.Provider;
+import com.yongy.dotoriAuthService.domain.user.entity.Role;
 import com.yongy.dotoriAuthService.domain.user.entity.User;
 import com.yongy.dotoriAuthService.domain.user.repository.UserRepository;
 import com.yongy.dotoriAuthService.global.email.EmailUtil;
@@ -10,9 +13,11 @@ import com.yongy.dotoriAuthService.global.redis.repository.EmailAuthRepository;
 import com.yongy.dotoriAuthService.global.redis.repository.UserRefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Random;
 
 @Service
@@ -30,6 +35,9 @@ public class UserService {
 
     @Autowired
     private UserRefreshTokenRepository userRefreshTokenRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
 
     // NOTE : 이메일 인증코드를 생성한다.
@@ -63,8 +71,9 @@ public class UserService {
     }
 
     // NOTE : 사용자를 저장한다.
-    public void saveUser(User user){
+    public User saveUser(User user){
         userRepository.save(user);
+        return user;
     }
 
     // NOTE : 사용자의 RefreshToken을 RedisDB에 저장한다.
@@ -75,6 +84,20 @@ public class UserService {
     // NOTE : 사용자의 RefreshToken에 맞는 UserRefreshToken을 가져온다.
     public UserRefreshToken getUserRefreshToken(String refreshToken){
         return userRefreshTokenRepository.findByRefreshToken(refreshToken);
+    }
+
+    public User userSingup(UserInfoReqDto userInfoReqDto){
+        User user = User.builder()
+                .id(userInfoReqDto.getId())
+                .password(passwordEncoder.encode(userInfoReqDto.getPassword())) // 비밀번호 암호화해서 저장하기
+                .userName(userInfoReqDto.getUserName())
+                .birthDate(LocalDate.parse(userInfoReqDto.getBirthDate()))
+                .phoneNumber(userInfoReqDto.getPhoneNumber())
+                .authProvider(Provider.DOTORI)
+                .role(Role.ROLE_USER)
+                .build();
+        userRepository.save(user);
+        return user;
     }
 
 
