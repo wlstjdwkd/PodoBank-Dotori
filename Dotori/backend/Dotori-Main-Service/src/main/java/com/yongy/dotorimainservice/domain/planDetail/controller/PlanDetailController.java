@@ -38,6 +38,9 @@ public class PlanDetailController {
     }
 
     @Operation(summary = "실행 중인 카테고리 상세 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "실행 중인 카테고리 상세 조회 성공")
+    })
     @GetMapping("/{planDetailSeq}")
     public ResponseEntity<PlanDetailDataDTO> findActiveCategoryDetail(@RequestParam Long planDetailSeq){
         PlanDetailDataDTO result = planDetailService.findActiveCategoryDetail(planDetailSeq);
