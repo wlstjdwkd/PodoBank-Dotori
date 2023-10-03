@@ -44,7 +44,8 @@ public class NaverController {
     @Value("${dotori.main.url}")
     private String MAIN_SERVICE_URL;
 
-    private final CallServer callServer;
+    @Autowired
+    private CallServer callServer;
 
     private final HashMap<String, Object> bodyData;
     private ResponseEntity<String> response;
