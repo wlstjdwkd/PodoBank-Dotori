@@ -178,10 +178,14 @@ public class UserAuthServiceImpl implements UserAuthService{
         if(bankAccessToken.isEmpty()){
             if(bankRefreshToken.isEmpty()){
                 log.info("--1--");
-                this.podoBankLogin();
+                this.podoBankLogin(); // refreshToken이 만료되었으므로 다시 로그인
             }else{
                 log.info("--2--");
-                this.podoTokenUpdate(bankRefreshToken.get().getToken());
+                try{
+                    this.podoTokenUpdate(bankRefreshToken.get().getToken()); // refreshToken으로 업데이트
+                }catch(Exception e){
+                    this.podoBankLogin(); // refreshToken이 만료되었으므로 다시 로그인
+                }
             }
             useToken = bankAccessTokenRepository.findById(bankInfo.getBankName()).get().getToken();
         }else{
