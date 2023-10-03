@@ -29,7 +29,7 @@ public class AccountController {
 
     @Operation(summary = "전체 계좌 조회", description = "USER")
     @GetMapping()
-    public ResponseEntity<List<AccountDTO>> findAllAccount() throws JsonProcessingException {
+    public ResponseEntity<List<AccountDTO>> findAllAccount() throws JsonProcessingException, ParseException {
         List<AccountDTO> result = accountService.findAllAccount();
         return ResponseEntity.ok(result);
     }

@@ -42,16 +42,15 @@ public class AccountServiceImpl implements AccountService{
 
     private final AccountRepository accountRepository;
 
-    private final BankAccessTokenRepository bankAccessTokenRepository;
-
     private final HashMap<String, Object> bodyData;
 
     private final PodoBankInfo podoBankInfo;
 
 
     @Override
-    public List<AccountDTO> findAllAccount() throws JsonProcessingException {
+    public List<AccountDTO> findAllAccount() throws JsonProcessingException, ParseException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.info("ID : "+user.getId());
         List<Account> accounts = accountRepository.findAllByUserSeqAndDeleteAtIsNull(user.getUserSeq());
         List<AccountDTO> result = new ArrayList<>();
 
@@ -68,11 +67,12 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public BigDecimal getBalance(Long accountSeq) throws JsonProcessingException {
+    public BigDecimal getBalance(Long accountSeq) throws JsonProcessingException, ParseException {
         Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
         Bank bankInfo = bankRepository.findByBankSeq(account.getBank().getBankSeq());
 
-        String accessToken = bankAccessTokenRepository.findByBankName(bankInfo.getBankName()).getToken();// 은행 accessToken 가져오기
+        String accessToken = podoBankInfo.getConnectionToken(bankInfo.getBankSeq()); // 은행 accessToken 가져오기
+
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/json;charset=utf-8");

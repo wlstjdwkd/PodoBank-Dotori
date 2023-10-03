@@ -242,7 +242,7 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public ActivePlanDTO findAllPlan(Long accountSeq) throws JsonProcessingException {
+    public ActivePlanDTO findAllPlan(Long accountSeq) throws JsonProcessingException, ParseException {
          // 실행중인 계획 조회
         Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
         Plan plan = planRepository.findByAccountAccountSeq(accountSeq);

@@ -39,6 +39,9 @@ public class CallUser {
 
         response = callServer.postHttpBodyAndSend(USER_SERVICE_URL+"/user/communication/userById", bodyData);
 
+        log.info(response.getStatusCode().toString());
+        log.info(response.getBody().toString());
+
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(response.getBody());
 

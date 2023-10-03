@@ -95,7 +95,7 @@ public class PlanController {
             @ApiResponse(responseCode = "200", description = "실행 중인 계획 조회 성공")
     })
     @GetMapping("/{accountSeq}")
-    public ResponseEntity<ActivePlanDTO> findAllPlan(@PathVariable Long accountSeq) throws JsonProcessingException {
+    public ResponseEntity<ActivePlanDTO> findAllPlan(@PathVariable Long accountSeq) throws JsonProcessingException, ParseException {
         ActivePlanDTO result = planService.findAllPlan(accountSeq);
         return ResponseEntity.ok(result);
     }
