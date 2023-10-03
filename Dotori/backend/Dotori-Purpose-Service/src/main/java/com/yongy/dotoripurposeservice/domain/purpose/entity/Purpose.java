@@ -41,6 +41,9 @@ public class Purpose {
     @Column(name="terminate_at")
     private LocalDateTime terminateAt;
 
+    @Column(name = "finished")
+    private boolean finished;
+
     public void update(Purpose purpose){
         if(purpose.endAt != null){
             this.endAt = purpose.endAt;

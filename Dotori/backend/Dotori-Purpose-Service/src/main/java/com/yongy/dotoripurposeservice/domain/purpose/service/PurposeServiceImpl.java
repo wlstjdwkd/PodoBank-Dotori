@@ -85,6 +85,7 @@ public class PurposeServiceImpl implements PurposeService{
                             .title(p.getPurposeTitle())
                             .currentBalance(p.getCurrentBalance())
                             .goalAmount(p.getGoalAmount())
+                            .terminatedAt(p.getTerminateAt())
                     .build());
             total.add(p.getCurrentBalance()); // 현재 총 저축액 구하기 위해서 각 목표의 currentBalance 합 구하기
         }
@@ -103,7 +104,6 @@ public class PurposeServiceImpl implements PurposeService{
         // 목표 상세 내역 조회
         Purpose purpose = purposeRepository.findByPurposeSeq(purposeSeq);
         List<PurposeData> list = purposeDataRepository.findAllByPurpose(purpose);
-        log.info(list.size()+"");
         List<PurposeDataDTO> purposeData = new ArrayList<>();
 
         for(PurposeData data : list){
