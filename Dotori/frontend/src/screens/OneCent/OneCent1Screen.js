@@ -16,22 +16,56 @@ const banks = [
   {
     bankSeq: 1,
     bankName: "포도은행",
-    image: require("../../assets/images/logo_podo.png"),
+    // image: require("../../assets/images/logo_podo.png"),
+    image: require("../../assets/images/bankImage0.png"),
   },
   {
     bankSeq: 2,
     bankName: "국민은행",
-    image: require("../../assets/images/logo_podo.png"),
+    // image: require("../../assets/images/logo_podo.png"),
+    image: require("../../assets/images/bankImage1.png"),
   },
   {
     bankSeq: 3,
     bankName: "카카오뱅크",
-    image: require("../../assets/images/logo_podo.png"),
+    // image: require("../../assets/images/logo_podo.png"),
+    image: require("../../assets/images/bankImage2.png"),
   },
   {
     bankSeq: 4,
     bankName: "신한은행",
-    image: require("../../assets/images/logo_podo.png"),
+    // image: require("../../assets/images/logo_podo.png"),
+    image: require("../../assets/images/bankImage3.png"),
+  },
+  {
+    bankSeq: 5,
+    bankName: "농협은행",
+    // image: require("../../assets/images/logo_podo.png"),
+    image: require("../../assets/images/bankImage4.png"),
+  },
+  {
+    bankSeq: 6,
+    bankName: "하나은행",
+    // image: require("../../assets/images/logo_podo.png"),
+    image: require("../../assets/images/bankImage5.png"),
+  },
+  {
+    bankSeq: 7,
+    bankName: "새마을금고",
+    // image: require("../../assets/images/logo_podo.png"),
+    image: require("../../assets/images/bankImage6.png"),
+  },
+  {
+    bankSeq: 8,
+    bankName: "대구은행",
+    // image: require("../../assets/images/logo_podo.png"),
+    image: require("../../assets/images/bankImage7.png"),
+  },
+  {
+    bankSeq: 9,
+    bankName: "케이뱅크",
+    // image: require("../../assets/images/logo_podo.png"),
+    image: require("../../assets/images/bankImage8.png"),
   },
 ];
 
@@ -91,7 +125,7 @@ export default function OneCent1Screen({ navigation,route }) {
               disabled={bankList.some((item) => item.bankSeq != bank.bankSeq)}  
             >
               <Image style={styles.bankLogo} source={bank.image} />
-              <Text style={styles.bankName}>{bank.bankName}</Text>
+              <Text style={[styles.bankName, {color: bankList.some((item) => item.bankSeq != bank.bankSeq)?"#A9A9A9":"black"}]}>{bank.bankName}</Text>
             </TouchableOpacity>
           ))}
         </View>

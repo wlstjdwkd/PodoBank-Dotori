@@ -42,23 +42,6 @@ export default function LoginScreen({ navigation }) {
     }
   }
 
-  // const doLogin = async () => {
-  //   console.log("로그인완료")
-  //   if(idSave){
-  //     await AsyncStorage.setItem("id", emailValue);
-  //     console.log(emailValue)
-  //   }else{
-  //     await AsyncStorage.removeItem('id')
-  //   }
-  //   dispatch(inputgrantType("123"))
-  //   dispatch(inputAccessToken("456"))
-  //   dispatch(inputRefreshToken("789"))
-  //   navigation.reset({
-  //     index: 0,
-  //     routes: [{ name: 'MainPageScreen' }],
-  //   });
-  // }
-
   const doLogin = async () => {
     const data = {id:emailValue, password:passwordValue}
     try{

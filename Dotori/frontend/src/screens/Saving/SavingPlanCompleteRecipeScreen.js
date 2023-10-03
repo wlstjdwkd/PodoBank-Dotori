@@ -12,7 +12,7 @@ import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { planSpecificationDetail } from "../../apis/planapi"
 
-export default function ReceipeScreen({ route, navigation }) {
+export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
   // 토큰
   const grantType =  useSelector((state)=>state.user.grantType)
   const accessToken =  useSelector((state)=>state.user.accessToken)
@@ -21,10 +21,13 @@ export default function ReceipeScreen({ route, navigation }) {
   // 그 외
   
   // route.params에서 선택한 계좌와 명세서 번호(receipeSeq)를 가져옴
-  const [accountName, setAccountName] = useState(route.params.selectedAccount)
-  const [planSeq, setPlanSeq] = useState(route.params.selectedReceipe)
+  const [accountName, setAccountName] = useState(route.params.accountName)
+  const [planSeq, setPlanSeq] = useState(route.params.planSeq)
+  // const [accountSeq, setAccountSeq] = useState(route.params.accountSeq)
+  const [accountSeq, setAccountSeq] = useState(2)
 
   // 가상 데이터 - 명세서 항목들
+  const [receipeItems, setReceipeItems] = useState([])
   // const [receipeItems, setReceipeItems] = useState([
   //   { categoryTitle: "식비", expense: 50000, savings: 20000 },
   //   { categoryTitle: "주거", expense: 30000, savings: 10000 },
@@ -37,11 +40,13 @@ export default function ReceipeScreen({ route, navigation }) {
   //   { categoryTitle: "주거", expense: 30000, savings: 10000 },
   //   // 다른 항목들 추가
   // ])
-  const [receipeItems, setReceipeItems] = useState([])
 
   // 추가 저축 항목
   const [additionalSavings, setAdditionalSavings] = useState(null)
 
+  const [totalExpense, setTotalExpense] = useState(null)
+  const [totalSavings, setTotalSavings] = useState(null)
+  
   // 총계 계산
   const funcTotalExpense = (counting) => {
     return counting.reduce(
@@ -55,18 +60,6 @@ export default function ReceipeScreen({ route, navigation }) {
       0
     )
   }
-  const [totalExpense, setTotalExpense] = useState(null)
-  const [totalSavings, setTotalSavings] = useState(null)
-  // const totalExpense = receipeItems.reduce(
-  //   (acc, item) => acc + item.expense,
-  //   0
-  // );
-  // const totalSavings = receipeItems.reduce(
-  //   (acc, item) => acc + item.savings,
-  //   0
-  // );
-  const totalAdditionalSavings = additionalSavings;
-
 
   const doPlanSpecificationDetail = async () =>{
     try{
@@ -87,8 +80,8 @@ export default function ReceipeScreen({ route, navigation }) {
 
   useEffect(()=>{
     doPlanSpecificationDetail()
-    setTotalExpense(funcTotalExpense(receipeItems))
-    setTotalSavings(funcTotalSavings(receipeItems))
+    // setTotalExpense(funcTotalExpense(receipeItems))
+    // setTotalSavings(funcTotalSavings(receipeItems))
   },[])
 
   return (
@@ -191,6 +184,25 @@ export default function ReceipeScreen({ route, navigation }) {
           </View>
           <View style={styles.tableLine} />
         </View>
+
+        <View style={{width:"100%", margin:50, flexDirection:"row", justifyContent: "space-evenly"}}>
+          <TouchableOpacity
+            style={[styles.button, {backgroundColor:"#FF965C"}]}
+            onPress={() => {
+              navigation.navigate("MainPageScreen")
+            }}
+          >
+            <Text style={styles.buttonText}>취소하기</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, {backgroundColor:"#FF965C"}]}
+            onPress={() => {
+              navigation.navigate("SavingMoneyScreen", {accountName:accountName, accountSeq:accountSeq, planSeq:planSeq, totalSavings: totalSavings})
+            }}
+          >
+            <Text style={styles.buttonText}>저축하기</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
@@ -291,5 +303,17 @@ const styles = StyleSheet.create({
   totalCell: {
     fontWeight: "bold",
     backgroundColor: "#F5F5F5",
+  },
+  button: {
+    height: 40,
+    width: '40%',
+    backgroundColor: "#FF965C",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 18,
   },
 });

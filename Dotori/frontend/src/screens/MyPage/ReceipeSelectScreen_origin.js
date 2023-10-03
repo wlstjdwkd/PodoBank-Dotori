@@ -41,20 +41,16 @@ export default function ReceipeSelectScreen({ navigation }) {
   // 그 외
   
   const [specificationList, setSpecificationList] = useState([])
-  // const [specificationList, setSpecificationList] = useState(specifications)
   const [selectedAccount, setSelectedAccount] = useState(null)
   const [selectedReceipe, setSelectedReceipe] = useState(null)
 
   const handleViewReceipe = () => {
     // 명세서 보기 화면으로 이동하면서 선택한 계좌와 명세서 번호(receipeSeq)를 전달
-    if(selectedAccount && (selectedReceipe != null)){
-      // 나중에 원상복귀 시켜야함.
+    if(a==1){
       navigation.navigate("ReceipeScreen", {
         selectedAccount,
         selectedReceipe,
       });
-      // 잠깐 쓰고 나중에 삭제할네비게이션임.
-      // navigation.navigate("SavingPlanCompleteRecipeScreen", {selectedAccount:selectedAccount, selectedReceipe:selectedReceipe, })
     }else{
       Alert.alert('','확인할 수 있는 명세서가 없습니다.')
     }
@@ -73,10 +69,8 @@ export default function ReceipeSelectScreen({ navigation }) {
       const response = await planSpecificationList(accessToken, grantType)
       if(response.status === 200){
         setSpecificationList(response.data)
-        if(response.data.length > 0){
-          setSelectedAccount(response.data[0].accountName)
-          setSelectedReceipe(response.data[0].planSeq)
-        }
+        setSelectedAccount(specificationList[0].accountName)
+        setSelectedReceipe(specificationList[0].planSeq)
         console.log("명세서 전체 리스트 받아오기 성공")
       }else{
         console.log("명세서 전체 리스트 받아오기 실패")
@@ -87,11 +81,10 @@ export default function ReceipeSelectScreen({ navigation }) {
   }
 
   useEffect(()=>{
-    doPlanSpecificationList()
-    // if(specificationList.length>0){
-    //   setSelectedAccount(specificationList[0].accountName)
-    //   setSelectedReceipe(specificationList[0].planSeq)
-    // }
+    // doPlanSpecificationList()
+    setSpecificationList(specifications)
+    setSelectedAccount(specificationList[0].accountName)
+    setSelectedReceipe(specificationList[0].planSeq)
   }, [])
 
   return (
@@ -107,98 +100,67 @@ export default function ReceipeSelectScreen({ navigation }) {
           명세서의 기간을 선택해 주세요
         </Text>
 
-
-        {specificationList.length>0
-          ?
-            (
-            <View style={styles.pickerContainer}>
-              <View style={styles.pickerItem}>
-                <View style={{ alignItems: "center", borderBottomWidth: 1 }}>
-                  <Text style={styles.dropdownLabel}>계좌 이름</Text>
-                </View>
-                <Picker
-                  style={styles.dropdownPicker}
-                  selectedValue={selectedAccount}
-                  onValueChange={(itemValue) => setSelectedAccount(itemValue)}
-                  itemStyle={{ textAlign: "center" }} // 이 줄 추가
-                >
-                  {specifications
-                    .filter((receipe, index, self) =>
-                      index === self.findIndex((r) => r.accountName === receipe.accountName)
-                    )
-                    .map((uniqueReceipe, index) => (
-                      <Picker.Item
-                        key={index}
-                        label={uniqueReceipe.accountName}
-                        value={uniqueReceipe.accountName}
-                      />
-                    ))}
-                </Picker>
-              </View>
-              <View style={styles.pickerItem}>
-                <View style={{ alignItems: "center", borderBottomWidth: 1 }}>
-                  <Text style={styles.dropdownLabel}>기간</Text>
-                </View>
-                <Picker
-                  style={styles.dropdownPicker}
-                  selectedValue={selectedReceipe}
-                  onValueChange={(itemValue, itemIndex) => {
-                    setSelectedReceipe(itemValue);
-                  }}
-                  itemStyle={{ textAlign: "center" }} // 이 줄 추가
-                >
-                  {specifications.map((receipe, index) => {
-                    if(receipe.accountName === selectedAccount){
-                      return (
-                        <Picker.Item
-                          key={index}
-                          label={`${changeDayForm(receipe.startAt)} ~ ${changeDayForm(receipe.endAt)}`}
-                          value={receipe.planSeq}
-                        />
-                      )
-                    }
-                  })}
-                </Picker>
-              </View>
-            </View>)
-          : 
-            (
-              <View style={styles.pickerContainer}>
-                <View style={styles.pickerItem}>
-                  <View style={{ alignItems: "center", borderBottomWidth: 1 }}>
-                    <Text style={styles.dropdownLabel}>계좌 이름</Text>
-                  </View>
-                  <Picker
-                    style={styles.dropdownPicker}
-                    selectedValue={selectedAccount}
-                    onValueChange={()=>{}}
-                    itemStyle={{ textAlign: "center" }} // 이 줄 추가
-                  >
-                        <Picker.Item
-                          label="해당없음"
-                          value=""
-                        />
-                  </Picker>
-                </View>
-                <View style={styles.pickerItem}>
-                  <View style={{ alignItems: "center", borderBottomWidth: 1 }}>
-                    <Text style={styles.dropdownLabel}>기간</Text>
-                  </View>
-                  <Picker
-                    style={styles.dropdownPicker}
-                    selectedValue={selectedReceipe}
-                    onValueChange={()=>{}}
-                    itemStyle={{ textAlign: "center" }} // 이 줄 추가
-                  >
-                    
+        {/* 계좌 이름과 기간 Picker를 가로로 배치 */}
+        <View style={styles.pickerContainer}>
+          <View style={styles.pickerItem}>
+            <View style={{ alignItems: "center", borderBottomWidth: 1 }}>
+              <Text style={styles.dropdownLabel}>계좌 이름</Text>
+            </View>
+            <Picker
+              style={styles.dropdownPicker}
+              selectedValue={selectedAccount}
+              onValueChange={(itemValue) => setSelectedAccount(itemValue)}
+              itemStyle={{ textAlign: "center" }} // 이 줄 추가
+            >
+              {/* 계좌 이름 목록 */}
+              {/* {specifications.map((receipe, index) => (
+                <Picker.Item
+                  key={index}
+                  label={receipe.accountName}
+                  value={receipe.accountName}
+                />
+              ))} */}
+              {/* 계좌 이름 목록 */}
+              {specifications
+                .filter((receipe, index, self) =>
+                  index === self.findIndex((r) => r.accountName === receipe.accountName)
+                )
+                .map((uniqueReceipe, index) => (
+                  <Picker.Item
+                    key={index}
+                    label={uniqueReceipe.accountName}
+                    value={uniqueReceipe.accountName}
+                  />
+                ))}
+            </Picker>
+          </View>
+          <View style={styles.pickerItem}>
+            <View style={{ alignItems: "center", borderBottomWidth: 1 }}>
+              <Text style={styles.dropdownLabel}>기간</Text>
+            </View>
+            <Picker
+              style={styles.dropdownPicker}
+              selectedValue={selectedReceipe}
+              onValueChange={(itemValue, itemIndex) => {
+                setSelectedReceipe(itemValue);
+              }}
+              itemStyle={{ textAlign: "center" }} // 이 줄 추가
+            >
+              {/* 기간 목록 */}
+              {specifications.map((receipe, index) => {
+                if(receipe.accountName === selectedAccount){
+                  return (
                     <Picker.Item
-                      label="해당없음"
-                      value=""
+                      key={index}
+                      label={`${changeDayForm(receipe.startAt)} ~ ${changeDayForm(receipe.endAt)}`}
+                      value={receipe.planSeq}
                     />
-                  </Picker>
-                </View>
-              </View>)
-        }
+                  )
+                }
+              })}
+            </Picker>
+          </View>
+        </View>
         {/* 명세서 보기 버튼 */}
         <TouchableOpacity
           style={styles.viewReceipeButton}
