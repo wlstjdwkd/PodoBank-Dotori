@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -65,11 +66,8 @@ public class UserController {
     private CallServer callServer;
 
     private final HashMap<String, Object> bodyData;
-
     private ResponseEntity<String> response;
 
-    @Autowired
-    private AuthProvider authProvider;
 
     // NOTE : 사용자 데이터 가져오기
     @ApiResponse(responseCode = "200", description = "사용자의 데이터를 가져오는데 성공함")
@@ -166,14 +164,23 @@ public class UserController {
             throw new FailedRetiredException("사용자의 목표 통장에 돈이 남아있어서 탈퇴할 수 없습니다.");
         }
 
-        // NOTE : 사용자의 계좌 모두 삭제하기
-        response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/delete/all", bodyData);
-
         // NOTE : 사용자의 진행중인 계획 모두 삭제하기
         response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/plan/communication/delete/all", bodyData);
 
+        // NOTE : 사용자의 계좌 모두 삭제하기
+        response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/delete/all", bodyData);
+
         // NOTE : 사용자의 RefreshToken 삭제하기
         userService.deleteUserRefreshToken(user.getId());
+
+        // NOTE : 사용자의 Reward 삭제하기
+        bodyData.clear();
+        bodyData.put("userSeq", user.getUserSeq());
+
+        response = callServer.getHttpWithParamsAndSend(MAIN_SERVICE_URL+"/reward/communication/delete", HttpMethod.GET, bodyData);
+
+        log.info("리워드 삭제 결과 : "+ response.getStatusCode());
+
 
         // NOTE : 사용자 탈퇴하기
         userService.removeRetireUser(user);
