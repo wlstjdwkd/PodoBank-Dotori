@@ -58,7 +58,7 @@ export default function SavingCompleteScreen({ navigation, route }) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          // navigation.navigate("")
+          navigation.navigate("RewardScreen")
         }}
       >
 
