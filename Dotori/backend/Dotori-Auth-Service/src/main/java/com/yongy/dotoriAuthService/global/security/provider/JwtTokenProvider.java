@@ -27,6 +27,8 @@ public class JwtTokenProvider {
 
     private final long exp = 1000L * 60 * 60; // 1시간
 
+    int time = 60*60;
+
 
     private Key secretKey;
 
@@ -49,15 +51,15 @@ public class JwtTokenProvider {
         String accessToken = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + exp)) // 1시간
+                .setExpiration(new Date(now.getTime() + exp))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
 
-        // 만료시간 : 24시간
+        // 만료시간 : 7일
         String refreshToken = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + (exp * 24 * 7))) // 7일
+                .setExpiration(new Date(now.getTime() + (exp * 24 * 7)))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
 
