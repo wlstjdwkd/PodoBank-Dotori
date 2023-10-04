@@ -27,9 +27,9 @@ public class BankController {
     }
 
     @GetMapping("/communication/bankInfo")
-    public ResponseEntity<BankDto> getBankInfo(@RequestParam Long bankSeq){
+    public ResponseEntity<BankDto> getBankInfo(@RequestParam String bankSeq){
         log.info("come - BANK");
-        return ResponseEntity.ok(bankService.bankDtoFromBank(bankSeq));
+        return ResponseEntity.ok(bankService.bankDtoFromBank(Long.valueOf(bankSeq)));
     }
 
 }
