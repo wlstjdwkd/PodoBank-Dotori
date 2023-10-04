@@ -1,25 +1,35 @@
 package com.yongy.dotoripurposeservice.domain.purpose.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.*;
-import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.PurposeSavingDTO;
-import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.SavingDataDTO;
+import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.*;
 import com.yongy.dotoripurposeservice.domain.purpose.entity.Purpose;
+import com.yongy.dotoripurposeservice.domain.purpose.exception.NotActiveException;
+import com.yongy.dotoripurposeservice.domain.purpose.exception.NotEqualsBalanceException;
 import com.yongy.dotoripurposeservice.domain.purpose.repository.PurposeRepository;
 import com.yongy.dotoripurposeservice.domain.purposeData.dto.PurposeDataDTO;
 import com.yongy.dotoripurposeservice.domain.purposeData.entity.PurposeData;
 import com.yongy.dotoripurposeservice.domain.purposeData.repository.PurposeDataRepository;
 import com.yongy.dotoripurposeservice.domain.user.entity.User;
 import com.yongy.dotoripurposeservice.global.common.CallServer;
+import com.yongy.dotoripurposeservice.global.common.PodoBankInfo;
+import com.yongy.dotoripurposeservice.global.redis.entity.BankAccessToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -29,6 +39,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -38,12 +49,11 @@ public class PurposeServiceImpl implements PurposeService{
 
     private final PurposeRepository purposeRepository;
     private final PurposeDataRepository purposeDataRepository;
+    private final CallServer callServer;
+    private final PodoBankInfo podoBankInfo;
 
     @Value("${dotori.main.url}")
     private String MAIN_SERVICE_URL;
-
-    @Autowired
-    private CallServer callServer;
 
     private static HashMap<String, Object> bodyData;
 
@@ -203,9 +213,88 @@ public class PurposeServiceImpl implements PurposeService{
         purposeDataRepository.saveAll(purposeDataList);
     }
 
-    public User getLoginUser(){
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    @Override
+    public void purposeFinised(PurposeFinisedDTO purposeFinisedDTO) throws JsonProcessingException, ParseException {
+        Purpose purpose = purposeRepository.findByPurposeSeq(purposeFinisedDTO.getPuposeSeq());
+
+        if(purpose.getTerminateAt() == null){
+            throw new NotActiveException("종료된 목표가 아닙니다.");
+        }
+
+        if(!purpose.getCurrentBalance().equals(purposeFinisedDTO.getPurposeSavings())){
+            throw new NotEqualsBalanceException("저축 금액이 일치하지 않습니다.");
+        }
+
+        // TODO : 금액만큼 은행에 송금 요청
+        // TODO : 1. 은행 정보 가져오기
+        MultiValueMap<String, Object> parameters = new LinkedMultiValueMap<>();
+        parameters.add("bankSeq", purposeFinisedDTO.getBankSeq());
+        ResponseEntity<String> bankResponse = callServer.getHttpWithParamsAndSend(MAIN_SERVICE_URL+"/api/v1/bank/communication/bankInfo", parameters);
+
+        String responseCode = bankResponse.getStatusCode().toString().split(" ")[0];
+        String responseContent = bankResponse.getBody();
+
+        if(responseCode.equals("200")){
+            ObjectMapper objectMapper = new ObjectMapper();
+            BankDTO bankInfo = objectMapper.readValue(responseContent,BankDTO.class);
+
+            // TODO : 2. 은행 정보와 계좌정보 바탕으로 account 정보 가져오기
+            HashMap<String, Object> body = new HashMap<>();
+            body.put("accountName", purposeFinisedDTO.getAccountNumber());
+            ResponseEntity<String> accountResponse = callServer.getHttpBodyAndSend(MAIN_SERVICE_URL+"/api/v1/account/communication/account", HttpMethod.GET, body);
+
+            responseCode = accountResponse.getStatusCode().toString().split(" ")[0];
+            responseContent = accountResponse.getBody();
+
+            AccountFintechCodeDTO accountFintechCodeDTO = objectMapper.readValue(responseContent, AccountFintechCodeDTO.class);
+
+            // TODO : 3. 은행에 송금 요청하기
+            this.callBankAPI(bankInfo, accountFintechCodeDTO, purposeFinisedDTO);
+        }
+    }
+
+    public void callBankAPI(BankDTO bankInfo, AccountFintechCodeDTO accountFintechCodeDTO, PurposeFinisedDTO purposeFinisedDTO) throws ParseException {
+        String bankAccessToken = podoBankInfo.getConnectionToken(bankInfo); // 은행 accessToken 가져오기
+        String accessToken = null;
+        Purpose purpose = purposeRepository.findByPurposeSeq(purposeFinisedDTO.getPuposeSeq());
+
+        if(bankAccessToken != null){ // accessToken이 없으면
+            accessToken = bankAccessToken;
+        }
+
+        if(bankAccessToken == null){
+            accessToken = podoBankInfo.getConnectionToken(bankInfo);
+        }
+        // NOTE : plan에 연결된 계좌에서 총 금액을 도토리 계좌로 입금 요청하기
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Type", "application/json;charset=utf-8");
+        httpHeaders.add("Authorization","Bearer " + accessToken);
+
+        Map<String, String> bodyData = new HashMap<>();
+        bodyData.put("serviceCode", bankInfo.getServiceCode());
+        bodyData.put("fintechCode", accountFintechCodeDTO.getFintechCode());
+        bodyData.put("amount", String.valueOf(purposeFinisedDTO.getPurposeSavings()));
+        bodyData.put("content", "도토리 "+purpose.getPurposeTitle());
+
+        HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, httpHeaders);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                bankInfo.getBankUrl()+"/api/v1/fintech/deposit",
+                HttpMethod.POST,
+                httpEntity,
+                String.class
+        );
+
+        String responseCode = response.getStatusCode().toString().split(" ")[0];
+        if(!responseCode.equals("200")){
+            throw new IllegalArgumentException("송금에 실패했습니다.");
+        }
     }
 
 
+    public User getLoginUser(){
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
 }

@@ -1,9 +1,6 @@
 package com.yongy.dotoripurposeservice.domain.purpose.controller;
 
-import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeAllDTO;
-import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeDTO;
-import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeDetailDTO;
-import com.yongy.dotoripurposeservice.domain.purpose.dto.PurposeSummaryDTO;
+import com.yongy.dotoripurposeservice.domain.purpose.dto.*;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.SavingDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.SavingDataDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.UserReqDto;
@@ -103,6 +100,10 @@ public class PurposeController {
     }
 
 
+    @Operation(summary = "목표 종료")
+    @PatchMapping("/finised")
+    public ResponseEntity<Void> purposeFinished(@RequestBody PurposeFinisedDTO purposeFinisedDTO){
 
-
+        return ResponseEntity.ok().build();
+    }
 }
