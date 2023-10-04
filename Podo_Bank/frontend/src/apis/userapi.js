@@ -1,6 +1,7 @@
 // src/api/userApi.js
 import axios from "axios";
 import * as Notifications from "expo-notifications";
+import messaging from '@react-native-firebase/messaging'
 // import { Constants } from "expo-constants";
 // const projectId = Constants.expoConfig.extra.eas.projectId;
 const apiAddress = "http://j9d107.p.ssafy.io:9600";
@@ -122,12 +123,8 @@ export const userLogin = async (email, password) => {
       throw new Error("Permissions not granted");
     }
 
-    const token = (
-      await Notifications.getExpoPushTokenAsync({
-        projectId: "87dc9661-bf07-4673-b9e6-dc5bcda7ea11",
-      })
-    ).data;
-    console.log("Token:", token);
+    const token = await messaging().getToken();
+    console.log("FCMToken: " + token);
 
     const response = await axios.post(apiAddress + "/api/v1/auth/login", {
       email: email,

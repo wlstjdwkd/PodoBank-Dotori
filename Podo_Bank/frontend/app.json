@@ -13,7 +13,6 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "bundleIdentifier": "com.yongyong.podobank",
       "supportsTablet": true
     },
     "android": {
@@ -21,14 +20,14 @@
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.yongyong.podobank"
+      "package": "com.hyunduk9775.PodoBank"
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "87dc9661-bf07-4673-b9e6-dc5bcda7ea11"
+        "projectId": "f3595617-0f64-40fc-bad1-ce0d6403e677"
       }
     }
   }
