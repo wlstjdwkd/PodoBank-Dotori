@@ -16,6 +16,12 @@ import PurposeCompleteScreen from "../screens/Purpose/PurposeCompleteScreen";
 import PurposeDetailScreen from "../screens/Purpose/PurposeDetailScreen";
 import PurposeStopScreen from "../screens/Purpose/PurposeStopScreen";
 import PurposeStop1Screen from "../screens/Purpose/PurposeStop1Screen";
+import PurposeEnd1Screen from "../screens/Purpose/PurposeEnd1Screen";
+import PurposeEnd2Screen from "../screens/Purpose/PurposeEnd2Screen";
+import PurposeEnd3Screen from "../screens/Purpose/PurposeEnd3Screen";
+import PurposeEnd4Screen from "../screens/Purpose/PurposeEnd4Screen";
+import PurposeEnd5Screen from "../screens/Purpose/PurposeEnd5Screen";
+
 import PlanMainScreen from "../screens/Plan/PlanMainScreen";
 import PlanCreate1Screen from "../screens/Plan/PlanCreate1Screen";
 import PlanCreate2Screen from "../screens/Plan/PlanCreate2Screen";
@@ -28,7 +34,6 @@ import PlanNotClassifyScreen from "../screens/Plan/PlanNotClassifyScreen";
 import SavingPlanCompleteRecipeScreen from "../screens/Saving/SavingPlanCompleteRecipeScreen";
 import SavingMoneyScreen from "../screens/Saving/SavingMoneyScreen";
 import SavingCompleteScreen from "../screens/Saving/SavingCompleteScreen";
-
 
 import OneCent1Screen from "../screens/OneCent/OneCent1Screen";
 import OneCent2Screen from "../screens/OneCent/OneCent2Screen";
@@ -112,6 +117,26 @@ export default function AppNavigator() {
       <Stack.Screen
         name="PurposeStop1Screen"
         component={PurposeStop1Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PurposeEnd1Screen"
+        component={PurposeEnd1Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PurposeEnd2Screen"
+        component={PurposeEnd2Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PurposeEnd3Screen"
+        component={PurposeEnd3Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PurposeEnd4Screen"
+        component={PurposeEnd4Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="PurposeEnd5Screen"
+        component={PurposeEnd5Screen}
       ></Stack.Screen>
       <Stack.Screen
         name="PlanMainScreen"
@@ -200,16 +225,16 @@ export default function AppNavigator() {
         component={WithDraw1Screen}
       ></Stack.Screen>
       <Stack.Screen
-      name="SavingPlanCompleteRecipeScreen"
-      component={SavingPlanCompleteRecipeScreen}
+        name="SavingPlanCompleteRecipeScreen"
+        component={SavingPlanCompleteRecipeScreen}
       ></Stack.Screen>
       <Stack.Screen
-      name="SavingMoneyScreen"
-      component={SavingMoneyScreen}
+        name="SavingMoneyScreen"
+        component={SavingMoneyScreen}
       ></Stack.Screen>
       <Stack.Screen
-      name="SavingCompleteScreen"
-      component={SavingCompleteScreen}
+        name="SavingCompleteScreen"
+        component={SavingCompleteScreen}
       ></Stack.Screen>
     </Stack.Navigator>
   );

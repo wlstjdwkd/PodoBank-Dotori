@@ -262,22 +262,14 @@ export const userSignup = async (signupData) => {
 
 // reward
 // 사용자 현재 도토리 갯수 조회
-export const userDotoriValueCheck = async (
-  dotoriValueCheckData,
-  accessToken,
-  grantType
-) => {
+export const userDotoriValueCheck = async (accessToken, grantType) => {
   try {
-    const response = await axios.get(
-      apiAddress + `/v1/reward/dotori`,
-      dotoriValueCheckData,
-      {
-        headers: {
-          Authorization: `${grantType} ${accessToken}`,
-        },
-      }
-    );
-    console.log("사용자 현재 도토리 갯수 조회 성공:", response.data);
+    const response = await axios.get(apiAddress + `/api/v1/reward`, {
+      headers: {
+        Authorization: `${grantType} ${accessToken}`,
+      },
+    });
+    console.log("사용자 현재 도토리 갯수 조회 성공:", response.data.dotori);
     return response;
   } catch (error) {
     console.error("사용자 현재 도토리 갯수 조회 실패:", error);
