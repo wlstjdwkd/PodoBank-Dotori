@@ -45,6 +45,31 @@ export const planSaving = async (savingData, accessToken, grantType) => {
     // throw error;
   }
 };
+// 계획 종료 후 저축안하고 끝내기
+export const planNoSaving = async (planSeq, accessToken, grantType) => {
+  try {
+    const response = await axios.patch(
+      apiAddress + `/api/v1/plan/completed/${planSeq}`,
+      null,
+      {
+        headers: {
+          Authorization: `${grantType} ${accessToken}`,
+        },
+      }
+    );
+    console.log("계획 종료 후 저축안하고 끝내기 성공:", response.data);
+    return response;
+  } catch (error) {
+    console.error(
+      "계획 종료 후 저축안하고 끝내기 실패:",
+      error.response.status,
+      error.response.data
+    );
+    const response = error.response;
+    return response;
+    // throw error;
+  }
+};
 // 계획 중단하기
 export const planStop = async (planSeq, accessToken, grantType) => {
   try {

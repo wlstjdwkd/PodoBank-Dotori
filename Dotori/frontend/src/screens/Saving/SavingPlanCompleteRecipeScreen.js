@@ -10,7 +10,7 @@ import {
 
 import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux";
-import { planSpecificationDetail } from "../../apis/planapi"
+import { planSpecificationDetail, planNoSaving } from "../../apis/planapi"
 
 export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
   // 토큰
@@ -46,6 +46,9 @@ export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
 
   const [totalExpense, setTotalExpense] = useState(null)
   const [totalSavings, setTotalSavings] = useState(null)
+  const [noSavingModalVisible, setNoSavingModalVisible] = useState(false)
+  const [currentAccountAmount, setCurrentAccountAmount] = useState(null)
+
   
   // 총계 계산
   const funcTotalExpense = (counting) => {
@@ -69,12 +72,34 @@ export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
         setAdditionalSavings(response.data.additionalSaving)
         setTotalExpense(funcTotalExpense(response.data.planDetailList))
         setTotalSavings(funcTotalSavings(response.data.planDetailList))
+        setCurrentAccountAmount(response.data.currentAmount) // 계좌 잔액
         console.log("명세서 상세 조회하기 성공", response.data)
       }else{
         console.log("명세서 상세 조회하기 실패", response.status)
       }
     }catch(error){
       console.log("오류 발생 명세서 상세 조회하기 실패: ", error)
+    }
+  }
+
+  const handlePlanNoSaving = async() =>{
+    await doPlanNoSaving()
+    setNoSavingModalVisible(false)
+  }
+  const doPlanNoSaving = async () => {
+    try{
+      const response = await planNoSaving(planSeq, accessToken, grantType)
+      if(response.status === 200){
+        console.log("저축 안하기 성공", response.data)
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainPageScreen' }],
+        });
+      }else{
+        console.log("저축 안하기 실패", response.status)
+      }
+    }catch(error){
+      console.log()
     }
   }
 
@@ -189,21 +214,58 @@ export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
           <TouchableOpacity
             style={[styles.button, {backgroundColor:"#FF965C"}]}
             onPress={() => {
-              navigation.navigate("MainPageScreen")
+              setNoSavingModalVisible(true)
             }}
           >
-            <Text style={styles.buttonText}>취소하기</Text>
+            <Text style={styles.buttonText}>종료하기</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, {backgroundColor:"#FF965C"}]}
             onPress={() => {
-              navigation.navigate("SavingMoneyScreen", {accountName:accountName, accountSeq:accountSeq, planSeq:planSeq, totalSavings: totalSavings})
+              navigation.navigate("SavingMoneyScreen", {accountName:accountName, accountSeq:accountSeq, planSeq:planSeq, totalSavings: totalSavings, currentAccountAmount:currentAccountAmount})
             }}
           >
             <Text style={styles.buttonText}>저축하기</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* 미저축 종료 모달창 */}
+      { noSavingModalVisible
+        ?
+        (<View style={styles.centeredView}>
+          <Modal
+            animationType="none"
+            transparent={true}
+            visible={noSavingModalVisible}
+            onRequestClose={() => {
+              setNoSavingModalVisible(false);
+            }}>
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalText}>저축하지 않고, 종료하시겠습니까?</Text>
+                <View style={{flexDirection:'row', justifyContent:'space-around'}}>
+                  <TouchableOpacity
+                    style={[styles.modalbutton, styles.buttonClose]}
+                    onPress={() => {
+                      handlePlanNoSaving()
+                    }}>
+                    <Text style={styles.textStyle}>예</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.modalbutton, styles.buttonClose]}
+                    onPress={() => {
+                      setNoSavingModalVisible(false)
+                    }}>
+                    <Text style={styles.textStyle}>아니오</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        </View>)
+        : null
+      }
     </View>
   );
 }
@@ -315,5 +377,51 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 18,
+  },
+
+   // 모달 관련 스타일
+   centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    // alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalbutton: {
+    flex:1,
+    borderRadius: 20,
+    padding: 10,
+    marginHorizontal: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    // backgroundColor: '#2196F3',
+    backgroundColor: '#FF965C',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });

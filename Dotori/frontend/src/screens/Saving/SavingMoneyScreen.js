@@ -7,6 +7,7 @@ import {
   FlatList,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native"
 import FooterScreen from "../Components/FooterScreen"
 import HeaderComponent from "../Components/HeaderScreen";
@@ -33,6 +34,7 @@ export default function SavingMoneyScreen({ navigation, route }) {
   const [accountSeq, setAccountSeq] = useState(route.params.accountSeq)
   const [planSeq, setPlanSeq] = useState(route.params.planSeq)
   const [totalSavings, setTotalSavings] = useState(route.params.totalSavings)
+  const [currentAccountAmount, setCurrentAccountAmount] = useState(route.params.currentAccountAmount)
   const [addSavings, setAddSavings] = useState(null)
   const [selectItem, setSelectItem] = useState(null)
   const [editAmount, setEditAmount] = useState("");
@@ -99,6 +101,15 @@ export default function SavingMoneyScreen({ navigation, route }) {
   //     "type" : "number"
   //   }
   // }
+
+  const handlePlanSaving = () => {
+    const allSaving = purposeList.reduce((total, item) => total + item.savingAmount, 0)
+    if(currentAccountAmount >= allSaving){
+      doPlanSaving()
+    }else{
+      Alert.alert("","현재 계좌 보유액보다 많은 금액을 저축할 수 없습니다.")
+    }
+  }
   const doPlanSaving = async () => {
     const purposeSavingList = purposeList.map((purpose) => ({
       purposeSeq: purpose.purposeSeq,
@@ -264,14 +275,14 @@ export default function SavingMoneyScreen({ navigation, route }) {
         style={[styles.button, {backgroundColor:"#FF965C"}]}
         onPress={() => {
           console.log(purposeList)
-          doPlanSaving()
+          handlePlanSaving()
           // navigation.reset({
           //   index: 0,
           //   routes: [{ name: 'SavingCompleteScreen' }],
           // });
         }}
       >
-        <Text style={styles.buttonText}>목표 생성하기</Text>
+        <Text style={styles.buttonText}>저축하기</Text>
       </TouchableOpacity>
     </View>
   );
