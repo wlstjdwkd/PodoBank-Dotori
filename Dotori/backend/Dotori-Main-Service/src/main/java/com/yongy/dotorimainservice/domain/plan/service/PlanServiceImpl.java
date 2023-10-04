@@ -2,6 +2,8 @@ package com.yongy.dotorimainservice.domain.plan.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotorimainservice.domain.account.entity.Account;
+import com.yongy.dotorimainservice.domain.account.exception.ExistAccountNumberException;
+import com.yongy.dotorimainservice.domain.account.exception.NotFoundAccountNumberException;
 import com.yongy.dotorimainservice.domain.account.repository.AccountRepository;
 import com.yongy.dotorimainservice.domain.account.service.AccountService;
 import com.yongy.dotorimainservice.domain.bank.entity.Bank;
@@ -80,9 +82,15 @@ public class PlanServiceImpl implements PlanService {
             state = State.ACTIVE;
         }
 
+        // TODO : accoutSeq랑 User랑 일치하는지 확인
+        Account account = accountRepository.findByUserSeqAndAccountSeqAndDeleteAtIsNull(loginUser.getUserSeq(), planDTO.getAccountSeq());
+        if(account == null){
+            throw new NotFoundAccountNumberException("계좌가 존재하지 않습니다.");
+        }
+
         Plan plan = planRepository.save(Plan.builder()
                 .userSeq(loginUser.getUserSeq())
-                .account(accountRepository.findByAccountSeqAndDeleteAtIsNull(planDTO.getAccountSeq()))
+                .account(account)
                 .startAt(LocalDateTime.parse(planDTO.getStartedAt(), formatter))
                 .endAt(LocalDateTime.parse(planDTO.getEndAt(), formatter))
                 .planState(state)
@@ -253,7 +261,6 @@ public class PlanServiceImpl implements PlanService {
         // 플랜이 없으면 : 플랜 만들기 페이지
 
         if((plan != null && plan.getPlanState().equals(State.ACTIVE)) || (plan != null && plan.getPlanState().equals(State.READY))){
-
 
             // TODO : 종료 됐는지 확인하고 종료 됐으면 terminateAt 변경하고 미분류 checked true로 변경
             if(plan.getPlanState().equals(State.ACTIVE) && checkTerminate(plan.getEndAt())){
