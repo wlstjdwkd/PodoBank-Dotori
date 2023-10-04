@@ -380,7 +380,7 @@ public class PlanServiceImpl implements PlanService {
     }
 
     // NOTE : 12시 되면 날짜 확인하고 실행
-    @Scheduled(cron = "0 0 0 * * *") // 매일 자정에 실행
+    //@Scheduled(cron = "* * * * * *") // 매일 자정에 실행
     public void startEndPlan() {
         // 모든 사용자의 모든 READY인 Plan 가져와서 ACTIVE로 변경하기
         LocalDateTime today = LocalDateTime.now();
@@ -388,6 +388,7 @@ public class PlanServiceImpl implements PlanService {
         today.withMinute(0);
         today.withSecond(0);
         today.withNano(0);
+        log.info(today.toString());
 
         // 시작 처리
         List<Plan> startplans = planRepository.findAllByStartAtAndPlanState(today, State.READY);

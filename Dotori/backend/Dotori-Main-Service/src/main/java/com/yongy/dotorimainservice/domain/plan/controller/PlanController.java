@@ -9,6 +9,7 @@ import com.yongy.dotorimainservice.domain.plan.dto.communication.UserSeqDto;
 import com.yongy.dotorimainservice.domain.plan.dto.response.PlanListDto;
 import com.yongy.dotorimainservice.domain.plan.entity.State;
 import com.yongy.dotorimainservice.domain.plan.service.PlanService;
+import com.yongy.dotorimainservice.domain.plan.service.PlanServiceImpl;
 import com.yongy.dotorimainservice.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,8 +30,8 @@ import java.util.List;
 @RequestMapping("/api/v1/plan")
 public class PlanController {
 
-    @Autowired
-    private PlanService planService;
+    private final PlanService planService;
+    private final PlanServiceImpl planServicelmpl;
 
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "계획 생성 성공")
@@ -104,6 +105,12 @@ public class PlanController {
         log.info("check-1");
         planService.removeUserPlans(userSeqDto.getUserSeq());
         log.info("check-2");
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/updateDay")
+    public ResponseEntity<Void> updateDay(){
+        planServicelmpl.startEndPlan();
         return ResponseEntity.ok().build();
     }
 }
