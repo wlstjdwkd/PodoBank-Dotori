@@ -113,6 +113,23 @@ export const purposeGetList = async (accessToken, grantType) => {
   }
 };
 
+// 목표 완료 후 저축하기
+export const purposeEndSaving = async (endSavingData, accessToken, grantType) => {
+  try {
+    const response = await axios.patch(apiAddress+`/api/v1/purpose/finished`, endSavingData, {
+      headers: {
+        Authorization: `${grantType} ${accessToken}`,
+      },
+    });
+    console.log('목표 완료 후 저축하기 성공:', response.data);
+    return response;
+  } catch (error) {
+    console.error('목표 완료 후 저축하기 실패:', error.response.status, error.response.data);
+    const response = error.response
+    return response
+    // throw error;
+  }
+};
 
 
 
@@ -169,23 +186,7 @@ export const purposeGetList = async (accessToken, grantType) => {
 //     // throw error;
 //   }
 // };
-// // 목표 완료 후 저축하기
-// export const purposeEndSaving = async (endSavingData, accessToken) => {
-//   try {
-//     const response = await axios.patch(apiAddress+`/v1/purpose/saving`, endSavingData, {
-//       headers: {
-//         Authorization: `Bearer ${accessToken}`,
-//       },
-//     });
-//     console.log('목표 완료 후 저축하기 성공:', response.data);
-//     return response;
-//   } catch (error) {
-//     console.error('목표 완료 후 저축하기 실패:', error.response.status, error.response.data);
-//     const response = error.response
-//     return response
-//     // throw error;
-//   }
-// };
+
 // // 목표 중단하기
 // export const purposeQuit = async (quitData, accessToken) => {
 //   try {

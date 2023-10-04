@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   Image,
+  ActivityIndicator,
 } from "react-native";
 // import DraggableFlatList from "volkeno-react-native-drag-drop";
 import HeaderComponent from "../Components/HeaderScreen";
@@ -22,6 +23,8 @@ export default function PlanCreate4Screen({ navigation, route }) {
   const dispatch = useDispatch();
   // 그 외
   const { categorise, categoryGroups } = route.params.planInfo;
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const [planInfo, setPlanInfo] = useState(route.params.planInfo);
   console.log(planInfo);
@@ -66,6 +69,7 @@ export default function PlanCreate4Screen({ navigation, route }) {
   const [data, setData] = useState(categoryData);
 
   const doPlanClassifyChatGpt = async () => {
+    setIsLoading(true);
     try {
       const payload = {
         categorise: categorise,
@@ -85,6 +89,8 @@ export default function PlanCreate4Screen({ navigation, route }) {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
   useEffect(() => {
@@ -153,52 +159,67 @@ export default function PlanCreate4Screen({ navigation, route }) {
   };
 
   return (
+    // {isLoading ? ():()}
     <View style={styles.container}>
-      <HeaderComponent
-        title="계획 생성(4/5)"
-        cancelNavi="PlanMainScreen"
-        navigation={navigation}
-      ></HeaderComponent>
-      <ScrollView style={styles.header}>
-        <Text style={styles.title}>카테고리 분류</Text>
-        <Text style={styles.subtitle}>
-          카테고리 그룹과 카테고리를 확인해주세요.
-        </Text>
-
-        <View style={styles.center}>
+      {isLoading ? (
+        <View style={styles.loaderContainer}>
           <Image
-            style={styles.centerImage}
-            source={require("../../assets/images/Hamster/PlanCreateHamster.png")}
-          />
-          <Text style={styles.questionText}>이 분류가 맞나요?</Text>
-          <Text style={styles.moveText}>카테고리를 눌러서 옮겨보세요!</Text>
+            style={styles.loadingImage}
+            source={require("../../assets/images/Hamster/LoadingHamster.png")}
+          ></Image>
+          <ActivityIndicator size="large" color="#FF965C" />
+          <Text style={styles.loadingText}>다람쥐가 열심히 분류 중입니다!</Text>
+          <Text style={styles.loadingText}>조금만 기다려 주세용</Text>
         </View>
+      ) : (
+        <View style={styles.innerContainer}>
+          <HeaderComponent
+            title="계획 생성(4/5)"
+            cancelNavi="PlanMainScreen"
+            navigation={navigation}
+          ></HeaderComponent>
+          <ScrollView style={styles.header}>
+            <Text style={styles.title}>카테고리 분류</Text>
+            <Text style={styles.subtitle}>
+              카테고리 그룹과 카테고리를 확인해주세요.
+            </Text>
 
-        {categoryData &&
-          categoryData.map((group, index) => (
-            <View key={index} style={styles.categoryGroup}>
-              <Text style={styles.inputText}>{group.categoryGroupName}</Text>
-              <View style={styles.categoriesContainer}>
-                {group.categories.map((category, idx) => (
-                  <View key={idx} style={styles.categoryBox}>
-                    <Text style={styles.categoryText}>
-                      {category.categoryName}{" "}
-                      {formatNumber(category.targetAmount)}원
-                    </Text>
-                  </View>
-                ))}
-              </View>
+            <View style={styles.center}>
+              <Image
+                style={styles.centerImage}
+                source={require("../../assets/images/Hamster/PlanCreateHamster.png")}
+              />
+              <Text style={styles.questionText}>이 분류가 맞나요?</Text>
+              <Text style={styles.moveText}>카테고리를 눌러서 옮겨보세요!</Text>
             </View>
-          ))}
 
-        {/* <DraggableFlatList
+            {categoryData &&
+              categoryData.map((group, index) => (
+                <View key={index} style={styles.categoryGroup}>
+                  <Text style={styles.inputText}>
+                    {group.categoryGroupName}
+                  </Text>
+                  <View style={styles.categoriesContainer}>
+                    {group.categories.map((category, idx) => (
+                      <View key={idx} style={styles.categoryBox}>
+                        <Text style={styles.categoryText}>
+                          {category.categoryName}{" "}
+                          {formatNumber(category.targetAmount)}원
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              ))}
+
+            {/* <DraggableFlatList
           data={data}
           renderItem={renderItem}
           keyExtractor={(item, index) => `draggable-item-${index}`}
           onDragEnd={({ data }) => setCategoryData(data)}
         /> */}
 
-        {/* <Text style={styles.inputText}>등록된 카테고리 그룹</Text>
+            {/* <Text style={styles.inputText}>등록된 카테고리 그룹</Text>
         <View style={styles.categoriesContainer}>
           {categoryGroups.map((categoryGroup, index) => (
             <View key={index} style={styles.categoryBox}>
@@ -206,11 +227,13 @@ export default function PlanCreate4Screen({ navigation, route }) {
             </View>
           ))}
         </View> */}
-      </ScrollView>
+          </ScrollView>
 
-      <TouchableOpacity style={styles.button} onPress={handleNextButton}>
-        <Text style={styles.buttonText}>다음</Text>
-      </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleNextButton}>
+            <Text style={styles.buttonText}>다음</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }
@@ -221,6 +244,25 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 20,
     backgroundColor: "white",
+  },
+  innerContainer: {
+    flex: 1,
+    justifyContent: "space-between",
+    // padding: 20,
+    backgroundColor: "white",
+  },
+  loadingImage: {
+    width: 200,
+    height: 200,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    fontSize: 20,
+    marginBottom: 20,
   },
   header: {
     flex: 1,

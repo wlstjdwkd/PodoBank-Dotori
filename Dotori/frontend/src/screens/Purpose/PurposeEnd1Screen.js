@@ -14,6 +14,11 @@ import { useDispatch, useSelector } from "react-redux";
 export default function PurposeEnd1Screen({ navigation, route }) {
   const [purposeData, setPurposeData] = useState(route.params.purposeData);
 
+  const [purposeEndData, setPurposeEndData] = useState({
+    purposeSeq: route.params.purposeData.purposeSeq,
+    purposeSavings: route.params.purposeData.currentBalance,
+    title: route.params.purposeData.title,
+  });
   return (
     <View style={styles.container}>
       {/* Close Button */}
@@ -60,7 +65,11 @@ export default function PurposeEnd1Screen({ navigation, route }) {
       {/* Receive Button */}
       <TouchableOpacity
         style={styles.receiveButton}
-        onPress={() => navigation.navigate("PurposeEnd2Screen")}
+        onPress={() =>
+          navigation.navigate("PurposeEnd2Screen", {
+            purposeData: purposeEndData,
+          })
+        }
       >
         <Text style={styles.receiveButtonText}>지급받기</Text>
       </TouchableOpacity>
