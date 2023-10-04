@@ -100,21 +100,33 @@ public class PlanServiceImpl implements PlanService {
                 .build());
 
         List<CategoryGroupListDTO> groupList = planDTO.getCategoryGroupList();
+        CategoryGroup categoryGroup = null;
         for (CategoryGroupListDTO group : groupList) {
+            categoryGroup = categoryGroupRepository.findByGroupTitle(group.getCategoryGroupName()); // categoryGroup이 없는 경우
+
             // 카테고리 그룹 만들기
-            CategoryGroup categoryGroup = categoryGroupRepository.save(CategoryGroup.builder()
-                    .userSeq(loginUser.getUserSeq())
-                    .groupTitle(group.getCategoryGroupName()).build());
+            if(categoryGroup == null){
+                categoryGroup = categoryGroupRepository.save(CategoryGroup.builder() // categoryGroup이 있는 경우
+                        .userSeq(loginUser.getUserSeq())
+                        .groupTitle(group.getCategoryGroupName()).build());
+            }
+
 
             // 카테고리 만들기 +  Plan에 딸린 실행중인 카테고리인 PlanDetail 생성
             List<ActiveCategoryDTO> categorise = group.getCategories();
             log.info(categorise.isEmpty()+"");
             List<PlanDetail> planDetailList = new ArrayList<>();
+
+            Category category = null;
             for (ActiveCategoryDTO data : categorise) {
-                Category category = categoryRepository.save(Category.builder()
-                        .userSeq(loginUser.getUserSeq())
-                        .categoryTitle(data.getCategoryName())
-                        .build());
+                category = categoryRepository.findByCategoryTitle(data.getCategoryName()); // category가 있는 경우
+
+                if(category == null){ // category가 없는 경우
+                    category = categoryRepository.save(Category.builder()
+                            .userSeq(loginUser.getUserSeq())
+                            .categoryTitle(data.getCategoryName())
+                            .build());
+                }
 
                 planDetailRepository.save(PlanDetail.builder()
                         .plan(plan)
