@@ -10,4 +10,6 @@ import java.util.List;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findAllByUserSeq(Long userSeq);
     Category findByCategorySeq(Long categorySeq);
+
+    Category findByCategoryTitleAndUserSeq(String categoryTitle, Long userSeq);
 }
