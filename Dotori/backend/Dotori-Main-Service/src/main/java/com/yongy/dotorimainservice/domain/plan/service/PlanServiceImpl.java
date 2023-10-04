@@ -333,7 +333,6 @@ public class PlanServiceImpl implements PlanService {
 
             return result;
         }
-
         return ActivePlanDTO.builder().accountBalance(accountService.getBalance(accountSeq)).build();
     }
 
@@ -349,8 +348,9 @@ public class PlanServiceImpl implements PlanService {
             return plan;
         }
 
-        if(planRepository.findByAccountAccountSeqAndPlanStateAndTerminatedAtIsNotNull(accountSeq, State.ACTIVE) != null){
-            throw new ExistTerminatedPlanException("명세서를 호출하세요.");
+        plan = planRepository.findByAccountAccountSeqAndPlanStateAndTerminatedAtIsNotNull(accountSeq, State.ACTIVE);
+        if(plan != null){
+            throw new ExistTerminatedPlanException(plan.getPlanSeq().toString());
         }
 
         return null;
