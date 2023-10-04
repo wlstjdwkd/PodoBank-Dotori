@@ -9,6 +9,8 @@ import {
   ScrollView,
 } from "react-native";
 
+
+import { Audio } from 'expo-av';
 import FooterScreen from "../Components/FooterScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { accountWholeInquiry } from "../../apis/accountapi";
@@ -57,6 +59,18 @@ export default function MainPageScreen({ navigation }) {
   const [accountList, setAccountList] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
   const isFocused = useIsFocused();
+  const [sound, setSound] = useState();
+
+  const playSound = async() => {
+    console.log('Loading Sound');
+    const { sound } = await Audio.Sound.createAsync( require('../../assets/insertCoin.mp3')
+    );
+    setSound(sound);
+
+    console.log('Playing Sound');
+    await sound.playAsync();
+
+  }
 
   // // 정보조회 함수
   // const do정보조회 = async () => {
@@ -93,6 +107,15 @@ export default function MainPageScreen({ navigation }) {
       console.error("오류 발생 : 사용자 정보 조회 실패:", error);
     }
   };
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          console.log('Unloading Sound');
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
 
   useEffect(() => {
     if (isFocused) {
@@ -178,6 +201,14 @@ export default function MainPageScreen({ navigation }) {
           keyExtractor={(item) => item.accountSeq.toString()}
         />
       </View>
+      {/* 임시 */}
+      <TouchableOpacity
+        onPress={()=>{
+          playSound()
+        }}
+      >
+        <Text>누르면 소리가 나지롱</Text>
+      </TouchableOpacity>
       <View style={styles.footer}>
         <FooterScreen navigation={navigation} />
       </View>
