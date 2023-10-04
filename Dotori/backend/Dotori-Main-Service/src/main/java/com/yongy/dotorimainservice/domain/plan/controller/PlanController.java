@@ -95,7 +95,8 @@ public class PlanController {
 
     @Operation(summary = "계좌에 연결된 실행중인 계획 조회")
     @ApiResponses(value={
-            @ApiResponse(responseCode = "200", description = "실행 중인 계획 조회 성공")
+            @ApiResponse(responseCode = "200", description = "실행 중인 계획 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "명세서 api를 호출하세요.")
     })
     @GetMapping("/{accountSeq}")
     public ResponseEntity<ActivePlanDTO> findAllPlan(@PathVariable Long accountSeq) throws JsonProcessingException, ParseException {
