@@ -113,8 +113,9 @@ export default function SavingMoneyScreen({ navigation, route }) {
   const doPlanSaving = async () => {
     const purposeSavingList = purposeList.map((purpose) => ({
       purposeSeq: purpose.purposeSeq,
-      toSavingAmount: purpose.savingAmount,
+      savingAmount: purpose.savingAmount,
     }))
+    
     const savingData = {
       planSeq:planSeq,
       purposeSavingList:purposeSavingList,
@@ -124,6 +125,7 @@ export default function SavingMoneyScreen({ navigation, route }) {
     try{
       const response = await planSaving(savingData, accessToken, grantType)
       if(response.status === 200){
+        console.log('데이터!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         navigation.reset({
           index: 0,
           routes: [{ name: 'SavingCompleteScreen' }],
@@ -174,6 +176,7 @@ export default function SavingMoneyScreen({ navigation, route }) {
       <HeaderComponent
         title="저축하기"
         navigation={navigation}
+        cancelNavi="MainPageScreen"
       ></HeaderComponent>
 
       {/* 최신순 & 저축액 */}

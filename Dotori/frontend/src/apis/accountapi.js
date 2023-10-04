@@ -25,7 +25,7 @@ export const accountNicknameRegist = async (nicknameRegistData, accessToken, gra
     console.log('계좌 이름 설정 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('계좌 이름 설정 실패:', error.response.status, error.response.data);
+    console.error('계좌 이름 설정 실패:', error);
     const response = error.response
     return response
     // throw error;
@@ -43,7 +43,7 @@ export const accountEmailSendOneCent = async (id, accessToken, grantType) => {
     console.log('1원 인증 전 본인확인 이메일 전송 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('1원 인증 전 본인확인 이메일 전송 실패:', error.response.status, error.response.data);
+    console.error('1원 인증 전 본인확인 이메일 전송 실패:', error);
     const response = error.response
     return response
     // throw error;
@@ -70,7 +70,7 @@ export const accountEmailCodeVerificationOneCent = async (emailCodeVerificationO
     console.log('1원 인증 전 본인확인 이메일 전송 코드 검사 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('1원 인증 전 본인확인 이메일 전송 코드 검사 실패:', error.response.status, error.response.data);
+    console.error('1원 인증 전 본인확인 이메일 전송 코드 검사 실패:', error);
     const response = error.response
     return response
     // throw error;
@@ -101,7 +101,7 @@ export const accountVerificationsOnecentCheck = async (verificationsOnecentCheck
     console.log('계좌 1원 인증 번호 확인 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('계좌 1원 인증 번호 확인 실패:', error.response.status, error.response.data);
+    console.error('계좌 1원 인증 번호 확인 실패:', error);
     const response = error.response
     return response
     // throw error;
@@ -128,7 +128,7 @@ export const accountVerificationsOnecentSend = async (verificationsOnecentSendDa
     console.log('계좌 1원 인증 전송 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('계좌 1원 인증 전송 실패:', error.response.status, error.response.data);
+    console.error('계좌 1원 인증 전송 실패:', error);
     const response = error.response
     return response
     // throw error;
@@ -147,7 +147,7 @@ export const accountWholeBank = async (accessToken, grantType) => {
     console.log('모든 은행 정보 불러오기 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('모든 은행 정보 불러오기 실패:', error.response.status, error.response.data);
+    console.error('모든 은행 정보 불러오기 실패:', error);
     const response = error.response
     return response
     // throw error;
@@ -168,154 +168,60 @@ export const accountWholeInquiry = async (accessToken, grantType) => {
     console.log('전체 계좌 조회하기 성공:', response.data);
     return response;
   } catch (error) {
-    console.error('전체 계좌 조회하기 실패:', error.response.status, error.response.data);
+    console.error('전체 계좌 조회하기 실패:', error);
     const response = error.response
     return response
     // throw error;
   }
 };
 
-// // home
-// // 계좌 전체 조회
-// export const accountWholeInquiry = async (wholeInquiryData, accessToken) => {
-//   try {
-//     const response = await axios.get(apiAddress+`/v1/home`, wholeInquiryData, {
-//       headers: {
-//         Authorization: `Bearer ${accessToken}`,
-//       },
-//     });
-//     console.log('계좌 전체 조회 성공:', response.data);
-//     return response;
-//   } catch (error) {
-//     console.error('계좌 전체 조회 실패:', error.response.status, error.response.data);
-//     const response = error.response
-//     return response
-//     // throw error;
-//   }
-// };
-// // 계좌 은행 전체 코드 반환
-// export const accountBankCodeReturn = async (bankCodeReturnData, accessToken) => {
-//   try {
-//     const response = await axios.get(apiAddress+`/v1/home/bankList`, bankCodeReturnData, {
-//       headers: {
-//         Authorization: `Bearer ${accessToken}`,
-//       },
-//     });
-//     console.log('계좌 은행 전체 코드 반환 성공:', response.data);
-//     return response;
-//   } catch (error) {
-//     console.error('계좌 은행 전체 코드 반환 실패:', error.response.status, error.response.data);
-//     const response = error.response
-//     return response
-//     // throw error;
-//   }
-// };
+// 연동 계좌 삭제하기
+export const accountDelete = async (accountSeq, accessToken, grantType) => {
+  try{
+    const response = await axios.post(apiAddress+`/api/v1/account/delete?accountSeq=${accountSeq}`, null, {
+      headers: {
+        Authorization: `${grantType} ${accessToken}`,
+      },
+    });
+    console.log('연동 계좌 삭제하기 성공:', response.data)
+    return response
+  }catch(error){
+    console.error('연동 계좌 삭제하기 실패', error)
+    const response = error.response
+    return response
+  }
+}
 
+// 계좌 1개 조회
+export const accountOneInquiry = async (planSeq, accessToken, grantType) => {
+  try{
+    const response = await axios.get(apiAddress+`/api/v1/account/one?planSeq=${planSeq}`, {
+      headers: {
+        Authorization: `${grantType} ${accessToken}`,
+      },
+    });
+    console.log('계좌 1개 조회 성공:', response.data)
+    return response
+  }catch(error){
+    console.error('계좌 1개 조회 실패', error)
+    const response = error.response
+    return response
+  }
+}
 
-// // verification
-// // 계좌 1원 인증 전송
-// export const accountVerificationsOnecentSend = async (verificationsOnecentSendData, accessToken) => {
-//   try {
-//     const response = await axios.post(apiAddress+`/v1/verification`, verificationsOnecentSendData, {
-//       headers: {
-//         Authorization: `Bearer ${accessToken}`,
-//       },
-//     });
-//     console.log('계좌 1원 인증 전송 성공:', response.data);
-//     return response;
-//   } catch (error) {
-//     console.error('계좌 1원 인증 전송 실패:', error.response.status, error.response.data);
-//     const response = error.response
-//     return response
-//     // throw error;
-//   }
-// };
-// // 계좌 1원 인증 번호 확인
-// export const accountVerificationsOnecentCheck = async (verificationsOnecentCheckData, accessToken) => {
-//   try {
-//     const response = await axios.post(apiAddress+`/v1/verification/valid`, verificationsOnecentCheckData, {
-//       headers: {
-//         Authorization: `Bearer ${accessToken}`,
-//       },
-//     });
-//     console.log('계좌 1원 인증 번호 확인 성공:', response.data);
-//     return response;
-//   } catch (error) {
-//     console.error('계좌 1원 인증 번호 확인 실패:', error.response.status, error.response.data);
-//     const response = error.response
-//     return response
-//     // throw error;
-//   }
-// };
-
-
-// // account
-// // 계좌 전체 조회
-// export const accountAllInquiry = async (allInquiryData, accessToken) => {
-//   try {
-//     const response = await axios.get(apiAddress+`/v1/account`, allInquiryData, {
-//       headers: {
-//         Authorization: `Bearer ${accessToken}`,
-//       },
-//     });
-//     console.log('계좌 전체 조회 성공:', response.data);
-//     return response;
-//   } catch (error) {
-//     console.error('계좌 전체 조회 실패:', error.response.status, error.response.data);
-//     const response = error.response
-//     return response
-//     // throw error;
-//   }
-// };
 // // 계좌 이름 변경
-// export const accountChangeNickname = async (changeNicknameData, accessToken) => {
-//   try {
-//     const response = await axios.patch(apiAddress+`/v1/account/${changeNicknameData.accountName}`, changeNicknameData, {
+// export const accountNameChange = async (accountSeq, accessToken, grantType) => {
+//   try{
+//     const response = await axios.patch(apiAddress+`/api/v1/account/{accountName}`, accountSeq, {
 //       headers: {
-//         Authorization: `Bearer ${accessToken}`,
+//         Authorization: `${grantType} ${accessToken}`,
 //       },
 //     });
-//     console.log('계좌 이름 변경 성공:', response.data);
-//     return response;
-//   } catch (error) {
-//     console.error('계좌 이름 변경 실패:', error.response.status, error.response.data);
+//     console.log('계좌 이름 변경 성공:', response.data)
+//     return response
+//   }catch(error){
+//     console.error('계좌 이름 변경 실패', error)
 //     const response = error.response
 //     return response
-//     // throw error;
 //   }
-// };
-// // 계좌 삭제
-// export const accountDelete = async (deleteData, accessToken) => {
-//   try {
-//     const response = await axios.get(apiAddress+`/v1/account/delete`, deleteData, {
-//       headers: {
-//         Authorization: `Bearer ${accessToken}`,
-//       },
-//     });
-//     console.log('계좌 삭제 성공:', response.data);
-//     return response;
-//   } catch (error) {
-//     console.error('계좌 삭제 실패:', error.response.status, error.response.data);
-//     const response = error.response
-//     return response
-//     // throw error;
-//   }
-// };
-// // 계좌 거래 내역 상세 조회
-// export const accountTransactionInquiry = async (transactionInquiryData, accessToken) => {
-//   try {
-//     const response = await axios.get(apiAddress+`/v1/account/payment`, transactionInquiryData, {
-//       headers: {
-//         Authorization: `Bearer ${accessToken}`,
-//       },
-//     });
-//     console.log('계좌 거래 내역 상세 조회 성공:', response.data);
-//     return response;
-//   } catch (error) {
-//     console.error('계좌 거래 내역 상세 조회 실패:', error.response.status, error.response.data);
-//     const response = error.response
-//     return response
-//     // throw error;
-//   }
-// };
-
+// }

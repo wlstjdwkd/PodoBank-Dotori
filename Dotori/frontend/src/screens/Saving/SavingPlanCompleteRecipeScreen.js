@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Modal,
 } from "react-native";
 
 import HeaderComponent from "../Components/HeaderScreen";
@@ -114,6 +115,7 @@ export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
       <HeaderComponent
         title="명세서 보기"
         navigation={navigation}
+        cancelNavi="MainPageScreen"
       ></HeaderComponent>
 
       {/* 선택한 명세서를 화면에 표시 */}
@@ -233,7 +235,8 @@ export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
       {/* 미저축 종료 모달창 */}
       { noSavingModalVisible
         ?
-        (<View style={styles.centeredView}>
+        // (<View style={styles.centeredView}>
+        (<View style={{}}>
           <Modal
             animationType="none"
             transparent={true}
