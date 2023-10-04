@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -83,6 +84,12 @@ public class Plan {
 
     public Plan updateAdditionalSaving(BigDecimal additionalSaving){
         this.additionalSaving = additionalSaving;
+        return this;
+    }
+
+    public Plan finisedPlan(LocalDateTime saveAt){
+        this.planState = State.SAVED;
+        this.saveAt = saveAt;
         return this;
     }
 }

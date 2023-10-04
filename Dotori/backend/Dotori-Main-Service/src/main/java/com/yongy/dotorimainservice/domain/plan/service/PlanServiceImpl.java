@@ -190,7 +190,7 @@ public class PlanServiceImpl implements PlanService {
         }
 
         // 2. 계획 종료 표시하기
-        planRepository.save(plan.updateState(State.SAVED));
+        planRepository.save(plan.finisedPlan(LocalDateTime.now()));
 
         // 3. 도토리 1개 얻기
         Reward reward = rewardRepository.findByUserSeq(plan.getUserSeq());
