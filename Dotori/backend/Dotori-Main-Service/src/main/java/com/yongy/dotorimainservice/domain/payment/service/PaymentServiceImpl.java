@@ -176,20 +176,20 @@ public class PaymentServiceImpl implements PaymentService{
         for(PlanDetail planDetail : planDetails){
             List<Payment> list = paymentRepository.findAllByPlanDetailSeqAndChecked(planDetail.getPlanDetailSeq(), false);
             for(Payment payment : list){
-                payment.updateChecked();
+               result.add(payment.updateChecked());
 
                 CategoryData categoryData = categoryDataRepository.findByDataCode(payment.getBusinessCode());
 
                 if(categoryData == null){ // 이전에 저장된 데이터가 없으면
-                    PlanDetail detail = planDetailRepository.findByPlanDetailSeq(payment.getPlanDetailSeq());
                     categoryDataSet.add(CategoryData.builder()
-                            .category(detail.getCategory())
+                            .category(planDetail.getCategory())
                             .dataName(payment.getPaymentName())
                             .dataCode(payment.getBusinessCode())
                             .count(1) // 한 번 결제된 사용처니까 1로 초기화
                             .build());
                     continue;
                 }
+                planDetail.updateBalance(payment.getPaymentPrice());
 
                 // 이전에 저장된 데이터가 있음
                 // TODO : payment 저장할 때마다 categoryData count++
