@@ -11,13 +11,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -33,30 +35,32 @@ public class PodoBankInfo {
     private final BankAccessTokenRepository bankAccessTokenRepository;
     private final BankRefreshTokenRepository bankRefreshTokenRepository;
     private final CallServer callServer;
-    @Value("${dotori.main.url}")
-    private String MAIN_SERVICE_URL;
+//    private static Bank bank;
+//    private final BankRepository bankRepository;
+
+    public ResponseEntity<String> response;
+    public final HashMap<String, Object> bodyData;
 
 
-    public void podoBankLogin(BankDTO bankInfo){
+    // NOTE: 사용자의 access, refreshToken 가져오기
+    public void podoBankLogin(BankDTO bank){
         try{
-
             HttpHeaders headers = new HttpHeaders();
             headers.add("Content-Type", "application/json;charset=utf-8");
 
             Map<String, String> bodyData = new HashMap<>();
-            bodyData.put("email", bankInfo.getBankId());
-            bodyData.put("password", bankInfo.getBankPwd());
+            bodyData.put("email", bank.getBankId());
+            bodyData.put("password", bank.getBankPwd());
 
             HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, headers);
 
             RestTemplate restTemplate = new RestTemplate();
 
             ResponseEntity<String> response = restTemplate.exchange(
-                    bankInfo.getBankUrl()+"/api/v1/user/login",
+                    bank.getBankUrl()+"/api/v1/auth/login",
                     HttpMethod.POST,
                     httpEntity,
                     String.class
-
             );
 
             JSONParser jsonParser = new JSONParser();
@@ -65,52 +69,67 @@ public class PodoBankInfo {
             String accessToken = (String) jsonObject.get("accessToken");
             String refreshToken = (String) jsonObject.get("refreshToken");
 
-            bankAccessTokenRepository.save(BankAccessToken.of("accessToken", accessToken));
-            bankRefreshTokenRepository.save(BankRefreshToken.of("refreshToken", refreshToken));
+            log.info("1- accessToken : "+ accessToken);
+            log.info("2- refreshToken : "+ refreshToken);
+
+            bankAccessTokenRepository.save(BankAccessToken.of(bank.getBankName(), accessToken));
+            bankRefreshTokenRepository.save(BankRefreshToken.of(bank.getBankName(), refreshToken));
         } catch (ParseException e) {
             throw new IllegalArgumentException("포도뱅크에 로그인할 수 없음");
         }
     }
 
+    public void podoTokenUpdate(BankDTO bank, String refreshToken) throws ParseException {
+
+        MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+        parameters.add("refreshToken", refreshToken);
+
+        log.info("RefreshToken : "+ refreshToken);
+
+        log.info(bank.getBankUrl()+"/api/v1/auth/refresh");
+
+        response = callServer.postHttpWithParamsAndSend(bank.getBankUrl()+"/api/v1/auth/refresh", parameters);
+
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(response.getBody());
+
+        String newAccessToken = (String) jsonObject.get("accessToken");
+        String newRefreshToken = (String) jsonObject.get("refreshToken");
+
+        log.info("1- newAccessToken : "+ newAccessToken);
+        log.info("2- newRefreshToken : "+ newRefreshToken);
+
+        bankAccessTokenRepository.save(BankAccessToken.of(bank.getBankName(), newAccessToken));
+        bankRefreshTokenRepository.save(BankRefreshToken.of(bank.getBankName(), newRefreshToken));
+    }
+
 
     // NOTE : accessToken이나 refreshToken을 세팅한다.(없으면 podoBankLogin을 호출해서 새로 발급해서 세팅함)
-    public String getConnectionToken(Long bankSeq) throws ParseException {
-        Optional<BankAccessToken> dotoriAccessToken = bankAccessTokenRepository.findById("accessToken");
-        Optional<BankRefreshToken> dotoriRefreshToken = bankRefreshTokenRepository.findById("refreshToken");
+    public String getConnectionToken(BankDTO bank) throws ParseException {
+
+        Optional<BankAccessToken> bankAccessToken = bankAccessTokenRepository.findById(bank.getBankName());
+
+        Optional<BankRefreshToken> bankRefreshToken = bankRefreshTokenRepository.findById(bank.getBankName());
 
         String useToken = null;
-        BankDTO bankInfo = null;
 
-        if(dotoriAccessToken.isEmpty()){
-            if(dotoriRefreshToken.isEmpty()){
-                log.info("accessToken, refreshToken 재발급");
-
-                HashMap<String, Object> body = new HashMap<>();
-                body.put("bankSeq",bankSeq);
-                ResponseEntity<String> response = callServer.getHttpWithParamsAndSend(MAIN_SERVICE_URL+"/communication/bankInfo",body);
-
-                JSONParser jsonParser = new JSONParser();
-                JSONObject jsonObject = (JSONObject)jsonParser.parse(response.getBody());
-
-                bankInfo = BankDTO.builder()
-                        .bankSeq(bankSeq)
-                        .bankName(String.valueOf(jsonObject.get("bankName")))
-                        .bankUrl(String.valueOf(jsonObject.get("bankUrl")))
-                        .bankId(String.valueOf(jsonObject.get("bankId")))
-                        .bankPwd(String.valueOf(jsonObject.get("bankPwd")))
-                        .serviceCode(String.valueOf(jsonObject.get("serviceCode"))).build();
-
-                this.podoBankLogin(bankInfo); // accessToken, refreshToken 재발급
-                useToken = bankAccessTokenRepository.findByBankName(bankInfo.getBankName()).getToken();
+        if(bankAccessToken.isEmpty()){
+            if(bankRefreshToken.isEmpty()){
+                log.info("--1--");
+                this.podoBankLogin(bank); // refreshToken이 만료되었으므로 다시 로그인
             }else{
-                log.info("refreshToken 사용");
-                useToken = dotoriRefreshToken.get().getToken();
+                log.info("--2--");
+                try{
+                    this.podoTokenUpdate(bank, bankRefreshToken.get().getToken()); // refreshToken으로 업데이트
+                }catch(Exception e){
+                    this.podoBankLogin(bank); // refreshToken이 만료되었으므로 다시 로그인
+                }
             }
+            useToken = bankAccessTokenRepository.findById(bank.getBankName()).get().getToken();
         }else{
-            log.info("accessToken 사용");
-            useToken = dotoriAccessToken.get().getToken();
+            log.info("--3--");
+            useToken = bankAccessToken.get().getToken();
         }
         return useToken;
     }
-
 }
