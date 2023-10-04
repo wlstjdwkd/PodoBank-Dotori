@@ -57,4 +57,9 @@ public class PlanDetail {
         return "{ planDetailSeq=" + planDetailSeq +
                 ", " + category+"}";
     }
+
+    public PlanDetail updateBalance(BigDecimal amount) {
+        this.detailBalance = this.getDetailBalance().add(amount);
+        return this;
+    }
 }
