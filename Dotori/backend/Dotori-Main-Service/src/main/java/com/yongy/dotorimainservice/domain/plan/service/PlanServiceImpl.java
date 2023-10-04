@@ -258,61 +258,63 @@ public class PlanServiceImpl implements PlanService {
     public ActivePlanDTO findAllPlan(Long accountSeq) throws JsonProcessingException, ParseException {
          // 실행중인 계획 조회
         List<Plan> plans = planRepository.findByAccountAccountSeqAndTerminatedAtIsNull(accountSeq); // 애초에 ACTIVE or READY만 가져옴
-        Plan plan = plans.get(0);
+        if(plans != null) {
+            Plan plan = plans.get(0);
 
-        // Plan이 있는 지 확인, 실행중인 Plan인지 확인
-        // 플랜이 있고, 실행중이면 : 로직 처리
-        // 플랜이 있고, 시작 전인 플랜이 있으면
-        // 플랜이 없으면 : 플랜 만들기 페이지
+            // Plan이 있는 지 확인, 실행중인 Plan인지 확인
+            // 플랜이 있고, 실행중이면 : 로직 처리
+            // 플랜이 있고, 시작 전인 플랜이 있으면
+            // 플랜이 없으면 : 플랜 만들기 페이지
 
 
-        // TODO : 플랜이 있고, 상태가 Active일때, plan이 있고, 상태가 Ready일때
-        if((plan != null && plan.getPlanState().equals(State.ACTIVE)) || (plan != null && plan.getPlanState().equals(State.READY))){
+            // TODO : 플랜이 있고, 상태가 Active일때, plan이 있고, 상태가 Ready일때
+            if ((plan != null && plan.getPlanState().equals(State.ACTIVE)) || (plan != null && plan.getPlanState().equals(State.READY))) {
 
-            // TODO : 종료 됐는지 확인하고 종료 됐으면 terminateAt 변경하고 미분류 checked true로 변경
-            if(plan.getPlanState().equals(State.ACTIVE) && checkTerminate(plan.getEndAt())){
-                planRepository.save(plan.terminate(plan.getEndAt()));
-            }
+                // TODO : 종료 됐는지 확인하고 종료 됐으면 terminateAt 변경하고 미분류 checked true로 변경
+                if (plan.getPlanState().equals(State.ACTIVE) && checkTerminate(plan.getEndAt())) {
+                    planRepository.save(plan.terminate(plan.getEndAt()));
+                }
 
-            // 실행 중인 카테고리 가져오기
-            List<PlanDetail> planDetailList = plan.getPlanDetailList();
-            List<ActivePlanDetailDTO> activePlanList = new ArrayList<>();
+                // 실행 중인 카테고리 가져오기
+                List<PlanDetail> planDetailList = plan.getPlanDetailList();
+                List<ActivePlanDetailDTO> activePlanList = new ArrayList<>();
 
-            for (PlanDetail detail : planDetailList) {
-                if (plan.getTerminatedAt() != null) { // 끝난 계획의 카테고리면 미분류 확인됨으로 바꿈
-                    List<Payment> unclassified = paymentRepository.findAllByPlanDetailSeqAndChecked(detail.getPlanDetailSeq(), false);
-                    List<Payment> checked = new ArrayList<>();
-                    for (Payment p : unclassified) {
-                        checked.add(p.updateChecked());
+                for (PlanDetail detail : planDetailList) {
+                    if (plan.getTerminatedAt() != null) { // 끝난 계획의 카테고리면 미분류 확인됨으로 바꿈
+                        List<Payment> unclassified = paymentRepository.findAllByPlanDetailSeqAndChecked(detail.getPlanDetailSeq(), false);
+                        List<Payment> checked = new ArrayList<>();
+                        for (Payment p : unclassified) {
+                            checked.add(p.updateChecked());
+                        }
+                        paymentRepository.saveAll(checked);
                     }
-                    paymentRepository.saveAll(checked);
+
+                    if (plan.getTerminatedAt() == null) {
+                        PlanDetail planDetail = detail;
+                        activePlanList.add(ActivePlanDetailDTO.builder()
+                                .title(planDetail.getCategory().getCategoryTitle())
+                                .groupTitle(planDetail.getCategoryGroup().getGroupTitle())
+                                .goalAmount(planDetail.getDetailLimit())
+                                .currentBalance(planDetail.getDetailBalance())
+                                .planDetailSeq(detail.getPlanDetailSeq())
+                                .build());
+                    }
+
                 }
 
-                if(plan.getTerminatedAt() == null){
-                    PlanDetail planDetail = detail;
-                    activePlanList.add(ActivePlanDetailDTO.builder()
-                            .title(planDetail.getCategory().getCategoryTitle())
-                            .groupTitle(planDetail.getCategoryGroup().getGroupTitle())
-                            .goalAmount(planDetail.getDetailLimit())
-                            .currentBalance(planDetail.getDetailBalance())
-                            .planDetailSeq(detail.getPlanDetailSeq())
-                            .build());
-                }
+                ActivePlanDTO result = ActivePlanDTO.builder()
+                        .accountBalance(accountService.getBalance(accountSeq))
+                        .startedAt(plan.getStartAt())
+                        .endAt(plan.getEndAt())
+                        .state(plan.getPlanState())
+                        .planSeq(plan.getPlanSeq())
+                        .terminatedAt(plan.getTerminatedAt())
+                        .unclassified(plan.getCount())
+                        .activePlanList(activePlanList)
+                        .build();
 
+                return result;
             }
-
-            ActivePlanDTO result = ActivePlanDTO.builder()
-                    .accountBalance(accountService.getBalance(accountSeq))
-                    .startedAt(plan.getStartAt())
-                    .endAt(plan.getEndAt())
-                    .state(plan.getPlanState())
-                    .planSeq(plan.getPlanSeq())
-                    .terminatedAt(plan.getTerminatedAt())
-                    .unclassified(plan.getCount())
-                    .activePlanList(activePlanList)
-                .build();
-
-            return result;
         }
         return ActivePlanDTO.builder().accountBalance(accountService.getBalance(accountSeq)).build();
     }
