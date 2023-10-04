@@ -90,7 +90,7 @@ public class RewardServiceImpl implements RewardService{
         RestTemplate restTemplate = new RestTemplate();
 
         ResponseEntity<String> response = restTemplate.exchange(
-                bankInfo.getBankUrl()+"/api/v1/fintech/withdraw",
+                bankInfo.getBankUrl()+"/api/v1/fintech/deposit",
                 HttpMethod.POST,
                 httpEntity,
                 String.class
