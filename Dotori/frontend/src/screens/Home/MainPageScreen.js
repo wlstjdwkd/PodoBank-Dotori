@@ -178,16 +178,6 @@ export default function MainPageScreen({ navigation }) {
           keyExtractor={(item) => item.accountSeq.toString()}
         />
       </View>
-      {/* 계획및계좌 관리페이지때문에 임시로 만듬 */}
-      <TouchableOpacity style={{borderColor: 'black', borderWidth:1}}
-        onPress={()=>{
-          navigation.navigate("PlanManageScreen")
-        }}
-      >
-        <Text>
-          눌러
-        </Text>
-      </TouchableOpacity>
       <View style={styles.footer}>
         <FooterScreen navigation={navigation} />
       </View>

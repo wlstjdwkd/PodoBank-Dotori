@@ -288,22 +288,6 @@ export const planCategoryList = async (accessToken, grantType) => {
 };
 
 // plan
-// // 계획 신규 등록
-// export const planNewRegister = async (newRegisterData, accessToken) => {
-//   try {
-//     const response = await axios.post(apiAddress+`/v1/plan`, newRegisterData, {
-//       headers: {
-//         Authorization: `Bearer ${accessToken}`,
-//       },
-//     });
-//     console.log('계획 신규 등록 성공:', response.data);
-//     return response;
-//   } catch (error) {
-//     console.error('계획 신규 등록 실패:', error.response.status, error.response.data);
-//     const response = error.response
-//     return response
-//   }
-// };
 // 진행중인 계획 조회
 export const planInProgress = async (
   inProgressData,
