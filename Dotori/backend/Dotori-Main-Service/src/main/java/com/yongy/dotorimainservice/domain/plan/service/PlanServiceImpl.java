@@ -159,14 +159,15 @@ public class PlanServiceImpl implements PlanService {
     @Override
     public void saving(SavingDTO savingDTO) throws ParseException {
         log.info(savingDTO.getPlanSeq()+"");
+        log.info(savingDTO.toString());
 
         Plan plan = planRepository.findByPlanSeq(savingDTO.getPlanSeq());
         Account account = plan.getAccount();
         List<PlanDetail> planDetailList = planDetailRepository.findAllByPlanPlanSeq(savingDTO.getPlanSeq());
         BigDecimal totalSaving = new BigDecimal(BigInteger.ZERO);
 
-        if(!plan.getPlanState().equals(State.ACTIVE)){
-            throw new IllegalArgumentException("실행 중인 계획이 아닙니다.");
+        if(plan.getPlanState().equals(State.SAVED)){
+            throw new IllegalArgumentException("저축 가능한 계획이 아닙니다.");
         }
 
         // 출금이 완료되면 금액 정보 갱신
@@ -189,7 +190,7 @@ public class PlanServiceImpl implements PlanService {
         }
 
         // 2. 계획 종료 표시하기
-        planRepository.save(plan.updateState(State.SAVED));
+        planRepository.save(plan.finisedPlan(LocalDateTime.now()));
 
         // 3. 도토리 1개 얻기
         Reward reward = rewardRepository.findByUserSeq(plan.getUserSeq());
@@ -237,12 +238,16 @@ public class PlanServiceImpl implements PlanService {
         }
     }
 
-    public List<PlanListDto> getPlanList(Long userSeq){
-        List<Plan> planList = planRepository.findAllByUserSeqAndTerminatedAtIsNull(userSeq);
-        List<PlanListDto> planListDtoList = null;
+    public List<PlanListDto> getPlanList(){
+        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // TODO : 전체 명세서 가져오기 completed, saved만
+
+        List<Plan> planList = planRepository.findAllByUserSeqAndTerminatedAtIsNotNull(user.getUserSeq());
+        List<PlanListDto> planListDtoList = new ArrayList<>();
         for(Plan plan : planList){
             planListDtoList.add(PlanListDto.builder().planSeq(plan.getPlanSeq())
-                    .accountTitle(accountRepository.findByUserSeqAndDeleteAtIsNull(userSeq).getAccountTitle())
+                    .accountTitle(accountRepository.findByUserSeqAndDeleteAtIsNull(user.getUserSeq()).getAccountTitle())
                     .startAt(plan.getStartAt().format(formatter))
                     .endAt(plan.getEndAt().format(formatter)).build());
         }
