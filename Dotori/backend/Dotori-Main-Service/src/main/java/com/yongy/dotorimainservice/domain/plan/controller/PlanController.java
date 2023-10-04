@@ -41,7 +41,7 @@ public class PlanController {
         planService.createPlan(planDTO);
         return ResponseEntity.ok().build();
     }
-
+    //
     @Operation(summary = "실행중인 계획 중단")
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "계획 중단 성공")
