@@ -167,7 +167,7 @@ public class PlanServiceImpl implements PlanService {
         BigDecimal totalSaving = new BigDecimal(BigInteger.ZERO);
 
         if(plan.getPlanState().equals(State.SAVED)){
-            throw new IllegalArgumentException("실행 중인 계획이 아닙니다.");
+            throw new IllegalArgumentException("저축 가능한 계획이 아닙니다.");
         }
 
         // 출금이 완료되면 금액 정보 갱신
