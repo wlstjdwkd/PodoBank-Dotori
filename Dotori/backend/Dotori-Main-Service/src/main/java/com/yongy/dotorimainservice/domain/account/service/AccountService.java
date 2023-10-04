@@ -3,7 +3,6 @@ package com.yongy.dotorimainservice.domain.account.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotorimainservice.domain.account.dto.AccountDto;
 import com.yongy.dotorimainservice.domain.account.dto.AccountListDto;
-import com.yongy.dotorimainservice.domain.account.dto.AccountDTO;
 import com.yongy.dotorimainservice.domain.account.dto.communication.AccountFintechCodeDTO;
 import com.yongy.dotorimainservice.domain.account.dto.communication.AccountInfoDTO;
 import com.yongy.dotorimainservice.domain.account.dto.communication.AccountNumberTitleReqDto;
