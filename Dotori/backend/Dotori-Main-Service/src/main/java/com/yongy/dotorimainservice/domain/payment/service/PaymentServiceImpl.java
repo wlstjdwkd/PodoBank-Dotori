@@ -11,6 +11,7 @@ import com.yongy.dotorimainservice.domain.categoryData.entity.CategoryData;
 import com.yongy.dotorimainservice.domain.categoryData.repository.CategoryDataRepository;
 import com.yongy.dotorimainservice.domain.payment.dto.PaymentDetailDTO;
 import com.yongy.dotorimainservice.domain.payment.dto.TransactionHistoryDTO;
+import com.yongy.dotorimainservice.domain.payment.dto.UnclassifiedDTO;
 import com.yongy.dotorimainservice.domain.payment.dto.UpdateDataDTO;
 import com.yongy.dotorimainservice.domain.payment.dto.response.PaymentPodoResDto;
 import com.yongy.dotorimainservice.domain.payment.entity.Payment;
@@ -144,12 +145,12 @@ public class PaymentServiceImpl implements PaymentService{
     }
 
     @Override
-    public void updateUnclassified(Long planSeq, List<UpdateDataDTO> updateUnclassifiedDTO) {
+    public void updateUnclassified(Long planSeq, UnclassifiedDTO updateUnclassifiedDTO) {
         Plan plan = planRepository.findByPlanSeq(planSeq);
         List<Payment> result = new ArrayList<>();
         Set<CategoryData> categoryDataSet = new HashSet<>(); // 저장할 CategoryData
 
-        for(UpdateDataDTO data : updateUnclassifiedDTO){
+        for(UpdateDataDTO data : updateUnclassifiedDTO.getUpdateData()){
             Payment payment = paymentRepository.findByPaymentSeq(data.getPaymentSeq());
             result.add(payment.updateChecked()); // checked = true
             CategoryData categoryData = categoryDataRepository.findByDataCode(payment.getBusinessCode());
