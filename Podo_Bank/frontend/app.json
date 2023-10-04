@@ -21,7 +21,7 @@
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.hyunduk9775.PodoBank"
+      "package": "com.hyunduk9775.podobank"
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
