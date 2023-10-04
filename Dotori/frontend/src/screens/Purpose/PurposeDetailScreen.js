@@ -5,7 +5,9 @@ import Feather from "react-native-vector-icons/Feather"; // Feather 아이콘을
 import { useDispatch, useSelector } from "react-redux";
 import { purposeDetail } from "../../apis/purposeapi"
 
-const tmpData = {"currentBalance": 230, "endAt": "2024-05-28", "goalAmount": 512000, "purposeDataList": [{"dataAmount": 1, "dataCreatedAt": "2023-09-27 23:02:51", "dataCurrentBalance": 1, "dataName": "진성갓2계좌"},
+const tmpData = {"currentBalance": 230, "endAt": "2024-02-28", "goalAmount": 512000, 
+"purposeDataList": [
+  {"dataAmount": 1, "dataCreatedAt": "2023-09-27 23:02:51", "dataCurrentBalance": 1, "dataName": "진성갓2계좌"},
 {"dataAmount": 2, "dataCreatedAt": "2023-09-27 23:03:00", "dataCurrentBalance": 2, "dataName": "진성갓2계좌"},
 {"dataAmount": 3, "dataCreatedAt": "2023-09-30 23:03:09", "dataCurrentBalance": 3, "dataName": "진성갓2계좌"},
 {"dataAmount": 4, "dataCreatedAt": "2023-10-01 23:03:18", "dataCurrentBalance": 4, "dataName": "진성갓2계좌"},
@@ -184,8 +186,8 @@ export default function PurposeDetailScreen({ navigation, route }) {
           <TouchableOpacity
             style={styles.stopPurposeButton}
             onPress={() => {
-              // navigation.navigate("PurposeStopScreen", {purposeSeq:purposeSeq, purposeDetailData:purposeDetailData})
-              navigation.navigate("PurposeStopScreen", {purposeSeq:purposeSeq, purposeDetailData:tmpData})
+              navigation.navigate("PurposeStopScreen", {purposeSeq:purposeSeq, purposeDetailData:purposeDetailData})
+              // navigation.navigate("PurposeStopScreen", {purposeSeq:purposeSeq, purposeDetailData:tmpData})
             }}
             
           >
