@@ -44,6 +44,9 @@ public class OpenBankingService {
         fintechUserRepository.findByFintechServiceAndAccountNumber(fintechService, fintechOneCentVerificationDTO.getAccountNumber())
                 .ifPresent(fintechUser -> {throw new AlreadyExistUserException("이미 해당 서비스에 등록된 계좌입니다.");});
 
+        accountVerificationCodeRepository.findById(fintechOneCentVerificationDTO.getAccountNumber())
+                .ifPresent(accountVerificationCode -> {throw new AlreadyExistUserException("이미 인증 코드가 발급된 계좌입니다.");});
+
         String verificationCode = generateVerificationCode(fintechService.getServiceName());
 
         if(transfer(fintechService.getAccountNumber(), fintechOneCentVerificationDTO.getAccountNumber(),
