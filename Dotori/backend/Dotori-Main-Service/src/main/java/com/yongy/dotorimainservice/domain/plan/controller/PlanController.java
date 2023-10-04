@@ -73,7 +73,7 @@ public class PlanController {
     @GetMapping("/specification")
     public ResponseEntity<List<PlanListDto>> planList(){
 
-        // TODO : Completed 또는 Saved
+        // TODO : Completed 또는 Saved 또는 Active이고 null이 아닌 경우
         try{
             List<PlanListDto> planListDto = planService.getPlanList();
             return ResponseEntity.ok().body(planListDto);
