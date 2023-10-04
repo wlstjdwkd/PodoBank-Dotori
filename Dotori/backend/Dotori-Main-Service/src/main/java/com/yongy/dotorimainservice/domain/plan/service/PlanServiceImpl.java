@@ -35,7 +35,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,11 +91,23 @@ public class PlanServiceImpl implements PlanService {
             throw new NotFoundAccountNumberException("계좌가 존재하지 않습니다.");
         }
 
+        LocalDateTime start = LocalDateTime.parse(planDTO.getStartedAt(), formatter);
+        start.withHour(0);
+        start.withMinute(0);
+        start.withSecond(0);
+        start.withNano(0);
+
+        LocalDateTime end = LocalDateTime.parse(planDTO.getEndAt(), formatter);
+        end.withHour(0);
+        end.withMinute(0);
+        end.withSecond(0);
+        end.withNano(0);
+
         Plan plan = planRepository.save(Plan.builder()
                 .userSeq(loginUser.getUserSeq())
                 .account(account)
-                .startAt(LocalDateTime.parse(planDTO.getStartedAt(), formatter))
-                .endAt(LocalDateTime.parse(planDTO.getEndAt(), formatter))
+                .startAt(start)
+                .endAt(end)
                 .planState(state)
                 .updatedAt(LocalDateTime.parse(planDTO.getStartedAt(), formatter)) // 마지막 업데이트 날짜
                 .totalSavings(BigDecimal.ZERO)
@@ -363,5 +377,38 @@ public class PlanServiceImpl implements PlanService {
 
     public Plan findByPlanSeq(Long planSeq){
         return planRepository.findByPlanSeq(planSeq);
+    }
+
+    // NOTE : 12시 되면 날짜 확인하고 실행
+    @Scheduled(cron = "0 0 0 * * *") // 매일 자정에 실행
+    public void startEndPlan() {
+        // 모든 사용자의 모든 READY인 Plan 가져와서 ACTIVE로 변경하기
+        LocalDateTime today = LocalDateTime.now();
+        today.withHour(0);
+        today.withMinute(0);
+        today.withSecond(0);
+        today.withNano(0);
+
+        // 시작 처리
+        List<Plan> startplans = planRepository.findAllByStartAtAndPlanState(today, State.READY);
+        List<Plan> startResult = new ArrayList<>();
+
+        for (Plan p : startplans) {
+            if (p.getStartAt().toLocalDate().equals(today)) {
+                startResult.add(p.updateState(State.ACTIVE));
+            }
+        }
+        planRepository.saveAll(startResult);
+
+        // 종료 처리
+        List<Plan> endPlans = planRepository.findAllByEndAtAndPlanState(today,State.ACTIVE);
+        List<Plan> endResult = new ArrayList<>();
+
+        for (Plan p : endPlans) {
+            if (p.getEndAt().toLocalDate().equals(today)) {
+                endResult.add(p.terminate(today));
+            }
+        }
+        planRepository.saveAll(endResult);
     }
 }
