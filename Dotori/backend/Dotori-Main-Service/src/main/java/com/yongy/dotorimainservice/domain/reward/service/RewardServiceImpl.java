@@ -23,7 +23,7 @@ public class RewardServiceImpl implements RewardService{
             throw new NotfoundRewardException("Reward 정보가 존재하지 않습니다.");
         }
 
-        return DotoriDTO.builder().dotori(reward.getDotori()).build();
+        return DotoriDTO.builder().dotori(reward.getDotori()).coin(reward.getCoin()).build();
     }
 
     // NOTE : 리워드 생성하기

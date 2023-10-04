@@ -9,4 +9,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class DotoriDTO {
     Long dotori;
+    Long coin;
 }
