@@ -2,7 +2,7 @@
   "expo": {
     "name": "PodoBank",
     "slug": "PodoBank",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "light",
@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -22,7 +24,8 @@
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.hyunduk9775.podobank"
+      "package": "com.hyunduk9775.podobank",
+      "versionCode": "2"
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
@@ -31,6 +34,12 @@
       "eas": {
         "projectId": "f3595617-0f64-40fc-bad1-ce0d6403e677"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/f3595617-0f64-40fc-bad1-ce0d6403e677"
     }
   }
 }
