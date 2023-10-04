@@ -15,104 +15,145 @@ import { Calendar, LocaleConfig, markedDates } from "react-native-calendars";
 import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux";
 
-LocaleConfig.locales['kr'] = {
-  monthNames: [ '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월','10월','11월','12월'],
-  monthNamesShort: ['1.', "2.", "3.", "4.", "5.", "6.", "7.", "8.", "9.", "10.", "11.", "12."],
-  dayNames: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
-  dayNamesShort: ['일', '월', '화', '수','목', '금','토'],
+LocaleConfig.locales["kr"] = {
+  monthNames: [
+    "1월",
+    "2월",
+    "3월",
+    "4월",
+    "5월",
+    "6월",
+    "7월",
+    "8월",
+    "9월",
+    "10월",
+    "11월",
+    "12월",
+  ],
+  monthNamesShort: [
+    "1.",
+    "2.",
+    "3.",
+    "4.",
+    "5.",
+    "6.",
+    "7.",
+    "8.",
+    "9.",
+    "10.",
+    "11.",
+    "12.",
+  ],
+  dayNames: [
+    "일요일",
+    "월요일",
+    "화요일",
+    "수요일",
+    "목요일",
+    "금요일",
+    "토요일",
+  ],
+  dayNamesShort: ["일", "월", "화", "수", "목", "금", "토"],
 };
 
-LocaleConfig.defaultLocale = 'kr';
+LocaleConfig.defaultLocale = "kr";
 
-export default function PurposeCreate2Screen({ navigation, route }) {
+export default function PurposeCreate1Screen({ navigation, route }) {
   // 토큰
-  const grantType =  useSelector((state)=>state.user.grantType)
-  const accessToken =  useSelector((state)=>state.user.accessToken)
-  const refreshToken =  useSelector((state)=>state.user.refreshToken)
-  const dispatch = useDispatch()
+  const grantType = useSelector((state) => state.user.grantType);
+  const accessToken = useSelector((state) => state.user.accessToken);
+  const refreshToken = useSelector((state) => state.user.refreshToken);
+  const dispatch = useDispatch();
   // 그 외
-
 
   // 달력
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
-  const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
-  const currentDay = String(currentDate.getDate()).padStart(2, '0');  
+  const currentMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
+  const currentDay = String(currentDate.getDate()).padStart(2, "0");
   const todayDate = `${currentYear}-${currentMonth}-${currentDay}`;
-  
+
   const [isCalendarVisible, setCalendarVisible] = useState(false);
-  const [selectionCount, setSelectionCount] = useState(0)
-  const [startingDate, setStartingDate] = useState(null)
-  const [endingDate, setEndingDate] = useState(null)
-  
+  const [selectionCount, setSelectionCount] = useState(0);
+  const [startingDate, setStartingDate] = useState(null);
+  const [endingDate, setEndingDate] = useState(null);
+
   const [settingDateType, setSettingDateType] = useState(""); // "start" 또는 "end"
-  
+
   // 달력 외
   // const [planInfo, setPlanInfo] = useState(route.params.planInfo);
   const [planInfo, setPlanInfo] = useState({
     startedAt: null,
     endAt: null,
-    // accountSeq: route.params.accountSeq,
-    accountSeq: 1,
+    accountSeq: route.params.accountSeq,
+    // accountSeq: 1,
   });
   const [isValid, setIsValid] = useState(false);
 
-
   // 달력 부분
-  const periodSelect = () =>{
-    if(selectionCount<=1){
-      setSelectionCount(selectionCount+1)
-    }else{
-      setSelectionCount(0)
+  const periodSelect = () => {
+    if (selectionCount <= 1) {
+      setSelectionCount(selectionCount + 1);
+    } else {
+      setSelectionCount(0);
     }
-  }
-  const handleStartingDate = (date)=>{
-    if(selectionCount===0){
-      setStartingDate(date)
-    }else if((selectionCount===2)){
-      setStartingDate(null)
+  };
+  const handleStartingDate = (date) => {
+    if (selectionCount === 0) {
+      setStartingDate(date);
+    } else if (selectionCount === 2) {
+      setStartingDate(null);
     }
     // periodSelect()
-  }
-  const handleEndingDate = (date)=>{
-    if(selectionCount===1){
+  };
+  const handleEndingDate = (date) => {
+    if (selectionCount === 1) {
       const startDate = new Date(startingDate);
       const endDate = new Date(date);
-      if(endDate >= startDate) {
+      if (endDate >= startDate) {
         setEndingDate(date);
-        periodSelect()
+        periodSelect();
       } else {
-        Alert.alert('종료 시점 오류', '종료일은 시작일보다 앞설 수 없습니다.')
+        Alert.alert("종료 시점 오류", "종료일은 시작일보다 앞설 수 없습니다.");
       }
+    } else {
+      setEndingDate(null);
+      periodSelect();
     }
-    else{
-      setEndingDate(null)
-      periodSelect()
-    }
-  }
+  };
   // 시작일과 종료일을 확인할 수 있게 해줌.
   const getDatesBetween = (startDate, endDate) => {
     let dates = [];
     let currentDate = new Date(startDate);
     const stopDate = new Date(endDate);
-  
+
     while (currentDate <= stopDate) {
       dates.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + 1);
     }
-  
+
     return dates;
   };
 
-  const periodDates = getDatesBetween(startingDate, endingDate).map(date => date.toISOString().split('T')[0]);
+  const periodDates = getDatesBetween(startingDate, endingDate).map(
+    (date) => date.toISOString().split("T")[0]
+  );
   let markedDates = {};
-  periodDates.forEach(date => {
+  periodDates.forEach((date) => {
     if (date === startingDate) {
-      markedDates[date] = {startingDay: true, color: '#50cebb', textColor: 'white'};
+      markedDates[date] = {
+        startingDay: true,
+        color: "#50cebb",
+        textColor: "white",
+      };
     } else if (date === endingDate) {
-      markedDates[date] = {endingDay: true, color: '#50cebb', textColor: 'white'};
+      markedDates[date] = {
+        endingDay: true,
+        color: "#50cebb",
+        textColor: "white",
+      };
     } else {
-      markedDates[date] = {color: '#70d7c7', textColor: 'white'};
+      markedDates[date] = { color: "#70d7c7", textColor: "white" };
     }
   });
 
@@ -121,11 +162,10 @@ export default function PurposeCreate2Screen({ navigation, route }) {
       ...planInfo,
       startedAt: startingDate,
       endAt: endingDate,
-    })
-    console.log(planInfo)
-    setCalendarVisible(false)
-  }
-
+    });
+    console.log(planInfo);
+    setCalendarVisible(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -170,7 +210,9 @@ export default function PurposeCreate2Screen({ navigation, route }) {
             onPress={() => {
               setCalendarVisible(true);
             }}
-            disabled={!planInfo.startedAt || (planInfo.startedAt && planInfo.endAt)}
+            disabled={
+              !planInfo.startedAt || (planInfo.startedAt && planInfo.endAt)
+            }
           >
             <View style={styles.inputContainer}>
               <TextInput
@@ -179,7 +221,15 @@ export default function PurposeCreate2Screen({ navigation, route }) {
                 // multiline={true}
                 editable={false}
               />
-              <AntDesign name="calendar" size={24} color={!planInfo.startedAt || (planInfo.startedAt && planInfo.endAt)?'#7B7B7B':"black"} />
+              <AntDesign
+                name="calendar"
+                size={24}
+                color={
+                  !planInfo.startedAt || (planInfo.startedAt && planInfo.endAt)
+                    ? "#7B7B7B"
+                    : "black"
+                }
+              />
             </View>
           </TouchableOpacity>
 
@@ -195,43 +245,50 @@ export default function PurposeCreate2Screen({ navigation, route }) {
                   setCalendarVisible(false);
                 }}
               >
-                <View style={{ flex: 1, justifyContent: "center", alignSelf:"center", width:"80%"}}>
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignSelf: "center",
+                    width: "80%",
+                  }}
+                >
                   <Calendar
-                    minDate = {todayDate}
+                    minDate={todayDate}
                     theme={{
                       arrowColor: "#FF965C",
-                      'stylesheet.day.basic': {
+                      "stylesheet.day.basic": {
                         // text: {
-                        //   color: 'red', 
+                        //   color: 'red',
                         // },
                       },
-                                       
-                      'stylesheet.calendar.header': {
+
+                      "stylesheet.calendar.header": {
                         dayTextAtIndex0: {
-                          color: 'red',
+                          color: "red",
                         },
                         dayTextAtIndex1: {
-                          color: 'black'
+                          color: "black",
                         },
                         dayTextAtIndex2: {
-                          color: 'black'
+                          color: "black",
                         },
                         dayTextAtIndex3: {
-                          color: 'black'
+                          color: "black",
                         },
                         dayTextAtIndex4: {
-                          color: 'black'
+                          color: "black",
                         },
                         dayTextAtIndex5: {
-                          color: 'black'
+                          color: "black",
                         },
                         dayTextAtIndex6: {
-                          color: 'blue'
+                          color: "blue",
                         },
-                      }
+                      },
                     }}
                     monthFormat="yyyy년 MM월"
-                    locale={'kr'}
+                    locale={"kr"}
                     current={todayDate}
                     onDayPress={(day) => {
                       // handleDateChange(day)
@@ -239,18 +296,34 @@ export default function PurposeCreate2Screen({ navigation, route }) {
                       handleEndingDate(day.dateString);
                     }}
                     // markedDates={markedDates}
-                    markingType={'period'}
+                    markingType={"period"}
                     markedDates={
-                      endingDate 
-                      ? (endingDate===startingDate)? {[startingDate]:{startingDay: true, color: '#50cebb', textColor: 'white',endingDay: true}} : markedDates 
-                      : {[startingDate]:{startingDay: true, color: '#50cebb', textColor: 'white',endingDay: true}}
+                      endingDate
+                        ? endingDate === startingDate
+                          ? {
+                              [startingDate]: {
+                                startingDay: true,
+                                color: "#50cebb",
+                                textColor: "white",
+                                endingDay: true,
+                              },
+                            }
+                          : markedDates
+                        : {
+                            [startingDate]: {
+                              startingDay: true,
+                              color: "#50cebb",
+                              textColor: "white",
+                              endingDay: true,
+                            },
+                          }
                     }
                   />
 
                   <TouchableOpacity
                     style={styles.button}
-                    onPress={()=>{
-                      handleConfirmDates()
+                    onPress={() => {
+                      handleConfirmDates();
                     }}
                   >
                     <Text style={styles.buttonText}>설정</Text>
@@ -258,20 +331,25 @@ export default function PurposeCreate2Screen({ navigation, route }) {
                 </View>
               </Modal>
             </View>
-
           )}
         </View>
 
         <TouchableOpacity
-          style={[styles.button, {backgroundColor:(!startingDate||!endingDate)?"gray":"#FF965C"}]}
+          style={[
+            styles.button,
+            {
+              backgroundColor:
+                !startingDate || !endingDate ? "gray" : "#FF965C",
+            },
+          ]}
           onPress={() => {
             navigation.navigate("PlanCreate2Screen", {
               planInfo: planInfo,
-            })
+            });
           }}
           //TODO: 풀기
           // disabled={!isValid}
-          disabled={!startingDate||!endingDate}
+          disabled={!startingDate || !endingDate}
         >
           <Text style={styles.buttonText}>다음</Text>
         </TouchableOpacity>
@@ -326,7 +404,7 @@ const styles = StyleSheet.create({
     padding: 0, // remove padding to avoid overlap
     fontSize: 16,
     // textAlign: "center",
-    color:'black'
+    color: "black",
   },
   button: {
     height: 40,
@@ -344,8 +422,8 @@ const styles = StyleSheet.create({
   },
   centeredView: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 22,
   },
 });
