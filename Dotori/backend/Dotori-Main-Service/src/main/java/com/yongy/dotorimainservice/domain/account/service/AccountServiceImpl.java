@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yongy.dotorimainservice.domain.account.dto.AccountDTO;
 import com.yongy.dotorimainservice.domain.account.dto.BodyDataDTO;
+import com.yongy.dotorimainservice.domain.account.dto.communication.AccountFintechCodeDTO;
+import com.yongy.dotorimainservice.domain.account.dto.communication.AccountInfoDTO;
 import com.yongy.dotorimainservice.domain.account.dto.communication.AccountNumberTitleReqDto;
 import com.yongy.dotorimainservice.domain.account.dto.communication.AccountReqDto;
 import com.yongy.dotorimainservice.domain.account.entity.Account;
@@ -39,11 +41,8 @@ import java.util.Map;
 @Service
 public class AccountServiceImpl implements AccountService{
     private final BankRepository bankRepository;
-
     private final AccountRepository accountRepository;
-
     private final HashMap<String, Object> bodyData;
-
     private final PodoBankInfo podoBankInfo;
 
 
@@ -140,6 +139,12 @@ public class AccountServiceImpl implements AccountService{
 
         account.setDeleteAt(LocalDateTime.now()); // 도토리에서 계좌를 삭제함
         accountRepository.save(account);
+    }
+
+    @Override
+    public AccountFintechCodeDTO getAccount(AccountInfoDTO accountInfoDTO) {
+        Account account = accountRepository.findByAccountNumberAndDeleteAtIsNull(accountInfoDTO.getAccountNumber());
+        return AccountFintechCodeDTO.builder().fintechCode(account.getFintechCode()).build();
     }
 
 

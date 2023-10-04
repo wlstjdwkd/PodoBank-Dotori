@@ -2,10 +2,7 @@ package com.yongy.dotorimainservice.domain.account.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotorimainservice.domain.account.dto.AccountDTO;
-import com.yongy.dotorimainservice.domain.account.dto.communication.AccountNumberReqDto;
-import com.yongy.dotorimainservice.domain.account.dto.communication.AccountNumberTitleReqDto;
-import com.yongy.dotorimainservice.domain.account.dto.communication.AccountReqDto;
-import com.yongy.dotorimainservice.domain.account.dto.communication.UserReqDto;
+import com.yongy.dotorimainservice.domain.account.dto.communication.*;
 import com.yongy.dotorimainservice.domain.account.entity.Account;
 import com.yongy.dotorimainservice.domain.account.service.AccountService;
 import com.yongy.dotorimainservice.domain.user.entity.User;
@@ -73,6 +70,11 @@ public class AccountController {
     public ResponseEntity<String> setAccountName(@RequestBody AccountNumberTitleReqDto accountNumberTitleReqDto){
         accountService.saveAccountTitle(accountNumberTitleReqDto);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/communication/account")
+    public ResponseEntity<AccountFintechCodeDTO> getAccount(@RequestBody AccountInfoDTO accountInfoDTO){
+        return ResponseEntity.ok(accountService.getAccount(accountInfoDTO));
     }
 
 

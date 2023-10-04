@@ -2,6 +2,8 @@ package com.yongy.dotorimainservice.domain.account.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotorimainservice.domain.account.dto.AccountDTO;
+import com.yongy.dotorimainservice.domain.account.dto.communication.AccountFintechCodeDTO;
+import com.yongy.dotorimainservice.domain.account.dto.communication.AccountInfoDTO;
 import com.yongy.dotorimainservice.domain.account.dto.communication.AccountNumberTitleReqDto;
 import com.yongy.dotorimainservice.domain.account.dto.communication.AccountReqDto;
 import com.yongy.dotorimainservice.domain.account.entity.Account;
@@ -21,5 +23,6 @@ public interface AccountService {
     BigDecimal getBalance(Long accountSeq) throws JsonProcessingException, ParseException;
 
     void removeUserAccount(Long accountSeq) throws ParseException;
+    AccountFintechCodeDTO getAccount(AccountInfoDTO accountInfoDTO);
 
 }
