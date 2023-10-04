@@ -65,9 +65,9 @@ public class AccountController {
     public ResponseEntity<String> accountVisibleCheck(@RequestBody AccountNumberReqDto accountNumberReqDto){
         log.info("come come");
         Account account = accountService.getUserAccount(accountNumberReqDto.getAccountNumber());
-        log.info(account.toString());
-        if(account == null)
+        if(account == null) {
             return ResponseEntity.ok("NO"); // 존재하지않음
+        }
         return ResponseEntity.ok("YES"); // 존재함
     }
 
