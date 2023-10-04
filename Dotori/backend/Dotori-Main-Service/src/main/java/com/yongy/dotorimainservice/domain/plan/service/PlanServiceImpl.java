@@ -166,7 +166,7 @@ public class PlanServiceImpl implements PlanService {
         List<PlanDetail> planDetailList = planDetailRepository.findAllByPlanPlanSeq(savingDTO.getPlanSeq());
         BigDecimal totalSaving = new BigDecimal(BigInteger.ZERO);
 
-        if(!plan.getPlanState().equals(State.ACTIVE)){
+        if(plan.getPlanState().equals(State.SAVED)){
             throw new IllegalArgumentException("실행 중인 계획이 아닙니다.");
         }
 
