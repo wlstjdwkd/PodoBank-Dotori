@@ -20,6 +20,7 @@ import com.yongy.dotorimainservice.global.common.PodoBankInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -41,17 +42,16 @@ import java.util.Map;
 @Transactional
 @Service
 public class AccountServiceImpl implements AccountService{
-    private final BankRepository bankRepository;
 
-    private final AccountRepository accountRepository;
+    @Autowired
+    private BankRepository bankRepository;
+
+    @Autowired
+    private AccountRepository accountRepository;
 
     private final HashMap<String, Object> bodyData;
 
     private final PodoBankInfo podoBankInfo;
-
-    private final PlanService planService;
-
-    private final BankService bankService;
 
 
     @Override
@@ -185,8 +185,7 @@ public class AccountServiceImpl implements AccountService{
     }
 
     // NOTE : 1개의 계좌 조회하기(관리페이지)
-    public AccountDto findAccount(Long planSeq) throws ParseException, JsonProcessingException {
-        Plan plan = planService.findByPlanSeq(planSeq);
+    public AccountDto findAccount(Plan plan) throws ParseException, JsonProcessingException {
         Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(plan.getAccount().getAccountSeq());
 
         return AccountDto.builder()

@@ -6,6 +6,7 @@ import com.yongy.dotorimainservice.domain.account.dto.AccountListDto;
 import com.yongy.dotorimainservice.domain.account.dto.communication.AccountNumberTitleReqDto;
 import com.yongy.dotorimainservice.domain.account.dto.communication.AccountReqDto;
 import com.yongy.dotorimainservice.domain.account.entity.Account;
+import com.yongy.dotorimainservice.domain.plan.entity.Plan;
 import org.json.simple.parser.ParseException;
 
 import java.math.BigDecimal;
@@ -23,7 +24,7 @@ public interface AccountService {
 
     void removeUserAccount(Long accountSeq) throws ParseException;
 
-    AccountDto findAccount(Long planSeq) throws ParseException, JsonProcessingException;
+    AccountDto findAccount(Plan plan) throws ParseException, JsonProcessingException;
 
 
 
