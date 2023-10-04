@@ -15,6 +15,7 @@ import com.yongy.dotorimainservice.global.common.PodoBankInfo;
 import com.yongy.dotorimainservice.global.redis.entity.BankAccessToken;
 import com.yongy.dotorimainservice.global.redis.repository.BankAccessTokenRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class RewardServiceImpl implements RewardService{
 
@@ -64,6 +66,7 @@ public class RewardServiceImpl implements RewardService{
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Account account = accountRepository.findByUserSeqAndAccountSeqAndDeleteAtIsNull(user.getUserSeq(), randomBoxDTO.getAccountSeq());
 
+        log.info("송금");
         this.callBankAPI(account, randomBoxDTO.getAmount());
     }
 
