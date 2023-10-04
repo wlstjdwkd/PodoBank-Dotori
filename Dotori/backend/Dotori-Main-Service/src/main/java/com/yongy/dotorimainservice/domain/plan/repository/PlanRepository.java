@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface PlanRepository extends JpaRepository<Plan, Long> {
     Plan findByPlanSeq(Long planSeq);
-    Plan findByAccountAccountSeq(Long accountSeq);
+    List<Plan> findByAccountAccountSeqAndTerminatedAtIsNull(Long accountSeq);
 //    List<Plan> findAllByUserUserSeqAndPlanState(@Param("userSeq") Long userSeq, @Param("planState") State state);
 //
 //    List<Plan> findAllByEndAt(LocalDateTime endAt);

@@ -269,14 +269,16 @@ public class PlanServiceImpl implements PlanService {
     @Override
     public ActivePlanDTO findAllPlan(Long accountSeq) throws JsonProcessingException, ParseException {
          // 실행중인 계획 조회
-        Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
-        Plan plan = planRepository.findByAccountAccountSeq(accountSeq);
+        List<Plan> plans = planRepository.findByAccountAccountSeqAndTerminatedAtIsNull(accountSeq); // 애초에 ACTIVE or READY만 가져옴
+        Plan plan = plans.get(0);
 
         // Plan이 있는 지 확인, 실행중인 Plan인지 확인
         // 플랜이 있고, 실행중이면 : 로직 처리
         // 플랜이 있고, 시작 전인 플랜이 있으면
         // 플랜이 없으면 : 플랜 만들기 페이지
 
+
+        // TODO : 플랜이 있고, 상태가 Active일때, plan이 있고, 상태가 Ready일때
         if((plan != null && plan.getPlanState().equals(State.ACTIVE)) || (plan != null && plan.getPlanState().equals(State.READY))){
 
             // TODO : 종료 됐는지 확인하고 종료 됐으면 terminateAt 변경하고 미분류 checked true로 변경
