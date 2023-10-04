@@ -230,8 +230,8 @@ public class PurposeServiceImpl implements PurposeService{
 
         // TODO : 금액만큼 은행에 송금 요청
         // TODO : 1. 은행 정보 가져오기
-        MultiValueMap<String, Object> parameters = new LinkedMultiValueMap<>();
-        parameters.add("bankSeq", purposeFinisedDTO.getBankSeq());
+        MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+        parameters.add("bankSeq", purposeFinisedDTO.getBankSeq().toString());
         ResponseEntity<String> bankResponse = callServer.getHttpWithParamsAndSend(MAIN_SERVICE_URL+"/bank/communication/bankInfo", parameters);
 
         String responseCode = bankResponse.getStatusCode().toString().split(" ")[0];
