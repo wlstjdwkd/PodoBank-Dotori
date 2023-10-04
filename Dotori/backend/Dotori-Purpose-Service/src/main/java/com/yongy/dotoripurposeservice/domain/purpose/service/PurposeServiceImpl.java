@@ -188,6 +188,7 @@ public class PurposeServiceImpl implements PurposeService{
         // 1. 각 목표에 따라 저축 금액 update 하기
         for (PurposeSavingDTO data : savingDataDTO.getSavingDTO().getPurposeSavingList()) {
             Purpose purpose = purposeRepository.findByPurposeSeq(data.getPurposeSeq());
+            log.info(data.toString());
 
             // 현재 금액에 저축 금액 더하기
             purpose.addCurrentBalance(data.getSavingAmount());
