@@ -270,6 +270,8 @@ public class PlanServiceImpl implements PlanService {
     public ActivePlanDTO findAllPlan(Long accountSeq) throws JsonProcessingException, ParseException {
          // 실행중인 계획 조회
         List<Plan> plans = planRepository.findByAccountAccountSeqAndTerminatedAtIsNull(accountSeq); // 애초에 ACTIVE or READY만 가져옴
+        log.info("계획 개수 : "+plans.size());
+
         if(plans != null) {
             Plan plan = plans.get(0);
 
@@ -280,7 +282,7 @@ public class PlanServiceImpl implements PlanService {
 
 
             // TODO : 플랜이 있고, 상태가 Active일때, plan이 있고, 상태가 Ready일때
-            if ((plan != null && plan.getPlanState().equals(State.ACTIVE)) || (plan != null && plan.getPlanState().equals(State.READY))) {
+            if (plan.getPlanState().equals(State.ACTIVE) || plan.getPlanState().equals(State.READY)) {
 
                 // TODO : 종료 됐는지 확인하고 종료 됐으면 terminateAt 변경하고 미분류 checked true로 변경
                 if (plan.getPlanState().equals(State.ACTIVE) && checkTerminate(plan.getEndAt())) {
