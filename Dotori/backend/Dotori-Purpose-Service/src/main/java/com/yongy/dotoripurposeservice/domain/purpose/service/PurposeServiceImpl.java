@@ -203,6 +203,7 @@ public class PurposeServiceImpl implements PurposeService{
                     .dataCreatedAt(LocalDateTime.now())
                     .build());
 
+            log.info(data.getSavingAmount().toString());
             totalSaving = totalSaving.add(data.getSavingAmount());
         }
 
