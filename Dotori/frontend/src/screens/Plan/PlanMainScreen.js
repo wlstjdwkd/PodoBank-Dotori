@@ -106,7 +106,7 @@ export default function PlanMainScreen({ navigation, route }) {
       if (response.status === 200) {
         setPlanInfo(response.data);
         // 종료된 계획이라면 바로 종료 명세서 보기 창으로 넘김, else는 만들 필요없음.
-        if (response.data.state === "ACTIVE" && terminatedAt) {
+        if (response.data.state === "ACTIVE" && response.data.terminatedAt) {
           navigation.navigate("SavingPlanCompleteRecipeScreen", {
             accountName: accountName,
             accountSeq: accountSeq,
