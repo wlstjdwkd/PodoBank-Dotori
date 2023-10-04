@@ -268,17 +268,18 @@ public class PlanServiceImpl implements PlanService {
     public List<PlanListDto> getPlanList(){
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        // TODO : 전체 명세서 가져오기 completed, saved만
+        // TODO :  null이 아닌 경우에서 Inactive를 제외한 모든 경우에 명세서를 출력함
 
-        log.info("SEQ : =====================> "+ user.getUserSeq());
+        List<Plan> planList = planRepository.findAllByUserSeqAndTerminatedAtIsNotNull(user.getUserSeq()); // null이 아닌 경우
 
-        List<Plan> planList = planRepository.findAllByUserSeqAndTerminatedAtIsNotNull(user.getUserSeq());
         List<PlanListDto> planListDtoList = new ArrayList<>();
         for(Plan plan : planList){
-            planListDtoList.add(PlanListDto.builder().planSeq(plan.getPlanSeq())
-                    .accountTitle(accountRepository.findByUserSeqAndDeleteAtIsNull(user.getUserSeq()).getAccountTitle())
-                    .startAt(plan.getStartAt().format(formatter))
-                    .endAt(plan.getEndAt().format(formatter)).build());
+            if(!plan.getPlanState().equals(State.INACTIVE)){
+                planListDtoList.add(PlanListDto.builder().planSeq(plan.getPlanSeq())
+                        .accountTitle(accountRepository.findByUserSeqAndDeleteAtIsNull(user.getUserSeq()).getAccountTitle())
+                        .startAt(plan.getStartAt().format(formatter))
+                        .endAt(plan.getEndAt().format(formatter)).build());
+            }
         }
         return planListDtoList;
     }
