@@ -7,6 +7,7 @@ import store from "./src/redux/store"; // Redux 스토어 가져오기
 import { NavigationContainer } from "@react-navigation/native";
 import AppNavigator from "./src/navigation/AppNavigator";
 import { setAccessTokenExpiration } from './src/redux/slices/auth/user';
+import { setUserTokenRefreshModalVisible } from './src/redux/slices/auth/user';
 
 function MainApp() {
   const accessTokenExpiration = useSelector(
@@ -87,7 +88,11 @@ export default function App() {
     });
 
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      Alert.alert(remoteMessage.notification.title, 
+                  remoteMessage.notification.body,
+                  [
+                    { text: "OK", onPress: () => console.log("OK Pressed") }
+                  ]);
     });
 
     return unsubscribe;
