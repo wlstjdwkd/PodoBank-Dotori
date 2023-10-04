@@ -41,7 +41,7 @@ public class CallServer {
     }
 
     // NOTE : parameter로 데이터 보낼 때
-    public ResponseEntity<String> getHttpWithParamsAndSend(String url, MultiValueMap<String, String> params){
+    public ResponseEntity<String> getHttpWithParamsAndSend(String url, MultiValueMap<String, Long> params){
         // HTTP 헤더 설정
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.getForEntity(url, String.class, params);
