@@ -195,6 +195,7 @@ public class ChatGPTService {
                 continue;
             }
 
+            log.info("1==>"+plan.getAccount().toString());
             List<PaymentPodoResDto> paymentResDto = paymentService.getPayments(plan.getUpdatedAt(),plan.getAccount().getAccountSeq());
             List<Payment> chatGPT = new ArrayList<>();
             List<Payment> existPayment = new ArrayList<>();
