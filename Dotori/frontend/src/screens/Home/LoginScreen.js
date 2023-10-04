@@ -180,7 +180,7 @@ export default function LoginScreen({ navigation }) {
       </TouchableOpacity>
 
       <View style={styles.linksContainer}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={()=>{
             Alert.alert('', '아이디 찾기 구현 필요')
             navigation.navigate("LoginScreen")
@@ -199,20 +199,20 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.linkText}>비밀번호 찾기</Text>
         </TouchableOpacity>
 
-        <Text style={styles.linkText}>|</Text>
+        <Text style={styles.linkText}>|</Text> */}
         <TouchableOpacity onPress={() => {
           navigation.navigate("SignUp1Screen")
         }}>
-          <Text style={styles.linkText}>회원가입</Text>
+          <Text style={styles.linkText}>아직 회원이 아니신가요?</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.divider}>
+      {/* <View style={styles.divider}>
         <Text style={styles.dividerText}>SNS 계정으로 로그인</Text>
-      </View>
+      </View> */}
 
       {/* 카카오, 네이버 로그인 버튼은 라이브러리나 직접 이미지로 구현해야 합니다. */}
-      <View style={styles.oauth}>
+      {/* <View style={styles.oauth}>
         <TouchableOpacity
           onPress={()=>{
             // handleKakaoLogin()
@@ -229,7 +229,7 @@ export default function LoginScreen({ navigation }) {
             source={require("../../assets/images/naver.png")}
           />
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 }
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   },
   linksContainer: {
     flexDirection: "row",
-    justifyContent: "space-between", // 수정: 양쪽 끝으로 확장
+    justifyContent:'center',
     width: "100%",
     marginBottom: 60,
     paddingHorizontal: 10,
