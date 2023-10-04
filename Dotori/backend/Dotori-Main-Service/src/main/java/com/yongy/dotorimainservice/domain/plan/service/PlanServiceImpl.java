@@ -348,7 +348,7 @@ public class PlanServiceImpl implements PlanService {
             return plan;
         }
 
-        if(planRepository.findByAccountAccountSeqAndPlanStateAndTerminatedAtIsNull(accountSeq, State.READY) != null){
+        if(planRepository.findByAccountAccountSeqAndPlanStateAndTerminatedAtIsNotNull(accountSeq, State.ACTIVE) != null){
             throw new ExistTerminatedPlanException("명세서를 호출하세요.");
         }
 
