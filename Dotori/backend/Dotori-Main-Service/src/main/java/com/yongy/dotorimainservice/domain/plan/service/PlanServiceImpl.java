@@ -244,7 +244,7 @@ public class PlanServiceImpl implements PlanService {
         // TODO : 전체 명세서 가져오기 completed, saved만
 
         List<Plan> planList = planRepository.findAllByUserSeqAndTerminatedAtIsNotNull(user.getUserSeq());
-        List<PlanListDto> planListDtoList = null;
+        List<PlanListDto> planListDtoList = new ArrayList<>();
         for(Plan plan : planList){
             planListDtoList.add(PlanListDto.builder().planSeq(plan.getPlanSeq())
                     .accountTitle(accountRepository.findByUserSeqAndDeleteAtIsNull(user.getUserSeq()).getAccountTitle())
