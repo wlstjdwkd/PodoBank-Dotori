@@ -159,6 +159,7 @@ public class PlanServiceImpl implements PlanService {
     @Override
     public void saving(SavingDTO savingDTO) throws ParseException {
         log.info(savingDTO.getPlanSeq()+"");
+        log.info(savingDTO.toString());
 
         Plan plan = planRepository.findByPlanSeq(savingDTO.getPlanSeq());
         Account account = plan.getAccount();
