@@ -59,7 +59,7 @@ public class PlanDetail {
     }
 
     public PlanDetail updateBalance(BigDecimal amount) {
-        this.detailBalance = this.detailBalance.add(amount);
+        this.detailBalance = this.getDetailBalance().add(amount);
         return this;
     }
 }
