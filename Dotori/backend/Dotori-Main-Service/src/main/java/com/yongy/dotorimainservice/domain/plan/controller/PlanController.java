@@ -8,6 +8,7 @@ import com.yongy.dotorimainservice.domain.plan.dto.SavingDTO;
 import com.yongy.dotorimainservice.domain.plan.dto.communication.UserSeqDto;
 import com.yongy.dotorimainservice.domain.plan.dto.response.PlanListDto;
 import com.yongy.dotorimainservice.domain.plan.entity.State;
+import com.yongy.dotorimainservice.domain.plan.exception.NotActivePlanException;
 import com.yongy.dotorimainservice.domain.plan.service.PlanService;
 import com.yongy.dotorimainservice.domain.plan.service.PlanServiceImpl;
 import com.yongy.dotorimainservice.domain.user.entity.User;
@@ -73,8 +74,12 @@ public class PlanController {
     public ResponseEntity<List<PlanListDto>> planList(){
 
         // TODO : Completed 또는 Saved
-        List<PlanListDto> planListDto = planService.getPlanList();
-        return ResponseEntity.ok().body(planListDto);
+        try{
+            List<PlanListDto> planListDto = planService.getPlanList();
+            return ResponseEntity.ok().body(planListDto);
+        }catch(Exception e){
+            throw new NotActivePlanException("가져올 데이터가 없습니다.[중지하거나 실행중인 명세서는 가져오지 않습니다]");
+        }
     }
 
 
