@@ -1,5 +1,6 @@
 package com.yongy.dotoripurposeservice.domain.purpose.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.*;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.SavingDTO;
 import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.SavingDataDTO;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.parser.ParseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -102,8 +104,8 @@ public class PurposeController {
 
     @Operation(summary = "목표 종료")
     @PatchMapping("/finised")
-    public ResponseEntity<Void> purposeFinished(@RequestBody PurposeFinisedDTO purposeFinisedDTO){
-
+    public ResponseEntity<Void> purposeFinished(@RequestBody PurposeFinisedDTO purposeFinisedDTO) throws ParseException, JsonProcessingException {
+        purposeService.purposeFinised(purposeFinisedDTO);
         return ResponseEntity.ok().build();
     }
 }
