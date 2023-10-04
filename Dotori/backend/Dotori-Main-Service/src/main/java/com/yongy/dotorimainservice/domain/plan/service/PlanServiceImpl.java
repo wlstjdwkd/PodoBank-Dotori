@@ -270,23 +270,13 @@ public class PlanServiceImpl implements PlanService {
     @Override
     public ActivePlanDTO findAllPlan(Long accountSeq) throws JsonProcessingException, ParseException {
          // 실행중인 계획 조회
-        Plan plan = planRepository.findByAccountAccountSeqAndPlanStateAndTerminatedAtIsNull(accountSeq, State.ACTIVE); // 모든 리스트 가져와서
 
         // Plan이 있는 지 확인, 실행중인 Plan인지 확인
         // 플랜이 있고, 실행중이면 : 로직 처리
         // 플랜이 있고, 시작 전인 플랜이 있으면
         // 플랜이 없으면 : 플랜 만들기 페이지
-
-
-        // TODO : 플랜이 있고, 상태가 Active일때, plan이 있고, 상태가 Ready일때
-//        if (plan.getPlanState().equals(State.ACTIVE) || plan.getPlanState().equals(State.READY)) {
-//
-//            // TODO : 종료 됐는지 확인하고 종료 됐으면 terminateAt 변경하고 미분류 checked true로 변경
-//            if (plan.getPlanState().equals(State.ACTIVE) && checkTerminate(plan.getEndAt())) {
-//                planRepository.save(plan.terminate(plan.getEndAt()));
-//            }
-
-        if(checkActivePlan(accountSeq)) { // 보여줄 계획이 존재하면
+        Plan plan = checkActivePlan(accountSeq);
+        if(plan != null) { // 보여줄 계획이 존재하면
             // 실행 중인 카테고리 가져오기
             List<PlanDetail> planDetailList = plan.getPlanDetailList();
             List<ActivePlanDetailDTO> activePlanList = new ArrayList<>();
@@ -325,29 +315,28 @@ public class PlanServiceImpl implements PlanService {
                     .build();
 
             return result;
-        }else{
-
         }
-
-
 
         return ActivePlanDTO.builder().accountBalance(accountService.getBalance(accountSeq)).build();
     }
 
-    public boolean checkActivePlan(Long accountSeq){
-        if(planRepository.findByAccountAccountSeqAndPlanStateAndTerminatedAtIsNull(accountSeq, State.ACTIVE) != null){
-            return true;
+    public Plan checkActivePlan(Long accountSeq){
+        Plan plan = planRepository.findByAccountAccountSeqAndPlanStateAndTerminatedAtIsNull(accountSeq, State.ACTIVE);
+
+        if(plan != null){
+            return plan;
         }
 
-        if(planRepository.findByAccountAccountSeqAndPlanStateAndTerminatedAtIsNull(accountSeq, State.READY) != null){
-            return true;
+        plan = planRepository.findByAccountAccountSeqAndPlanStateAndTerminatedAtIsNull(accountSeq, State.READY);
+        if(plan != null){
+            return plan;
         }
 
         if(planRepository.findByAccountAccountSeqAndPlanStateAndTerminatedAtIsNull(accountSeq, State.READY) != null){
             throw new ExistTerminatedPlanException("명세서를 호출하세요.");
         }
 
-        return false;
+        return null;
     }
 
     @Override

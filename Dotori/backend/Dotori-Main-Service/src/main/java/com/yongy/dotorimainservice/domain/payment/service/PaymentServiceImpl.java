@@ -12,7 +12,6 @@ import com.yongy.dotorimainservice.domain.categoryData.repository.CategoryDataRe
 import com.yongy.dotorimainservice.domain.payment.dto.PaymentDetailDTO;
 import com.yongy.dotorimainservice.domain.payment.dto.TransactionHistoryDTO;
 import com.yongy.dotorimainservice.domain.payment.dto.UpdateDataDTO;
-import com.yongy.dotorimainservice.domain.payment.dto.UpdateUnclassifiedDTO;
 import com.yongy.dotorimainservice.domain.payment.dto.response.PaymentPodoResDto;
 import com.yongy.dotorimainservice.domain.payment.entity.Payment;
 import com.yongy.dotorimainservice.domain.payment.repository.PaymentRepository;

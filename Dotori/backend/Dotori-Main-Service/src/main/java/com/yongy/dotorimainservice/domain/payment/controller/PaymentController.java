@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotorimainservice.domain.account.service.AccountService;
 import com.yongy.dotorimainservice.domain.payment.dto.PaymentDetailDTO;
 import com.yongy.dotorimainservice.domain.payment.dto.UpdateDataDTO;
-import com.yongy.dotorimainservice.domain.payment.dto.UpdateUnclassifiedDTO;
 import com.yongy.dotorimainservice.domain.payment.dto.request.PaymentPodoReqDto;
 import com.yongy.dotorimainservice.domain.payment.dto.response.PaymentPodoResDto;
 import com.yongy.dotorimainservice.domain.payment.service.PaymentService;
@@ -22,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Slf4j
