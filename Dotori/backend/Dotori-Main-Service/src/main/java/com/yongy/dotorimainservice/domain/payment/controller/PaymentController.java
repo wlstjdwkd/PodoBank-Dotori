@@ -79,7 +79,7 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "미분류 사용자 확인")
     })
     @PatchMapping("/{planSeq}")
-    public ResponseEntity<Void> updateUnclassified(@PathVariable Long planSeq, @RequestParam UnclassifiedDTO updateDataDTOList){
+    public ResponseEntity<Void> updateUnclassified(@PathVariable Long planSeq, @RequestBody UnclassifiedDTO updateDataDTOList){
         paymentService.updateUnclassified(planSeq, updateDataDTOList);
         return ResponseEntity.ok().build();
     }
