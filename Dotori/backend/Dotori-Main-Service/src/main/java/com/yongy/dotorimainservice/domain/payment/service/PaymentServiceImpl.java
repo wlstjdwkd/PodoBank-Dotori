@@ -66,6 +66,9 @@ public class PaymentServiceImpl implements PaymentService{
     // NOTE : 시작날짜, 계좌seq
     public List<PaymentPodoResDto> getPayments(LocalDateTime updateTime, Long accountSeq) throws ParseException, JsonProcessingException {
         Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(accountSeq);
+        if(account == null){
+            return new ArrayList<>();
+        }
         Bank bank = bankRepository.findByBankSeq(account.getBank().getBankSeq());
 
         String useToken = podoBankInfo.getConnectionToken(bank.getBankSeq());
@@ -176,11 +179,14 @@ public class PaymentServiceImpl implements PaymentService{
         List<PlanDetail> planDetails = planDetailRepository.findAllByPlanPlanSeq(planSeq);
         for(PlanDetail planDetail : planDetails){
             List<Payment> list = paymentRepository.findAllByPlanDetailSeqAndChecked(planDetail.getPlanDetailSeq(), false);
+            log.info("payment개수" + list.size());
+
             for(Payment payment : list){
                 log.info(payment.toString());
                 result.add(payment.updateChecked());
 
                 CategoryData categoryData = categoryDataRepository.findByDataCode(payment.getBusinessCode());
+                planDetailRepository.save(planDetail.updateBalance(payment.getPaymentPrice()));
 
                 if(categoryData == null){ // 이전에 저장된 데이터가 없으면
                     categoryDataSet.add(CategoryData.builder()
@@ -191,10 +197,6 @@ public class PaymentServiceImpl implements PaymentService{
                             .build());
                     continue;
                 }
-                log.info("들어오니?");
-                log.info(payment.getPaymentPrice().toString());
-                planDetailRepository.save(planDetail.updateBalance(payment.getPaymentPrice()));
-
                 // 이전에 저장된 데이터가 있음
                 // TODO : payment 저장할 때마다 categoryData count++
                 categoryDataSet.add(categoryData.updateCount());

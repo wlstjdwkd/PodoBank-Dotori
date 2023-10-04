@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Builder
-@ToString
 public class Payment {
 
     @Id
