@@ -71,11 +71,9 @@ public class PlanController {
     })
     @GetMapping("/specification")
     public ResponseEntity<List<PlanListDto>> planList(){
-        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // TODO : Completed 또는 Saved
-        List<PlanListDto> planListDto = planService.getPlanList(user.getUserSeq());
-
+        List<PlanListDto> planListDto = planService.getPlanList();
         return ResponseEntity.ok().body(planListDto);
     }
 
