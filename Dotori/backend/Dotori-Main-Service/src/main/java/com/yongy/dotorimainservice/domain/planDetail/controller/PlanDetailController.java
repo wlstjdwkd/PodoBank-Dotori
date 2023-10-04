@@ -31,8 +31,8 @@ public class PlanDetailController {
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "명세서 상세 조회 성공")
     })
-    @GetMapping("/specification")
-    public ResponseEntity<SpecificationDTO> getPlanDetail(@RequestBody PlanSeqDTO planSeq) throws ParseException, JsonProcessingException {
+    @GetMapping("/specification/{planSeq}")
+    public ResponseEntity<SpecificationDTO> getPlanDetail(@PathVariable PlanSeqDTO planSeq) throws ParseException, JsonProcessingException {
         SpecificationDTO specificationDTO = planDetailService.getPlanDetail(planSeq.getPlanSeq());
         return ResponseEntity.ok().body(specificationDTO);
     }
