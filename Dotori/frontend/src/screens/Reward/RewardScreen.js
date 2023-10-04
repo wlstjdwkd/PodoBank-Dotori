@@ -22,9 +22,9 @@ export default function RewardScreen({ navigation }) {
 
   const doUserDotoriValueCheck = async () => {
     try {
-      const response = await userDotoriValueCheck("", accessToken, grantType);
+      const response = await userDotoriValueCheck(accessToken, grantType);
       if (response.status === 200) {
-        setDotoriCount(response.data);
+        setDotoriCount(response.data.dotori);
       } else {
         console.log("사용자 현재 도토리 갯수 조회 실패", response.status);
       }
@@ -70,12 +70,12 @@ export default function RewardScreen({ navigation }) {
 
   useEffect(() => {
     // 서버에서 데이터 가져오기 (여기서는 setTimeout을 사용해 시뮬레이션)
-    setTimeout(() => {
-      setDotoriCount(9);
-    }, 1000);
-    // if(isFocused) {
-    //   doUserDotoriValueCheck();
-    // }
+    // setTimeout(() => {
+    //   setDotoriCount(9);
+    // }, 1000);
+    if (isFocused) {
+      doUserDotoriValueCheck();
+    }
   }, [isFocused]);
   return (
     <View style={styles.container}>

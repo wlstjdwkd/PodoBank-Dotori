@@ -196,11 +196,15 @@ export const planClassifyChatGpt = async (
 // 계획 전체 카테고리 그룹 가져오기
 export const planCategoryGroupList = async (accessToken, grantType) => {
   try {
-    const response = await axios.get(apiAddress + `/api/v1/categoryGroup`, null, {
-      headers: {
-        Authorization: `${grantType} ${accessToken}`,
-      },
-    });
+    const response = await axios.get(
+      apiAddress + `/api/v1/categoryGroup`,
+      null,
+      {
+        headers: {
+          Authorization: `${grantType} ${accessToken}`,
+        },
+      }
+    );
     console.log("계획 전체 카테고리 그룹 가져오기 성공:", response.data);
     return response;
   } catch (error) {
@@ -215,7 +219,6 @@ export const planCategoryGroupList = async (accessToken, grantType) => {
   }
 };
 
-
 // categorydata
 // 계획 카테고리 사용처 목록 가져오기
 // [
@@ -225,47 +228,67 @@ export const planCategoryGroupList = async (accessToken, grantType) => {
 //     "count": 0
 //   }
 // ]
-export const planCategoryUsingSpot = async (categorySeq, accessToken, grantType) => {
+export const planCategoryUsingSpot = async (
+  categorySeq,
+  accessToken,
+  grantType
+) => {
   try {
-    const response = await axios.get(apiAddress+`/api/v1/categoryData?categorySeq=${categorySeq}`,  {
-      headers: {
-        Authorization: `${grantType} ${accessToken}`,
-      },
-    });
-    console.log('계획 카테고리 사용처 목록 가져오기 성공:', response.data);
+    const response = await axios.get(
+      apiAddress + `/api/v1/categoryData?categorySeq=${categorySeq}`,
+      {
+        headers: {
+          Authorization: `${grantType} ${accessToken}`,
+        },
+      }
+    );
+    console.log("계획 카테고리 사용처 목록 가져오기 성공:", response.data);
     return response;
   } catch (error) {
-    console.error('계획 카테고리 사용처 목록 가져오기 실패:', error.response.status, error.response.data);
-    const response = error.response
-    return response
+    console.error(
+      "계획 카테고리 사용처 목록 가져오기 실패:",
+      error.response.status,
+      error.response.data
+    );
+    const response = error.response;
+    return response;
     // throw error;
   }
 };
-export const planCategoryDeleteSpot = async (dataCode, accessToken, grantType) => {
+export const planCategoryDeleteSpot = async (
+  dataCode,
+  accessToken,
+  grantType
+) => {
   try {
-    const response = await axios.delete(apiAddress+`/api/v1/categoryData`, {dataCode:dataCode}, {
-      headers: {
-        Authorization: `${grantType} ${accessToken}`,
-      },
-    });
-    console.log('계획 카테고리 사용처 목록 제거하기 성공:', response.data);
+    const response = await axios.delete(
+      apiAddress + `/api/v1/categoryData`,
+      { dataCode: dataCode },
+      {
+        headers: {
+          Authorization: `${grantType} ${accessToken}`,
+        },
+      }
+    );
+    console.log("계획 카테고리 사용처 목록 제거하기 성공:", response.data);
     return response;
   } catch (error) {
-    console.error('계획 카테고리 사용처 목록 제거하기 실패:', error.response.status, error.response.data);
-    const response = error.response
-    return response
+    console.error(
+      "계획 카테고리 사용처 목록 제거하기 실패:",
+      error.response.status,
+      error.response.data
+    );
+    const response = error.response;
+    return response;
     // throw error;
   }
 };
-
-
-
 
 // category
 // 계획 전체 카테고리 목록 가져오기
 export const planCategoryList = async (accessToken, grantType) => {
   try {
-    const response = await axios.get(apiAddress+`/api/v1/category`, {
+    const response = await axios.get(apiAddress + `/api/v1/category`, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
@@ -401,35 +424,50 @@ export const unClassifiedUpdate = async (
 //명세서 전체 조회하기
 export const planSpecificationList = async (accessToken, grantType) => {
   try {
-    const response = await axios.get(apiAddress+`/v1/plan/specification`,  {
+    const response = await axios.get(apiAddress + `api/v1/plan/specification`, {
       headers: {
         Authorization: `${grantType} ${accessToken}`,
       },
     });
-    console.log('계획 명세서 전체 조회하기 성공:', response.data);
+    console.log("계획 명세서 전체 조회하기 성공:", response.data);
     return response;
   } catch (error) {
-    console.error('계획 명세서 전체 조회하기 실패:', error.response.status, error.response.data);
-    const response = error.response
-    return response
+    console.error(
+      "계획 명세서 전체 조회하기 실패:",
+      error.response.status,
+      error.response.data
+    );
+    const response = error.response;
+    return response;
     // throw error;
   }
 };
 
 //명세서 상세 조회하기
-export const planSpecificationDetail = async (planSeq, accessToken, grantType) => {
+export const planSpecificationDetail = async (
+  planSeq,
+  accessToken,
+  grantType
+) => {
   try {
-    const response = await axios.get(apiAddress+`/v1/planDetail/specification?planSeq=${planSeq}`,  {
-      headers: {
-        Authorization: `${grantType} ${accessToken}`,
-      },
-    });
-    console.log('계획 명세서 상세 조회하기 성공:', response.data);
+    const response = await axios.get(
+      apiAddress + `/api/v1/planDetail/specification?planSeq=${planSeq}`,
+      {
+        headers: {
+          Authorization: `${grantType} ${accessToken}`,
+        },
+      }
+    );
+    console.log("계획 명세서 상세 조회하기 성공:", response.data);
     return response;
   } catch (error) {
-    console.error('계획 명세서 상세 조회하기 실패:', error.response.status, error.response.data);
-    const response = error.response
-    return response
+    console.error(
+      "계획 명세서 상세 조회하기 실패:",
+      error.response.status,
+      error.response.data
+    );
+    const response = error.response;
+    return response;
     // throw error;
   }
 };

@@ -6,24 +6,24 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-} from "react-native"
-import FooterScreen from "../Components/FooterScreen"
-import { useDispatch, useSelector } from "react-redux"
-import { purposeGetList } from "../../apis/purposeapi"
-import { useIsFocused } from "@react-navigation/native"
+} from "react-native";
+import FooterScreen from "../Components/FooterScreen";
+import { useDispatch, useSelector } from "react-redux";
+import { purposeGetList } from "../../apis/purposeapi";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function PurposeScreen({ navigation }) {
   // 토큰
-  const grantType =  useSelector((state)=>state.user.grantType)
-  const accessToken =  useSelector((state)=>state.user.accessToken)
-  const refreshToken =  useSelector((state)=>state.user.refreshToken)
-  const dispatch = useDispatch()
+  const grantType = useSelector((state) => state.user.grantType);
+  const accessToken = useSelector((state) => state.user.accessToken);
+  const refreshToken = useSelector((state) => state.user.refreshToken);
+  const dispatch = useDispatch();
   // 그 외
-  const isFocused = useIsFocused()
+  const isFocused = useIsFocused();
 
-  const [currentTotalSavings, setcurrentTotalSavings] = useState(0)
-  const [purposeList, setPurposeList] = useState([])
-  
+  const [currentTotalSavings, setcurrentTotalSavings] = useState(0);
+  const [purposeList, setPurposeList] = useState([]);
+
   const data = [
     {
       id: "1",
@@ -51,25 +51,24 @@ export default function PurposeScreen({ navigation }) {
   };
 
   const doPurposeGetList = async () => {
-    try{
-      const response = await purposeGetList(accessToken, grantType)
-      if(response.status === 200){
-        console.log("목표 리스트 조회 성공")
-        console.log(response.data)
-        setPurposeList(response.data.purposeList)
-        setcurrentTotalSavings(response.data.currentTotalSavings)
-      }else{
-        console.log("목표 리스트 조회 실패", response.status)
+    try {
+      const response = await purposeGetList(accessToken, grantType);
+      if (response.status === 200) {
+        console.log("목표 리스트 조회 성공");
+        console.log(response.data);
+        setPurposeList(response.data.purposeList);
+        setcurrentTotalSavings(response.data.currentTotalSavings);
+      } else {
+        console.log("목표 리스트 조회 실패", response.status);
       }
-    }catch(error){
-      console.log('오류 발생: 목표 리스트 조회 실패',error)
+    } catch (error) {
+      console.log("오류 발생: 목표 리스트 조회 실패", error);
     }
-
-  }
+  };
 
   useEffect(() => {
-    if(isFocused){
-      doPurposeGetList()
+    if (isFocused) {
+      doPurposeGetList();
     }
   }, [isFocused]);
 
@@ -104,14 +103,23 @@ export default function PurposeScreen({ navigation }) {
 
       {/* 목표 리스트 */}
       <FlatList
-        style={{marginBottom:80}}
+        style={{ marginBottom: 80 }}
         data={purposeList}
         renderItem={({ item }) => {
           const borderColor = getRandomBorderColor();
           return (
-            <TouchableOpacity style={[styles.targetContainer, { borderColor }]}
-              onPress={()=>{
-                navigation.navigate("PurposeDetailScreen", {purposeSeq:item.purposeSeq})
+            <TouchableOpacity
+              style={[styles.targetContainer, { borderColor }]}
+              onPress={() => {
+                if (item.terminatedAt !== null) {
+                  navigation.navigate("PurposeEnd1Screen", {
+                    purposeData: item,
+                  });
+                } else {
+                  navigation.navigate("PurposeDetailScreen", {
+                    purposeSeq: item.purposeSeq,
+                  });
+                }
               }}
             >
               <Text style={styles.targetName}>{item.title}</Text>
@@ -131,7 +139,6 @@ export default function PurposeScreen({ navigation }) {
             </TouchableOpacity>
           );
         }}
-        // keyExtractor={(item) => item.purposeSeq}
         keyExtractor={(item) => item.purposeSeq}
         ListFooterComponent={
           <TouchableOpacity
@@ -142,6 +149,7 @@ export default function PurposeScreen({ navigation }) {
           </TouchableOpacity>
         }
       />
+
       {/* 목표 리스트 */}
       {/* <FlatList
         data={data}

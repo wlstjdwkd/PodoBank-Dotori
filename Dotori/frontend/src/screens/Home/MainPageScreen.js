@@ -175,7 +175,7 @@ export default function MainPageScreen({ navigation }) {
               <View style={{ marginTop: 50 }}></View>
             </>
           }
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.accountSeq.toString()}
         />
       </View>
       <View style={styles.footer}>
