@@ -32,7 +32,6 @@ public class PlanController {
     @Autowired
     private PlanService planService;
 
-
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "계획 생성 성공")
     })
@@ -107,5 +106,4 @@ public class PlanController {
         log.info("check-2");
         return ResponseEntity.ok().build();
     }
-
 }
