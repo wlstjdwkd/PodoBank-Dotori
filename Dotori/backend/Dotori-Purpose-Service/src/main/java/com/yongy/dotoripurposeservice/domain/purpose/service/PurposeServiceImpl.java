@@ -224,6 +224,7 @@ public class PurposeServiceImpl implements PurposeService{
             throw new NotActiveException("종료된 목표가 아닙니다.");
         }
 
+        log.info("저축금액비교 : "+purpose.getCurrentBalance()+" "+purposeFinisedDTO.getPurposeSavings());
         if(!purpose.getCurrentBalance().equals(purposeFinisedDTO.getPurposeSavings())){
             throw new NotEqualsBalanceException("저축 금액이 일치하지 않습니다.");
         }

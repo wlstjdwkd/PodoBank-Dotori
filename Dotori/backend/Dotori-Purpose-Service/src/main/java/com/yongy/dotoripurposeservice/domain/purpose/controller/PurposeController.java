@@ -103,7 +103,7 @@ public class PurposeController {
 
 
     @Operation(summary = "목표 종료")
-    @PatchMapping("/finised")
+    @PatchMapping("/finished")
     public ResponseEntity<Void> purposeFinished(@RequestBody PurposeFinisedDTO purposeFinisedDTO) throws ParseException, JsonProcessingException {
         purposeService.purposeFinised(purposeFinisedDTO);
         return ResponseEntity.ok().build();
