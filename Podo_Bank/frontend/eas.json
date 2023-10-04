@@ -8,8 +8,10 @@
       "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal",
-      "usesCleartextTraffic": true
+      "android": {
+        "distribution": "internal",
+        "usesCleartextTraffic": true
+      }
     },
     "production": {}
   },
