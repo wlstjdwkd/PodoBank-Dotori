@@ -91,7 +91,7 @@ export default function MyPageScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <HeaderComponent title="마이페이지" navigation={navigation}></HeaderComponent>
+      <HeaderComponent title="마이페이지" navigation={navigation} cancelNavi={"MainPageScreen"}></HeaderComponent>
 
       {/* 프로필 이미지 */}
       <View style={styles.profileContainer}>

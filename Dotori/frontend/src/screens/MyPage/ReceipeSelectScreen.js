@@ -79,7 +79,7 @@ export default function ReceipeSelectScreen({ navigation }) {
         }
         console.log("명세서 전체 리스트 받아오기 성공")
       }else{
-        console.log("명세서 전체 리스트 받아오기 실패")
+        console.log("명세서 전체 리스트 받아오기 실패", response.status)
       }
     }catch(error){
       console.log("오류발생 명세서 전체 리스트 받아오기 실패:", error)
