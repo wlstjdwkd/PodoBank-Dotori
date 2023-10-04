@@ -3,6 +3,7 @@ package com.yongy.dotorimainservice.domain.payment.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotorimainservice.domain.account.service.AccountService;
 import com.yongy.dotorimainservice.domain.payment.dto.PaymentDetailDTO;
+import com.yongy.dotorimainservice.domain.payment.dto.UpdateDataDTO;
 import com.yongy.dotorimainservice.domain.payment.dto.UpdateUnclassifiedDTO;
 import com.yongy.dotorimainservice.domain.payment.dto.request.PaymentPodoReqDto;
 import com.yongy.dotorimainservice.domain.payment.dto.response.PaymentPodoResDto;
@@ -79,8 +80,8 @@ public class PaymentController {
             @ApiResponse(responseCode = "200", description = "미분류 사용자 확인")
     })
     @PatchMapping("/{planSeq}")
-    public ResponseEntity<Void> updateUnclassified(@PathVariable Long planSeq, @RequestBody UpdateUnclassifiedDTO updateUnclassifiedDTO){
-        paymentService.updateUnclassified(planSeq, updateUnclassifiedDTO);
+    public ResponseEntity<Void> updateUnclassified(@PathVariable Long planSeq, @RequestParam List<UpdateDataDTO> updateDataDTOList){
+        paymentService.updateUnclassified(planSeq, updateDataDTOList);
         return ResponseEntity.ok().build();
     }
 }

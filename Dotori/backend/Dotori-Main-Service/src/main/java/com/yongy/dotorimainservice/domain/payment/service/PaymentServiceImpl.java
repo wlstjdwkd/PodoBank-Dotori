@@ -145,13 +145,12 @@ public class PaymentServiceImpl implements PaymentService{
     }
 
     @Override
-    public void updateUnclassified(Long planSeq, UpdateUnclassifiedDTO updateUnclassifiedDTO) {
+    public void updateUnclassified(Long planSeq, List<UpdateDataDTO> updateUnclassifiedDTO) {
         Plan plan = planRepository.findByPlanSeq(planSeq);
-        List<UpdateDataDTO> payments = updateUnclassifiedDTO.getUpdateData();
         List<Payment> result = new ArrayList<>();
         Set<CategoryData> categoryDataSet = new HashSet<>(); // 저장할 CategoryData
 
-        for(UpdateDataDTO data : payments){
+        for(UpdateDataDTO data : updateUnclassifiedDTO){
             Payment payment = paymentRepository.findByPaymentSeq(data.getPaymentSeq());
             result.add(payment.updateChecked()); // checked = true
             CategoryData categoryData = categoryDataRepository.findByDataCode(payment.getBusinessCode());
@@ -172,7 +171,7 @@ public class PaymentServiceImpl implements PaymentService{
             categoryDataSet.add(categoryData.updateCount());
         }
 
-        planRepository.save(plan.updateCount((long) -(updateUnclassifiedDTO.getUpdateData().size())));
+        planRepository.save(plan.updateCount(0L)); // 모든 데이터 처리 했으니까
         paymentRepository.saveAll(result);
         categoryDataRepository.saveAll(categoryDataSet);
     }
