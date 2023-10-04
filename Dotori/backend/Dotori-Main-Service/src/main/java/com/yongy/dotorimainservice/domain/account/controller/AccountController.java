@@ -3,15 +3,21 @@ package com.yongy.dotorimainservice.domain.account.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotorimainservice.domain.account.dto.AccountDTO;
 import com.yongy.dotorimainservice.domain.account.dto.communication.*;
+import com.yongy.dotorimainservice.domain.account.dto.AccountDto;
+import com.yongy.dotorimainservice.domain.account.dto.AccountListDto;
+import com.yongy.dotorimainservice.domain.account.dto.communication.AccountNumberReqDto;
+import com.yongy.dotorimainservice.domain.account.dto.communication.AccountNumberTitleReqDto;
+import com.yongy.dotorimainservice.domain.account.dto.communication.AccountReqDto;
+import com.yongy.dotorimainservice.domain.account.dto.communication.UserReqDto;
 import com.yongy.dotorimainservice.domain.account.entity.Account;
 import com.yongy.dotorimainservice.domain.account.service.AccountService;
-import com.yongy.dotorimainservice.domain.user.entity.User;
+import com.yongy.dotorimainservice.domain.plan.entity.Plan;
+import com.yongy.dotorimainservice.domain.plan.service.PlanService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,14 +30,22 @@ public class AccountController {
 
     private final AccountService accountService;
 
+    private final PlanService planService;
+
     @Operation(summary = "전체 계좌 조회", description = "USER")
     @GetMapping()
-    public ResponseEntity<List<AccountDTO>> findAllAccount() throws JsonProcessingException, ParseException {
-        List<AccountDTO> result = accountService.findAllAccount();
+    public ResponseEntity<List<AccountListDto>> findAllAccount() throws JsonProcessingException, ParseException {
+        List<AccountListDto> result = accountService.findAllAccount();
         return ResponseEntity.ok(result);
     }
 
-    // NOTE : 사용자의 계좌 1개를 삭제함
+    @Operation(summary = "사용자의 계좌 조회(1개)", description = "USER")
+    @GetMapping("/one")
+    public ResponseEntity<AccountDto> findAccount(@RequestParam Long planSeq) throws ParseException, JsonProcessingException {
+        Plan plan = planService.findByPlanSeq(planSeq);
+        return ResponseEntity.ok(accountService.findAccount(plan));
+    }
+
     @Operation(summary = "사용자의 계좌 삭제(1개)", description = "USER")
     @PostMapping("/delete")
     public ResponseEntity<String> deleteUserOneAccount(@RequestParam Long accountSeq) throws ParseException {

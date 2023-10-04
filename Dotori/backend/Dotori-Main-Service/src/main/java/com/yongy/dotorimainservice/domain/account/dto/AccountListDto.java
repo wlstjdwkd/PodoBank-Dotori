@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Getter
 @Builder
 @AllArgsConstructor
-public class AccountDTO {
+public class AccountListDto {
     Long accountSeq;
     String accountTitle;
     BigDecimal currentBalance;

@@ -107,4 +107,8 @@ public class PlanController {
         log.info("check-2");
         return ResponseEntity.ok().build();
     }
+
+    // TODO : 관리페이지에서 계획이랑 계좌번호 알려줌
+
+//    @PostMapping("/")
 }
