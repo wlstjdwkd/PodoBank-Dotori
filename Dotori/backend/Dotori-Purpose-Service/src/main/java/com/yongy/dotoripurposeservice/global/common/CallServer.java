@@ -44,7 +44,7 @@ public class CallServer {
     public ResponseEntity<String> getHttpWithParamsAndSend(String url, MultiValueMap<String, Long> params){
         // HTTP 헤더 설정
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.getForEntity(url+"/{bankSeq}", String.class, params);
+        ResponseEntity<String> response = restTemplate.getForEntity(url+"/{bankSeq}", String.class, params.get("bankSeq"));
 
         return response;
     }
