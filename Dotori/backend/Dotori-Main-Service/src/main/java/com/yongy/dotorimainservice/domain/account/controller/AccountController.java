@@ -1,7 +1,6 @@
 package com.yongy.dotorimainservice.domain.account.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.yongy.dotorimainservice.domain.account.dto.AccountDTO;
 import com.yongy.dotorimainservice.domain.account.dto.communication.*;
 import com.yongy.dotorimainservice.domain.account.dto.AccountDto;
 import com.yongy.dotorimainservice.domain.account.dto.AccountListDto;
@@ -66,6 +65,7 @@ public class AccountController {
     public ResponseEntity<String> accountVisibleCheck(@RequestBody AccountNumberReqDto accountNumberReqDto){
         log.info("come come");
         Account account = accountService.getUserAccount(accountNumberReqDto.getAccountNumber());
+        log.info(account.toString());
         if(account == null)
             return ResponseEntity.ok("NO"); // 존재하지않음
         return ResponseEntity.ok("YES"); // 존재함
@@ -90,6 +90,4 @@ public class AccountController {
     public ResponseEntity<AccountFintechCodeDTO> getAccount(@RequestBody AccountInfoDTO accountInfoDTO){
         return ResponseEntity.ok(accountService.getAccount(accountInfoDTO));
     }
-
-
 }

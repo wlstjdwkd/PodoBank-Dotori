@@ -3,16 +3,14 @@ package com.yongy.dotorimainservice.domain.account.entity;
 
 import com.yongy.dotorimainservice.domain.bank.entity.Bank;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Setter
 @Getter
 @NoArgsConstructor
+@ToString
 @Entity(name="accounts")
 public class Account {
     @Id
