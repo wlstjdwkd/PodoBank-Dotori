@@ -9,6 +9,7 @@ import com.bank.podo.domain.account.exception.InsufficientBalanceException;
 import com.bank.podo.domain.account.exception.PasswordRetryCountExceededException;
 import com.bank.podo.domain.account.repository.AccountRepository;
 import com.bank.podo.domain.account.repository.TransactionHistoryRepository;
+import com.bank.podo.global.others.service.FCMService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AccountAdminService {
 
+    private final AccountService accountService;
+    private final FCMService fcmService;
+
     private final AccountRepository accountRepository;
     private final TransactionHistoryRepository transactionHistoryRepository;
 
@@ -36,33 +40,11 @@ public class AccountAdminService {
 
         BigDecimal transferAmount = transferDTO.getAmount();
 
-        if(senderAccount.getBalance().compareTo(transferAmount) < 0) {
-            throw new InsufficientBalanceException("잔액이 부족합니다.");
-        }
+        accountService.withdraw(senderAccount, transferAmount, transferDTO.getSenderContent(), null);
+        accountService.deposit(receiverAccount, transferAmount, transferDTO.getReceiverContent(), null);
 
-        senderAccount.withdraw(transferAmount);
-        receiverAccount.deposit(transferAmount);
-
-        accountRepository.saveAll(Arrays.asList(senderAccount, receiverAccount));
-
-        TransactionHistory senderAccountHistory = TransactionHistory.builder()
-                .transactionType(TransactionType.WITHDRAWAL)
-                .amount(transferAmount)
-                .balanceAfter(senderAccount.getBalance())
-                .counterAccount(receiverAccount)
-                .account(senderAccount)
-                .content(transferDTO.getSenderContent())
-                .build();
-        TransactionHistory receiverAccountHistory = TransactionHistory.builder()
-                .transactionType(TransactionType.DEPOSIT)
-                .amount(transferAmount)
-                .balanceAfter(receiverAccount.getBalance())
-                .counterAccount(senderAccount)
-                .account(receiverAccount)
-                .content(transferDTO.getReceiverContent())
-                .build();
-
-        transactionHistoryRepository.saveAll(Arrays.asList(senderAccountHistory, receiverAccountHistory));
+        fcmService.sendNotification(receiverAccount.getUser().getEmail(), "입금", transferAmount.toString() + "원이 입금되었습니다."+"\n"+transferDTO.getReceiverContent());
+        fcmService.sendNotification(senderAccount.getUser().getEmail(), "출금", transferAmount.toString() + "원이 출금되었습니다."+ "\n"+transferDTO.getSenderContent());
 
         logTransfer(senderAccount, receiverAccount, transferAmount);
     }
@@ -102,6 +84,7 @@ public class AccountAdminService {
                 .transactionAt(transactionHistory.getCreatedAt())
                 .amount(transactionHistory.getAmount())
                 .balanceAfter(transactionHistory.getBalanceAfter())
+                .businessCode(transactionHistory.getBusinessCode())
                 .content(transactionHistory.getContent());
 
         if (transactionHistory.getCounterAccount() != null) {

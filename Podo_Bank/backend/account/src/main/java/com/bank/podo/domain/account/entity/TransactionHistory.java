@@ -44,13 +44,17 @@ public class TransactionHistory extends BaseEntity {
     @Column
     private String content;
 
+    @Column
+    private String businessCode;
+
     @Builder
-    public TransactionHistory(Account account, TransactionType transactionType, BigDecimal amount, BigDecimal balanceAfter, Account counterAccount, String content) {
+    public TransactionHistory(Account account, TransactionType transactionType, BigDecimal amount, BigDecimal balanceAfter, Account counterAccount, String content, String businessCode) {
         this.account = account;
         this.transactionType = transactionType;
         this.amount = amount;
         this.balanceAfter = balanceAfter;
         this.counterAccount = counterAccount;
         this.content = content;
+        this.businessCode = businessCode;
     }
 }

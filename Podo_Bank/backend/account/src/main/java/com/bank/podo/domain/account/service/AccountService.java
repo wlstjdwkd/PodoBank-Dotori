@@ -10,6 +10,7 @@ import com.bank.podo.domain.account.repository.AccountCategoryRepository;
 import com.bank.podo.domain.account.repository.AccountRepository;
 import com.bank.podo.domain.account.repository.TransactionHistoryRepository;
 import com.bank.podo.domain.user.entity.User;
+import com.bank.podo.global.others.service.FCMService;
 import com.bank.podo.global.request.RequestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 public class AccountService {
 
     private final RequestUtil requestUtil;
+    private final FCMService FCMService;
 
     private final AccountRepository accountRepository;
     private final AccountCategoryRepository accountCategoryRepository;
@@ -172,7 +174,7 @@ public class AccountService {
     }
 
     @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
-    public void deposit(DepositDTO depositDTO, PasswordEncoder passwordEncoder) {
+    public void userDeposit(DepositDTO depositDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
         Account account = accountRepository.findByAccountNumberAndDeletedFalse(depositDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
@@ -181,6 +183,15 @@ public class AccountService {
 
         BigDecimal depositAmount = depositDTO.getAmount();
 
+        deposit(account, depositAmount, depositDTO.getContent(), depositDTO.getBusinessCode());
+
+        FCMService.sendNotification(account.getUser().getEmail(), "입금", depositAmount.toString() + "원이 입금되었습니다.");
+
+        logDeposit(account, depositAmount);
+    }
+
+    @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
+    public void deposit(Account account, BigDecimal depositAmount, String content, String businessCode) {
         account.deposit(depositAmount);
 
         accountRepository.save(account);
@@ -190,16 +201,15 @@ public class AccountService {
                 .amount(depositAmount)
                 .balanceAfter(account.getBalance())
                 .account(account)
-                .content(depositDTO.getContent())
+                .content(content)
+                .businessCode(businessCode)
                 .build();
         transactionHistoryRepository.save(depositHistory);
-
-        logDeposit(account, depositAmount);
     }
 
 
     @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
-    public void withdraw(WithdrawDTO withdrawDTO, PasswordEncoder passwordEncoder) {
+    public void userWithdraw(WithdrawDTO withdrawDTO, PasswordEncoder passwordEncoder) {
         User user = getLoginUser();
         Account account = accountRepository.findByAccountNumberAndDeletedFalse(withdrawDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
@@ -208,6 +218,15 @@ public class AccountService {
 
         BigDecimal withdrawalAmount = withdrawDTO.getAmount();
 
+        withdraw(account, withdrawalAmount, withdrawDTO.getContent(), withdrawDTO.getBusinessCode());
+
+        FCMService.sendNotification(account.getUser().getEmail(), "출금", withdrawalAmount.toString() + "원이 출금되었습니다.");
+
+        logWithdraw(account, withdrawalAmount);
+    }
+
+    @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
+    public void withdraw(Account account, BigDecimal withdrawalAmount, String content, String businessCode) {
         if(account.getBalance().compareTo(withdrawalAmount) < 0) {
             throw new InsufficientBalanceException("잔액이 부족합니다.");
         }
@@ -221,11 +240,10 @@ public class AccountService {
                 .amount(withdrawalAmount)
                 .balanceAfter(account.getBalance())
                 .account(account)
-                .content(withdrawDTO.getContent())
+                .content(content)
+                .businessCode(businessCode)
                 .build();
         transactionHistoryRepository.save(withdrawalHistory);
-
-        logWithdraw(account, withdrawalAmount);
     }
 
     @Transactional(noRollbackFor = PasswordRetryCountExceededException.class)
@@ -240,34 +258,11 @@ public class AccountService {
 
         BigDecimal transferAmount = transferDTO.getAmount();
 
-        if(senderAccount.getBalance().compareTo(transferAmount) < 0) {
-            throw new InsufficientBalanceException("잔액이 부족합니다.");
-        }
+        deposit(receiverAccount, transferAmount, transferDTO.getReceiverContent(), null);
+        withdraw(senderAccount, transferAmount, transferDTO.getSenderContent(), null);
 
-        senderAccount.withdraw(transferAmount);
-        receiverAccount.deposit(transferAmount);
-
-        accountRepository.save(senderAccount);
-        accountRepository.save(receiverAccount);
-
-        TransactionHistory senderAccountHistory = TransactionHistory.builder()
-                .transactionType(TransactionType.WITHDRAWAL)
-                .amount(transferAmount)
-                .balanceAfter(senderAccount.getBalance())
-                .counterAccount(receiverAccount)
-                .account(senderAccount)
-                .content(transferDTO.getSenderContent())
-                .build();
-        TransactionHistory receiverAccountHistory = TransactionHistory.builder()
-                .transactionType(TransactionType.DEPOSIT)
-                .amount(transferAmount)
-                .balanceAfter(receiverAccount.getBalance())
-                .counterAccount(senderAccount)
-                .account(receiverAccount)
-                .content(transferDTO.getReceiverContent())
-                .build();
-        transactionHistoryRepository.save(senderAccountHistory);
-        transactionHistoryRepository.save(receiverAccountHistory);
+        FCMService.sendNotification(receiverAccount.getUser().getEmail(), "입금", transferAmount.toString() + "원이 입금되었습니다.");
+        FCMService.sendNotification(senderAccount.getUser().getEmail(), "출금", transferAmount.toString() + "원이 출금되었습니다.");
 
         logTransfer(senderAccount, receiverAccount, transferAmount);
     }
