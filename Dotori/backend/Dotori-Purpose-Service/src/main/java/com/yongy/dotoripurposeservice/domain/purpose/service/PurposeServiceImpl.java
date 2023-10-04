@@ -232,7 +232,7 @@ public class PurposeServiceImpl implements PurposeService{
         // TODO : 1. 은행 정보 가져오기
         MultiValueMap<String, Long> parameters = new LinkedMultiValueMap<>();
         parameters.add("bankSeq", purposeFinisedDTO.getBankSeq());
-        ResponseEntity<String> bankResponse = callServer.getHttpWithParamsAndSend(MAIN_SERVICE_URL+"/bank/communication/bankInfo", parameters);
+        ResponseEntity<String> bankResponse = callServer.getHttpWithParamsAndSend(MAIN_SERVICE_URL+"/bank/communication/bankInfo?bankSeq={bankSeq}", parameters);
 
         String responseCode = bankResponse.getStatusCode().toString().split(" ")[0];
         String responseContent = bankResponse.getBody();
