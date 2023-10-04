@@ -272,7 +272,7 @@ public class PlanServiceImpl implements PlanService {
         List<Plan> plans = planRepository.findByAccountAccountSeqAndTerminatedAtIsNull(accountSeq); // 애초에 ACTIVE or READY만 가져옴
         log.info("계획 개수 : "+plans.size());
 
-        if(plans != null) {
+        if(plans.size() != 0) {
             Plan plan = plans.get(0);
 
             // Plan이 있는 지 확인, 실행중인 Plan인지 확인
