@@ -2,7 +2,8 @@ package com.yongy.dotorimainservice.domain.account.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yongy.dotorimainservice.domain.account.dto.AccountDTO;
+import com.yongy.dotorimainservice.domain.account.dto.AccountDto;
+import com.yongy.dotorimainservice.domain.account.dto.AccountListDto;
 import com.yongy.dotorimainservice.domain.account.dto.BodyDataDTO;
 import com.yongy.dotorimainservice.domain.account.dto.communication.AccountNumberTitleReqDto;
 import com.yongy.dotorimainservice.domain.account.dto.communication.AccountReqDto;
@@ -11,9 +12,11 @@ import com.yongy.dotorimainservice.domain.account.repository.AccountRepository;
 import com.yongy.dotorimainservice.domain.bank.entity.Bank;
 import com.yongy.dotorimainservice.domain.bank.repository.BankRepository;
 
+import com.yongy.dotorimainservice.domain.bank.service.BankService;
+import com.yongy.dotorimainservice.domain.plan.entity.Plan;
+import com.yongy.dotorimainservice.domain.plan.service.PlanService;
 import com.yongy.dotorimainservice.domain.user.entity.User;
 import com.yongy.dotorimainservice.global.common.PodoBankInfo;
-import com.yongy.dotorimainservice.global.redis.repository.BankAccessTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
@@ -46,16 +49,20 @@ public class AccountServiceImpl implements AccountService{
 
     private final PodoBankInfo podoBankInfo;
 
+    private final PlanService planService;
+
+    private final BankService bankService;
+
 
     @Override
-    public List<AccountDTO> findAllAccount() throws JsonProcessingException, ParseException {
+    public List<AccountListDto> findAllAccount() throws JsonProcessingException, ParseException {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         log.info("ID : "+user.getId());
         List<Account> accounts = accountRepository.findAllByUserSeqAndDeleteAtIsNull(user.getUserSeq());
-        List<AccountDTO> result = new ArrayList<>();
+        List<AccountListDto> result = new ArrayList<>();
 
         for(Account account : accounts){
-            result.add(AccountDTO.builder()
+            result.add(AccountListDto.builder()
                     .accountSeq(account.getAccountSeq())
                     .accountTitle(account.getAccountTitle())
                     .currentBalance(this.getBalance(account.getAccountSeq()))
@@ -175,6 +182,17 @@ public class AccountServiceImpl implements AccountService{
         Account account = accountRepository.findByAccountNumberAndDeleteAtIsNull(accountNumberTitleReqDto.getAccountNumber());
         account.setAccountTitle(accountNumberTitleReqDto.getAccountTitle());
         accountRepository.save(account);
+    }
+
+    // NOTE : 1개의 계좌 조회하기(관리페이지)
+    public AccountDto findAccount(Long planSeq) throws ParseException, JsonProcessingException {
+        Plan plan = planService.findByPlanSeq(planSeq);
+        Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(plan.getAccount().getAccountSeq());
+
+        return AccountDto.builder()
+                .bankName(account.getBank().getBankName())
+                .accountNumber(account.getAccountNumber())
+                .accountBalance(this.getBalance(account.getAccountSeq())).build();
     }
 
 

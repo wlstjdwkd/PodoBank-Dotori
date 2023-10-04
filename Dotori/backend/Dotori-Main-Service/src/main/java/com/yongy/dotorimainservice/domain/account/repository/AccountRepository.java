@@ -13,4 +13,5 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     List<Account> findAllByUserSeqAndDeleteAtIsNull(Long userSeq);
     Account findByUserSeqAndDeleteAtIsNull(Long userSeq);
 
+
 }
