@@ -8,10 +8,7 @@
       "distribution": "internal"
     },
     "preview": {
-      "android": {
-        "distribution": "internal",
-        "usesCleartextTraffic": true
-      }
+      "distribution": "internal"
     },
     "production": {}
   },
