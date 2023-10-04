@@ -189,7 +189,7 @@ public class PaymentServiceImpl implements PaymentService{
                             .build());
                     continue;
                 }
-                planDetail.updateBalance(payment.getPaymentPrice());
+                planDetailRepository.save(planDetail.updateBalance(payment.getPaymentPrice()));
 
                 // 이전에 저장된 데이터가 있음
                 // TODO : payment 저장할 때마다 categoryData count++
