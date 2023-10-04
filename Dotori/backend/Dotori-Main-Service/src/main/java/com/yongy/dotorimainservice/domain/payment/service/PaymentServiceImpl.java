@@ -189,6 +189,7 @@ public class PaymentServiceImpl implements PaymentService{
                             .build());
                     continue;
                 }
+                log.info(payment.getPaymentPrice().toString());
                 planDetailRepository.save(planDetail.updateBalance(payment.getPaymentPrice()));
 
                 // 이전에 저장된 데이터가 있음
