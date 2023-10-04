@@ -11,5 +11,5 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findAllByUserSeq(Long userSeq);
     Category findByCategorySeq(Long categorySeq);
 
-    Category findByCategoryTitle(String categoryTitle);
+    Category findByCategoryTitleAndUserSeq(String categoryTitle, Long userSeq);
 }

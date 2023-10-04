@@ -12,5 +12,5 @@ public interface CategoryGroupRepository extends JpaRepository<CategoryGroup, Lo
     CategoryGroup findByCategoryGroupSeq(Long categoryGroupSeq);
     List<CategoryGroup> findAllByUserSeq(Long userSeq);
 
-    CategoryGroup findByGroupTitle(String groupTitle);
+    CategoryGroup findByGroupTitleAndUserSeq(String groupTitle, Long userSeq);
 }

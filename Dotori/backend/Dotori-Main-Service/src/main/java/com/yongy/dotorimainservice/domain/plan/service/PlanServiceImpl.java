@@ -102,7 +102,7 @@ public class PlanServiceImpl implements PlanService {
         List<CategoryGroupListDTO> groupList = planDTO.getCategoryGroupList();
         CategoryGroup categoryGroup = null;
         for (CategoryGroupListDTO group : groupList) {
-            categoryGroup = categoryGroupRepository.findByGroupTitle(group.getCategoryGroupName()); // categoryGroup이 없는 경우
+            categoryGroup = categoryGroupRepository.findByGroupTitleAndUserSeq(group.getCategoryGroupName(), loginUser.getUserSeq()); // categoryGroup이 없는 경우
 
             // 카테고리 그룹 만들기
             if(categoryGroup == null){
@@ -119,7 +119,7 @@ public class PlanServiceImpl implements PlanService {
 
             Category category = null;
             for (ActiveCategoryDTO data : categorise) {
-                category = categoryRepository.findByCategoryTitle(data.getCategoryName()); // category가 있는 경우
+                category = categoryRepository.findByCategoryTitleAndUserSeq(data.getCategoryName(), loginUser.getUserSeq()); // category가 있는 경우
 
                 if(category == null){ // category가 없는 경우
                     category = categoryRepository.save(Category.builder()
