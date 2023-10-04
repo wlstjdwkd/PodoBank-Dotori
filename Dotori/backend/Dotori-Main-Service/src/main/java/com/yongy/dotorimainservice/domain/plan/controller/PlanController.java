@@ -100,6 +100,8 @@ public class PlanController {
         return ResponseEntity.ok(result);
     }
 
+    //-------통신-------
+
     @PostMapping("/communication/delete/all")
     public ResponseEntity<String> removeUserPlans(@RequestBody UserSeqDto userSeqDto){
         log.info("check-1");
@@ -108,7 +110,4 @@ public class PlanController {
         return ResponseEntity.ok().build();
     }
 
-    // TODO : 관리페이지에서 계획이랑 계좌번호 알려줌
-
-//    @PostMapping("/")
 }
