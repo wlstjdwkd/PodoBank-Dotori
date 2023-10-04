@@ -183,6 +183,7 @@ public class PurposeServiceImpl implements PurposeService{
 
         List<PurposeData> purposeDataList = new ArrayList<>();
         BigDecimal totalSaving = new BigDecimal(BigInteger.ZERO);
+        log.info("purpose 들어옴");
 
         // 1. 각 목표에 따라 저축 금액 update 하기
         for (PurposeSavingDTO data : savingDataDTO.getSavingDTO().getPurposeSavingList()) {
@@ -191,7 +192,7 @@ public class PurposeServiceImpl implements PurposeService{
             // 현재 금액에 저축 금액 더하기
             purpose.addCurrentBalance(data.getSavingAmount());
             purposeRepository.save(purpose);
-            log.info(purpose.getCurrentBalance()+"");
+            log.info("현재 금액 "+purpose.getCurrentBalance()+"");
 
             // 1-2. purpose_data 저장하기
             // 각 purpose에 연결된 purpose_data에 저장
