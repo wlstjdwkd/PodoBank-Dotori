@@ -308,7 +308,7 @@ public class PlanServiceImpl implements PlanService {
         if(plan != null) { // 보여줄 계획이 존재하면
             // NOTE : 포도뱅크에서 페이먼트 불러오는 로직 처리하기
 
-            chatGPTService.getOnePayments(plan); // TODO : 포도은행에서 새로운 계좌내역 가져오기(사용자)
+             chatGPTService.getOnePayments(plan); // TODO : 포도은행에서 새로운 계좌내역 가져오기(사용자)
 
             // 실행 중인 카테고리 가져오기
             List<PlanDetail> planDetailList = plan.getPlanDetailList();

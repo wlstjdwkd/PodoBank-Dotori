@@ -228,8 +228,9 @@ public class ChatGPTService {
             Category category = categoryRepository.findByCategorySeq(categoryData.getCategory().getCategorySeq());
             PlanDetail planDetail = planDetailRepository.findByCategory(category);
 
-            if(plan == planDetail.getPlan()){ // 결제 내역을 가져온 플랜과 카테고리데이터에 연결된 카테고리에 연결된 플랜이 같으면
+            if(plan.getPlanSeq() == planDetail.getPlan().getPlanSeq()){ // 결제 내역을 가져온 플랜과 카테고리데이터에 연결된 카테고리에 연결된 플랜이 같으면
                 // 해당 planDetail정보를 payment에 저장하고, checked는 false로 해서 payment 생성
+                log.info("planDetail에 있음");
                 existPayment.add(Payment.builder()
                         .paymentName(payment.getContent())
                         .paymentPrice(payment.getAmount())
@@ -241,6 +242,7 @@ public class ChatGPTService {
                 continue;
             }
 
+            log.info("미분류로 저장");
             chatGPT.add(Payment.builder()
                     .paymentName(payment.getContent())
                     .paymentPrice(payment.getAmount())
@@ -315,7 +317,7 @@ public class ChatGPTService {
                 Category category = categoryRepository.findByCategorySeq(categoryData.getCategory().getCategorySeq());
                 PlanDetail planDetail = planDetailRepository.findByCategory(category);
 
-                if(plan == planDetail.getPlan()){ // 결제 내역을 가져온 플랜과 카테고리데이터에 연결된 카테고리에 연결된 플랜이 같으면
+                if(plan.getPlanSeq() == planDetail.getPlan().getPlanSeq()){ // 결제 내역을 가져온 플랜과 카테고리데이터에 연결된 카테고리에 연결된 플랜이 같으면
                     // 해당 planDetail정보를 payment에 저장하고, checked는 false로 해서 payment 생성
                     existPayment.add(Payment.builder()
                             .paymentName(payment.getContent())
