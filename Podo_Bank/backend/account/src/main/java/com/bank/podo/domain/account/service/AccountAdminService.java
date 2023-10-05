@@ -112,6 +112,13 @@ public class AccountAdminService {
         accountService.withdraw(account, new BigDecimal(20000), "크로스핏진평", "3456789012");
         fcmService.sendNotification(account.getUser().getEmail(), "출금", "20000 출금되었습니다.");
 
+    }
+
+    public void test2(String accountNumber) {
+        log.info(accountNumber);
+        Account account = accountRepository.findByAccountNumber(accountNumber);
+        log.info(account.toString());
+
         accountService.withdraw(account, new BigDecimal(8000), "올리브영구미인동점", "3456789012");
         fcmService.sendNotification(account.getUser().getEmail(), "출금", "8000 출금되었습니다.");
 

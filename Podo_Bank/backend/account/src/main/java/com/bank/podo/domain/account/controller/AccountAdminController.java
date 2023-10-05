@@ -50,4 +50,10 @@ public class AccountAdminController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/test2")
+    public ResponseEntity<Void> test2(@RequestParam String accountNumber) {
+        accountAdminService.test2(accountNumber);
+        return ResponseEntity.ok().build();
+    }
+
 }
