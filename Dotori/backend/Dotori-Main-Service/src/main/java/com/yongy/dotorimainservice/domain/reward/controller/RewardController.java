@@ -47,7 +47,7 @@ public class RewardController {
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "랜덤박스 송금 성공")
     })
-    @GetMapping("/randombox")
+    @PostMapping("/randombox")
     public ResponseEntity<Void> randomBox(@RequestBody RandomBoxDTO randomBoxDTO) throws ParseException {
         rewardService.randomBox(randomBoxDTO);
         return ResponseEntity.ok().build();
