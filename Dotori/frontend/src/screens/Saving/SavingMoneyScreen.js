@@ -40,22 +40,7 @@ export default function SavingMoneyScreen({ navigation, route }) {
   const [addSavings, setAddSavings] = useState(null)
   const [selectItem, setSelectItem] = useState(null)
   const [editAmount, setEditAmount] = useState("");
-  
-  const data = [
-    {
-      id: "1",
-      name: "목표1",
-      currentAmount: 2500,
-      targetAmount: 10000,
-    },
-    {
-      id: "2",
-      name: "목표2",
-      currentAmount: 2500,
-      targetAmount: 10000,
-    },
-    // 다른 목표들...
-  ];
+
 
   const playSound = async() => {
     const { sound } = await Audio.Sound.createAsync( require('../../assets/insertCoin.mp3')
@@ -80,7 +65,6 @@ export default function SavingMoneyScreen({ navigation, route }) {
     try{
       const response = await purposeGetList(accessToken, grantType)
       if(response.status === 200){
-        console.log("목표 리스트 조회 성공")
         const modifiedPurposeList = response.data.purposeList.map((item) => ({
           ...item,
           savingAmount: 0, // 기본값으로 0을 설정
@@ -89,29 +73,11 @@ export default function SavingMoneyScreen({ navigation, route }) {
         setPurposeList(modifiedPurposeList);
         setcurrentTotalSavings(response.data.currentTotalSavings)
       }else{
-        console.log("목표 리스트 조회 실패", response.status)
       }
     }catch(error){
-      console.log('오류 발생: 목표 리스트 조회 실패',error)
     }
 
   }
-  // 계획 종료 후 저축하기
-  // {
-  //   "planSeq" : {
-  //     "type" : "integer",
-  //     "format" : "int64"
-  //   },
-  //   "purposeSavingList" : {
-  //     "type" : "array",
-  //     "items" : {
-  //       "$ref" : "#/components/schemas/PurposeSavingDTO"
-  //     }
-  //   },
-  //   "totalSaving" : {
-  //     "type" : "number"
-  //   }
-  // }
 
   const handlePlanSaving = () => {
     const allSaving = purposeList.reduce((total, item) => total + item.savingAmount, 0)
@@ -140,20 +106,16 @@ export default function SavingMoneyScreen({ navigation, route }) {
           index: 0,
           routes: [{ name: 'SavingCompleteScreen' }],
         });
-        console.log("저축하기 성공")
         playSound()
       }else{
-        console.log("저축하기 실패", response.status)
       }
     }catch(error){
-      console.log("오류 발생: 저축하기 실패",error)
     }
 
   }
 
   const handleInputSavingValue = () => {
     if(editAmount){
-      // 입력 값을 숫자로 변환하고 purposeList를 업데이트합니다
       const updatedPurposeList = purposeList.map((purpose) => ({
         ...purpose,
         savingAmount: purpose.purposeSeq === selectItem ? parseInt(editAmount, 10) : purpose.savingAmount,
@@ -161,7 +123,6 @@ export default function SavingMoneyScreen({ navigation, route }) {
       setPurposeList(updatedPurposeList);
     }
   
-    // 수정 모드를 종료하기 위해 selectItem을 초기화합니다
     setSelectItem(null);
     setEditAmount("")
   }
@@ -228,9 +189,7 @@ export default function SavingMoneyScreen({ navigation, route }) {
 
       <View style={styles.divider}></View>
 
-      {/* 목표 리스트 */}
       <FlatList
-        // style={{marginBottom:80}}
         data={purposeList}
         renderItem={({ item, index }) => {
           const borderColor = getRandomBorderColor();

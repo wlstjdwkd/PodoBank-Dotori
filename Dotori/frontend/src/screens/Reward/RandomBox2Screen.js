@@ -13,7 +13,6 @@ import { useIsFocused } from "@react-navigation/native";
 
 
 export default function RandomBox2Screen({ navigation, route }) {
-  // const coin = route.params.coin;
   const [prizeAmount, setPrizeAmount] = useState(route.params.prizeAmount)
   const [sound1, setSound1] = useState();
 
@@ -24,11 +23,8 @@ export default function RandomBox2Screen({ navigation, route }) {
 
   const playSound1 = async() => {
     const { sound } = await Audio.Sound.createAsync( require('../../assets/dodoong.mp3')
-    // const { sound } = await Audio.Sound.createAsync( require('../../assets/doogoodoogoo.mp3')
     );
     setSound1(sound);
-
-    console.log('Playing Sound');
     await sound.playAsync();
   }
 
@@ -86,13 +82,10 @@ const styles = StyleSheet.create({
     flex: 0.6,
     alignSelf: "center",
     alignItems:'center',
-    // justifyContent: "center",
     justifyContent: "space-evenly",
     width: "80%"
   },
   questionMark:{
     position:'absolute',
-    // right: 50,
-    // top: 100
   }
 });

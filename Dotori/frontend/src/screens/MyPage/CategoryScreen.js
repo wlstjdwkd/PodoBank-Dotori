@@ -45,12 +45,9 @@ export default function CategoryScreen({ navigation }) {
       const response = await planCategoryList(accessToken, grantType)
       if(response.status === 200){
         setCategoryList(response.data)
-        console.log('전체 카테고리 목록 가져오기 성공:', response.data)
       }else{
-        console.log('전체 카테고리 목록 가져오기 실패', response.status)
       }
     }catch(error){
-      console.log('오류 발생 : 전체 카테고리 목록 가져오기 실패', error)
     }
   }
 
@@ -74,7 +71,7 @@ export default function CategoryScreen({ navigation }) {
       <Text style={styles.categoryGroup}>{item.categoryGroup}</Text>
       <Image
         style={styles.arrowIcon}
-        source={require("../../assets/icon/forward_arrow.png")} // 화살표 아이콘 이미지 경로
+        source={require("../../assets/icon/forward_arrow.png")}
       />
     </TouchableOpacity>
   );
@@ -87,7 +84,6 @@ export default function CategoryScreen({ navigation }) {
     <View style={styles.container}>
       <HeaderComponent title="카테고리 보기" navigation={navigation} cancelNavi="MyPageScreen"/>
 
-      {/* 상단 작은 사각형 4개 */}
       <View style={styles.titleContainer}>
         <View style={styles.rectangleContainer}>
           <View style={styles.smallRectangles}>
@@ -146,8 +142,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   arrowIcon: {
-    // width: 12,
-    // height: 12,
   },
   CategoryText: {
     fontSize: 24,
@@ -163,13 +157,13 @@ const styles = StyleSheet.create({
   },
   smallRectangles: {
     alignItems: "center",
-    justifyContent: "space-between", // 가로 간격을 균등하게 분배
+    justifyContent: "space-between",
     marginBottom: 10,
   },
   smallRectangle: {
     width: 12,
     height: 12,
-    backgroundColor: "red", // 임시 색상
+    backgroundColor: "red",
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
@@ -193,8 +187,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   categoryList: {
-    alignItems: "center", // 중앙 정렬
-    width: "80%", // 화면 가로폭의 80%
+    alignItems: "center",
+    width: "80%",
     marginLeft: "auto",
     marginRight: "auto",
   },
@@ -205,7 +199,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 28,
     height: 50,
-    width: "100%", // 카테고리 아이템 가로폭을 100%로 설정
+    width: "100%",
   },
   categoryTitle: {
     fontSize: 16,

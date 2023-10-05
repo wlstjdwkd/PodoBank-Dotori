@@ -8,29 +8,18 @@ import {
   Dimensions,
 } from "react-native";
 
-import { Audio } from 'expo-av';
 import { useIsFocused } from "@react-navigation/native";
 
 export default function RandomBoxLoadingScreen ({ navigation, route }) {
-  // const coin = route.params.coin;
   const [prizeAmount, setPrizeAmount] = useState(route.params.prizeAmount)
   const [money1, setMoney1] = useState(0)
   const [money2, setMoney2] = useState(0)
   const [money3, setMoney3] = useState(0)
-  const [soundRandomball, setSoundRandomball] = useState();
 
   const isFocused = useIsFocused();
 
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
-
-  const playSoundRandomball = async() => {
-    const { sound } = await Audio.Sound.createAsync( require('../../assets/randomball.mp3')
-    );
-    setSoundRandomball(sound);
-
-    await sound.playAsync();
-  }
 
   const goRandomBox3Screen = () => {
     navigation.navigate("RandomBox3Screen", {prizeAmount:prizeAmount})
@@ -49,26 +38,11 @@ export default function RandomBoxLoadingScreen ({ navigation, route }) {
       }, 10);
       const timeout = setTimeout(() => {
         goRandomBox3Screen()
-      }, 1000);
+      }, 3000);
       return () => {
         clearInterval(timer)
         clearTimeout(timeout)
       }
-    }
-  }, [isFocused])
-
-  useEffect(() => {
-    return soundRandomball
-      ? () => {
-        soundRandomball.unloadAsync();
-        }
-      : undefined;
-  }, [soundRandomball]);
-
-
-  useEffect(()=>{
-    if(isFocused){
-      // playSoundRandomball()
     }
   }, [isFocused])
 
@@ -101,14 +75,11 @@ const styles = StyleSheet.create({
     flex: 0.7,
     alignSelf: "center",
     alignItems:'center',
-    // justifyContent: "center",
     justifyContent: "space-evenly",
     width: "80%"
   },
   questionMark:{
     position:'absolute',
-    // right: 50,
-    // top: 100
   },
   button: {
     backgroundColor: "#FF965C",
@@ -116,7 +87,6 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 10,
     alignItems: "center",
-    // marginTop: 35,
     marginTop: 15,
   },
   buttonText: {

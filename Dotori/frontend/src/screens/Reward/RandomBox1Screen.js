@@ -17,8 +17,6 @@ export default function RandomBox1Screen({ navigation, route }) {
   const refreshToken =  useSelector((state)=>state.user.refreshToken)
 
   const [coin, setCoin] = useState(route.params.coin);
-
-  // 선택한 코인의 상태를 관리합니다. 0은 선택하지 않은 상태입니다.
   const [selectedCoin, setSelectedCoin] = useState(0);
   
   const windowWidth = Dimensions.get('window').width;
@@ -35,9 +33,6 @@ export default function RandomBox1Screen({ navigation, route }) {
     }else if(coin < selectedCoin){
       Alert.alert('',`소지한 코인보다 많은 랜덤박스를 열 수는 없습니다.${'\n'}${'\n'}현재 코인 갯수${coin}`)
     }else{
-      // navigation.navigate("RandomBox2Screen", {
-      //   prizeAmount: 200,
-      // })
       doUserOpenRandomBox()
     }
   };
@@ -46,17 +41,14 @@ export default function RandomBox1Screen({ navigation, route }) {
     try{
       const response = await userOpenRandomBox(selectedCoin, accessToken, grantType)
       if(response.status === 200){
-        console.log("랜덤박스 개봉 성공")
         navigation.reset({
           index: 0,
           routes: [{ name: "RandomBox2Screen", params: {prizeAmount: response.data,} }],
         })
       }else{
-        console.log("랜덤박스 개봉 실패", response.status)
       }
     }
     catch(error){
-      console.log("오류 발생 : 랜덤박스 개봉 실패", error)
     }
   }
 
@@ -104,12 +96,10 @@ export default function RandomBox1Screen({ navigation, route }) {
         </View>
 
         <View style={{flex:0.3}}>
-          {/* <TouchableOpacity style={[styles.button, {backgroundColor:selectedCoin?"#FF965B":'gray'}]}  */}
           <TouchableOpacity style={[styles.button]} 
             onPress={() => {
               handleOpen()
             }}
-            // disabled={!selectedCoin}
           >
             <Text style={styles.buttonText}>열어보기</Text>
           </TouchableOpacity>
@@ -122,7 +112,6 @@ export default function RandomBox1Screen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // alignItems: "center",
     alignSelf: 'center',
     justifyContent: "center",
     width: "80%",
@@ -144,12 +133,12 @@ const styles = StyleSheet.create({
     alignItems:'center',
   },
   image: {
-    width: 80, // 이미지 크기는 적절히 조정해주세요
+    width: 80,
     height: 80,
     marginHorizontal: 10,
   },
   dimImage: {
-    opacity: 0.5, // 희미하게 만들기 위한 스타일
+    opacity: 0.5,
   },
   button: {
     backgroundColor: "#FF965B",

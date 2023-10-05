@@ -1,18 +1,9 @@
 import React, { useEffect, useState } from "react";
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, Alert, Pressable } from "react-native";
-import { AntDesign, Entypo, FontAwesome } from "@expo/vector-icons";
-
-// const userInfo = {
-//   name: "홍길동",
-//   email: "example@example.com",
-//   birth: "2000-01-01",
-//   phone: "010-1111-1111",
-// };
-
+import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux";
-import {userLogout,userWithdrawDotori, userInfoInquiry} from "../../apis/userapi"
+import {userLogout, userInfoInquiry} from "../../apis/userapi"
 import {inputgrantType, inputAccessToken, inputRefreshToken} from "../../redux/slices/auth/user"
 import { useIsFocused } from "@react-navigation/native";
 
@@ -32,7 +23,6 @@ export default function MyPageScreen({ navigation }) {
     try{
       const response = await userLogout(refreshToken, accessToken, grantType)
       if(response.status === 200){
-        console.log("로그아웃 성공")
         try {
           dispatch(inputgrantType(null))
           dispatch(inputAccessToken(null))
@@ -42,15 +32,11 @@ export default function MyPageScreen({ navigation }) {
             routes: [{ name: 'LoginScreen' }],
           });
         } catch(error) {
-          console.log(error)
         }
       }else if(response.status===403){
-        console.log("로그아웃 실패 토큰없음", response.status)
       }else{
-        console.log("로그아웃 실패", response.status)
       }
     }catch(error){
-      console.log("오류발생: 로그아웃 실패", error)
     }
   }
 
@@ -75,10 +61,8 @@ export default function MyPageScreen({ navigation }) {
       if(response.status===200){
         setUserInfo(response.data);
       }else{
-        console.log('사용자 정보 조회 실패',response.status)
       }
     } catch (error) {
-      console.error('오류 발생 : 사용자 정보 조회 실패:', error);
     }
   }
 
@@ -93,7 +77,6 @@ export default function MyPageScreen({ navigation }) {
     <View style={styles.container}>
       <HeaderComponent title="마이페이지" navigation={navigation} cancelNavi={"MainPageScreen"}></HeaderComponent>
 
-      {/* 프로필 이미지 */}
       <View style={styles.profileContainer}>
         <Image
           style={styles.profileImage}
@@ -101,10 +84,8 @@ export default function MyPageScreen({ navigation }) {
         />
       </View>
 
-      {/* 구분선 */}
       <View style={styles.separator}></View>
 
-      {/* 기본 정보 */}
       <View style={styles.basicContainer}>
         <Text style={styles.boldText}>기본 정보</Text>
         <View style={styles.infoItem}>
@@ -124,7 +105,7 @@ export default function MyPageScreen({ navigation }) {
             >
               <Image
                 style={styles.editIcon}
-                source={require("../../assets/icon/pencil.png")} // 편집 아이콘 이미지 경로
+                source={require("../../assets/icon/pencil.png")}
               />
             </TouchableOpacity>
           </View>
@@ -138,18 +119,15 @@ export default function MyPageScreen({ navigation }) {
             >
               <Image
                 style={styles.editIcon}
-                source={require("../../assets/icon/pencil.png")} // 편집 아이콘 이미지 경로
+                source={require("../../assets/icon/pencil.png")}
               />
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
-      {/* 구분선 */}
       <View style={styles.separator}></View>
 
-      {/* 기능 항목 */}
-      {/* <Text style={styles.boldText}>기능</Text> */}
       <View style={styles.basicContainer}>
         <TouchableOpacity
           style={styles.featureItem}
@@ -185,7 +163,6 @@ export default function MyPageScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      {/* 로그아웃과 회원탈퇴 */}
       <View style={styles.bottomRow}>
         <TouchableOpacity 
           style={styles.logoutButton}
@@ -205,14 +182,12 @@ export default function MyPageScreen({ navigation }) {
         </TouchableOpacity>
       </View>
       
-      {/* 회원탈퇴 모달창 */}
       <View style={styles.centeredView}>
         <Modal
           animationType="none"
           transparent={true}
           visible={userWithdrawModalVisible}
           onRequestClose={() => {
-            // Alert.alert('Modal has been closed.');
             setUserWithdrawModalVisible(false);
           }}>
           <View style={styles.centeredView}>
@@ -265,7 +240,7 @@ const styles = StyleSheet.create({
   },
   myPageText: {
     fontSize: 24,
-    flex: 1, // 텍스트가 남은 공간을 모두 차지하도록 설정
+    flex: 1,
     textAlign: "center",
   },
   profileContainer: {
@@ -274,7 +249,7 @@ const styles = StyleSheet.create({
   profileImage: {
     width: 100,
     height: 100,
-    borderRadius: 50, // 원형 모양으로 만들기 위한 반지름 설정
+    borderRadius: 50,
     marginVertical: 16,
   },
   separator: {
@@ -343,7 +318,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: "#FF3737",
   },
-  // 모달 관련 스타일
   centeredView: {
     flex: 1,
     justifyContent: 'center',
@@ -355,7 +329,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
-    // alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -376,7 +349,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F194FF',
   },
   buttonClose: {
-    // backgroundColor: '#2196F3',
     backgroundColor: '#FF965C',
   },
   textStyle: {

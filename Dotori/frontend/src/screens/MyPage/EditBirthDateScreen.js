@@ -81,16 +81,13 @@ export default function EditBirthDateScreen({ navigation, route }) {
       if(response.status === 200){
         setIsBirthDateValid(true)
         setResponseMessage("생년월일 변경 성공")
-        console.log('생년월일 변경 성공')
         Alert.alert('','생년월일이 변경되었습니다.')
         navigation.navigate("MyPageScreen")
       }else{
         setResponseMessage("오류 발생 : 생년월일 변경 실패")
-        console.log('오류 발생 : 생년월일 변경 실패', response.status)
         setIsBirthDateValid(false)
       }
     }catch(error){
-      console.log('오류발생 : 생년월일 변경 실패', error)
       setIsBirthDateValid(false)
     }
   }
@@ -101,12 +98,12 @@ export default function EditBirthDateScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <HeaderComponent title="생년월일 변경" navigation={navigation}/>
+      <HeaderComponent title="생년월일 변경" navigation={navigation} cancelNavi="MyPageScreen"/>
 
       <View style={styles.iconContainer}>
         <Image
           style={styles.lockIcon}
-          source={require("../../assets/icon/birthday.png")} // 스마트폰 이미지
+          source={require("../../assets/icon/birthday.png")}
         />
       </View>
 
@@ -117,7 +114,6 @@ export default function EditBirthDateScreen({ navigation, route }) {
         <Text style={styles.passwordPlaceholder}>*</Text>
       </View>
 
-      {/* 비밀번호 안내 텍스트 */}
       <View style={styles.passwordInfoContainer}>
         <Text style={styles.passwordChangeInfoText}>
           생년월일을 변경해주세요.
@@ -127,7 +123,6 @@ export default function EditBirthDateScreen({ navigation, route }) {
         </Text>
       </View>
 
-      {/* 텍스트 입력란 */}
       <TextInput
         style={[styles.inputBox, {}]}
         placeholder={"기존 생년월일 : " + currentBirthDate}
@@ -181,7 +176,6 @@ export default function EditBirthDateScreen({ navigation, route }) {
       </View>
       
 
-      {/* 변경 완료 버튼 */}
       <TouchableOpacity
         style={[styles.changePasswordButton, {backgroundColor:isBirthDateValid?"#FF965C":'grey'}]}
         onPress={() => {
@@ -223,22 +217,22 @@ const styles = StyleSheet.create({
   passwordInput: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center", // 가로 중앙 정렬
+    justifyContent: "center",
     marginBottom: 16,
   },
   passwordPlaceholder: {
     fontSize: 24,
     borderBottomWidth: 1,
-    width: 20, // 각 * 텍스트 너비 설정
+    width: 20,
     textAlign: "center",
     fontWeight: "bold",
-    marginLeft: 10, // 각 * 텍스트 사이 간격 조절
+    marginLeft: 10, 
     marginTop: 10,
     marginBottom: 30,
   },
   passwordChangeText: {
     fontSize: 24,
-    flex: 1, // 텍스트가 남은 공간을 모두 차지하도록 설정
+    flex: 1, 
     textAlign: "center",
   },
   passwordInfoContainer: {
@@ -261,7 +255,6 @@ const styles = StyleSheet.create({
     borderColor: "#BAC0CA",
     borderRadius: 10,
     padding: 6,
-    // marginBottom: 16,
     fontSize: 12,
     paddingLeft: 12,
     marginHorizontal: 20,
@@ -269,20 +262,18 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   changePasswordButton: {
-    backgroundColor: "#FF965C", // 배경색
-    borderRadius: 8, // BorderRadius 설정
+    backgroundColor: "#FF965C", 
+    borderRadius: 8, 
     alignItems: "center",
     justifyContent: "center",
-    height: 40, // 버튼 높이 조절
-    marginTop: 16, // 버튼을 아래로 내립니다.
+    height: 40, 
+    marginTop: 16, 
     width: "90%",
     alignSelf: "center",
-    // marginTop: 130,
-    // marginTop: 100,
   },
   changePasswordButtonText: {
-    color: "white", // 텍스트 색상
-    fontWeight: "bold", // 텍스트를 bold체로 설정
+    color: "white", 
+    fontWeight: "bold", 
     fontSize: 15,
   },
   pwMessage:{

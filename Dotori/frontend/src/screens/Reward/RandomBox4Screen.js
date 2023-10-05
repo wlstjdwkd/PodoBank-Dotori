@@ -39,10 +39,8 @@ export default function MainPageScreen({ navigation, route }) {
     try {
       const response = await accountWholeInquiry(accessToken, grantType);
       if (response.status === 200) {
-        console.log("전체 계좌 리스트 불러오기 성공");
         setAccountList(response.data);
       } else {
-        console.log("전체 계좌 리스트 불러오기 실패");
       }
     } catch (error) {
       console.log(error);
@@ -54,10 +52,8 @@ export default function MainPageScreen({ navigation, route }) {
       if (response.status === 200) {
         setUserInfo(response.data);
       } else {
-        console.log("사용자 정보 조회 실패", response.status);
       }
     } catch (error) {
-      console.error("오류 발생 : 사용자 정보 조회 실패:", error);
     }
   };
 
@@ -77,22 +73,18 @@ export default function MainPageScreen({ navigation, route }) {
     try{
       const response = await userKeepReward(data, accessToken, grantType)
       if (response.status == 200) {
-        console.log('리워드 이체 성공');
         navigation.reset({
           index: 0,
           routes: [{ name: 'RandomBoxCompleteScreen', params:{prizeAmount:prizeAmount, selectedAccountName:selectedAccountName } }],
         });
       } else {
-        console.log('리워드 이체 실패', response.status)
       }
     }catch(error){
-      console.log('오류발생: 리워드 이체 실패', error)
     }
   }
 
   useEffect(() => {
     if (isFocused) {
-      // do정보조회()
       doAccountWholeInquiry();
       doUserInfoInquiry();
     }
@@ -104,13 +96,9 @@ export default function MainPageScreen({ navigation, route }) {
       <View style={styles.innerContainer}>
         <FlatList
           data={accountList}
-          showsVerticalScrollIndicator={false} // 수직 스크롤바 숨김
+          showsVerticalScrollIndicator={false}
           ListHeaderComponent={
             <>
-              {/* <Image
-                style={styles.rightImage}
-                source={require("../../assets/images/Hamster/MainHamster.png")}
-              /> */}
               <Text style={styles.title}>당첨금을 이체해요!</Text>
               <Text style={styles.subtitle}>
                 어느 계좌로 이체 할까요?
@@ -232,8 +220,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   bankContainer: {
-    // flexDirection: "row",
-    // alignItems: "center",
     borderWidth: 1,
     borderColor: "#FCAF17",
     borderRadius: 20,
@@ -250,33 +236,15 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
 
-  addButton: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#FCAF17",
-    borderRadius: 15,
-    height: 50,
-    borderStyle: "dashed", // 점선 테두리 추가
-    marginVertical: 10, // 위아래로 여백 추가
-  },
-  addText: {
-    color: "#FCAF17",
-    fontSize: 24,
-    fontWeight: "bold",
-  },
   footer: {
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "center",
-    // marginTop: 220,
     marginBottom: -20,
   },
   bankTextContainer: {
     flex: 1,
     justifyContent: "space-between",
-    // marginTop: 20,
     paddingHorizontal: 10,
   },
 
@@ -288,7 +256,6 @@ const styles = StyleSheet.create({
   },
 
   bankBalance: {
-    // 기존 스타일에서 marginLeft: 'auto' 삭제
     fontSize: 16,
     fontWeight: "bold",
   },

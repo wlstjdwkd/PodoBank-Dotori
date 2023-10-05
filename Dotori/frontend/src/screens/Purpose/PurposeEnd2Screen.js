@@ -15,55 +15,46 @@ const banks = [
   {
     bankSeq: 1,
     bankName: "포도은행",
-    // image: require("../../assets/images/logo_podo.png"),
     image: require("../../assets/images/bankImage0.png"),
   },
   {
     bankSeq: 2,
     bankName: "국민은행",
-    // image: require("../../assets/images/logo_podo.png"),
     image: require("../../assets/images/bankImage1.png"),
   },
   {
     bankSeq: 3,
     bankName: "카카오뱅크",
-    // image: require("../../assets/images/logo_podo.png"),
     image: require("../../assets/images/bankImage2.png"),
   },
   {
     bankSeq: 4,
     bankName: "신한은행",
-    // image: require("../../assets/images/logo_podo.png"),
     image: require("../../assets/images/bankImage3.png"),
   },
   {
     bankSeq: 5,
     bankName: "농협은행",
-    // image: require("../../assets/images/logo_podo.png"),
     image: require("../../assets/images/bankImage4.png"),
   },
   {
     bankSeq: 6,
     bankName: "하나은행",
-    // image: require("../../assets/images/logo_podo.png"),
     image: require("../../assets/images/bankImage5.png"),
   },
   {
     bankSeq: 7,
     bankName: "새마을금고",
-    // image: require("../../assets/images/logo_podo.png"),
     image: require("../../assets/images/bankImage6.png"),
   },
   {
     bankSeq: 8,
     bankName: "대구은행",
-    // image: require("../../assets/images/logo_podo.png"),
     image: require("../../assets/images/bankImage7.png"),
   },
   {
     bankSeq: 9,
     bankName: "케이뱅크",
-    // image: require("../../assets/images/logo_podo.png"),
     image: require("../../assets/images/bankImage8.png"),
   },
 ];
@@ -83,12 +74,9 @@ export default function PurposeEnd2Screen({ navigation, route }) {
       const response = await accountWholeBank(accessToken, grantType);
       if (response.status === 200) {
         setBankList(response.data);
-        console.log(response.data);
       } else {
-        console.log("은행 리스트 조회 실패", response.status);
       }
     } catch (error) {
-      console.log(error);
     }
   };
 
@@ -118,7 +106,6 @@ export default function PurposeEnd2Screen({ navigation, route }) {
                   purposeData: updatedPurposeData,
                 });
               }}
-              // 미리 front에서 등록해둔 은행이 back에서 불러온 것과 일치하지 않으면 비활성
               disabled={bankList.some((item) => item.bankSeq != bank.bankSeq)}
             >
               <Image style={styles.bankLogo} source={bank.image} />
@@ -145,15 +132,11 @@ export default function PurposeEnd2Screen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // alignItems: "flex-start",
-    // justifyContent: "center",
     backgroundColor: "white",
     padding: 16,
   },
   inContainer: {
     flex: 1,
-    // alignItems: "flex-start",
-    // justifyContent: "center",
     backgroundColor: "white",
     padding: 16,
   },
@@ -164,7 +147,6 @@ const styles = StyleSheet.create({
   boldText: {
     fontWeight: "bold",
     fontSize: 20,
-    // marginBottom: 8,
     marginLeft: 5,
     textAlign: "left",
   },
