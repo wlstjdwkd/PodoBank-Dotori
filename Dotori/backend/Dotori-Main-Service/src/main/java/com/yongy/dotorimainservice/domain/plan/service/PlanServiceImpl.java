@@ -221,11 +221,11 @@ public class PlanServiceImpl implements PlanService {
 
         // 3. 도토리 1개 얻기
         Reward reward = rewardRepository.findByUserSeq(plan.getUserSeq());
-        reward.plusDotori();
+        reward = reward.plusDotori();
 
         if(reward.getDotori() == 10){ // 도토리가 10개가 되면 coin 1개 지급
-            reward.initDotori();
-            reward.plusCoin();
+            reward = reward.initDotori();
+            reward = reward.plusCoin();
         }
 
         rewardRepository.save(reward);
