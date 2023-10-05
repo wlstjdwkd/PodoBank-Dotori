@@ -96,6 +96,7 @@ export default function ReceipeScreen({ route, navigation }) {
       <HeaderComponent
         title="명세서 보기"
         navigation={navigation}
+        cancelNavi="MyPageScreen"
       ></HeaderComponent>
 
       {/* 선택한 명세서를 화면에 표시 */}

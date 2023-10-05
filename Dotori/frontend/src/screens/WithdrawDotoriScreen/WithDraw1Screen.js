@@ -46,20 +46,6 @@ export default function WithDraw1Screen({ navigation, route }) {
     }
   }
 
-  // const doUserWithdrawDotori = async () => {
-  //   Alert.alert('', `${userInfo.userName}님 탈퇴가 완료되었습니다.`, [
-  //     {
-  //       text: '확인',
-  //       onPress: () => {
-  //         navigation.reset({
-  //           index: 0,
-  //           routes: [{ name: 'MainPageScreen' }],
-  //         });
-  //       },
-  //     },
-  //   ]);
-  // }
-
   const cancelUserWithdrawDotori = () => {
     navigation.navigate("MyPageScreen")
   }

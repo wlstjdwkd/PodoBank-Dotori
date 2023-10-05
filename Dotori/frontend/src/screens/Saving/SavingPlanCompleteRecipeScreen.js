@@ -9,6 +9,7 @@ import {
   Modal,
 } from "react-native";
 
+import { Audio } from 'expo-av';
 import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { planSpecificationDetail, planNoSaving } from "../../apis/planapi"
@@ -49,7 +50,19 @@ export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
   const [totalSavings, setTotalSavings] = useState(null)
   const [noSavingModalVisible, setNoSavingModalVisible] = useState(false)
   const [currentAccountAmount, setCurrentAccountAmount] = useState(null)
+  const [sound, setSound] = useState();
 
+
+  const playSound = async() => {
+    console.log('Loading Sound');
+    const { sound } = await Audio.Sound.createAsync( require('../../assets/nextPage.mp3')
+    );
+    setSound(sound);
+
+    console.log('Playing Sound');
+    await sound.playAsync();
+
+  }
   
   // 총계 계산
   const funcTotalExpense = (counting) => {
@@ -103,6 +116,15 @@ export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
       console.log()
     }
   }
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          console.log('Unloading Sound');
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
 
   useEffect(()=>{
     doPlanSpecificationDetail()
@@ -224,6 +246,7 @@ export default function SavingPlanCompleteRecipeScreen({ route, navigation }) {
           <TouchableOpacity
             style={[styles.button, {backgroundColor:"#FF965C"}]}
             onPress={() => {
+              playSound()
               navigation.navigate("SavingMoneyScreen", {accountName:accountName, accountSeq:accountSeq, planSeq:planSeq, totalSavings: totalSavings, currentAccountAmount:currentAccountAmount})
             }}
           >

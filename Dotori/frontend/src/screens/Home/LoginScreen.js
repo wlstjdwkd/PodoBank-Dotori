@@ -102,18 +102,6 @@ export default function LoginScreen({ navigation }) {
     getExistingId()
   }, [])
 
-  // // 카카오 로그인
-  // const handleKakaoLogin = () => {
-  //   const kakaoLoginUrl = 'https://accounts.kakao.com/login/?continue=https%3A%2F%2Fkauth.kakao.com%2Foauth%2Fauthorize%3Fresponse_type%3Dcode%26redirect_uri%3Dhttp%253A%252F%252Fj9d107.p.ssafy.io%253A9100%252Fv1%252Fkakao%252Fcallback%26through_account%3Dtrue%26client_id%3D866dc3358fdb2e42441c258a45fe9850#login';
-  //   Linking.openURL(kakaoLoginUrl)
-  //     .then((url) => {
-  //       console.log('URL opened:', url);
-  //     })
-  //     .catch((error) => {
-  //       console.log('URL open error:', error);
-  //     });
-  // };
-
   return (
     <View style={styles.container}>
       <Image
@@ -180,26 +168,7 @@ export default function LoginScreen({ navigation }) {
       </TouchableOpacity>
 
       <View style={styles.linksContainer}>
-        {/* <TouchableOpacity
-          onPress={()=>{
-            Alert.alert('', '아이디 찾기 구현 필요')
-            navigation.navigate("LoginScreen")
-          }}
-        >
-          <Text style={styles.linkText}>아이디 찾기</Text>
-        </TouchableOpacity>
 
-        <Text style={styles.linkText}>|</Text>
-        <TouchableOpacity
-          onPress={()=>{
-            Alert.alert('', '비밀번호 찾기 구현 필요')
-            navigation.navigate("LoginScreen")
-          }}
-        >
-          <Text style={styles.linkText}>비밀번호 찾기</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.linkText}>|</Text> */}
         <TouchableOpacity onPress={() => {
           navigation.navigate("SignUp1Screen")
         }}>
@@ -207,29 +176,6 @@ export default function LoginScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      {/* <View style={styles.divider}>
-        <Text style={styles.dividerText}>SNS 계정으로 로그인</Text>
-      </View> */}
-
-      {/* 카카오, 네이버 로그인 버튼은 라이브러리나 직접 이미지로 구현해야 합니다. */}
-      {/* <View style={styles.oauth}>
-        <TouchableOpacity
-          onPress={()=>{
-            // handleKakaoLogin()
-          }}
-        >
-          <Image
-            style={styles.oauthImage}
-            source={require("../../assets/images/kakao.png")}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Image
-            style={styles.oauthImage}
-            source={require("../../assets/images/naver.png")}
-          />
-        </TouchableOpacity>
-      </View> */}
     </View>
   );
 }

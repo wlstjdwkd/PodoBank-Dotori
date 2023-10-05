@@ -299,7 +299,6 @@ export const planInProgress = async (
     console.log(accessToken + " " + grantType);
     const response = await axios.get(
       apiAddress + `/api/v1/plan/${inProgressData}`,
-      // newRegisterData,
       {
         headers: {
           Authorization: `${grantType} ${accessToken}`,
@@ -309,11 +308,7 @@ export const planInProgress = async (
     console.log("진행중인 계획 조회 성공:", response.data);
     return response;
   } catch (error) {
-    console.error(
-      "진행중인 계획 조회 실패:",
-      error.response.status,
-      error.response.data
-    );
+    console.log("진행중인 계획 조회 실패:",error);
     const response = error.response;
     return response;
   }

@@ -105,14 +105,22 @@ export default function PlanMainScreen({ navigation, route }) {
       const response = await planInProgress(accountSeq, accessToken, grantType);
       if (response.status === 200) {
         setPlanInfo(response.data);
+        console.log(response.data)
         // 종료된 계획이라면 바로 종료 명세서 보기 창으로 넘김, else는 만들 필요없음.
-        if (response.data.state === "ACTIVE" && response.data.terminatedAt) {
-          navigation.navigate("SavingPlanCompleteRecipeScreen", {
-            accountName: accountName,
-            accountSeq: accountSeq,
-            planSeq: response.data.planSeq,
-          });
-        }
+        // if (response.data.state === "ACTIVE" && response.data.terminatedAt) {
+        //   navigation.navigate("SavingPlanCompleteRecipeScreen", {
+        //     accountName: accountName,
+        //     accountSeq: accountSeq,
+        //     planSeq: response.data.planSeq,
+        //   });
+        // }
+      } else if (response.status === 404){
+        navigation.navigate("SavingPlanCompleteRecipeScreen", {
+          accountName: accountName,
+          accountSeq: accountSeq,
+          planSeq: response.data,
+        });
+
       } else {
         console.log("계획 정보 조회 실패", response.status);
       }

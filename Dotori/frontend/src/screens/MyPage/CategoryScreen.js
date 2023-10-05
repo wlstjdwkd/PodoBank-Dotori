@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import {
   View,
   Text,
@@ -11,30 +11,6 @@ import HeaderComponent from "../Components/HeaderScreen";
 import { AntDesign, Entypo, FontAwesome } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { planCategoryList } from "../../apis/planapi"
-import { useState } from "react";
-import { useEffect } from "react";
-const categorys = [
-  {
-    categorySeq: "1",
-    categoryTitle: "옷(겨울)",
-  },
-  {
-    categorySeq: "2",
-    categoryTitle: "요가학원",
-  },
-  {
-    categorySeq: "3",
-    categoryTitle: "가구구매",
-  },
-  {
-    categorySeq: "4",
-    categoryTitle: "식자재",
-  },
-  {
-    categorySeq: "5",
-    categoryTitle: "배달",
-  },
-];
 
 const randomColors = [
   "#FFD700",
@@ -63,7 +39,6 @@ export default function CategoryScreen({ navigation }) {
   // 그 외
 
   const [categoryList, setCategoryList] = useState([])
-  // const [categoryList, setCategoryList] = useState(categorys)
   
   const doPlanCategoryList = async () => {
     try{
@@ -110,7 +85,7 @@ export default function CategoryScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <HeaderComponent title="카테고리 보기" navigation={navigation}/>
+      <HeaderComponent title="카테고리 보기" navigation={navigation} cancelNavi="MyPageScreen"/>
 
       {/* 상단 작은 사각형 4개 */}
       <View style={styles.titleContainer}>
@@ -135,13 +110,6 @@ export default function CategoryScreen({ navigation }) {
         <Text style={styles.titleText}>카테고리 </Text>
       </View>
 
-      {/* 카테고리 목록 */}
-      {/* <FlatList
-        data={categorys}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.categorySeq}
-        contentContainerStyle={styles.categoryList}
-      /> */}
       {categoryList.length
         ?(<FlatList
           data={categoryList}
@@ -159,11 +127,6 @@ export default function CategoryScreen({ navigation }) {
           ]}
         >
           <Text style={styles.categoryTitle}>현재 등록된 카테고리가 없습니다.</Text>
-          {/* <Text style={styles.categoryGroup}>메롱</Text> */}
-          {/* <Image
-            style={styles.arrowIcon}
-            source={require("../../assets/icon/forward_arrow.png")} // 화살표 아이콘 이미지 경로
-          /> */}
         </View>)
       }
     </View>
