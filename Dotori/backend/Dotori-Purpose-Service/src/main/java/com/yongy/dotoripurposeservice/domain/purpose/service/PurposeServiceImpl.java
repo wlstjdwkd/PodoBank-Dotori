@@ -230,7 +230,7 @@ public class PurposeServiceImpl implements PurposeService{
         // TODO : 1. 은행 정보 가져오기
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put("bankSeq", purposeFinisedDTO.getBankSeq());
-        ResponseEntity<String> bankResponse = callServer.postHttpWithParamsAndSend(MAIN_SERVICE_URL+"/bank/communication/bankInfo", HttpMethod.POST, parameters);
+        ResponseEntity<String> bankResponse = callServer.getHttpWithParamsAndSend(MAIN_SERVICE_URL+"/bank/communication/bankInfo", HttpMethod.GET, parameters);
 
         String responseCode = bankResponse.getStatusCode().toString().split(" ")[0];
         String responseContent = bankResponse.getBody();
