@@ -10,11 +10,12 @@ import {
 
 import { useIsFocused } from "@react-navigation/native";
 
-export default function RandomBoxLoadingScreen ({ navigation, route }) {
+export default function RandomBoxLoadingScreen({ navigation, route }) {
   const [prizeAmount, setPrizeAmount] = useState(route.params.prizeAmount)
   const [money1, setMoney1] = useState(0)
   const [money2, setMoney2] = useState(0)
   const [money3, setMoney3] = useState(0)
+  const [isQuit, setIsQuit] = useState(false)
 
   const isFocused = useIsFocused();
 
@@ -22,6 +23,7 @@ export default function RandomBoxLoadingScreen ({ navigation, route }) {
   const windowHeight = Dimensions.get('window').height;
 
   const goRandomBox3Screen = () => {
+    setIsQuit(true)
     navigation.navigate("RandomBox3Screen", {prizeAmount:prizeAmount})
   }
 
@@ -29,8 +31,19 @@ export default function RandomBoxLoadingScreen ({ navigation, route }) {
     return Math.floor(Math.random() * (10 - 0) + 0)
   }
 
+  const formatNumber = (num) => {
+    if (num < 10) {
+      return `00${num}`;
+    } else if (num < 100) {
+      return `0${num}`;
+    } else {
+      return num.toString();
+    }
+  }
+
   useEffect(()=>{
     if(isFocused){
+      setIsQuit(false)
       const timer = setInterval(() => {
         setMoney1(randomNum())
         setMoney2(randomNum())
@@ -61,7 +74,12 @@ export default function RandomBoxLoadingScreen ({ navigation, route }) {
         </View>
         <View>
           <Text style={{textAlign:'center', fontSize:24, fontWeight:'bold', padding:10}}>얼마가 당첨될까요?</Text>
-          <Text style={{textAlign:'center', fontSize:20, padding:10} }>{money1}{money2}{money3}원</Text>
+          <Text style={{textAlign:'center', fontSize:20, padding:10} }>
+            { isQuit
+              ?`${formatNumber(prizeAmount)}원`
+              :`${money1}${money2}${money3}원`
+            }
+          </Text>
         </View>
       </View>
         

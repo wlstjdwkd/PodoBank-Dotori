@@ -101,7 +101,7 @@ export default function RandomBox1Screen({ navigation, route }) {
               handleOpen()
             }}
           >
-            <Text style={styles.buttonText}>열어보기</Text>
+            <Text style={styles.buttonText}>랜덤받스 받기</Text>
           </TouchableOpacity>
         </View>
       </View>

@@ -53,7 +53,7 @@ export default function RandomBox2Screen({ navigation, route }) {
         </View>
         <TouchableOpacity
           onPress={()=>{
-            navigation.navigate("RandomBoxLoadingScreen ", {prizeAmount:prizeAmount})
+            navigation.navigate("RandomBoxLoadingScreen", {prizeAmount:prizeAmount})
           }}
         >
           <Image
