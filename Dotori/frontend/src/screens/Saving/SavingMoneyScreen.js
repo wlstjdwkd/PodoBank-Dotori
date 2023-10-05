@@ -64,7 +64,6 @@ export default function SavingMoneyScreen({ navigation, route }) {
 
     console.log('Playing Sound');
     await sound.playAsync();
-
   }
 
   const formatNumber = (num) => {
