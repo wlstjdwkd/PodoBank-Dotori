@@ -76,9 +76,13 @@ export default function MainPageScreen({ navigation, route }) {
     }
     try{
       const response = await userKeepReward(data, accessToken, grantType)
-      if(response.status==200){
-        console.log('리워드 이체 성공')
-      }else{
+      if (response.status == 200) {
+        console.log('리워드 이체 성공');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'RandomBoxCompleteScreen', params:{prizeAmount:prizeAmount, selectedAccountName:selectedAccountName } }],
+        });
+      } else {
         console.log('리워드 이체 실패', response.status)
       }
     }catch(error){
@@ -96,20 +100,21 @@ export default function MainPageScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
+      <View style={{flex:0.1}}></View>
       <View style={styles.innerContainer}>
         <FlatList
           data={accountList}
           showsVerticalScrollIndicator={false} // 수직 스크롤바 숨김
           ListHeaderComponent={
             <>
+              {/* <Image
+                style={styles.rightImage}
+                source={require("../../assets/images/Hamster/MainHamster.png")}
+              /> */}
               <Text style={styles.title}>당첨금을 이체해요!</Text>
               <Text style={styles.subtitle}>
                 어느 계좌로 이체 할까요?
               </Text>
-              <Image
-                style={styles.rightImage}
-                source={require("../../assets/images/Hamster/MainHamster.png")}
-              />
               <Text style={{textAlign:'center', marginVertical:20, fontSize:18,}}>
                 {selectedAccountName
                   ? `${selectedAccountName}에 입금해주세요!`
@@ -164,9 +169,6 @@ export default function MainPageScreen({ navigation, route }) {
         />
       </View>
 
-      <View style={styles.footer}>
-        <FooterScreen navigation={navigation} />
-      </View>
     </View>
   );
 }
@@ -179,6 +181,7 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     paddingHorizontal: 20,
+    flex:0.9
   },
   header: {
     flexDirection: "row",
@@ -209,11 +212,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 5,
     marginTop: 30,
+    alignSelf:'center'
   },
   subtitle: {
     fontSize: 16,
     color: "#7B7B7B",
     marginBottom: 20,
+    alignSelf:'center'
   },
   rightImage: {
     alignSelf: "center",
