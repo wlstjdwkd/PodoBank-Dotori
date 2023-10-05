@@ -164,6 +164,7 @@ const styles = StyleSheet.create({
   },
   coinText:{
     margin:20,
+    marginRight:30,
     fontSize:18, 
     fontWeight:'bold'
   },

@@ -7,73 +7,88 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
+
 import { Audio } from 'expo-av';
 import { useIsFocused } from "@react-navigation/native";
 
-export default function RandomBox3Screen({ navigation, route }) {
+export default function RandomBoxLoadingScreen ({ navigation, route }) {
   // const coin = route.params.coin;
   const [prizeAmount, setPrizeAmount] = useState(route.params.prizeAmount)
-  const [openSound, setOpenSound] = useState();
+  const [money1, setMoney1] = useState(0)
+  const [money2, setMoney2] = useState(0)
+  const [money3, setMoney3] = useState(0)
+  const [soundRandomball, setSoundRandomball] = useState();
 
   const isFocused = useIsFocused();
+
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
 
-  const playopenSound = async() => {
-    const { sound } = await Audio.Sound.createAsync( require('../../assets/bbak.mp3')
+  const playSoundRandomball = async() => {
+    const { sound } = await Audio.Sound.createAsync( require('../../assets/randomball.mp3')
     );
-    setOpenSound(sound);
+    setSoundRandomball(sound);
+
     await sound.playAsync();
   }
 
-  useEffect(() => {
-    return openSound
-      ? () => {
-        openSound.unloadAsync();
-        }
-      : undefined;
-  }, [openSound]);
+  const goRandomBox3Screen = () => {
+    navigation.navigate("RandomBox3Screen", {prizeAmount:prizeAmount})
+  }
+
+  function randomNum() {
+    return Math.floor(Math.random() * (10 - 0) + 0)
+  }
 
   useEffect(()=>{
     if(isFocused){
-      playopenSound()
+      const timer = setInterval(() => {
+        setMoney1(randomNum())
+        setMoney2(randomNum())
+        setMoney3(randomNum())
+      }, 10);
+      const timeout = setTimeout(() => {
+        goRandomBox3Screen()
+      }, 1000);
+      return () => {
+        clearInterval(timer)
+        clearTimeout(timeout)
+      }
     }
   }, [isFocused])
+
+  useEffect(() => {
+    return soundRandomball
+      ? () => {
+        soundRandomball.unloadAsync();
+        }
+      : undefined;
+  }, [soundRandomball]);
+
+
+  useEffect(()=>{
+    if(isFocused){
+      // playSoundRandomball()
+    }
+  }, [isFocused])
+
   return (
     <View style={{flex:1, backgroundColor:'white'}}>
-      <View style={{flex:0.15}}></View>
+      <View style={{flex:0.3}}>
+
+      </View>
 
       <View style={styles.container}>
-        {/* <View style={{}}>
-          <Text style={{fontWeight:"bold", fontSize:26}}>RANDOM BOX</Text>
-        </View> */}
-        <View
-          onPress={()=>{
-            // navigation.navigate("RandomBox3Screen", {prizeAmount:prizeAmount})
-          }}
-        >
+        <View>
           <Image
-            source={require("../../assets/images/Hamster/giftHamster2.png")}
+            source={require("../../assets/images/loadingGift.gif")}
             style={{width:windowWidth*0.7, height:windowWidth*0.7}}
           />
         </View>
         <View>
-          <Text style={{fontSize:40, fontWeight:"bold"}}>{prizeAmount}원</Text>
-          <Text style={{textAlign:'center'}}>축하합니다!</Text>
+          <Text style={{textAlign:'center', fontSize:24, fontWeight:'bold', padding:10}}>얼마가 당첨될까요?</Text>
+          <Text style={{textAlign:'center', fontSize:20, padding:10} }>{money1}{money2}{money3}원</Text>
         </View>
-      </View>
-      <View style={{width: "80%", alignSelf: "center", alignItems:'center',}}>
-        {/* 버튼 */}
-        <TouchableOpacity
-            style={[
-              styles.button,
-            ]}
-            onPress={() => {
-              navigation.navigate("RandomBox4Screen",{prizeAmount:prizeAmount})
-            }}
-          >
-            <Text style={styles.buttonText}>저축하기</Text>
-          </TouchableOpacity>
       </View>
         
         <View style={{flex:0.2}}></View>
@@ -83,7 +98,7 @@ export default function RandomBox3Screen({ navigation, route }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 0.6,
+    flex: 0.7,
     alignSelf: "center",
     alignItems:'center',
     // justifyContent: "center",
