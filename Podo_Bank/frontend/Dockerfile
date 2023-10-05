@@ -12,3 +12,7 @@ RUN npm install
 RUN npm install -g expo-cli
 
 RUN npm install eas-cli
+
+RUN eas login
+
+CMD npx expo start --dev-client
