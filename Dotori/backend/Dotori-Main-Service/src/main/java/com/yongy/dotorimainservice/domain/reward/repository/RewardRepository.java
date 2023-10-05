@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface RewardRepository extends JpaRepository<Reward, Long> {
     Reward findByUserSeq(Long userSeq);
 
-    int deleteByUserSeq(Long userSeq);
+    void deleteByUserSeq(Long userSeq);
 }

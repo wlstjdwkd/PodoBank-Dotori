@@ -8,6 +8,7 @@ public interface RewardService {
 
     DotoriDTO getDotori();
     void createUserReward(Long userSeq);
-    void randomBox(RandomBoxDTO randomBoxDTO) throws ParseException;
+    void randomBoxWithdraw(RandomBoxDTO randomBoxDTO) throws ParseException;
     void deleteUserReward(Long userSeq);
+    int openRandomBox(Long coin);
 }

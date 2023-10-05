@@ -48,8 +48,17 @@ public class RewardController {
             @ApiResponse(responseCode = "200", description = "랜덤박스 송금 성공")
     })
     @PostMapping("/randombox")
-    public ResponseEntity<Void> randomBox(@RequestBody RandomBoxDTO randomBoxDTO) throws ParseException {
-        rewardService.randomBox(randomBoxDTO);
+    public ResponseEntity<Void> randomBoxWithdraw(@RequestBody RandomBoxDTO randomBoxDTO) throws ParseException {
+        rewardService.randomBoxWithdraw(randomBoxDTO);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "랜덤박스 열기")
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "랜덤박스 열기 성공")
+    })
+    @PostMapping("/randombox/{coin}")
+    public ResponseEntity<Integer> openRandomBox(@PathVariable Long coin){
+        return ResponseEntity.ok(rewardService.openRandomBox(coin));
     }
 }
