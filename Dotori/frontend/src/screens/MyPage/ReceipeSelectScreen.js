@@ -53,8 +53,6 @@ export default function ReceipeSelectScreen({ navigation }) {
         selectedAccount,
         selectedReceipe,
       });
-      // 잠깐 쓰고 나중에 삭제할네비게이션임.
-      // navigation.navigate("SavingPlanCompleteRecipeScreen", {selectedAccount:selectedAccount, selectedReceipe:selectedReceipe, })
     }else{
       Alert.alert('','확인할 수 있는 명세서가 없습니다.')
     }
@@ -99,6 +97,7 @@ export default function ReceipeSelectScreen({ navigation }) {
       <HeaderComponent
         title="명세서 보기"
         navigation={navigation}
+        cancelNavi="MyPageScreen"
       ></HeaderComponent>
 
       <View style={styles.container}>

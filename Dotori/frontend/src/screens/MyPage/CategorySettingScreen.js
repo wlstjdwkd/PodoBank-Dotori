@@ -18,69 +18,6 @@ import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { planCategoryUsingSpot, planCategoryDeleteSpot } from "../../apis/planapi"
 
-const categorys = [
-  {
-    "dataCode":"0",
-    "dataName":"리안",
-    "count":1
-  },
-  {
-    "dataCode":"1",
-    "dataName":"마왕족발",
-    "count":1
-  },
-  {
-    "dataCode":"2",
-    "dataName":"김치찜은 못참치",
-    "count":1
-  },
-  {
-    "dataCode":"3",
-    "dataName":"최각루",
-    "count":2
-  },
-  {
-    "dataCode":"4",
-    "dataName":"피자가좋다",
-    "count":12
-  },
-  {
-    "dataCode":"5",
-    "dataName":"세찜",
-    "count":3
-  },
-  {
-    "dataCode":"6",
-    "dataName":"내가닭이다",
-    "count":3
-  },
-  {
-    "dataCode":"7",
-    "dataName":"52는맛있지",
-    "count":13
-  },
-  {
-    "dataCode":"8",
-    "dataName":"최코다리",
-    "count":2
-  },
-  {
-    "dataCode":"9",
-    "dataName":"신촌 등갈비찜",
-    "count":5
-  },
-  {
-    "dataCode":"10",
-    "dataName":"우정양개탕",
-    "count":4
-  },
-  {
-    "dataCode":"11",
-    "dataName":"다이소다이소",
-    "count":3
-  },
-];
-
 export default function CategorySettingScreen({ navigation, route }) {
   // 토큰
   const grantType =  useSelector((state)=>state.user.grantType)
@@ -96,7 +33,6 @@ export default function CategorySettingScreen({ navigation, route }) {
 
   
   // categorySeq와 일치하는 category 데이터를 찾습니다.
-  // const [categorySpot, setCategorySpot] = useState(categorys)
   const [categorySpot, setCategorySpot] = useState(null)
 
   // 카테고리 사용처 목록 가져오기 함수
@@ -105,7 +41,7 @@ export default function CategorySettingScreen({ navigation, route }) {
       const response = await planCategoryUsingSpot(categorySeq, accessToken, grantType)
       if(response.status===200){
         console.log("카테고리 사용처 목록 데이터:",response.data)
-        // setCategorySpot(response.data)
+        setCategorySpot(response.data)
         console.log('카테고리 사용처 목록 가져오기 성공') 
       }else{
         console.log('카테고리 사용처 목록 가져오기 실패',response.status) 
@@ -138,7 +74,7 @@ export default function CategorySettingScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <HeaderComponent title="카테고리 세부 내용" navigation={navigation}></HeaderComponent>
+      <HeaderComponent title="카테고리 세부 내용" navigation={navigation} cancelNavi="MyPageScreen"></HeaderComponent>
 
       <View style={styles.topContainer}>
         {/* 페이지 상단 좌측에 categoryTitle 출력 */}
@@ -225,7 +161,6 @@ export default function CategorySettingScreen({ navigation, route }) {
             transparent={true}
             visible={isDeleteModalVisible}
             onRequestClose={() => {
-              // Alert.alert('Modal has been closed.');
               setIsDeleteModalVisible(false)
               setSelectedSpot(null)
             }}>
@@ -236,7 +171,7 @@ export default function CategorySettingScreen({ navigation, route }) {
                   <TouchableOpacity
                     style={[styles.button, styles.buttonClose]}
                     onPress={() => {
-                      // doPlanCategoryDeleteSpot(selectedSpot.dataCode)
+                      doPlanCategoryDeleteSpot(selectedSpot.dataCode)
                       const newCategorySpot = categorySpot.filter(item => item.dataCode !== selectedSpot.dataCode);
                       setCategorySpot(newCategorySpot)
                       setIsDeleteModalVisible(false)

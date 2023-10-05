@@ -97,7 +97,7 @@ export default function MyPageScreen({ navigation }) {
       <View style={styles.profileContainer}>
         <Image
           style={styles.profileImage}
-          source={require("../../assets/images/Hamster/MainHamster.png")} // 프로필 이미지 경로
+          source={require("../../assets/images/Hamster/MainHamster.png")}
         />
       </View>
 
@@ -109,17 +109,14 @@ export default function MyPageScreen({ navigation }) {
         <Text style={styles.boldText}>기본 정보</Text>
         <View style={styles.infoItem}>
           <Text style={styles.infoText}>이름</Text>
-          {/* <Text style={styles.infoText}>{userInfo.name}</Text> */}
           <Text style={styles.infoText}>{userInfo?userInfo.userName:'박새로이'}</Text>
         </View>
         <View style={styles.infoItem}>
           <Text style={styles.infoText}>이메일</Text>
-          {/* <Text style={styles.infoText}>{userInfo.email}</Text> */}
           <Text style={styles.infoText}>{userInfo?userInfo.id:"dotori123@dotori.com"}</Text>
         </View>
         <View style={styles.infoItem}>
           <Text style={styles.infoText}>생년월일</Text>
-          {/* <Text style={styles.infoText}>{userInfo.birth}</Text> */}
           <View style={styles.infoRow}>
             <Text style={styles.infoText}>{userInfo?userInfo.birthDate:"1999-12-12"} </Text>
             <TouchableOpacity
@@ -135,9 +132,7 @@ export default function MyPageScreen({ navigation }) {
         <View style={styles.infoItem}>
           <Text style={styles.infoText}>핸드폰 번호</Text>
           <View style={styles.infoRow}>
-            {/* <Text style={styles.infoText}>{userInfo.phone}</Text> */}
             <Text style={styles.infoText}>{userInfo?changeFormPhoneNumber(userInfo.phoneNumber):"010-1234-1234"} </Text>
-            {/* <Text style={styles.infoText}>{userInfo?userInfo.phoneNumber:"010-1234-1234"}</Text> */}
             <TouchableOpacity
               onPress={() => navigation.navigate("EditPhoneNumberScreen", {phoneNumber: userInfo.phoneNumber})}
             >
@@ -229,10 +224,6 @@ export default function MyPageScreen({ navigation }) {
                   onPress={() => {
                     setUserWithdrawModalVisible(false)
                     navigation.navigate("WithDraw1Screen", {userInfo : userInfo})
-                    // navigation.reset({
-                    //   index: 0,
-                    //   routes: [{ name: 'MainPageScreen' }],
-                    // });
                   }}>
                   <Text style={styles.textStyle}>예</Text>
                 </TouchableOpacity>

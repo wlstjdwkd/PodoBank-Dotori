@@ -30,21 +30,14 @@ export default function EditBirthDateScreen({ navigation, route }) {
   const [responseMessage, setResponseMessage] = useState("")
   
 
-  // const validateBirthDate = (text) => {
-  //   const regex = /^01\d{6}$/;
-  //   return regex.test(text);
-  // };
   const validateBirthDate = (text) => {
     if (!/^\d{8}$/.test(text)) {
-      return false; // 8자리 숫자가 아니면 유효하지 않음
+      return false; 
     }
     const year = parseInt(text.substr(0, 4));
-    const month = parseInt(text.substr(4, 2)) - 1; // 월은 0부터 시작하므로 1을 빼줍니다.
+    const month = parseInt(text.substr(4, 2)) - 1;
     const day = parseInt(text.substr(6, 2));  
-    // Date 객체를 생성하여 유효한 날짜인지 확인합니다.
     const date = new Date(year, month, day);
-    // Date 객체의 날짜가 유효하면 (예: 20211231), 유효한 날짜로 간주합니다.
-    // Date 객체의 날짜가 유효하지 않으면 (예: 20210231), 유효하지 않은 날짜로 간주합니다.
     return (
       date.getFullYear() === year &&
       date.getMonth() === month &&
@@ -142,7 +135,6 @@ export default function EditBirthDateScreen({ navigation, route }) {
         returnKeyType="next"
         keyboardType="number-pad"
         ref={currentBirthDateRef}
-        // value={currentBirthDate}
         onChangeText={(text)=>{
           handlePasswordCurrentCheck(text)
         }}
