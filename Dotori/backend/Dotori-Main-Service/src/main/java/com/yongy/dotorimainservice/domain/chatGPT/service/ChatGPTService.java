@@ -209,7 +209,7 @@ public class ChatGPTService {
             }
 
             CategoryData categoryData = categoryDataRepository.findByDataCode(payment.getCode());
-            log.info("사업자코드"+payment.getCode());
+            log.info("사업자코드"+payment.getCode()+"planDetail사이즈!!!!!!"+planDetails.size());
 
             if(categoryData == null){
                 log.info(payment.getContent());
