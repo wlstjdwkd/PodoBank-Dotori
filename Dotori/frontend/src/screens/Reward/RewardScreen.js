@@ -24,7 +24,7 @@ export default function RewardScreen({ navigation }) {
   const opacityAnim = useRef(new Animated.Value(1)).current;
 
   const [dotoriCount, setDotoriCount] = useState(null);
-  
+
   // 이 부분!!!
   // const [coinCount, setCoinCount] = useState(1);
   const [coinCount, setCoinCount] = useState(null);
@@ -43,7 +43,6 @@ export default function RewardScreen({ navigation }) {
       console.error("사용자 현재 도토리 갯수 조회 실패:", error);
     }
   };
-
 
   const currentDotoriEffect = (index) => {
     if (dotoriCount !== index) {
@@ -114,7 +113,7 @@ export default function RewardScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require("../../assets/images/rewardBackground.png")}
+        source={require("../../assets/RewardImage.jpg")}
         style={styles.imageBackground}
       >
         <View style={styles.borderBox}>
@@ -210,6 +209,7 @@ const styles = StyleSheet.create({
     // marginBottom: 30,
     marginBottom: -150,
     marginTop: -200,
+
     height: Dimensions.get("window").height - 10, // FooterScreen의 높이만큼 감소. 50은 예시값이며, 실제 FooterScreen의 높이에 맞게 조정해야 합니다.
   },
   borderBox: {
