@@ -45,12 +45,12 @@ public class RewardServiceImpl implements RewardService{
     private final AccountRepository accountRepository;
     private final BankRepository bankRepository;
     private final PodoBankInfo podoBankInfo;
-    @Value("${randombox.weight.one}")
-    private int COIN_WEIGHT_ONE;
-    @Value("${randombox.weight.two}")
-    private int COIN_WEIGHT_TWO;
-    @Value("${randombox.weight.three}")
-    private int COIN_WEIGHT_THREE;
+//    @Value("${randombox.weight.one}")
+//    private int COIN_WEIGHT_ONE;
+//    @Value("${randombox.weight.two}")
+//    private int COIN_WEIGHT_TWO;
+//    @Value("${randombox.weight.three}")
+//    private int COIN_WEIGHT_THREE;
 
     @Override
     public DotoriDTO getDotori() {
