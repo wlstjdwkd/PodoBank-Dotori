@@ -235,6 +235,8 @@ public class PurposeServiceImpl implements PurposeService{
         String responseCode = bankResponse.getStatusCode().toString().split(" ")[0];
         String responseContent = bankResponse.getBody();
 
+        log.info("은행 정보 받아옴 ");
+
         if(responseCode.equals("200")){
             ObjectMapper objectMapper = new ObjectMapper();
             BankDTO bankInfo = objectMapper.readValue(responseContent,BankDTO.class);
