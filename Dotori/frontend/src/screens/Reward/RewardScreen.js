@@ -23,12 +23,19 @@ export default function RewardScreen({ navigation }) {
   const isFocused = useIsFocused();
   const opacityAnim = useRef(new Animated.Value(1)).current;
 
+  const [dotoriCount, setDotoriCount] = useState(null);
+  
+  // 이 부분!!!
+  // const [coinCount, setCoinCount] = useState(1);
+  const [coinCount, setCoinCount] = useState(null);
+
   const doUserDotoriValueCheck = async () => {
     try {
       const response = await userDotoriValueCheck(accessToken, grantType);
       if (response.status === 200) {
         setDotoriCount(response.data.dotori);
-        // setCoinCount(response.data.coin);
+        // 이 부분!!!
+        setCoinCount(response.data.coin);
       } else {
         console.log("사용자 현재 도토리 갯수 조회 실패", response.status);
       }
@@ -37,8 +44,7 @@ export default function RewardScreen({ navigation }) {
     }
   };
 
-  const [dotoriCount, setDotoriCount] = useState(null);
-  const [coinCount, setCoinCount] = useState(1);
+
   const currentDotoriEffect = (index) => {
     if (dotoriCount !== index) {
       return null;

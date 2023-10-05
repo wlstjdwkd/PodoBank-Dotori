@@ -133,7 +133,7 @@ export default function PlanManageScreen({ navigation, route }) {
 
 
   useEffect(()=>{
-    // doAccountOneInquiry()
+    doAccountOneInquiry()
   },[])
 
   return (
@@ -254,12 +254,12 @@ export default function PlanManageScreen({ navigation, route }) {
             }}>
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
-                <Text style={styles.modalText}>연동된 계좌를 삭제하시겠습니까?</Text>
+                <Text style={styles.modalText}>현재 계획을 중지하시겠습니까?</Text>
                 <View style={{flexDirection:'row', justifyContent:'space-around'}}>
                   <TouchableOpacity
                     style={[styles.button, styles.buttonClose]}
                     onPress={() => {
-                      doAccountDelete()
+                      doPlanStop()
                       setPlanStopModalVisible(false)
                     }}>
                     <Text style={styles.textStyle}>예</Text>

@@ -164,6 +164,25 @@ export default function PlanMainScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
+      { planInfo
+        ? planInfo.planSeq
+          ? (<TouchableOpacity style={{alignSelf:'flex-end', margin:20, marginBottom:-40}}
+              onPress={()=>{
+                navigation.navigate("PlanManageScreen", {
+                  accountTitle: accountName,
+                  accountSeq:accountSeq,
+                  planSeq:planInfo.planSeq,
+                  accountBalance:planInfo.accountBalance,
+                  endAt:planInfo.endAt,
+                  startedAt:planInfo.startedAt,
+                })
+              }}
+            >
+              <Text style={{fontSize:18,fontWeight:'bold'}}>관리</Text>
+            </TouchableOpacity>)
+          : null
+        : null
+      }
       <Text style={styles.accountName}>{accountName}</Text>
       <Text style={styles.accountMoney}>
         {planInfo ? formatNumber(planInfo.accountBalance) + "원" : "Loading..."}
