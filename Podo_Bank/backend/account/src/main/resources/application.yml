@@ -1,3 +1,5 @@
+server:
+  port: 9030
 spring:
   config:
     import: "optional:configserver:http://j9d107.p.ssafy.io:9900/"
@@ -12,6 +14,8 @@ eureka:
   client:
     service-url:
       defaultZone: http://j9d107.p.ssafy.io:9761/eureka/
+    instance:
+      hostname: j9d107.p.ssafy.io
 
 encrypt:
   key: ${ENCRYPT_KEY}
