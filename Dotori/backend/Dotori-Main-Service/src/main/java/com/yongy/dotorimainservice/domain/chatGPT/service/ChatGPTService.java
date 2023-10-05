@@ -219,6 +219,7 @@ public class ChatGPTService {
                         .userSeq(plan.getUserSeq())
                         .checked(false)
                         .businessCode(payment.getCode())
+                        .planDetailSeq(planDetails.get(0).getPlanDetailSeq())
                         .paymentDate(payment.getTransactionAt())
                         .build());
                 continue;
