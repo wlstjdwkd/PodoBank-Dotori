@@ -8,6 +8,7 @@ import com.yongy.dotorimainservice.domain.plan.dto.PlanStateDTO;
 import com.yongy.dotorimainservice.domain.plan.dto.SavingDTO;
 import com.yongy.dotorimainservice.domain.plan.dto.communication.UserSeqDto;
 import com.yongy.dotorimainservice.domain.plan.dto.response.PlanListDto;
+import com.yongy.dotorimainservice.domain.plan.entity.Plan;
 import com.yongy.dotorimainservice.domain.plan.entity.State;
 import com.yongy.dotorimainservice.domain.plan.exception.NotActivePlanException;
 import com.yongy.dotorimainservice.domain.plan.service.PlanService;
@@ -34,7 +35,6 @@ import java.util.List;
 public class PlanController {
 
     private final PlanService planService;
-    private final PlanServiceImpl planServicelmpl;
     private final ChatGPTService chatGPTService;
 
     @ApiResponses(value={
@@ -76,7 +76,6 @@ public class PlanController {
     @GetMapping("/specification")
     public ResponseEntity<List<PlanListDto>> planList(){
 
-        // TODO : Completed 또는 Saved 또는 Active이고 null이 아닌 경우
         try{
             List<PlanListDto> planListDto = planService.getPlanList();
             return ResponseEntity.ok().body(planListDto);
@@ -104,10 +103,6 @@ public class PlanController {
     @GetMapping("/{accountSeq}")
     public ResponseEntity<ActivePlanDTO> findAllPlan(@PathVariable Long accountSeq) throws IOException, ParseException {
         ActivePlanDTO result = planService.findAllPlan(accountSeq);
-
-        // TODO : 포도은행에서 새로운 계좌내역 가져오기
-        chatGPTService.getPayments();
-
         return ResponseEntity.ok(result);
     }
 
@@ -123,7 +118,7 @@ public class PlanController {
 
     @PatchMapping("/updateDay")
     public ResponseEntity<Void> updateDay(){
-        planServicelmpl.startEndPlan();
+        planService.startEndPlan();
         return ResponseEntity.ok().build();
     }
 }

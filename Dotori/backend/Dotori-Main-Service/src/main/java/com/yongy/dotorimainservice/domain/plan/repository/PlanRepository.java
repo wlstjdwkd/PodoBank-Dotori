@@ -18,7 +18,6 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     Plan findByAccountAccountSeqAndPlanStateAndTerminatedAtIsNotNull(Long accountSeq, State state);
 
 
-
     List<Plan> findAllByEndAtAndPlanState(LocalDateTime endAt, State state);
 
     List<Plan> findAllByStartAtAndPlanState(LocalDateTime startAt, State state);
@@ -26,5 +25,6 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
 
     List<Plan> findAllByUserSeqAndTerminatedAtIsNotNull(Long userSeq);
     List<Plan> findAllByUserSeqAndTerminatedAtIsNull(Long userSeq);
+
 
 }

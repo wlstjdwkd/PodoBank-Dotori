@@ -12,6 +12,7 @@ import com.yongy.dotorimainservice.domain.category.entity.Category;
 import com.yongy.dotorimainservice.domain.category.repository.CategoryRepository;
 import com.yongy.dotorimainservice.domain.categoryGroup.entity.CategoryGroup;
 import com.yongy.dotorimainservice.domain.categoryGroup.repository.CategoryGroupRepository;
+import com.yongy.dotorimainservice.domain.chatGPT.service.ChatGPTService;
 import com.yongy.dotorimainservice.domain.payment.entity.Payment;
 import com.yongy.dotorimainservice.domain.payment.repository.PaymentRepository;
 import com.yongy.dotorimainservice.domain.plan.dto.*;
@@ -43,6 +44,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -73,6 +75,7 @@ public class PlanServiceImpl implements PlanService {
     @Value("${dotori.purpose.url}")
     private String PURPOSE_SERVICE_URL;
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public final ChatGPTService chatGPTService;
 
     @Override
     public void createPlan(PlanDTO planDTO) {
@@ -291,8 +294,10 @@ public class PlanServiceImpl implements PlanService {
         return planListDtoList;
     }
 
+
+
     @Override
-    public ActivePlanDTO findAllPlan(Long accountSeq) throws JsonProcessingException, ParseException {
+    public ActivePlanDTO findAllPlan(Long accountSeq) throws IOException, ParseException {
          // 실행중인 계획 조회
 
         // Plan이 있는 지 확인, 실행중인 Plan인지 확인
@@ -301,6 +306,10 @@ public class PlanServiceImpl implements PlanService {
         // 플랜이 없으면 : 플랜 만들기 페이지
         Plan plan = checkActivePlan(accountSeq);
         if(plan != null) { // 보여줄 계획이 존재하면
+            // NOTE : 포도뱅크에서 페이먼트 불러오는 로직 처리하기
+
+            chatGPTService.getOnePayments(plan); // TODO : 포도은행에서 새로운 계좌내역 가져오기(사용자)
+
             // 실행 중인 카테고리 가져오기
             List<PlanDetail> planDetailList = plan.getPlanDetailList();
             List<ActivePlanDetailDTO> activePlanList = new ArrayList<>();
