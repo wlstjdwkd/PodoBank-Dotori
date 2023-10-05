@@ -24,9 +24,6 @@ export default function RewardScreen({ navigation }) {
   const opacityAnim = useRef(new Animated.Value(1)).current;
 
   const [dotoriCount, setDotoriCount] = useState(null);
-  
-  // 이 부분!!!
-  // const [coinCount, setCoinCount] = useState(1);
   const [coinCount, setCoinCount] = useState(null);
 
   const doUserDotoriValueCheck = async () => {
@@ -34,13 +31,10 @@ export default function RewardScreen({ navigation }) {
       const response = await userDotoriValueCheck(accessToken, grantType);
       if (response.status === 200) {
         setDotoriCount(response.data.dotori);
-        // 이 부분!!!
         setCoinCount(response.data.coin);
       } else {
-        console.log("사용자 현재 도토리 갯수 조회 실패", response.status);
       }
     } catch (error) {
-      console.error("사용자 현재 도토리 갯수 조회 실패:", error);
     }
   };
 
@@ -75,22 +69,16 @@ export default function RewardScreen({ navigation }) {
     }
   };
   const getOpacity = (index) => {
-    // 현재 이미지의 인덱스가 도토리 개수보다 크거나 같으면 희미하게, 그렇지 않으면 선명하게
     return dotoriCount >= index ? 1 : 0.5;
   };
 
   useEffect(() => {
-    // 서버에서 데이터 가져오기 (여기서는 setTimeout을 사용해 시뮬레이션)
-    // setTimeout(() => {
-    //   setDotoriCount(9);
-    // }, 1000);
     if (isFocused) {
       doUserDotoriValueCheck();
     }
   }, [isFocused]);
 
   useEffect(() => {
-    // coinCount가 1 이상일 경우 깜빡이게 하기
     if (coinCount >= 1) {
       const blink = Animated.sequence([
         Animated.timing(opacityAnim, {
@@ -206,11 +194,9 @@ const styles = StyleSheet.create({
   },
   imageBackground: {
     width: "100%",
-    // marginHorizontal: -10,
-    // marginBottom: 30,
     marginBottom: -150,
     marginTop: -200,
-    height: Dimensions.get("window").height - 10, // FooterScreen의 높이만큼 감소. 50은 예시값이며, 실제 FooterScreen의 높이에 맞게 조정해야 합니다.
+    height: Dimensions.get("window").height - 10,
   },
   borderBox: {
     position: "absolute",
@@ -220,19 +206,19 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 15,
     backgroundColor: "white",
-    width: Dimensions.get("window").width * 0.3, // 상자의 크기를 설정하세요.
-    height: Dimensions.get("window").height * 0.06, // 상자의 크기를 설정하세요.
+    width: Dimensions.get("window").width * 0.3,
+    height: Dimensions.get("window").height * 0.06,
   },
   dotoriText: {
-    fontSize: 18, // 원하는 글자 크기로 조정하세요.
+    fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
     marginTop: "auto",
     marginBottom: "auto",
   },
   dashedImage: {
-    width: Dimensions.get("window").width * 0.8, // 이미지의 크기를 설정하세요.
-    height: Dimensions.get("window").height * 0.8, // 이미지의 크기를 설정하세요.
+    width: Dimensions.get("window").width * 0.8,
+    height: Dimensions.get("window").height * 0.8,
     marginTop: 90,
     marginLeft: 40,
   },
@@ -240,15 +226,15 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 50,
     left: 10,
-    width: 120, // 이미지의 크기를 설정하세요.
-    height: 120, // 이미지의 크기를 설정하세요.
+    width: 120,
+    height: 120,
   },
   topRightImage: {
     position: "absolute",
     top: 70,
     right: 20,
-    width: 100, // 이미지의 크기를 설정하세요.
-    height: 100, // 이미지의 크기를 설정하세요.
+    width: 100,
+    height: 100,
   },
   firstDotoriImage: {
     position: "absolute",

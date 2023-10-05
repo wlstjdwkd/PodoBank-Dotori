@@ -11,7 +11,6 @@ import { Audio } from 'expo-av';
 import { useIsFocused } from "@react-navigation/native";
 
 export default function RandomBox3Screen({ navigation, route }) {
-  // const coin = route.params.coin;
   const [prizeAmount, setPrizeAmount] = useState(route.params.prizeAmount)
   const [openSound, setOpenSound] = useState();
 
@@ -44,14 +43,7 @@ export default function RandomBox3Screen({ navigation, route }) {
       <View style={{flex:0.15}}></View>
 
       <View style={styles.container}>
-        {/* <View style={{}}>
-          <Text style={{fontWeight:"bold", fontSize:26}}>RANDOM BOX</Text>
-        </View> */}
-        <View
-          onPress={()=>{
-            // navigation.navigate("RandomBox3Screen", {prizeAmount:prizeAmount})
-          }}
-        >
+        <View>
           <Image
             source={require("../../assets/images/Hamster/giftHamster2.png")}
             style={{width:windowWidth*0.7, height:windowWidth*0.7}}
@@ -63,7 +55,6 @@ export default function RandomBox3Screen({ navigation, route }) {
         </View>
       </View>
       <View style={{width: "80%", alignSelf: "center", alignItems:'center',}}>
-        {/* 버튼 */}
         <TouchableOpacity
             style={[
               styles.button,
@@ -86,14 +77,11 @@ const styles = StyleSheet.create({
     flex: 0.6,
     alignSelf: "center",
     alignItems:'center',
-    // justifyContent: "center",
     justifyContent: "space-evenly",
     width: "80%"
   },
   questionMark:{
     position:'absolute',
-    // right: 50,
-    // top: 100
   },
   button: {
     backgroundColor: "#FF965C",
@@ -101,7 +89,6 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 10,
     alignItems: "center",
-    // marginTop: 35,
     marginTop: 15,
   },
   buttonText: {
