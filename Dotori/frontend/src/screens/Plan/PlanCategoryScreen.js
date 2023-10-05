@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,55 +8,100 @@ import {
   ScrollView,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import { useIsFocused } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
+import { planDetailConsumeList } from "../../apis/planapi";
 
-export default function PlanCategoryScreen({ navigation }) {
+export default function PlanCategoryScreen({ navigation, route }) {
   // 토큰
-  const grantType =  useSelector((state)=>{state.user.grantType})
-  const accessToken =  useSelector((state)=>{state.user.accessToken})
-  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
-  const dispatch = useDispatch()
+  const grantType = useSelector((state) => state.user.grantType);
+  const accessToken = useSelector((state) => state.user.accessToken);
+  const refreshToken = useSelector((state) => state.user.refreshToken);
+  const isFocused = useIsFocused();
+  const dispatch = useDispatch();
   // 그 외
-  
-  // TODO: 서버에서 데이터를 가져와 아래 변수들을 설정하세요
-  const sampleData = {
-    categoryName: "Travel",
-    targetMoney: 500000,
-    currentMoney: 250000,
-    consumeList: [
-      {
-        transaction_at: "2023-09-15 10:30:00",
-        transaction_details: "Flight ticket",
-        amount: 150000,
-      },
-      {
-        transaction_at: "2023-09-15 08:30:00",
-        transaction_details: "Flight ticket",
-        amount: 200000,
-      },
-      {
-        transaction_at: "2023-09-16 13:45:00",
-        transaction_details: "Hotel booking",
-        amount: 100000,
-      },
-    ],
-  };
+  const [planDetailSeq, setPlanDetailSeq] = useState(
+    route.params.planDetailSeq
+  );
+  console.log("planDetailSeq: " + planDetailSeq);
+  const [consumeList, setConsumeList] = useState(null);
+  const [data, setData] = useState(null);
+  const doPlanDetailConsumeList = async () => {
+    try {
+      const response = await planDetailConsumeList(
+        planDetailSeq,
+        accessToken,
+        grantType
+      );
+      if (response.status === 200) {
+        console.log("response.data", response.data);
+        setConsumeList(response.data);
+        // console.log("consumeList", consumeList);
+        setData(response.data);
+        // 종료된 계획이라면 바로 종료 명세서 보기 창으로 넘김, else는 만들 필요없음.
 
-  const [data, setData] = useState(sampleData);
+        console.log("data", data);
+      } else {
+        console.log("계획 정보 조회 실패", response.status);
+      }
+    } catch (error) {
+      console.error("오류 발생 : 계획 정보 조회 실패:", error);
+    }
+  };
+  // TODO: 서버에서 데이터를 가져와 아래 변수들을 설정하세요
+  // const sampleData = {
+  //   categoryName: "Travel",
+  //   targetMoney: 500000,
+  //   currentMoney: 250000,
+  //   consumeList: [
+  //     {
+  //       transaction_at: "2023-09-15 10:30:00",
+  //       transaction_details: "Flight ticket",
+  //       amount: 150000,
+  //     },
+  //     {
+  //       transaction_at: "2023-09-15 08:30:00",
+  //       transaction_details: "Flight ticket",
+  //       amount: 200000,
+  //     },
+  //     {
+  //       transaction_at: "2023-09-16 13:45:00",
+  //       transaction_details: "Hotel booking",
+  //       amount: 100000,
+  //     },
+  //   ],
+  // };
+  useEffect(() => {
+    if (isFocused) {
+      doPlanDetailConsumeList();
+    }
+  }, [isFocused]);
+
   const formatNumber = (num) => {
+    if (num === undefined || num === null) return "0";
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
   };
-  const formatDate = (dateStr) => {
-    const dateObj = new Date(dateStr);
+  const formatDate = (transaction_at) => {
+    const dateObj = new Date(transaction_at);
     const month = dateObj.getMonth() + 1; // 월은 0부터 시작하므로 +1 해주어야 합니다.
     const date = dateObj.getDate();
     return `${month}월 ${date}일`;
   };
 
+  const formatTime = (transaction_at) => {
+    const dateObj = new Date(transaction_at);
+    const hours = String(dateObj.getHours()).padStart(2, "0");
+    const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+
   const groupedConsumeList = () => {
-    const sortedList = data.consumeList.sort(
-      (a, b) => new Date(b.transaction_at) - new Date(a.transaction_at)
-    );
+    const sortedList =
+      data && data.consumeList
+        ? data.consumeList.sort(
+            (a, b) => new Date(b.transaction_at) - new Date(a.transaction_at)
+          )
+        : [];
 
     const grouped = sortedList.reduce((acc, curr) => {
       const date = curr.transaction_at.split(" ")[0];
@@ -90,7 +135,9 @@ export default function PlanCategoryScreen({ navigation }) {
       </View>
 
       <View style={styles.moneyValuesContainer}>
-        <Text style={styles.tempMoney}>0원</Text>
+        <Text style={styles.tempMoney}>
+          {formatNumber(data?.targetMoney - data?.currentMoney)}원
+        </Text>
         <Text style={styles.currentMoney}>
           {formatNumber(data?.currentMoney)}원
         </Text>
@@ -109,8 +156,11 @@ export default function PlanCategoryScreen({ navigation }) {
                     {trans.transaction_details}
                   </Text>
                   <View style={styles.innerContainer}>
+                    <Text style={styles.dateText}>
+                      {formatDate(trans.transaction_at)}
+                    </Text>
                     <Text style={styles.transTime}>
-                      {trans.transaction_at.split(" ")[1].slice(0, 5)}
+                      {formatTime(trans.transaction_at)}
                     </Text>
                     <Text style={styles.transAmount}>
                       {formatNumber(trans.amount)}원

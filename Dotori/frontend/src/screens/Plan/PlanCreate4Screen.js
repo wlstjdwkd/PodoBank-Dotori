@@ -254,6 +254,7 @@ const styles = StyleSheet.create({
   loadingImage: {
     width: 200,
     height: 200,
+    marginBottom: 30,
   },
   loaderContainer: {
     flex: 1,

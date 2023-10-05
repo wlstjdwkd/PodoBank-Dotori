@@ -349,11 +349,11 @@ export const unclassifiedList = async (
         },
       }
     );
-    console.log("진행중인 계획 조회 성공:", response.data);
+    console.log("미분류 정보 조회 성공:", response.data);
     return response;
   } catch (error) {
     console.error(
-      "진행중인 계획 조회 실패:",
+      "미분류 정보 계획 조회 실패:",
       error.response.status,
       error.response.data
     );
@@ -365,28 +365,27 @@ export const unclassifiedList = async (
 
 //미분류 항목 업데이트
 export const unClassifiedUpdate = async (
-  inProgressData,
+  updateData,
   planSeq,
   accessToken,
   grantType
 ) => {
   try {
-    console.log(inProgressData);
-    console.log(accessToken + " " + grantType);
+    console.log("inProgressData", updateData);
     const response = await axios.patch(
       apiAddress + `/api/v1/payment/${planSeq}`,
-      inProgressData,
+      { updateData },
       {
         headers: {
           Authorization: `${grantType} ${accessToken}`,
         },
       }
     );
-    console.log("진행중인 계획 조회 성공:", response.data);
+    console.log("미분류 항목 업데이트 성공:", response.data);
     return response;
   } catch (error) {
     console.error(
-      "진행중인 계획 조회 실패:",
+      "미분류 항목 업데이트 실패:",
       error.response.status,
       error.response.data
     );
@@ -438,6 +437,36 @@ export const planSpecificationDetail = async (
   } catch (error) {
     console.error(
       "계획 명세서 상세 조회하기 실패:",
+      error.response.status,
+      error.response.data
+    );
+    const response = error.response;
+    return response;
+    // throw error;
+  }
+};
+
+//카테고리 소비 내역 조회
+export const planDetailConsumeList = async (
+  planDetailSeq,
+  accessToken,
+  grantType
+) => {
+  try {
+    console.log(planDetailSeq + "planDetailSeq");
+    const response = await axios.get(
+      apiAddress + `/api/v1/planDetail/${planDetailSeq}`,
+      {
+        headers: {
+          Authorization: `${grantType} ${accessToken}`,
+        },
+      }
+    );
+    console.log("카테고리 소비 내역 조회 성공:", response.data);
+    return response;
+  } catch (error) {
+    console.error(
+      "카테고리 소비 내역 조회 실패:",
       error.response.status,
       error.response.data
     );
