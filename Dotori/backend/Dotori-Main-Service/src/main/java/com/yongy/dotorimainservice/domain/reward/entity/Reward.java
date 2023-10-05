@@ -27,4 +27,9 @@ public class Reward implements Serializable {
         this.dotori = this.dotori+1;
         return this;
     }
+
+    public Reward updateCoin(Long coin){
+        this.coin = this.getCoin() - coin;
+        return this;
+    }
 }
