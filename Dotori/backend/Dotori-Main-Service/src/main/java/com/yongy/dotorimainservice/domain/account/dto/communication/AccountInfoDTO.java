@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccountInfoDTO {
+    Long userSeq;
     String accountNumber;
 }

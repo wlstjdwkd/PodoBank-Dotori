@@ -146,9 +146,9 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public AccountFintechCodeDTO getFintechCode(AccountInfoDTO accountInfoDTO) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Account account = accountRepository.findByUserSeqAndAccountNumberAndDeleteAtIsNull(user.getUserSeq(), accountInfoDTO.getAccountNumber());
+    public AccountFintechCodeDTO getFintechCode(Long userSeq, AccountInfoDTO accountInfoDTO) {
+//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Account account = accountRepository.findByUserSeqAndAccountNumberAndDeleteAtIsNull(userSeq, accountInfoDTO.getAccountNumber());
         return AccountFintechCodeDTO.builder().fintechCode(account.getFintechCode()).build();
     }
 
