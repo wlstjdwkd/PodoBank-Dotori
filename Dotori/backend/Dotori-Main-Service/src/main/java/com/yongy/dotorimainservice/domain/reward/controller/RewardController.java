@@ -1,16 +1,15 @@
 package com.yongy.dotorimainservice.domain.reward.controller;
 
 import com.yongy.dotorimainservice.domain.reward.dto.DotoriDTO;
+import com.yongy.dotorimainservice.domain.reward.dto.RandomBoxDTO;
 import com.yongy.dotorimainservice.domain.reward.service.RewardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.json.simple.parser.ParseException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -41,6 +40,16 @@ public class RewardController {
     @GetMapping("/communication/delete")
     public ResponseEntity<String> deleteUserReward(@RequestParam Long userSeq){
         rewardService.deleteUserReward(userSeq);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "랜덤박스 송금")
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "랜덤박스 송금 성공")
+    })
+    @GetMapping("/randombox")
+    public ResponseEntity<Void> randomBox(@RequestBody RandomBoxDTO randomBoxDTO) throws ParseException {
+        rewardService.randomBox(randomBoxDTO);
         return ResponseEntity.ok().build();
     }
 }
