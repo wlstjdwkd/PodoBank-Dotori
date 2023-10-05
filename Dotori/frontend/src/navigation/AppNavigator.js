@@ -47,7 +47,7 @@ import RandomBox2Screen from "../screens/Reward/RandomBox2Screen";
 import RandomBox3Screen from "../screens/Reward/RandomBox3Screen";
 import RandomBox4Screen from "../screens/Reward/RandomBox4Screen";
 import RandomBoxCompleteScreen from "../screens/Reward/RandomBoxCompleteScreen";
-import RandomBoxLoadingScreen  from "../screens/Reward/RandomBoxLoadingScreen ";
+import RandomBoxLoadingScreen from "../screens/Reward/RandomBoxLoadingScreen";
 
 import MyPageScreen from "../screens/MyPage/MyPageScreen";
 import PasswordChangeScreen from "../screens/MyPage/PasswordChangeScreen";
@@ -223,8 +223,8 @@ export default function AppNavigator() {
         component={RandomBoxCompleteScreen}
       ></Stack.Screen>
       <Stack.Screen
-        name="RandomBoxLoadingScreen "
-        component={RandomBoxLoadingScreen }
+        name="RandomBoxLoadingScreen"
+        component={RandomBoxLoadingScreen}
       ></Stack.Screen>
       <Stack.Screen name="MyPageScreen" component={MyPageScreen}></Stack.Screen>
       <Stack.Screen
