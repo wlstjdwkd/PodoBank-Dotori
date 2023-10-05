@@ -56,16 +56,19 @@ public class ChatGPTService {
 
     public Map<String, Integer> map;
 
-    /** [카테고리] - [카테고리 그룹]
-     * 1. 외식 - 식비
-     * 2. 카페 - 식비
-     * 3. 여가 - 나를 위한 투자
-     * 4. 교통비 - 생활비
-     * 5. 장보기 - 생활비
-     * 6. 운동 - 나를 위한 투자
-     * 7. 기타 - 기타
+    /** [카테고리] - [카테고리 그룹] - 45
+     * 1. 외식 10만원 - 식비
+     * 2. 카페 3만원 - 식비
+     * 3. 여가 5만원 - 나를 위한 투자
+     * 4. 교통비 10만원 - 가타
+     * 5. 장보기 5만원 - 생활비
+     * 6. 운동 5만원 - 나를 위한 투자
+     * 7. 기타 7만원- 기타
      * */
 
+    /**
+     * [목표] 유럽여행, 결혼, 내집마련
+     * */
 
     public void initSetting(){
         map = new HashMap<>();
@@ -276,6 +279,7 @@ public class ChatGPTService {
 
             if(categoryData == null){
 
+                log.info("FIND ===========================>  "+ payment.getContent()+"," +map.get(payment.getContent()));
                 // TODO : 랜덤메소드
                 log.info(payment.getContent());
                 chatGPT.add(Payment.builder()
