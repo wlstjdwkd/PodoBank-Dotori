@@ -118,7 +118,7 @@ public class PurposeServiceImpl implements PurposeService{
             bodyData.clear();
             bodyData.put("accountSeq", data.getAccountSeq());
 
-            response = callServer.getHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/getTitle", HttpMethod.GET, bodyData);
+            response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/getTitle", HttpMethod.GET, bodyData);
             log.info("TEST - 1 : "+ response.getBody().toString());
             purposeData.add(PurposeDataDTO.builder()
                             .dataName(response.getBody().toString())
@@ -244,7 +244,7 @@ public class PurposeServiceImpl implements PurposeService{
             // TODO : 2. 은행 정보와 계좌정보 바탕으로 account 정보 가져오기
             HashMap<String, Object> body = new HashMap<>();
             body.put("accountNumber", purposeFinisedDTO.getAccountNumber());
-            ResponseEntity<String> accountResponse = callServer.getHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/account", HttpMethod.GET, body);
+            ResponseEntity<String> accountResponse = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/account", HttpMethod.GET, body);
 
             responseCode = accountResponse.getStatusCode().toString().split(" ")[0];
             responseContent = accountResponse.getBody();

@@ -22,7 +22,7 @@ public class CallServer {
 
 
     // NOTE : requestBody로 데이터 보낼 때
-    public ResponseEntity<String> getHttpBodyAndSend(String url, HttpMethod method, HashMap<String, Object> bodyData){
+    public ResponseEntity<String> postHttpBodyAndSend(String url, HttpMethod method, HashMap<String, Object> bodyData){
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json;charset=utf-8");
 
