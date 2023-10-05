@@ -175,7 +175,7 @@ export default function PlanCreate4Screen({ navigation, route }) {
         <View style={styles.innerContainer}>
           <HeaderComponent
             title="계획 생성(4/5)"
-            cancelNavi="PlanMainScreen"
+            cancelNavi="MainPageScreen"
             navigation={navigation}
           ></HeaderComponent>
           <ScrollView style={styles.header}>

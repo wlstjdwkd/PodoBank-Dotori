@@ -51,7 +51,7 @@ export default function PurposeEnd1Screen({ navigation, route }) {
 
       {/* Period Dates */}
       <Text style={styles.periodDates}>
-        {purposeData.startedAt} ~ {purposeData.terminatedAt}
+        {purposeData.startedAt} ~ {purposeData.terminatedAt.slice(0,10)}
       </Text>
 
       {/* Goal Amount Text */}

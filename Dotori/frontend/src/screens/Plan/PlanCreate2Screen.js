@@ -53,7 +53,7 @@ export default function PlanCreate2Screen({ navigation, route }) {
     <View style={styles.container}>
       <HeaderComponent
         title="계획 생성(2/5)"
-        cancelNavi="PlanMainScreen"
+        cancelNavi="MainPageScreen"
         navigation={navigation}
       ></HeaderComponent>
       <ScrollView style={styles.header}>

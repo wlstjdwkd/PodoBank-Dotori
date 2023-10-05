@@ -7,7 +7,9 @@ import {
   FlatList,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native"
+import { Audio } from 'expo-av';
 import FooterScreen from "../Components/FooterScreen"
 import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux"
@@ -24,6 +26,7 @@ export default function SavingMoneyScreen({ navigation, route }) {
   const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
+  const [sound, setSound] = useState();
   const isFocused = useIsFocused()
 
   const [currentTotalSavings, setcurrentTotalSavings] = useState(0)
@@ -33,6 +36,7 @@ export default function SavingMoneyScreen({ navigation, route }) {
   const [accountSeq, setAccountSeq] = useState(route.params.accountSeq)
   const [planSeq, setPlanSeq] = useState(route.params.planSeq)
   const [totalSavings, setTotalSavings] = useState(route.params.totalSavings)
+  const [currentAccountAmount, setCurrentAccountAmount] = useState(route.params.currentAccountAmount)
   const [addSavings, setAddSavings] = useState(null)
   const [selectItem, setSelectItem] = useState(null)
   const [editAmount, setEditAmount] = useState("");
@@ -52,6 +56,16 @@ export default function SavingMoneyScreen({ navigation, route }) {
     },
     // 다른 목표들...
   ];
+
+  const playSound = async() => {
+    const { sound } = await Audio.Sound.createAsync( require('../../assets/insertCoin.mp3')
+    );
+    setSound(sound);
+
+    console.log('Playing Sound');
+    await sound.playAsync();
+
+  }
 
   const formatNumber = (num) => {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
@@ -99,11 +113,21 @@ export default function SavingMoneyScreen({ navigation, route }) {
   //     "type" : "number"
   //   }
   // }
+
+  const handlePlanSaving = () => {
+    const allSaving = purposeList.reduce((total, item) => total + item.savingAmount, 0)
+    if(currentAccountAmount >= allSaving){
+      doPlanSaving()
+    }else{
+      Alert.alert("","현재 계좌 보유액보다 많은 금액을 저축할 수 없습니다.")
+    }
+  }
   const doPlanSaving = async () => {
     const purposeSavingList = purposeList.map((purpose) => ({
       purposeSeq: purpose.purposeSeq,
-      toSavingAmount: purpose.savingAmount,
+      savingAmount: purpose.savingAmount,
     }))
+    
     const savingData = {
       planSeq:planSeq,
       purposeSavingList:purposeSavingList,
@@ -118,6 +142,7 @@ export default function SavingMoneyScreen({ navigation, route }) {
           routes: [{ name: 'SavingCompleteScreen' }],
         });
         console.log("저축하기 성공")
+        playSound()
       }else{
         console.log("저축하기 실패", response.status)
       }
@@ -142,6 +167,15 @@ export default function SavingMoneyScreen({ navigation, route }) {
     setEditAmount("")
   }
 
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
+
   useEffect(()=>{
     const allSaving = purposeList.reduce((total, item) => total + item.savingAmount, 0)
     totalSavings
@@ -163,6 +197,7 @@ export default function SavingMoneyScreen({ navigation, route }) {
       <HeaderComponent
         title="저축하기"
         navigation={navigation}
+        cancelNavi="MainPageScreen"
       ></HeaderComponent>
 
       {/* 최신순 & 저축액 */}
@@ -264,14 +299,10 @@ export default function SavingMoneyScreen({ navigation, route }) {
         style={[styles.button, {backgroundColor:"#FF965C"}]}
         onPress={() => {
           console.log(purposeList)
-          doPlanSaving()
-          // navigation.reset({
-          //   index: 0,
-          //   routes: [{ name: 'SavingCompleteScreen' }],
-          // });
+          handlePlanSaving()
         }}
       >
-        <Text style={styles.buttonText}>목표 생성하기</Text>
+        <Text style={styles.buttonText}>저축하기</Text>
       </TouchableOpacity>
     </View>
   );

@@ -5,32 +5,32 @@ import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { planSpecificationList } from "../../apis/planapi"
 
-const specifications = [
-  {
-    accountName: "힘들어",
-    planSeq: 0,
-    startAt: "2023-07-15 09:10",
-    endAt: "2023-07-25 09:09" ,
-  },
-  {
-    accountName: "너무",
-    planSeq: 1,
-    startAt: "2023-08-01 15:20",
-    endAt: "2023-08-10 15:19",
-  },
-  {
-    accountName: "힘들어",
-    planSeq: 2,
-    startAt: "2023-08-01 20:12",
-    endAt: "2023-08-10 20:11",
-  },
-  {
-    accountName: "프론트",
-    planSeq: 3,
-    startAt: "2023-09-01 18:59",
-    endAt: "2023-09-10 18:58",
-  },
-];
+// const specifications = [
+//   {
+//     accountTitle: "힘들어",
+//     planSeq: 0,
+//     startAt: "2023-07-15 09:10",
+//     endAt: "2023-07-25 09:09" ,
+//   },
+//   {
+//     accountTitle: "너무",
+//     planSeq: 1,
+//     startAt: "2023-08-01 15:20",
+//     endAt: "2023-08-10 15:19",
+//   },
+//   {
+//     accountTitle: "힘들어",
+//     planSeq: 2,
+//     startAt: "2023-08-01 20:12",
+//     endAt: "2023-08-10 20:11",
+//   },
+//   {
+//     accountTitle: "프론트",
+//     planSeq: 3,
+//     startAt: "2023-09-01 18:59",
+//     endAt: "2023-09-10 18:58",
+//   },
+// ];
 
 export default function ReceipeSelectScreen({ navigation }) {
   // 토큰
@@ -53,8 +53,6 @@ export default function ReceipeSelectScreen({ navigation }) {
         selectedAccount,
         selectedReceipe,
       });
-      // 잠깐 쓰고 나중에 삭제할네비게이션임.
-      // navigation.navigate("SavingPlanCompleteRecipeScreen", {selectedAccount:selectedAccount, selectedReceipe:selectedReceipe, })
     }else{
       Alert.alert('','확인할 수 있는 명세서가 없습니다.')
     }
@@ -74,12 +72,12 @@ export default function ReceipeSelectScreen({ navigation }) {
       if(response.status === 200){
         setSpecificationList(response.data)
         if(response.data.length > 0){
-          setSelectedAccount(response.data[0].accountName)
+          setSelectedAccount(response.data[0].accountTitle)
           setSelectedReceipe(response.data[0].planSeq)
         }
         console.log("명세서 전체 리스트 받아오기 성공")
       }else{
-        console.log("명세서 전체 리스트 받아오기 실패")
+        console.log("명세서 전체 리스트 받아오기 실패", response.status)
       }
     }catch(error){
       console.log("오류발생 명세서 전체 리스트 받아오기 실패:", error)
@@ -89,7 +87,7 @@ export default function ReceipeSelectScreen({ navigation }) {
   useEffect(()=>{
     doPlanSpecificationList()
     // if(specificationList.length>0){
-    //   setSelectedAccount(specificationList[0].accountName)
+    //   setSelectedAccount(specificationList[0].accountTitle)
     //   setSelectedReceipe(specificationList[0].planSeq)
     // }
   }, [])
@@ -99,6 +97,7 @@ export default function ReceipeSelectScreen({ navigation }) {
       <HeaderComponent
         title="명세서 보기"
         navigation={navigation}
+        cancelNavi="MyPageScreen"
       ></HeaderComponent>
 
       <View style={styles.container}>
@@ -122,15 +121,15 @@ export default function ReceipeSelectScreen({ navigation }) {
                   onValueChange={(itemValue) => setSelectedAccount(itemValue)}
                   itemStyle={{ textAlign: "center" }} // 이 줄 추가
                 >
-                  {specifications
+                  {specificationList
                     .filter((receipe, index, self) =>
-                      index === self.findIndex((r) => r.accountName === receipe.accountName)
+                      index === self.findIndex((r) => r.accountTitle === receipe.accountTitle)
                     )
                     .map((uniqueReceipe, index) => (
                       <Picker.Item
                         key={index}
-                        label={uniqueReceipe.accountName}
-                        value={uniqueReceipe.accountName}
+                        label={uniqueReceipe.accountTitle}
+                        value={uniqueReceipe.accountTitle}
                       />
                     ))}
                 </Picker>
@@ -147,8 +146,8 @@ export default function ReceipeSelectScreen({ navigation }) {
                   }}
                   itemStyle={{ textAlign: "center" }} // 이 줄 추가
                 >
-                  {specifications.map((receipe, index) => {
-                    if(receipe.accountName === selectedAccount){
+                  {specificationList.map((receipe, index) => {
+                    if(receipe.accountTitle === selectedAccount){
                       return (
                         <Picker.Item
                           key={index}
