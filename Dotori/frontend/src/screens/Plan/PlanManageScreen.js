@@ -6,11 +6,8 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
-  Alert,
-  Linking,
   Modal,
 } from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage' // 스토리지에 저장하기 위해 사용되는 import
 import {inputgrantType, inputAccessToken, inputRefreshToken} from "../../redux/slices/auth/user"
 import {userLogin} from "../../apis/userapi"
 import { useDispatch, useSelector } from "react-redux"
@@ -39,20 +36,7 @@ export default function PlanManageScreen({ navigation, route }) {
   const [endAt, setEndAt] = useState(route.params.endAt);
   const [startedAt, setStartedAt] = useState(route.params.startedAt);
   const [accountNumber, setAccountNumber] = useState("1111111111111");
-  const [bankName, setBankName] = useState('포도은행');
-  
-  // // 임의값
-  // const [changeAccountName, setChangeAccountName] = useState("임의의계좌")
-  // const [accountName, setAccountName] = useState("임의의계좌");
-  // const [accountNumber, setAccountNumber] = useState("1235-4568-4532");
-  // const [bankName, setBankName] = useState('포도은행');
-  // const [accountSeq, setAccountSeq] = useState(2);
-  // const [planSeq, setPlanSeq] = useState(3);
-  // const [accountBalance, setAccountBalance] = useState(50000);
-  // const [endAt, setEndAt] = useState("2023-11-11T00:00:00");
-  // const [startedAt, setStartedAt] = useState("2023-09-04T00:00:00");
-  
-
+  const [bankName, setBankName] = useState('포도은행');  
   
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
@@ -61,16 +45,13 @@ export default function PlanManageScreen({ navigation, route }) {
     try{
       const response = await planStop(planSeq, accessToken, grantType)
       if(response.status === 200){
-        console.log('계획 중단 성공')
         navigation.reset({
           index: 0,
           routes: [{ name: 'MainPageScreen' }],
         });
       }else{
-        console.log('계획 중단 실패', response.status)
       }
     }catch(error){
-      console.log('오류 발생: 계획 중단 실패',error)
     }
   }
 
@@ -78,16 +59,13 @@ export default function PlanManageScreen({ navigation, route }) {
     try{
       const response = await accountDelete(accountSeq, accessToken, grantType)
       if(response.status === 200){
-        console.log('계좌 삭제 성공')
         navigation.reset({
           index: 0,
           routes: [{ name: 'MainPageScreen' }],
         });
       }else{
-        console.log('계좌 삭제 실패', response.status)
       }
     }catch(error){
-      console.log('오류 발생: 계좌 삭제 실패',error)
     }
   }
 
@@ -96,15 +74,12 @@ export default function PlanManageScreen({ navigation, route }) {
     try{
       const response = await accountOneInquiry(planSeq, accessToken, grantType)
       if(response.status === 200){
-        console.log('계좌 1개 조회 성공')
         setBankName(response.data.bankName)
         setAccountNumber(response.data.accountNumber)
         setAccountBalance(response.data.accountBalance)
       }else{
-        console.log('계좌 1개 조회 실패', response.status)
       }
     }catch(error){
-      console.log('오류 발생: 계좌 1개 조회 실패',error)
     }
   }
 
@@ -121,13 +96,10 @@ export default function PlanManageScreen({ navigation, route }) {
     try{
       const response = await accountNicknameRegist(nicknameRegistData, accessToken, grantType)
       if(response.status === 200){
-        console.log('계좌 이름 변경 성공')
         setAccountName(changeAccountName)
       }else{
-        console.log('계좌 이름 변경 실패', response.status)
       }
     }catch(error){
-      console.log('오류 발생: 계좌 이름 변경 실패',error)
     }
   }
 
@@ -142,7 +114,6 @@ export default function PlanManageScreen({ navigation, route }) {
         <Text style={styles.headerTitle}>계좌 정보</Text>
       </View>
 
-      {/* 시민주의 통장 */}
       <View style={[{flexDirection:'row', flex:0.1,}]}>
         { editAccountName
           ?
@@ -181,11 +152,9 @@ export default function PlanManageScreen({ navigation, route }) {
       </View>
       <View style={[styles.divideLine,{}]}></View>
 
-      {/* 계좌번호 */}
       <View style={{flex:0.2, justifyContent:"space-around"}}>
         <Text style={[styles.subTitle2,{}]}>계좌번호</Text>
         <View style={{flexDirection:'row', justifyContent:"space-between"}}>
-          {/* 이미지 넣기 */}
           <Image
             style={[styles.podoBankImage,{}]}
             source={require("../../assets/images/logo_podo.png")}
@@ -198,14 +167,12 @@ export default function PlanManageScreen({ navigation, route }) {
       </View>
       <View style={[styles.divideLine,{}]}></View>
 
-      {/* 잔액 */}
       <View style={{flex:0.2, justifyContent:"space-around"}}>
         <Text style={[styles.subTitle2,{}]}>잔액</Text>
         <Text style={[styles.textRight,{}]}>{accountBalance != null ? accountBalance.toLocaleString() : 0}원</Text>
       </View>
       <View style={[styles.divideLine,{}]}></View>
 
-      {/* 계획 */}
       <View style={{flex:0.2, justifyContent:"space-around", }}>
         <Text style={[styles.subTitle2,{}]}>계획</Text>
         <View style={{}}>
@@ -220,7 +187,6 @@ export default function PlanManageScreen({ navigation, route }) {
         </View>
       </View>
 
-      {/* 계획중지하기 계좌 삭제하기 */}
       <View style={[styles.planManage,{}]}>
         <TouchableOpacity
           onPress={()=>{
@@ -241,7 +207,6 @@ export default function PlanManageScreen({ navigation, route }) {
         ?null
         :<View style={styles.centeredView}></View>
       }
-      {/* 계획 중지 모달창 */}
       { planStopModalVisible
         ?
         (<View style={styles.centeredView}>
@@ -278,7 +243,6 @@ export default function PlanManageScreen({ navigation, route }) {
         </View>)
         : null
       }
-      {/* 계좌 삭제 모달창 */}
       { accountDeleteModalVisible
         ?
         (<View style={[styles.centeredView]}>
@@ -323,12 +287,9 @@ export default function PlanManageScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
     padding: 45,
     backgroundColor: "white",
   },
-  // 제작
   headerTitle: {
     fontSize: 18,
     fontWeight: "bold",
@@ -389,21 +350,16 @@ const styles = StyleSheet.create({
     padding:10, 
     borderRadius: 10
   },
-  // 모달
-  // 모달 관련 스타일
   centeredView: {
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 22,
   },
   modalView: {
-    // margin: 20,
     top: '225%',
-    // left: '50%',
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
-    // alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -424,7 +380,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F194FF',
   },
   buttonClose: {
-    // backgroundColor: '#2196F3',
     backgroundColor: '#FF965C',
   },
   textStyle: {

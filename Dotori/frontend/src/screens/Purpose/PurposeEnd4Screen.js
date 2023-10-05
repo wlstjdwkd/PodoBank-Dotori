@@ -16,10 +16,6 @@ export default function PurposeEnd4Screen({ navigation, route }) {
 
   const handleConfirm = () => {
     doPurposeEndSaving();
-    // // 페이지 이동 예시:
-    // navigation.navigate("OneCent4Screen", {
-    //   accountInfo: accountInfo,
-    // });
   };
 
   const doPurposeEndSaving = async () => {
@@ -34,10 +30,8 @@ export default function PurposeEnd4Screen({ navigation, route }) {
           title: purposeData.title,
         });
       } else {
-        console.log("저축 실패", response.status);
       }
     } catch (error) {
-      console.error("오류 발생 : 저축 실패:", error);
     }
   };
 
@@ -80,7 +74,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "white",
-    paddingBottom: 20, // 추가됨
+    paddingBottom: 20,
   },
   image: {
     width: 150,
@@ -112,7 +106,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF965C",
     borderRadius: 8,
     width: "80%",
-    // padding: 16,
     height: 40,
     marginTop: 180,
     marginBottom: -100,

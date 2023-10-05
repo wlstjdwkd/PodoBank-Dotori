@@ -9,7 +9,7 @@ import {
   Alert,
   Linking,
 } from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage' // 스토리지에 저장하기 위해 사용되는 import
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import {inputgrantType, inputAccessToken, inputRefreshToken} from "../../redux/slices/auth/user"
 import {userLogin} from "../../apis/userapi"
 import { useDispatch, useSelector } from "react-redux" 
@@ -23,7 +23,7 @@ export default function LoginScreen({ navigation }) {
   // 그 외
   const idRef = useRef(null)
   const passwordRef = useRef(null)
-  const [idSave, setIdSave] = useState(false) // 아이디 저장여부
+  const [idSave, setIdSave] = useState(false) 
   const [emailValue, setEmailValue] = useState("")
   const [passwordValue, setPasswordValue] = useState("")
   const [loginMessage, setLoginMessage] = useState("")
@@ -47,14 +47,12 @@ export default function LoginScreen({ navigation }) {
     try{
       const response = await userLogin(data)
       if(response.status === 200){
-        console.log('로그인 성공')
         dispatch(inputgrantType(response.data.grantType))
         dispatch(inputAccessToken(response.data.accessToken))
         dispatch(inputRefreshToken(response.data.refreshToken))
         try{
           if(idSave){
             await AsyncStorage.setItem("id", emailValue);
-            console.log(emailValue)
           }else{
             await AsyncStorage.removeItem('id')
           }
@@ -66,14 +64,12 @@ export default function LoginScreen({ navigation }) {
           setLoginMessage('오류 발생: 로그인 실패')
         }
       }else if(response.status === 404){
-        console.log('로그인 실패')
         Alert.alert('로그인 실패', "아이디와 비밀번호를 확인해주세요.")
         setLoginMessage("아이디와 비밀번호를 확인해주세요.")
       }else{
         setLoginMessage('오류 발생: 로그인 실패')
       }
     }catch(error){
-      console.log(error)
       setLoginMessage('오류 발생: 로그인 실패')
     }
   }
@@ -87,16 +83,13 @@ export default function LoginScreen({ navigation }) {
       try{
         const existingId = await AsyncStorage.getItem("id");
         if(existingId){
-          // 데이터 발견, 해당 데이터로 무언가 수행
           setEmailValue(existingId)
           passwordRef.current.focus()
           setIdSave(true)
         }else {
-          // 데이터 없음
           idRef.current.focus()
         }
       }catch (error) {
-        console.log(error)
       }
     }
     getExistingId()
@@ -151,7 +144,6 @@ export default function LoginScreen({ navigation }) {
             ?(<Text style={{textAlign:'center'}}>✔️</Text>)
             :null}
           </View>
-          {/* <View style={[styles.checkbox, {backgroundColor:idSave?'black':'white'}]}></View> */}
           <Text style={{ color: "#878787" }}>아이디저장</Text>
         </View>
       </TouchableOpacity>
@@ -213,8 +205,7 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     flexDirection: "row",
     alignItems: "center",
-    alignSelf: "flex-start", // 추가: 왼쪽 정렬
-    // marginBottom: 30,
+    alignSelf: "flex-start",
   },
   checkbox: {
     width: 20,
@@ -256,12 +247,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
-    marginBottom: 30, // 추가: 여백
+    marginBottom: 30,
   },
   dividerText: {
-    position: "absolute", // 중앙에 배치하기 위해
-    backgroundColor: "white", // 배경색으로 구분선 가리기
-    paddingHorizontal: 10, // 좌우 패딩
+    position: "absolute",
+    backgroundColor: "white",
+    paddingHorizontal: 10,
     color: "#858585",
   },
   linkText: {
@@ -269,7 +260,6 @@ const styles = StyleSheet.create({
   },
   idSave:{
     width:"100%", 
-    // marginBottom: 30,
   },
   referenceMessage:{
     marginVertical: 10,

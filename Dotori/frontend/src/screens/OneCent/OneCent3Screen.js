@@ -16,10 +16,6 @@ export default function OneCent3Screen({ navigation, route }) {
 
   const handleConfirm = () => {
     doAccountVerificationsOnecentSend()
-    // // 페이지 이동 예시:
-    // navigation.navigate("OneCent4Screen", {
-    //   accountInfo: accountInfo,
-    // });
   };
 
   const doAccountVerificationsOnecentSend = async () =>{
@@ -31,12 +27,9 @@ export default function OneCent3Screen({ navigation, route }) {
           accountInfo: accountInfo,
         });
       }else if(response.status === 404){
-        console.log('1원 인증 실패',response.status)
       }else{
-        console.log('1원 인증 실패',response.status)
       }
     }catch(error){
-      console.log('오류 발생: 1원 인증 실패',error)
     }
   }
 
@@ -82,7 +75,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "white",
-    paddingBottom: 20, // 추가됨
+    paddingBottom: 20,
   },
   image: {
     width: 150,
@@ -114,7 +107,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF965C",
     borderRadius: 8,
     width: "80%",
-    // padding: 16,
     height: 40,
     marginTop: 180,
     marginBottom: -100,

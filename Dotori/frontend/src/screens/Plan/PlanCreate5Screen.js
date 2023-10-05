@@ -8,9 +8,6 @@ import {
   ScrollView,
   Image,
 } from "react-native";
-// import DraggableFlatList, {
-//   RenderItemParams,
-// } from "react-native-draggable-flatlist";
 import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { planNewRegister } from "../../apis/planapi";
@@ -49,8 +46,6 @@ export default function PlanCreate5Screen({ navigation, route }) {
       accountSeq: planInfo.accountSeq,
     });
   };
-  console.log(planInfo);
-  console.log(categoryData);
 
   const doPlanNewRegister = async () => {
     try {
@@ -60,23 +55,14 @@ export default function PlanCreate5Screen({ navigation, route }) {
         endAt: planInfo.endAt.toString() + " 00:00:00",
         categoryGroupList: categoryData,
       };
-      console.log(
-        "payload " +
-          payload.accountSeq +
-          " " +
-          payload.startedAt +
-          " " +
-          payload.categoryGroupList
-      );
+      
       const response = await planNewRegister(payload, accessToken, grantType);
       if (response.status === 200) {
         console.log("계획 생성 성공");
         setCategoryData(response.data);
       } else {
-        console.log("계획 생성 실패");
       }
     } catch (error) {
-      console.log(error);
     }
   };
 
@@ -118,14 +104,7 @@ export default function PlanCreate5Screen({ navigation, route }) {
               </View>
             </View>
           ))}
-        {/* <Text style={styles.inputText}>등록된 카테고리 그룹</Text>
-        <View style={styles.categoriesContainer}>
-          {categoryGroups.map((categoryGroup, index) => (
-            <View key={index} style={styles.categoryBox}>
-              <Text style={styles.categoryText}>{categoryGroup.name} </Text>
-            </View>
-          ))}
-        </View> */}
+
         <View style={styles.center}>
           <View style={styles.rowContainer}>
             <Text style={styles.dateText}>총 금액</Text>
@@ -153,8 +132,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
     marginTop: 90,
   },
   title: {
