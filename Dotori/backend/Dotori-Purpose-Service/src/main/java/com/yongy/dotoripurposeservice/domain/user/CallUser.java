@@ -37,7 +37,7 @@ public class CallUser {
         bodyData.clear();
         bodyData.put("id", id);
 
-        response = callServer.getHttpBodyAndSend(USER_SERVICE_URL+"/user/communication/userById", HttpMethod.POST, bodyData);
+        response = callServer.postHttpBodyAndSend(USER_SERVICE_URL+"/user/communication/userById", HttpMethod.POST, bodyData);
 
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(response.getBody());
