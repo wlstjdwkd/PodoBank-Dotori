@@ -35,4 +35,16 @@ public class AccountAdminController {
         return ResponseEntity.ok(transactionHistoryDTO);
     }
 
+    @PostMapping("/withdraw")
+    public ResponseEntity<Void> withdraw(@RequestBody WithdrawDTO withdrawDTO) {
+        accountAdminService.withdraw(withdrawDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/deposit")
+    public ResponseEntity<Void> deposit(@RequestBody DepositDTO depositDTO) {
+        accountAdminService.deposit(depositDTO);
+        return ResponseEntity.ok().build();
+    }
+
 }

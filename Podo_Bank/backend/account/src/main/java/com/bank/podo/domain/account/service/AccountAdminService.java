@@ -49,6 +49,7 @@ public class AccountAdminService {
         logTransfer(senderAccount, receiverAccount, transferAmount);
     }
 
+    @Transactional(readOnly = true)
     public AdminBalanceDTO balance(AdminBalanceDTO balanceDTO) {
         Account account = accountRepository.findByAccountNumberAndDeletedFalse(balanceDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
@@ -60,6 +61,7 @@ public class AccountAdminService {
         return balanceDTO;
     }
 
+    @Transactional(readOnly = true)
     public List<TransactionHistoryDTO> history(AdminHistoryDTO historyDTO) {
         Account account = accountRepository.findByAccountNumberAndDeletedFalse(historyDTO.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
@@ -70,6 +72,24 @@ public class AccountAdminService {
         logHistory(account);
 
         return toTransactionHistoryDTOList(transactionHistoryList);
+    }
+
+    public void withdraw(WithdrawDTO withdrawDTO) {
+        Account account = accountRepository.findByAccountNumberAndDeletedFalse(withdrawDTO.getAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
+
+        accountService.withdraw(account, withdrawDTO.getAmount(), withdrawDTO.getContent(), null);
+
+        fcmService.sendNotification(account.getUser().getEmail(), "출금", withdrawDTO.getAmount().toString() + "원이 출금되었습니다."+ "\n"+withdrawDTO.getContent());
+    }
+
+    public void deposit(DepositDTO depositDTO) {
+        Account account = accountRepository.findByAccountNumberAndDeletedFalse(depositDTO.getAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException("계좌를 찾을 수 없습니다."));
+
+        accountService.deposit(account, depositDTO.getAmount(), depositDTO.getContent(), null);
+
+        fcmService.sendNotification(account.getUser().getEmail(), "입금", depositDTO.getAmount().toString() + "원이 입금되었습니다."+ "\n"+depositDTO.getContent());
     }
 
     private List<TransactionHistoryDTO> toTransactionHistoryDTOList(List<TransactionHistory> transactionHistoryList) {
