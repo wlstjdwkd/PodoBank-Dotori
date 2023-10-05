@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,101 +8,109 @@ import {
   Dimensions,
 } from "react-native";
 
-export default function RandomBox1Screen({ navigation, route }) {
-  const coin = route.params.coin;
+import { Audio } from 'expo-av';
 
-  // 선택한 코인의 상태를 관리합니다. 0은 선택하지 않은 상태입니다.
-  const [selectedCoin, setSelectedCoin] = useState(0);
 
-  const handleCoinSelect = (coinValue) => {
-    setSelectedCoin(coinValue);
-  };
+export default function RandomBox2Screen({ navigation, route }) {
+  // const coin = route.params.coin;
+  const [prizeAmount, setPrizeAmount] = useState(route.params.prizeAmount)
+  const [sound1, setSound1] = useState();
+  const [sound2, setSound2] = useState();
 
-  const handleOpen = () => {
-    navigation.navigate("RandomBox2Screen", {
-      selectedCoinValue: selectedCoin,
-    });
-  };
+
+  const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
+
+
+  const playSound1 = async() => {
+    const { sound } = await Audio.Sound.createAsync( require('../../assets/dodoong.mp3')
+    // const { sound } = await Audio.Sound.createAsync( require('../../assets/doogoodoogoo.mp3')
+    );
+    setSound1(sound);
+
+    console.log('Playing Sound');
+    await sound.playAsync();
+  }
+
+  useEffect(() => {
+    return sound1
+      ? () => {
+        sound1.unloadAsync();
+        }
+      : undefined;
+  }, [sound1]);
+
+  const playSound2 = async() => {
+    if(sound1){
+      await sound1.stopAsync()
+      await sound1.unloadAsync()
+    }
+    const { sound } = await Audio.Sound.createAsync( require('../../assets/bbak.mp3')
+    );
+    setSound2(sound);
+
+    console.log('Playing Sound');
+    await sound.playAsync();
+  }
+
+  useEffect(() => {
+    return sound2
+      ? () => {
+        sound2.unloadAsync();
+        }
+      : undefined;
+  }, [sound2]);
+
+  useEffect(()=>{
+    playSound1()
+  }, [])
   return (
-    <View style={styles.container}>
-      <Text style={styles.headerText}>꽝 없는 랜덤박스</Text>
-      <Text style={styles.infoText}>
-        코인 1개, 2개, 3개로 랜덤박스를 뽑을 수 있어요.
-      </Text>
-      <Text style={styles.infoText}>
-        코인을 많이 줄수록 더 좋은 상품이 나온답니다.
-      </Text>
-      <View style={styles.imagesContainer}>
-        <TouchableOpacity onPress={() => handleCoinSelect(1)}>
+    <View style={{flex:1, backgroundColor:'white'}}>
+      <View style={{flex:0.15}}></View>
+
+      <View style={styles.container}>
+        <View style={{}}>
+          <Text style={{fontWeight:"bold", fontSize:26}}>RANDOM BOX</Text>
+        </View>
+        <TouchableOpacity
+          onPress={()=>{
+            playSound2()
+            navigation.navigate("RandomBox3Screen", {prizeAmount:prizeAmount})
+          }}
+        >
           <Image
-            source={require("../../assets/images/coin1.png")}
-            style={[styles.image, selectedCoin !== 1 && styles.dimImage]}
+            source={require("../../assets/images/questionMark.png")}
+            style={[styles.questionMark, {right:windowWidth*0.03, top:-windowHeight*0.03, width:80, height:80, transform: [{ rotate: '25deg' }] }]}
+          />
+          <Image
+            source={require("../../assets/images/Hamster/giftHamster1.png")}
+            style={{width:windowWidth*0.7, height:windowWidth*0.7}}
           />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleCoinSelect(2)}>
-          <Image
-            source={require("../../assets/images/coin2.png")}
-            style={[styles.image, selectedCoin !== 2 && styles.dimImage]}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleCoinSelect(3)}>
-          <Image
-            source={require("../../assets/images/coin3.png")}
-            style={[styles.image, selectedCoin !== 3 && styles.dimImage]}
-          />
-        </TouchableOpacity>
+        <View>
+          <Text style={{fontSize:24}}>
+            상자를 눌러주세요
+          </Text>
+        </View>
       </View>
-      <TouchableOpacity style={styles.button} onPress={handleOpen}>
-        <Text style={styles.buttonText}>열어보기</Text>
-      </TouchableOpacity>
+      
+      <View style={{flex:0.2}}></View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    // alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 40,
-    backgroundColor: "white",
+    flex: 0.6,
+    alignSelf: "center",
+    alignItems:'center',
+    // justifyContent: "center",
+    justifyContent: "space-evenly",
+    width: "80%"
   },
-  headerText: {
-    fontSize: 30,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  infoText: {
-    fontSize: 12,
-    marginVertical: 10,
-    color: "#757575",
-  },
-  imagesContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: Dimensions.get("window").width - 40,
-    marginBottom: 20,
-    marginTop: 100,
-    marginLeft: -20,
-  },
-  image: {
-    width: 80, // 이미지 크기는 적절히 조정해주세요
-    height: 80,
-    marginHorizontal: 10,
-  },
-  dimImage: {
-    opacity: 0.5, // 희미하게 만들기 위한 스타일
-  },
-  button: {
-    backgroundColor: "#FF965B",
-    borderRadius: 20,
-    paddingHorizontal: 40,
-    paddingVertical: 10,
-    alignItems: "center",
-    marginTop: 100,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 18,
-  },
+  questionMark:{
+    position:'absolute',
+    // right: 50,
+    // top: 100
+  }
 });

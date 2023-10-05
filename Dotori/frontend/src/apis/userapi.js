@@ -256,10 +256,47 @@ export const userDotoriValueCheck = async (accessToken, grantType) => {
         Authorization: `${grantType} ${accessToken}`,
       },
     });
-    console.log("사용자 현재 도토리 갯수 조회 성공:", response.data.dotori);
+    console.log("사용자 현재 도토리 갯수 조회 성공:", response.data);
     return response;
   } catch (error) {
     console.error("사용자 현재 도토리 갯수 조회 실패:", error);
+    const response = error.response;
+    return response;
+    // throw error;
+  }
+};
+
+// reward
+// 사용자 랜덤박스 개봉
+export const userOpenRandomBox = async (coin, accessToken, grantType) => {
+  try {
+    const response = await axios.post(apiAddress + `/api/v1/reward/randombox/${coin}`, null, {
+      headers: {
+        Authorization: `${grantType} ${accessToken}`,
+      },
+    });
+    console.log("사용자 랜덤박스 개봉 성공:", response.data);
+    return response;
+  } catch (error) {
+    console.error("사용자 랜덤박스 개봉 실패:", error);
+    const response = error.response;
+    return response;
+    // throw error;
+  }
+};
+
+// 사용자 리워드 이체
+export const userKeepReward = async (data, accessToken, grantType) => {
+  try {
+    const response = await axios.post(apiAddress + `/api/v1/reward/randombox`, data, {
+      headers: {
+        Authorization: `${grantType} ${accessToken}`,
+      },
+    });
+    console.log("사용자 리워드 이체 성공:", response.data);
+    return response;
+  } catch (error) {
+    console.error("사용자 리워드 이체 실패:", error);
     const response = error.response;
     return response;
     // throw error;

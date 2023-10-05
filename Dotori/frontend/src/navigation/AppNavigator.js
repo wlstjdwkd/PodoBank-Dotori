@@ -44,6 +44,8 @@ import OneCent5Screen from "../screens/OneCent/OneCent5Screen";
 import RewardScreen from "../screens/Reward/RewardScreen";
 import RandomBox1Screen from "../screens/Reward/RandomBox1Screen";
 import RandomBox2Screen from "../screens/Reward/RandomBox2Screen";
+import RandomBox3Screen from "../screens/Reward/RandomBox3Screen";
+import RandomBox4Screen from "../screens/Reward/RandomBox4Screen";
 
 import MyPageScreen from "../screens/MyPage/MyPageScreen";
 import PasswordChangeScreen from "../screens/MyPage/PasswordChangeScreen";
@@ -205,6 +207,14 @@ export default function AppNavigator() {
       <Stack.Screen
         name="RandomBox2Screen"
         component={RandomBox2Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="RandomBox3Screen"
+        component={RandomBox3Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="RandomBox4Screen"
+        component={RandomBox4Screen}
       ></Stack.Screen>
       <Stack.Screen name="MyPageScreen" component={MyPageScreen}></Stack.Screen>
       <Stack.Screen
