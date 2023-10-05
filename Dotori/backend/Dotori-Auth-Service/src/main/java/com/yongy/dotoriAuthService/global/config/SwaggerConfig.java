@@ -17,10 +17,10 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
     @Bean
     public GroupedOpenApi dotoriApi() {
-        String[] paths = {"/v1/**"};
+        String[] paths = {"/api/**"};
 
         return GroupedOpenApi.builder()
-                .group("도토리 API v1")
+                .group("[MSA-V1] Dotori-Auth-Service")
                 .pathsToMatch(paths)
                 .build();
     }
