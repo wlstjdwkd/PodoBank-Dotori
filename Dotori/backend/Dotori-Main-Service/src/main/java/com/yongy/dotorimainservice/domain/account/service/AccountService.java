@@ -25,7 +25,7 @@ public interface AccountService {
     BigDecimal getBalance(Long accountSeq) throws JsonProcessingException, ParseException;
 
     void removeUserAccount(Long accountSeq) throws ParseException;
-    AccountFintechCodeDTO getAccount(AccountInfoDTO accountInfoDTO);
+    AccountFintechCodeDTO getFintechCode(AccountInfoDTO accountInfoDTO);
 
     AccountDto findAccount(Plan plan) throws ParseException, JsonProcessingException;
 

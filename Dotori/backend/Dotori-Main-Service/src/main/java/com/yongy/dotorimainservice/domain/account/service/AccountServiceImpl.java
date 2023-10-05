@@ -146,11 +146,11 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public AccountFintechCodeDTO getAccount(AccountInfoDTO accountInfoDTO) {
-        Account account = accountRepository.findByAccountNumberAndDeleteAtIsNull(accountInfoDTO.getAccountNumber());
+    public AccountFintechCodeDTO getFintechCode(AccountInfoDTO accountInfoDTO) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Account account = accountRepository.findByUserSeqAndAccountNumberAndDeleteAtIsNull(user.getUserSeq(), accountInfoDTO.getAccountNumber());
         return AccountFintechCodeDTO.builder().fintechCode(account.getFintechCode()).build();
     }
-
 
     // NOTE : 사용자의 계좌 모두 삭제하기
     public void removeUserAllAccounts(Long userSeq) throws ParseException {

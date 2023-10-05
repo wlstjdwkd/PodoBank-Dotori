@@ -9,9 +9,11 @@ import java.util.List;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
     Account findByAccountSeqAndDeleteAtIsNull(Long accountSeq);
-    Account findByAccountNumberAndDeleteAtIsNull(String AccountNumber);
+    Account findByAccountNumberAndDeleteAtIsNull(String accountNumber);
     List<Account> findAllByUserSeqAndDeleteAtIsNull(Long userSeq);
     Account findByUserSeqAndDeleteAtIsNull(Long userSeq);
+
+    Account findByUserSeqAndAccountNumberAndDeleteAtIsNull(Long userSeq, String accountNumber);
 
     Account findByUserSeqAndAccountSeqAndDeleteAtIsNull(Long userSeq, Long accountSeq);
 
