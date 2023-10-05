@@ -14,7 +14,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { planInProgress } from "../../apis/planapi";
 
 function ProgressBar({ current, target }) {
-  const progress = (current / target) * 100;
+  const progress = 100 - (current / target) * 100;
   const displayedProgress = Math.floor(progress); // Ensure it's from the unit's digit
   let progressBarColor;
   if (displayedProgress >= 50) {
@@ -116,7 +116,7 @@ export default function PlanMainScreen({ navigation, route }) {
       const response = await planInProgress(accountSeq, accessToken, grantType);
       if (response.status === 200) {
         setPlanInfo(response.data);
-        console.log(response.data)
+        console.log(response.data);
         // 종료된 계획이라면 바로 종료 명세서 보기 창으로 넘김, else는 만들 필요없음.
         // if (response.data.state === "ACTIVE" && response.data.terminatedAt) {
         //   navigation.navigate("SavingPlanCompleteRecipeScreen", {
@@ -125,13 +125,12 @@ export default function PlanMainScreen({ navigation, route }) {
         //     planSeq: response.data.planSeq,
         //   });
         // }
-      } else if (response.status === 404){
+      } else if (response.status === 404) {
         navigation.navigate("SavingPlanCompleteRecipeScreen", {
           accountName: accountName,
           accountSeq: accountSeq,
           planSeq: response.data,
         });
-
       } else {
         console.log("계획 정보 조회 실패", response.status);
       }
@@ -164,25 +163,25 @@ export default function PlanMainScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      { planInfo
-        ? planInfo.planSeq
-          ? (<TouchableOpacity style={{alignSelf:'flex-end', margin:20, marginBottom:-40}}
-              onPress={()=>{
-                navigation.navigate("PlanManageScreen", {
-                  accountTitle: accountName,
-                  accountSeq:accountSeq,
-                  planSeq:planInfo.planSeq,
-                  accountBalance:planInfo.accountBalance,
-                  endAt:planInfo.endAt,
-                  startedAt:planInfo.startedAt,
-                })
-              }}
-            >
-              <Text style={{fontSize:18,fontWeight:'bold'}}>관리</Text>
-            </TouchableOpacity>)
-          : null
-        : null
-      }
+      {planInfo ? (
+        planInfo.planSeq ? (
+          <TouchableOpacity
+            style={{ alignSelf: "flex-end", margin: 20, marginBottom: -40 }}
+            onPress={() => {
+              navigation.navigate("PlanManageScreen", {
+                accountTitle: accountName,
+                accountSeq: accountSeq,
+                planSeq: planInfo.planSeq,
+                accountBalance: planInfo.accountBalance,
+                endAt: planInfo.endAt,
+                startedAt: planInfo.startedAt,
+              });
+            }}
+          >
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}>관리</Text>
+          </TouchableOpacity>
+        ) : null
+      ) : null}
       <Text style={styles.accountName}>{accountName}</Text>
       <Text style={styles.accountMoney}>
         {planInfo ? formatNumber(planInfo.accountBalance) + "원" : "Loading..."}
@@ -268,7 +267,7 @@ export default function PlanMainScreen({ navigation, route }) {
             </View>
             {planInfo.activePlanList.map((category, index) => {
               const percentage = Math.floor(
-                (category.currentBalance / category.goalAmount) * 100
+                100 - (category.currentBalance / category.goalAmount) * 100
               );
               let textColor;
               if (percentage >= 50) {

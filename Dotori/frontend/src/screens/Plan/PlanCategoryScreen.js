@@ -136,10 +136,10 @@ export default function PlanCategoryScreen({ navigation, route }) {
 
       <View style={styles.moneyValuesContainer}>
         <Text style={styles.tempMoney}>
-          {formatNumber(data?.targetMoney - data?.currentMoney)}원
+          {formatNumber(data?.currentMoney)}원
         </Text>
         <Text style={styles.currentMoney}>
-          {formatNumber(data?.currentMoney)}원
+          {formatNumber(data?.targetMoney - data?.currentMoney)}원
         </Text>
       </View>
 

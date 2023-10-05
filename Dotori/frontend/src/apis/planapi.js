@@ -22,13 +22,17 @@ const apiAddress = "http://j9d107.p.ssafy.io:9200";
 //   }
 // }
 export const planSaving = async (savingData, accessToken, grantType) => {
-  console.log('메롱',savingData)
+  console.log("메롱", savingData);
   try {
-    const response = await axios.patch(apiAddress + `/api/v1/plan/saving`, savingData, {
-      headers: {
-        Authorization: `${grantType} ${accessToken}`,
-      },
-    });
+    const response = await axios.patch(
+      apiAddress + `/api/v1/plan/saving`,
+      savingData,
+      {
+        headers: {
+          Authorization: `${grantType} ${accessToken}`,
+        },
+      }
+    );
     console.log("계획 종료 후 저축하기 성공:", response.data);
     return response;
   } catch (error) {
@@ -308,7 +312,7 @@ export const planInProgress = async (
     console.log("진행중인 계획 조회 성공:", response.data);
     return response;
   } catch (error) {
-    console.log("진행중인 계획 조회 실패:",error);
+    console.log("진행중인 계획 조회 실패:", error);
     const response = error.response;
     return response;
   }
@@ -374,15 +378,18 @@ export const unClassifiedUpdate = async (
 //명세서 전체 조회하기
 export const planSpecificationList = async (accessToken, grantType) => {
   try {
-    const response = await axios.get(apiAddress + `/api/v1/plan/specification`, {
-      headers: {
-        Authorization: `${grantType} ${accessToken}`,
-      },
-    });
+    const response = await axios.get(
+      apiAddress + `/api/v1/plan/specification`,
+      {
+        headers: {
+          Authorization: `${grantType} ${accessToken}`,
+        },
+      }
+    );
     console.log("계획 명세서 전체 조회하기 성공:", response.data);
     return response;
   } catch (error) {
-    console.error("계획 명세서 전체 조회하기 실패:",error);
+    console.error("계획 명세서 전체 조회하기 실패:", error);
     const response = error.response;
     return response;
   }
@@ -413,5 +420,35 @@ export const planSpecificationDetail = async (
     );
     const response = error.response;
     return response;
+  }
+};
+
+//카테고리 소비 내역 조회
+export const planDetailConsumeList = async (
+  planDetailSeq,
+  accessToken,
+  grantType
+) => {
+  try {
+    console.log(planDetailSeq + "planDetailSeq");
+    const response = await axios.get(
+      apiAddress + `/api/v1/planDetail/${planDetailSeq}`,
+      {
+        headers: {
+          Authorization: `${grantType} ${accessToken}`,
+        },
+      }
+    );
+    console.log("카테고리 소비 내역 조회 성공:", response.data);
+    return response;
+  } catch (error) {
+    console.error(
+      "카테고리 소비 내역 조회 실패:",
+      error.response.status,
+      error.response.data
+    );
+    const response = error.response;
+    return response;
+    // throw error;
   }
 };
