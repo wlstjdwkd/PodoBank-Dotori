@@ -8,6 +8,7 @@ import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.*;
 import com.yongy.dotoripurposeservice.domain.purpose.entity.Purpose;
 import com.yongy.dotoripurposeservice.domain.purpose.exception.NotActiveException;
 import com.yongy.dotoripurposeservice.domain.purpose.exception.NotEqualsBalanceException;
+import com.yongy.dotoripurposeservice.domain.purpose.exception.NotFoundFintechCodeException;
 import com.yongy.dotoripurposeservice.domain.purpose.repository.PurposeRepository;
 import com.yongy.dotoripurposeservice.domain.purposeData.dto.PurposeDataDTO;
 import com.yongy.dotoripurposeservice.domain.purposeData.entity.PurposeData;
@@ -20,10 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -241,13 +239,19 @@ public class PurposeServiceImpl implements PurposeService{
             ObjectMapper objectMapper = new ObjectMapper();
             BankDTO bankInfo = objectMapper.readValue(responseContent,BankDTO.class);
 
+            log.info("account 정보 받아오기");
+
             // TODO : 2. 은행 정보와 계좌정보 바탕으로 account 정보 가져오기
             HashMap<String, Object> body = new HashMap<>();
-            body.put("accountName", purposeFinisedDTO.getAccountNumber());
+            body.put("accountNumber", purposeFinisedDTO.getAccountNumber());
             ResponseEntity<String> accountResponse = callServer.getHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/account", HttpMethod.GET, body);
 
             responseCode = accountResponse.getStatusCode().toString().split(" ")[0];
             responseContent = accountResponse.getBody();
+
+            if(!responseCode.equals(HttpStatusCode.valueOf(200))){
+                throw new NotFoundFintechCodeException("FintechCode를 가져오는데 실패했습니다.");
+            }
 
             AccountFintechCodeDTO accountFintechCodeDTO = objectMapper.readValue(responseContent, AccountFintechCodeDTO.class);
 

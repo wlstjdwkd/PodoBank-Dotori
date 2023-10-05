@@ -40,15 +40,6 @@ public class CallServer {
         return response;
     }
 
-    // NOTE : parameter로 데이터 보낼 때
-//    public ResponseEntity<String> getHttpWithParamsAndSend(String url, MultiValueMap<String, Long> params){
-//        // HTTP 헤더 설정
-//        RestTemplate restTemplate = new RestTemplate();
-//        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class, params.get("bankSeq"));
-//
-//        return response;
-//    }
-
     public ResponseEntity<String> getHttpWithParamsAndSend(String url, HttpMethod method, HashMap<String, Object> params){
         // URL 매개변수를 이용한 요청 URL 생성
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
