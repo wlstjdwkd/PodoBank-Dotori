@@ -20,6 +20,7 @@ export default function PlanNotClassifyScreen({ navigation, route }) {
   const refreshToken = useSelector((state) => state.user.refreshToken);
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
+  const [unClassifiedList, setUnClassifiedList] = useState([]);
   const planSeq = route.params.planSeq;
 
   // 그 외
@@ -51,33 +52,34 @@ export default function PlanNotClassifyScreen({ navigation, route }) {
       paymentDate: "2023-08-15 15:30",
     },
   ];
-  const [data, setData] = useState(samepleData2); // 이 부분 추가
-
+  const [data, setData] = useState([]); // 이 부분 추가
+  const [updateData, setUpdateData] = useState([]);
   const [categoryMapping, setCategoryMapping] = useState({});
 
   const doUnClassifiedList = async () => {
     try {
       const response = await unclassifiedList(planSeq, accessToken, grantType);
       if (response.status === 200) {
-        setPlanInfo(response.data);
+        setUnClassifiedList(response.data);
+        setData(response.data);
       } else {
-        console.log("계획 정보 조회 실패", response.status);
+        console.log("미분류 정보 조회 실패", response.status);
       }
     } catch (error) {
-      console.error("오류 발생 : 계획 정보 조회 실패:", error);
+      console.error("오류 발생 : 미분류 정보 조회 실패:", error);
     }
   };
 
   const doUnClassifiedUpdate = async () => {
     try {
+      console.log("updateData:", updateData);
       const response = await unClassifiedUpdate(
-        data,
+        updateData,
         planSeq,
         accessToken,
         grantType
       );
       if (response.status === 200) {
-        setData(response.data);
       } else {
         console.log("계획 정보 조회 실패", response.status);
       }
@@ -88,21 +90,27 @@ export default function PlanNotClassifyScreen({ navigation, route }) {
 
   useEffect(() => {
     // 서버로부터 데이터를 가져오는 코드가 들어갈 위치입니다.
-    // 예시로는, samepleData2를 사용합니다.
     if (isFocused) {
-      //doUnClassifiedList();
+      doUnClassifiedList();
+      //samleData2 => unClassifiedList
+      const mapping = {};
+      unClassifiedList.forEach((item) => {
+        if (!mapping[item.categoryName]) {
+          mapping[item.categoryName] = item.planDetailSeq;
+        }
+        console.log("mapping", mapping);
+      });
+      setCategoryMapping(mapping);
+      // 첫 번째 categoryGroupName을 default로 선택합니다.
+      setSelectedCategoryName(unClassifiedList[0]?.categoryName || null);
     }
-    const mapping = {};
-    samepleData2.forEach((item) => {
-      if (!mapping[item.categoryName]) {
-        mapping[item.categoryName] = item.planDetailSeq;
-      }
-    });
-    setCategoryMapping(mapping);
   }, [isFocused]); // 이 빈 배열은 이 useEffect가 컴포넌트가 마운트될 때만 실행되게 합니다.
 
-  const onCategoryChange = (paymentSeq, newCategory) => {
-    const newPlanDetailSeq = categoryMapping[newCategory];
+  const onCategoryChange = (paymentSeq, newCategory, newPlanDetailSeq) => {
+    // const newPlanDetailSeq = categoryMapping[newCategory];
+    console.log("categoryMapping", categoryMapping);
+    console.log("newCategory", newCategory);
+    console.log("newPlanDetailSeq", newPlanDetailSeq);
 
     const newData = data.map((item) =>
       item.paymentSeq === paymentSeq
@@ -114,26 +122,38 @@ export default function PlanNotClassifyScreen({ navigation, route }) {
         : item
     );
     setData(newData);
-    console.log(newData);
+    console.log("newPlanDetailSeq", newPlanDetailSeq);
+
+    console.log("newData:", newData);
+
+    const updatedUpdateData = [
+      ...updateData,
+      { planDetailSeq: newPlanDetailSeq, paymentSeq: paymentSeq },
+    ];
+    setUpdateData(updatedUpdateData);
+    console.log("updateData", updateData);
+    // console.log("newData:"newData);
   };
 
   // uniqueCategories 정의
   const uniqueCategories = useMemo(() => {
-    return [...new Set(samepleData2.map((item) => item.categoryName))];
-  }, [samepleData2]);
+    return [...new Set(unClassifiedList.map((item) => item.categoryName))];
+  }, [unClassifiedList]);
 
   const formatNumber = (num) =>
     num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 
   const handleNextButton = () => {
     // doPlanNewRegister();
-    navigation.navigate("PlanMainScreen", {
-      accountSeq: planInfo.accountSeq,
-    });
+    doUnClassifiedUpdate();
+    // navigation.navigate("PlanMainScreen", {
+    //   accountSeq: planInfo.accountSeq,
+    // });
+    navigation.goBack();
   };
   // 기존의 sampleData 대신 sampleData2 사용
   const [selectedCategoryName, setSelectedCategoryName] = useState(
-    samepleData2[0]?.categoryName || null
+    unClassifiedList[0]?.categoryName || null
   );
 
   // 적절한 카테고리에 해당하는 아이템들을 얻기 위한 함수 변경
@@ -149,29 +169,34 @@ export default function PlanNotClassifyScreen({ navigation, route }) {
       ></HeaderComponent>
       <View style={styles.innerContainer}>
         <Text style={styles.accountName}>{accountName}</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {uniqueCategories.map((category) => (
-            <TouchableOpacity
-              key={category}
-              onPress={() => setSelectedCategoryName(category)}
-              style={
-                selectedCategoryName === category
-                  ? styles.selectedGroupName
-                  : styles.groupName
-              }
-            >
-              <Text
+        <View style={styles.scrollViewContainer}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {uniqueCategories.map((category) => (
+              <TouchableOpacity
+                key={category}
+                onPress={() => setSelectedCategoryName(category)}
                 style={
                   selectedCategoryName === category
-                    ? styles.selectedGroupText
-                    : styles.groupText
+                    ? styles.selectedGroupName
+                    : styles.groupName
                 }
+                // ellipsizeMode="tail" // 'tail'은 문자열의 끝에서 짤림을 의미합니다.
+                // numberOfLines={1} // 텍스트를 한 줄로 제한합니다.
               >
-                {category}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+                <Text
+                  style={
+                    selectedCategoryName === category
+                      ? styles.selectedGroupText
+                      : styles.groupText
+                  }
+                >
+                  {category}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
         <View style={styles.divider} />
         {/* // FlatList 부분 변경 */}
         <FlatList
@@ -187,6 +212,7 @@ export default function PlanNotClassifyScreen({ navigation, route }) {
                     item={item}
                     onCategoryChange={onCategoryChange}
                     uniqueCategories={uniqueCategories}
+                    categoryMapping={categoryMapping} // 추가
                   />
                 </View>
 
@@ -209,7 +235,12 @@ export default function PlanNotClassifyScreen({ navigation, route }) {
   );
 }
 
-function CategoryBox({ item, onCategoryChange, uniqueCategories }) {
+function CategoryBox({
+  item,
+  onCategoryChange,
+  uniqueCategories,
+  categoryMapping,
+}) {
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
@@ -243,8 +274,13 @@ function CategoryBox({ item, onCategoryChange, uniqueCategories }) {
                     key={category}
                     style={styles.modalItem}
                     onPress={() => {
+                      const newPlanDetailSeq = categoryMapping[category];
                       setModalVisible(false);
-                      onCategoryChange(item.paymentSeq, category);
+                      onCategoryChange(
+                        item.paymentSeq,
+                        category,
+                        newPlanDetailSeq
+                      );
                     }}
                   >
                     <Text style={styles.modalItemText}>{category}</Text>
@@ -310,6 +346,8 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     // alignItems: "center",
+    flex: 1,
+    // marginBottom: -100,
   },
   accountName: {
     fontWeight: "bold",
@@ -321,18 +359,27 @@ const styles = StyleSheet.create({
   },
   groupName: {
     padding: 10,
+    paddingBottom: 5,
+    // height: 100,
   },
 
   selectedGroupName: {
     borderBottomWidth: 5,
     borderBottomColor: "#FF965C",
     padding: 10,
+    paddingBottom: 5,
+    // height: 100,
+    // marginHorizontal: 10,
+    // marginVertical: 10,
   },
   groupText: {
     color: "#727070",
+    marginBottom: 10,
   },
   selectedGroupText: {
     color: "#FF965C",
+    // paddingBottom: 10,
+    marginBottom: 10,
   },
   divider: {
     height: 1,
@@ -398,7 +445,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 400,
+    marginTop: 10,
   },
   buttonText: {
     color: "white",

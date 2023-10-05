@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  RefreshControl,
 } from "react-native";
 import FooterScreen from "../Components/FooterScreen";
 import { useDispatch, useSelector } from "react-redux";
@@ -47,12 +48,22 @@ export default function PlanMainScreen({ navigation, route }) {
   // 토큰
   const grantType = useSelector((state) => state.user.grantType);
   const accessToken = useSelector((state) => state.user.accessToken);
+  const [refreshing, setRefreshing] = useState(false);
 
   const refreshToken = useSelector((state) => state.user.refreshToken);
   const dispatch = useDispatch();
   // 그 외
   const isFocused = useIsFocused();
   // const
+
+  const onRefresh = async () => {
+    setRefreshing(true); // 새로고침 시작
+
+    // 데이터를 다시 가져오는 코드
+    await doPlanInquiry();
+
+    setRefreshing(false); // 새로고침 종료
+  };
 
   // TODO: 서버에서 데이터를 가져와 아래 변수들을 설정하세요
   const accountName = route.params.accountTitle;
@@ -203,6 +214,9 @@ export default function PlanMainScreen({ navigation, route }) {
           <ScrollView
             showsVerticalScrollIndicator={false}
             style={styles.planContainer}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
           >
             <View style={styles.headerContainer}>
               <Text style={styles.endDate}>
@@ -253,7 +267,12 @@ export default function PlanMainScreen({ navigation, route }) {
                   key={index}
                   style={styles.categoryBox}
                   onPress={() => {
-                    navigation.navigate("PlanCategoryScreen");
+                    console.log(
+                      "category.planDetailSeq: " + category.planDetailSeq
+                    );
+                    navigation.navigate("PlanCategoryScreen", {
+                      planDetailSeq: category.planDetailSeq,
+                    });
                   }}
                 >
                   <View style={styles.categoryTop}>

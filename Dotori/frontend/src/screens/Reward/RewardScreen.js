@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Image,
@@ -6,6 +6,8 @@ import {
   Dimensions,
   ImageBackground,
   Text,
+  Animated,
+  TouchableOpacity,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useIsFocused } from "@react-navigation/native";
@@ -19,12 +21,14 @@ export default function RewardScreen({ navigation }) {
   const refreshToken = useSelector((state) => state.user.refreshToken);
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
+  const opacityAnim = useRef(new Animated.Value(1)).current;
 
   const doUserDotoriValueCheck = async () => {
     try {
       const response = await userDotoriValueCheck(accessToken, grantType);
       if (response.status === 200) {
         setDotoriCount(response.data.dotori);
+        // setCoinCount(response.data.coin);
       } else {
         console.log("사용자 현재 도토리 갯수 조회 실패", response.status);
       }
@@ -34,6 +38,7 @@ export default function RewardScreen({ navigation }) {
   };
 
   const [dotoriCount, setDotoriCount] = useState(null);
+  const [coinCount, setCoinCount] = useState(1);
   const currentDotoriEffect = (index) => {
     if (dotoriCount !== index) {
       return null;
@@ -77,6 +82,29 @@ export default function RewardScreen({ navigation }) {
       doUserDotoriValueCheck();
     }
   }, [isFocused]);
+
+  useEffect(() => {
+    // coinCount가 1 이상일 경우 깜빡이게 하기
+    if (coinCount >= 1) {
+      const blink = Animated.sequence([
+        Animated.timing(opacityAnim, {
+          toValue: 0.2,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]);
+
+      Animated.loop(blink).start();
+    } else {
+      opacityAnim.setValue(1);
+    }
+  }, [coinCount]);
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -96,10 +124,20 @@ export default function RewardScreen({ navigation }) {
           source={require("../../assets/images/Hamster/RunningHamster.png")}
           style={styles.bottomLeftImage}
         />
-        <Image
-          source={require("../../assets/images/Hamster/WinnerHamster.png")}
+        <TouchableOpacity
           style={styles.topRightImage}
-        />
+          onPress={() =>
+            navigation.navigate("RandomBox1Screen", {
+              coin: coinCount,
+            })
+          }
+        >
+          <Animated.Image
+            source={require("../../assets/images/Hamster/WinnerHamster.png")}
+            style={[{ width: 100, height: 100, opacity: opacityAnim }]}
+          />
+        </TouchableOpacity>
+
         <Image
           source={require("../../assets/images/acorn.png")}
           style={[styles.firstDotoriImage, { opacity: getOpacity(1) }]}
@@ -201,10 +239,10 @@ const styles = StyleSheet.create({
   },
   topRightImage: {
     position: "absolute",
-    top: 60,
-    right: 10,
-    width: 120, // 이미지의 크기를 설정하세요.
-    height: 120, // 이미지의 크기를 설정하세요.
+    top: 70,
+    right: 20,
+    width: 100, // 이미지의 크기를 설정하세요.
+    height: 100, // 이미지의 크기를 설정하세요.
   },
   firstDotoriImage: {
     position: "absolute",
