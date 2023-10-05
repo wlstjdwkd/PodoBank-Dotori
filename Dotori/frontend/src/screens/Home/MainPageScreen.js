@@ -15,34 +15,6 @@ import { accountWholeInquiry } from "../../apis/accountapi";
 import { userInfoInquiry } from "../../apis/userapi";
 import { useIsFocused } from "@react-navigation/native";
 
-// const banks = [
-//   {
-//     id: "1",
-//     name: "월급 통장",
-//     balance: 10000,
-//   },
-//   {
-//     id: "2",
-//     name: "비상금 통장",
-//     balance: 20000,
-//   },
-//   // {
-//   //   id: "3",
-//   //   name: "비상금 통장",
-//   //   balance: "20,000원",
-//   // },
-//   // {
-//   //   id: "4",
-//   //   name: "비상금 통장",
-//   //   balance: "20,000원",
-//   // },
-//   // {
-//   //   id: "5",
-//   //   name: "비상금 통장",
-//   //   balance: "20,000원",
-//   // },
-//   // ... 다른 은행들의 데이터
-// ];
 const formatNumber = (num) => {
   return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 };
@@ -57,16 +29,6 @@ export default function MainPageScreen({ navigation }) {
   const [accountList, setAccountList] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
   const isFocused = useIsFocused();
-
-  // // 정보조회 함수
-  // const do정보조회 = async () => {
-  //   const response = await 함수()
-  //   if(response.status === 200){
-  //     console.log('연결 계좌 조회 성공')
-  //   }else if(response.status === 400){
-  //     console.log('연결 계좌 조회 실패')
-  //   }
-  // }
 
   const doAccountWholeInquiry = async () => {
     try {
@@ -178,6 +140,7 @@ export default function MainPageScreen({ navigation }) {
           keyExtractor={(item) => item.accountSeq.toString()}
         />
       </View>
+
       <View style={styles.footer}>
         <FooterScreen navigation={navigation} />
       </View>

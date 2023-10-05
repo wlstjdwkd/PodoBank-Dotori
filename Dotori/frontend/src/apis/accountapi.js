@@ -208,20 +208,3 @@ export const accountOneInquiry = async (planSeq, accessToken, grantType) => {
     return response
   }
 }
-
-// // 계좌 이름 변경
-// export const accountNameChange = async (accountSeq, accessToken, grantType) => {
-//   try{
-//     const response = await axios.patch(apiAddress+`/api/v1/account/{accountName}`, accountSeq, {
-//       headers: {
-//         Authorization: `${grantType} ${accessToken}`,
-//       },
-//     });
-//     console.log('계좌 이름 변경 성공:', response.data)
-//     return response
-//   }catch(error){
-//     console.error('계좌 이름 변경 실패', error)
-//     const response = error.response
-//     return response
-//   }
-// }

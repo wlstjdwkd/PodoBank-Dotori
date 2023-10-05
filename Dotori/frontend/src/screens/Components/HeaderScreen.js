@@ -7,7 +7,6 @@ export default function HeaderComponent({ navigation, title, cancelNavi }) {
     <View style={styles.header}>
       <TouchableOpacity onPress={() => {navigation.goBack()}}>
         <FontAwesome name="angle-left" style={{ fontSize: 30 }}></FontAwesome>
-        {/* <Text style={styles.backButton}>&lt;</Text> */}
       </TouchableOpacity>
       <Text style={styles.headerTitle}>{title}</Text>
 

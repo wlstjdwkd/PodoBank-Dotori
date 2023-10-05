@@ -171,7 +171,7 @@ export default function PurposeCreate1Screen({ navigation, route }) {
     <View style={styles.container}>
       <HeaderComponent
         title="계획 생성(1/5)"
-        cancelNavi="PlanMainScreen"
+        cancelNavi="MainPageScreen"
         navigation={navigation}
       ></HeaderComponent>
       <View style={styles.innerContainer}>

@@ -9,6 +9,7 @@ import {
   TextInput,
   Alert,
 } from "react-native"
+import { Audio } from 'expo-av';
 import FooterScreen from "../Components/FooterScreen"
 import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux"
@@ -25,6 +26,7 @@ export default function SavingMoneyScreen({ navigation, route }) {
   const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
+  const [sound, setSound] = useState();
   const isFocused = useIsFocused()
 
   const [currentTotalSavings, setcurrentTotalSavings] = useState(0)
@@ -54,6 +56,16 @@ export default function SavingMoneyScreen({ navigation, route }) {
     },
     // 다른 목표들...
   ];
+
+  const playSound = async() => {
+    const { sound } = await Audio.Sound.createAsync( require('../../assets/insertCoin.mp3')
+    );
+    setSound(sound);
+
+    console.log('Playing Sound');
+    await sound.playAsync();
+
+  }
 
   const formatNumber = (num) => {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
@@ -125,12 +137,12 @@ export default function SavingMoneyScreen({ navigation, route }) {
     try{
       const response = await planSaving(savingData, accessToken, grantType)
       if(response.status === 200){
-        console.log('데이터!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         navigation.reset({
           index: 0,
           routes: [{ name: 'SavingCompleteScreen' }],
         });
         console.log("저축하기 성공")
+        playSound()
       }else{
         console.log("저축하기 실패", response.status)
       }
@@ -154,6 +166,15 @@ export default function SavingMoneyScreen({ navigation, route }) {
     setSelectItem(null);
     setEditAmount("")
   }
+
+
+  useEffect(() => {
+    return sound
+      ? () => {
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
 
   useEffect(()=>{
     const allSaving = purposeList.reduce((total, item) => total + item.savingAmount, 0)
@@ -279,10 +300,6 @@ export default function SavingMoneyScreen({ navigation, route }) {
         onPress={() => {
           console.log(purposeList)
           handlePlanSaving()
-          // navigation.reset({
-          //   index: 0,
-          //   routes: [{ name: 'SavingCompleteScreen' }],
-          // });
         }}
       >
         <Text style={styles.buttonText}>저축하기</Text>

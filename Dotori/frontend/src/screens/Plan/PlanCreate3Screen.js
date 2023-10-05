@@ -46,7 +46,7 @@ export default function PlanCreate3Screen({ navigation, route }) {
     <View style={styles.container}>
       <HeaderComponent
         title="계획 생성(3/5)"
-        cancelNavi="PlanMainScreen"
+        cancelNavi="MainPageScreen"
         navigation={navigation}
       ></HeaderComponent>
       <ScrollView style={styles.header}>

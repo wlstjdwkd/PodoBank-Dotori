@@ -28,10 +28,7 @@ export default function FooterScreen({ navigation }) {
         style={styles.iconContainer}
         onPress={() => navigation.navigate("PurposeScreen")}
       >
-        {/* <Image
-            style={{ width: 24, height: 24 }}
-            source={require("../../assets/images/all-account.png")}
-          ></Image> */}
+
         <MaterialCommunityIcons
           name="target"
           size={24}

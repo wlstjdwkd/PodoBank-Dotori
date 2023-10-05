@@ -144,7 +144,7 @@ export default function PlanNotClassifyScreen({ navigation, route }) {
     <View style={styles.container}>
       <HeaderComponent
         title="미분류 항목"
-        cancelNavi="PlanMainScreen"
+        cancelNavi="MainPageScreen"
         navigation={navigation}
       ></HeaderComponent>
       <View style={styles.innerContainer}>

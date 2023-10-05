@@ -85,8 +85,7 @@ export default function EditPhoneNumberScreen({ navigation, route }) {
       <View style={styles.iconContainer}>
         <Image
           style={styles.lockIcon}
-          // source={require("../../assets/icon/lock.png")} // 프로필 이미지 경로
-          source={require("../../assets/icon/smartphone.png")} // 스마트폰 이미지
+          source={require("../../assets/icon/smartphone.png")}
         />
       </View>
 
