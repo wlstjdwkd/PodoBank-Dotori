@@ -152,27 +152,6 @@ public class PaymentServiceImpl implements PaymentService{
         Plan plan = planRepository.findByPlanSeq(planSeq);
         List<Payment> result = new ArrayList<>();
         Set<CategoryData> categoryDataSet = new HashSet<>(); // 저장할 CategoryData
-//
-//        for(UpdateDataDTO data : updateUnclassifiedDTO.getUpdateData()){
-//            Payment payment = paymentRepository.findByPaymentSeq(data.getPaymentSeq());
-//            result.add(payment.updateChecked()); // checked = true
-//            CategoryData categoryData = categoryDataRepository.findByDataCode(payment.getBusinessCode());
-//
-//            if(categoryData == null){ // 이전에 저장된 데이터가 없으면
-//                PlanDetail planDetail = planDetailRepository.findByPlanDetailSeq(payment.getPlanDetailSeq());
-//                categoryDataSet.add(CategoryData.builder()
-//                        .category(planDetail.getCategory())
-//                        .dataName(payment.getPaymentName())
-//                        .dataCode(payment.getBusinessCode())
-//                        .count(1) // 한 번 결제된 사용처니까 1로 초기화
-//                        .build());
-//                continue;
-//            }
-//
-//            // 이전에 저장된 데이터가 있음
-//            // TODO : payment 저장할 때마다 categoryData count++
-//            categoryDataSet.add(categoryData.updateCount());
-//        }
 
         log.info("시작");
         // TODO : plan에 딸린 planDetail에 딸린 payment중 checked가 false인 것
@@ -201,10 +180,13 @@ public class PaymentServiceImpl implements PaymentService{
                 // TODO : payment 저장할 때마다 categoryData count++
                 categoryDataSet.add(categoryData.updateCount());
             }
-        }
 
+
+        }
+        plan.setCount(0L);
         planRepository.save(plan.updateCount(0L)); // 모든 데이터 처리 했으니까
         paymentRepository.saveAll(result);
         categoryDataRepository.saveAll(categoryDataSet);
+
     }
 }
