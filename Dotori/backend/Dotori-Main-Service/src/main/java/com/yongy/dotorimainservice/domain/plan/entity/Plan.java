@@ -78,7 +78,7 @@ public class Plan {
     }
 
     public Plan updateCount(Long count){
-        this.count = count;
+        this.count = this.getCount()+count;
         return this;
     }
 
