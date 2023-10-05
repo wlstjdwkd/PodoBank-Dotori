@@ -296,7 +296,10 @@ export default function PlanMainScreen({ navigation, route }) {
                   <View style={styles.categoryTop}>
                     <Text style={styles.categoryName}>{category.title}</Text>
                     <Text style={styles.currentMoney}>
-                      {formatNumber(category.currentBalance)}원
+                      {formatNumber(
+                        category.goalAmount - category.currentBalance
+                      )}
+                      원
                     </Text>
                   </View>
                   <Text style={styles.categoryGroupName}>
