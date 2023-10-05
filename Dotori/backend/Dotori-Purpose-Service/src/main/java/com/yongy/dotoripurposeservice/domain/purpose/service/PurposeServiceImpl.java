@@ -271,26 +271,28 @@ public class PurposeServiceImpl implements PurposeService{
 
     public void callBankAPI(BankDTO bankInfo, AccountFintechCodeDTO accountFintechCodeDTO, PurposeFinisedDTO purposeFinisedDTO) throws ParseException {
         String bankAccessToken = podoBankInfo.getConnectionToken(bankInfo); // 은행 accessToken 가져오기
-        String accessToken = null;
+ //       String accessToken = null;
         Purpose purpose = purposeRepository.findByPurposeSeq(purposeFinisedDTO.getPuposeSeq());
 
-        if(bankAccessToken != null){ // accessToken이 없으면
-            accessToken = bankAccessToken;
-        }
-
-        if(bankAccessToken == null){
-            accessToken = podoBankInfo.getConnectionToken(bankInfo);
-        }
+//        if(bankAccessToken != null){ // accessToken이 없으면
+//            accessToken = bankAccessToken;
+//        }
+//
+//        if(bankAccessToken == null){
+//            accessToken = podoBankInfo.getConnectionToken(bankInfo);
+//        }
         // NOTE : plan에 연결된 계좌에서 총 금액을 도토리 계좌로 입금 요청하기
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Content-Type", "application/json;charset=utf-8");
-        httpHeaders.add("Authorization","Bearer " + accessToken);
+        httpHeaders.add("Authorization","Bearer " + bankAccessToken);
 
         Map<String, String> bodyData = new HashMap<>();
         bodyData.put("serviceCode", bankInfo.getServiceCode());
         bodyData.put("fintechCode", accountFintechCodeDTO.getFintechCode());
         bodyData.put("amount", String.valueOf(purposeFinisedDTO.getPurposeSavings()));
         bodyData.put("content", "도토리 "+purpose.getPurposeTitle());
+
+        log.info(bodyData.toString());
 
         HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(bodyData, httpHeaders);
 
