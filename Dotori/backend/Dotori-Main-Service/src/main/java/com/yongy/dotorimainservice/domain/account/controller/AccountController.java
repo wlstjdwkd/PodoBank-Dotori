@@ -90,7 +90,7 @@ public class AccountController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/communication/account")
+    @PostMapping("/communication/account")
     public ResponseEntity<AccountFintechCodeDTO> getAccount(@RequestBody AccountInfoDTO accountInfoDTO){
         return ResponseEntity.ok(accountService.getFintechCode(accountInfoDTO));
     }
