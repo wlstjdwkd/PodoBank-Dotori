@@ -241,6 +241,8 @@ public class PurposeServiceImpl implements PurposeService{
             ObjectMapper objectMapper = new ObjectMapper();
             BankDTO bankInfo = objectMapper.readValue(responseContent,BankDTO.class);
 
+            log.info("===========================CHECK=========================" + bankInfo.toString());
+
             log.info("account 정보 받아오기");
 
             // TODO : 2. 은행 정보와 계좌정보 바탕으로 account 정보 가져오기
