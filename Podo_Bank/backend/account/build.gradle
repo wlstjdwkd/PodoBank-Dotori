@@ -49,7 +49,7 @@ dependencies {
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
     // Spring Cloud Config Client
-//    implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
     // actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
