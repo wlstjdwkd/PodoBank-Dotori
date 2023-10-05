@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +52,65 @@ public class ChatGPTService {
     @Value("${chatGPT.api-key}")
     private String API_KEY;
     private static final String API_URL = "https://api.openai.com/v1/chat/completions";
+
+
+    public Map<String, Integer> map;
+
+    /** [카테고리] - [카테고리 그룹]
+     * 1. 외식 - 식비
+     * 2. 카페 - 식비
+     * 3. 여가 - 나를 위한 투자
+     * 4. 교통비 - 생활비
+     * 5. 장보기 - 생활비
+     * 6. 운동 - 나를 위한 투자
+     * 7. 기타 - 기타
+     * */
+
+
+    public void initSetting(){
+        map = new HashMap<>();
+
+        // 식비
+        map.put("요기요_위대한상상", 1);
+        map.put("버거킹(인의점)", 1);
+        map.put("육쌈냉면", 1);
+        map.put("미소야인동점", 1);
+
+        // 카페
+        map.put("커피비치", 2);
+        map.put("카페봉봉", 2);
+        map.put("탐앤탐스구미인동점", 2);
+        map.put("무인아이스크림할인점",2);
+
+        // 여가
+        map.put("비트코인동전노래방", 3);
+        map.put("볼륨업피씨방", 3);
+        map.put("(주)인터파크", 3);
+        map.put("JDC면세점_공항", 3);
+        map.put("올리브영구미인동점", 3);
+
+        // 교통비
+        map.put("티머니개인택시_0", 4);
+        map.put("한국철도공사", 4);
+        map.put("후불교통대금", 4);
+
+        // 장보기
+        map.put("플러스마트", 5);
+        map.put("GS25진평베스트", 5);
+
+        // 운동
+        map.put("유니버시아드레포츠센터", 6);
+        map.put("율핏", 6);
+        map.put("크로스핏진평", 6);
+
+        // 기타
+        map.put("영남에너지서비스", 7);
+        map.put("뉴스터디카페", 7);
+
+    }
+
+
+
     public List<ResultDataDTO> getChatGPTResponse(CategoryDataDTO categoryDataDTO) throws Exception {
 
         HttpClient httpClient = HttpClients.createDefault();
@@ -180,8 +240,11 @@ public class ChatGPTService {
 
     }
 
+
     // NOTE : 계획 1개의 결제내역을 가져온다
     public void getOnePayments(Plan plan) throws ParseException, IOException {
+
+        this.initSetting();
 
         List<Plan> activePlanList = planRepository.findAllByPlanStateAndTerminatedAtIsNull(State.ACTIVE);
         List<PlanDetail> planDetails = planDetailRepository.findAllByPlanPlanSeq(plan.getPlanSeq());
@@ -212,6 +275,8 @@ public class ChatGPTService {
             log.info("사업자코드"+payment.getCode()+"planDetail사이즈!!!!!!"+planDetails.size());
 
             if(categoryData == null){
+
+                // TODO : 랜덤메소드
                 log.info(payment.getContent());
                 chatGPT.add(Payment.builder()
                         .paymentName(payment.getContent())
@@ -219,7 +284,7 @@ public class ChatGPTService {
                         .userSeq(plan.getUserSeq())
                         .checked(false)
                         .businessCode(payment.getCode())
-                        .planDetailSeq(planDetails.get(0).getPlanDetailSeq())
+                        .planDetailSeq(Long.parseLong(map.get(payment.getContent()).toString()))
                         .paymentDate(payment.getTransactionAt())
                         .build());
                 continue;
