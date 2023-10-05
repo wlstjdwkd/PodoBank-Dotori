@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { accountWholeInquiry } from "../../apis/accountapi";
 import { userInfoInquiry } from "../../apis/userapi";
 import { useIsFocused } from "@react-navigation/native";
+import { Alert } from "react-native";
 
 const formatNumber = (num) => {
   return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
