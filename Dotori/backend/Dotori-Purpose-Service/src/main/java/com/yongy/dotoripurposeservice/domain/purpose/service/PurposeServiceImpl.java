@@ -258,7 +258,7 @@ public class PurposeServiceImpl implements PurposeService{
 
             log.info(responseContent);
 
-            if(!responseCode.equals(HttpStatusCode.valueOf(200))){
+            if(!responseCode.equals("200")){
                 throw new NotFoundFintechCodeException("FintechCode를 가져오는데 실패했습니다.");
             }
 
