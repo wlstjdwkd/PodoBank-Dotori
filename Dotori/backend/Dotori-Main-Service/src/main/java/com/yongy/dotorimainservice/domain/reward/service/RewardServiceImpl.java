@@ -18,6 +18,7 @@ import com.yongy.dotorimainservice.global.redis.repository.BankAccessTokenReposi
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -119,32 +120,32 @@ public class RewardServiceImpl implements RewardService{
         rewardRepository.deleteByUserSeq(userSeq);
     }
 
-    @Override
-    public int openRandomBox(Long coin) {
-        // TODO : 코인개수 차감하고 해당 개수당 금액 적용한 랜덤값 보내기
-        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Reward reward = rewardRepository.findByUserSeq(user.getUserSeq());
-        Random random = new Random();
-        int amount = 0;
-
-        if(reward.getCoin() < coin){
-            throw new FailedRandomBoxException("코인이 부족합니다.");
-        }
-
-        if(coin == 1){
-            amount = (int)(random.nextDouble() * COIN_WEIGHT_ONE + 1);
-        }
-
-        if(coin == 2){
-            amount = (int)(random.nextDouble() * COIN_WEIGHT_TWO + 1);
-        }
-
-        if(coin == 3){
-            amount = (int)(random.nextDouble() * COIN_WEIGHT_THREE + 1);
-        }
-
-        rewardRepository.save(reward.updateCoin(coin));
-
-        return amount;
-    }
+//    @Override
+//    public int openRandomBox(Long coin) {
+//        // TODO : 코인개수 차감하고 해당 개수당 금액 적용한 랜덤값 보내기
+//        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        Reward reward = rewardRepository.findByUserSeq(user.getUserSeq());
+//        Random random = new Random();
+//        int amount = 0;
+//
+//        if(reward.getCoin() < coin){
+//            throw new FailedRandomBoxException("코인이 부족합니다.");
+//        }
+//
+//        if(coin == 1){
+//            amount = (int)(random.nextDouble() * COIN_WEIGHT_ONE + 1);
+//        }
+//
+//        if(coin == 2){
+//            amount = (int)(random.nextDouble() * COIN_WEIGHT_TWO + 1);
+//        }
+//
+//        if(coin == 3){
+//            amount = (int)(random.nextDouble() * COIN_WEIGHT_THREE + 1);
+//        }
+//
+//        rewardRepository.save(reward.updateCoin(coin));
+//
+//        return amount;
+//    }
 }

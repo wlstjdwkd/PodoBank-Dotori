@@ -11,5 +11,5 @@ public interface RewardService {
     void randomBoxWithdraw(RandomBoxDTO randomBoxDTO) throws ParseException;
     void deleteUserReward(Long userSeq);
 
-    int openRandomBox(Long coin);
+//    int openRandomBox(Long coin);
 }
