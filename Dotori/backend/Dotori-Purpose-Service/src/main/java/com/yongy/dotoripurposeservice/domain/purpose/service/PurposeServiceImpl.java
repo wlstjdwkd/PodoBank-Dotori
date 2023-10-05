@@ -216,7 +216,9 @@ public class PurposeServiceImpl implements PurposeService{
 
     @Override
     public void purposeFinised(PurposeFinisedDTO purposeFinisedDTO) throws JsonProcessingException, ParseException {
+
         Purpose purpose = purposeRepository.findByPurposeSeq(purposeFinisedDTO.getPuposeSeq());
+        User user = this.getLoginUser();
 
         if(purpose.getTerminateAt() == null){
             throw new NotActiveException("종료된 목표가 아닙니다.");
@@ -248,6 +250,7 @@ public class PurposeServiceImpl implements PurposeService{
             // TODO : 2. 은행 정보와 계좌정보 바탕으로 account 정보 가져오기
             HashMap<String, Object> body = new HashMap<>();
             body.put("accountNumber", purposeFinisedDTO.getAccountNumber());
+            body.put("userSeq", user.getUserSeq());
             ResponseEntity<String> accountResponse = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/account", HttpMethod.POST, body);
 
             responseCode = accountResponse.getStatusCode().toString().split(" ")[0];
