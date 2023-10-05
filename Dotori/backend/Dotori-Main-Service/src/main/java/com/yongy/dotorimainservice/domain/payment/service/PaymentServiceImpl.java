@@ -87,7 +87,7 @@ public class PaymentServiceImpl implements PaymentService{
         RestTemplate restTemplate = new RestTemplate();
 
         ResponseEntity<String> response = restTemplate.exchange(
-                bank.getBankUrl()+"/api/v1/fintech/k",
+                bank.getBankUrl()+"/api/v1/fintech/history",
                 HttpMethod.POST,
                 httpEntity,
                 String.class
