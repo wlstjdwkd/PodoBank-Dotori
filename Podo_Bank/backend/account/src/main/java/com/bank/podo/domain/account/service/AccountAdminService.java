@@ -92,6 +92,37 @@ public class AccountAdminService {
         fcmService.sendNotification(account.getUser().getEmail(), "입금", depositDTO.getAmount().toString() + "원이 입금되었습니다."+ "\n"+depositDTO.getContent());
     }
 
+    public void test1(String accountNumber) {
+        log.info(accountNumber);
+        Account account = accountRepository.findByAccountNumber(accountNumber);
+        log.info(account.toString());
+
+        accountService.withdraw(account, new BigDecimal(8000), "무인아이스크림할인점", "3456789012");
+        fcmService.sendNotification(account.getUser().getEmail(), "출금", "8000 출금되었습니다.");
+
+        accountService.withdraw(account, new BigDecimal(12000), "요기요_위대한상상", "3456789012");
+        fcmService.sendNotification(account.getUser().getEmail(), "출금", "12000 출금되었습니다.");
+
+        accountService.withdraw(account, new BigDecimal(9000), "플러스마트", "3456789012");
+        fcmService.sendNotification(account.getUser().getEmail(), "출금", "9000 출금되었습니다.");
+
+        accountService.withdraw(account, new BigDecimal(10000), "유니버시아드레포츠센터", "3456789012");
+        fcmService.sendNotification(account.getUser().getEmail(), "출금", "10000 출금되었습니다.");
+
+        accountService.withdraw(account, new BigDecimal(20000), "크로스핏진평", "3456789012");
+        fcmService.sendNotification(account.getUser().getEmail(), "출금", "20000 출금되었습니다.");
+
+        accountService.withdraw(account, new BigDecimal(8000), "올리브영구미인동점", "3456789012");
+        fcmService.sendNotification(account.getUser().getEmail(), "출금", "8000 출금되었습니다.");
+
+        accountService.withdraw(account, new BigDecimal(11000), "한국철도공사", "3456789012");
+        fcmService.sendNotification(account.getUser().getEmail(), "출금", "11000 출금되었습니다.");
+
+        accountService.withdraw(account, new BigDecimal(9500), "커피비치", "3456789012");
+        fcmService.sendNotification(account.getUser().getEmail(), "출금", "9500 출금되었습니다.");
+
+    }
+
     private List<TransactionHistoryDTO> toTransactionHistoryDTOList(List<TransactionHistory> transactionHistoryList) {
         return transactionHistoryList.stream()
                 .map(this::toTransactionHistoryDTO)

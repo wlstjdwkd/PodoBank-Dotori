@@ -4,10 +4,7 @@ import com.bank.podo.domain.account.dto.*;
 import com.bank.podo.domain.account.service.AccountAdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -44,6 +41,12 @@ public class AccountAdminController {
     @PostMapping("/deposit")
     public ResponseEntity<Void> deposit(@RequestBody DepositDTO depositDTO) {
         accountAdminService.deposit(depositDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/test1")
+    public ResponseEntity<Void> test1(@RequestParam String accountNumber) {
+        accountAdminService.test1(accountNumber);
         return ResponseEntity.ok().build();
     }
 
