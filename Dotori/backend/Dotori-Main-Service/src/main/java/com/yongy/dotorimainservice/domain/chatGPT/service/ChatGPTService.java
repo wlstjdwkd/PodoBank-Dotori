@@ -190,76 +190,79 @@ public class ChatGPTService {
 
         // 해당 플랜에 연결된 결제 내역
 
-            // 현재 찾으려는 시간이 업데이트한 시간보다 이전이다.
-            if(currentTime.isBefore(plan.getUpdatedAt())){
-                return;
+        // 현재 찾으려는 시간이 업데이트한 시간보다 이전이다.
+        if(currentTime.isBefore(plan.getUpdatedAt())){
+            return;
+        }
+
+        log.info("1==>"+plan.getAccount().toString());
+        List<PaymentPodoResDto> paymentResDto = paymentService.getPayments(plan.getUpdatedAt(),plan.getAccount().getAccountSeq());
+        List<Payment> chatGPT = new ArrayList<>();
+        List<Payment> existPayment = new ArrayList<>();
+
+        for(PaymentPodoResDto payment : paymentResDto){
+            log.info("Title : "+payment.getContent()+"Code :"+payment.getCode());
+            // 카테고리 데이터에 정보가 없으면 최초로 들어온 정보이므로 GPT 분류
+            if(payment.getCode() == null){
+                continue;
             }
 
-            log.info("1==>"+plan.getAccount().toString());
-            List<PaymentPodoResDto> paymentResDto = paymentService.getPayments(plan.getUpdatedAt(),plan.getAccount().getAccountSeq());
-            List<Payment> chatGPT = new ArrayList<>();
-            List<Payment> existPayment = new ArrayList<>();
+            CategoryData categoryData = categoryDataRepository.findByDataCode(payment.getCode());
+            log.info("사업자코드"+payment.getCode());
 
-            for(PaymentPodoResDto payment : paymentResDto){
-                log.info("Title : "+payment.getContent()+"Code :"+payment.getCode());
-                // 카테고리 데이터에 정보가 없으면 최초로 들어온 정보이므로 GPT 분류
-                if(payment.getCode() == null){
-                    continue;
-                }
-
-                CategoryData categoryData = categoryDataRepository.findByDataCode(payment.getCode());
-                log.info("사업자코드"+payment.getCode());
-
-                if(categoryData == null){
-                    log.info(payment.getContent());
-                    chatGPT.add(Payment.builder()
-                            .paymentName(payment.getContent())
-                            .paymentPrice(payment.getAmount())
-                            .userSeq(plan.getUserSeq())
-                            .checked(false)
-                            .businessCode(payment.getCode())
-                            .paymentDate(payment.getTransactionAt())
-                            .build());
-                    continue;
-                }
-
-                // 카테고리 데이터가 이미 있어서 planDetail에 연결 돼있는지 확인 해야하면
-                // 카테고리데이터에 연결된 카테고리로 planDetail 찾기
-                Category category = categoryRepository.findByCategorySeq(categoryData.getCategory().getCategorySeq());
-                PlanDetail planDetail = planDetailRepository.findByCategory(category);
-
-                if(plan == planDetail.getPlan()){ // 결제 내역을 가져온 플랜과 카테고리데이터에 연결된 카테고리에 연결된 플랜이 같으면
-                    // 해당 planDetail정보를 payment에 저장하고, checked는 false로 해서 payment 생성
-                    existPayment.add(Payment.builder()
-                            .paymentName(payment.getContent())
-                            .paymentPrice(payment.getAmount())
-                            .userSeq(plan.getUserSeq())
-                            .planDetailSeq(planDetail.getPlanDetailSeq())
-                            .checked(false)
-                            .businessCode(payment.getCode())
-                            .build());
-                    continue;
-                }
-
+            if(categoryData == null){
+                log.info(payment.getContent());
                 chatGPT.add(Payment.builder()
                         .paymentName(payment.getContent())
                         .paymentPrice(payment.getAmount())
                         .userSeq(plan.getUserSeq())
                         .checked(false)
                         .businessCode(payment.getCode())
+                        .paymentDate(payment.getTransactionAt())
                         .build());
+                continue;
             }
 
-            paymentRepository.saveAll(chatGPT); // chatGPT로 분류할 거 저장
-            paymentRepository.saveAll(existPayment); // 이미 등록된 사업장인 payment 한 번에 저장
-            planRepository.save(plan.updateCount((long) chatGPT.size())); // 미분류 개수 저장
+            // 카테고리 데이터가 이미 있어서 planDetail에 연결 돼있는지 확인 해야하면
+            // 카테고리데이터에 연결된 카테고리로 planDetail 찾기
+            Category category = categoryRepository.findByCategorySeq(categoryData.getCategory().getCategorySeq());
+            PlanDetail planDetail = planDetailRepository.findByCategory(category);
 
-            // NOTE : chatGPT로 분류
-            List<PlanDetail> planDetails = planDetailRepository.findAllByPlanPlanSeq(plan.getPlanSeq());
-            this.getPaymentChatGPTResponse(UnclassifiedDataDTO.builder()
-                    .planDetails(planDetails)
-                    .payments(chatGPT)
+            if(plan == planDetail.getPlan()){ // 결제 내역을 가져온 플랜과 카테고리데이터에 연결된 카테고리에 연결된 플랜이 같으면
+                // 해당 planDetail정보를 payment에 저장하고, checked는 false로 해서 payment 생성
+                existPayment.add(Payment.builder()
+                        .paymentName(payment.getContent())
+                        .paymentPrice(payment.getAmount())
+                        .userSeq(plan.getUserSeq())
+                        .planDetailSeq(planDetail.getPlanDetailSeq())
+                        .checked(false)
+                        .businessCode(payment.getCode())
+                        .build());
+                continue;
+            }
+
+            chatGPT.add(Payment.builder()
+                    .paymentName(payment.getContent())
+                    .paymentPrice(payment.getAmount())
+                    .userSeq(plan.getUserSeq())
+                    .checked(false)
+                    .businessCode(payment.getCode())
                     .build());
+        }
+
+        plan.setUpdatedAt(LocalDateTime.now());
+        planRepository.save(plan);
+
+        paymentRepository.saveAll(chatGPT); // chatGPT로 분류할 거 저장
+        paymentRepository.saveAll(existPayment); // 이미 등록된 사업장인 payment 한 번에 저장
+        planRepository.save(plan.updateCount((long) chatGPT.size())); // 미분류 개수 저장
+
+        // NOTE : chatGPT로 분류
+        List<PlanDetail> planDetails = planDetailRepository.findAllByPlanPlanSeq(plan.getPlanSeq());
+        this.getPaymentChatGPTResponse(UnclassifiedDataDTO.builder()
+                .planDetails(planDetails)
+                .payments(chatGPT)
+                .build());
     }
 
 
@@ -332,6 +335,11 @@ public class ChatGPTService {
                         .checked(false)
                         .businessCode(payment.getCode())
                         .build());
+
+                // 업데이트한 날짜 저장
+
+                plan.setUpdatedAt(LocalDateTime.now());
+                planRepository.save(plan);
             }
 
             paymentRepository.saveAll(chatGPT); // chatGPT로 분류할 거 저장

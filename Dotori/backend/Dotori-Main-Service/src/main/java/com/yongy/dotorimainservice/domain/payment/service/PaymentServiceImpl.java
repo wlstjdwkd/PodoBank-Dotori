@@ -17,6 +17,7 @@ import com.yongy.dotorimainservice.domain.payment.dto.response.PaymentPodoResDto
 import com.yongy.dotorimainservice.domain.payment.entity.Payment;
 import com.yongy.dotorimainservice.domain.payment.repository.PaymentRepository;
 import com.yongy.dotorimainservice.domain.plan.entity.Plan;
+import com.yongy.dotorimainservice.domain.plan.entity.State;
 import com.yongy.dotorimainservice.domain.plan.repository.PlanRepository;
 import com.yongy.dotorimainservice.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotorimainservice.domain.planDetail.repository.PlanDetailRepository;
@@ -115,7 +116,6 @@ public class PaymentServiceImpl implements PaymentService{
                     .collect(Collectors.toList());
 
         }
-
 
         return paymentList;
     }
