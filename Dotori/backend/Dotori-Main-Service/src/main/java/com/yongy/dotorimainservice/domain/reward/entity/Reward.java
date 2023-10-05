@@ -23,13 +23,23 @@ public class Reward implements Serializable {
     private Long dotori;
     private Long coin;
 
-    public Reward updateDotori(){
-        this.dotori = this.dotori+1;
+    public Reward initDotori(){
+        this.dotori = 0L;
+        return this;
+    }
+
+    public Reward plusDotori(){
+        this.dotori = this.dotori + 1;
         return this;
     }
 
     public Reward updateCoin(Long coin){
         this.coin = this.getCoin() - coin;
+        return this;
+    }
+
+    public Reward plusCoin(){
+        this.coin = this.getCoin() + 1;
         return this;
     }
 }
