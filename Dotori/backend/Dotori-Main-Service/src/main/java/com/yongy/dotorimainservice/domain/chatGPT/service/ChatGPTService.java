@@ -184,6 +184,7 @@ public class ChatGPTService {
     public void getOnePayments(Plan plan) throws ParseException, IOException {
 
         List<Plan> activePlanList = planRepository.findAllByPlanStateAndTerminatedAtIsNull(State.ACTIVE);
+        List<PlanDetail> planDetails = planDetailRepository.findAllByPlanPlanSeq(plan.getPlanSeq());
 
         LocalDateTime currentTime = LocalDateTime.now(); // 현재시간
         log.info("현재 시간: {}", currentTime);
@@ -248,6 +249,7 @@ public class ChatGPTService {
                     .paymentPrice(payment.getAmount())
                     .userSeq(plan.getUserSeq())
                     .checked(false)
+                    .planDetailSeq(planDetails.get(0).getPlanDetailSeq())
                     .businessCode(payment.getCode())
                     .build());
         }
@@ -259,12 +261,12 @@ public class ChatGPTService {
         paymentRepository.saveAll(existPayment); // 이미 등록된 사업장인 payment 한 번에 저장
         planRepository.save(plan.updateCount((long) chatGPT.size())); // 미분류 개수 저장
 
-        // NOTE : chatGPT로 분류
-        List<PlanDetail> planDetails = planDetailRepository.findAllByPlanPlanSeq(plan.getPlanSeq());
-        this.getPaymentChatGPTResponse(UnclassifiedDataDTO.builder()
-                .planDetails(planDetails)
-                .payments(chatGPT)
-                .build());
+//        // NOTE : chatGPT로 분류
+//        List<PlanDetail> planDetails = planDetailRepository.findAllByPlanPlanSeq(plan.getPlanSeq());
+//        this.getPaymentChatGPTResponse(UnclassifiedDataDTO.builder()
+//                .planDetails(planDetails)
+//                .payments(chatGPT)
+//                .build());
     }
 
 
