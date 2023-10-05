@@ -11,7 +11,7 @@ import {
   setIsnotReissuanceToken,
 } from "./src/redux/slices/auth/user";
 
-import * as Notifications from "expo-notifications";
+// import * as Notifications from "expo-notifications";
 
 function MainApp() {
   const accessTokenExpiration = useSelector(
@@ -45,15 +45,15 @@ function MainApp() {
 }
 
 export default function App() {
-  useEffect(() => {
-    const subscription = Notifications.addNotificationReceivedListener(
-      (notification) => {
-        console.log("Notification received: ", notification);
-      }
-    );
+  // useEffect(() => {
+  //   const subscription = Notifications.addNotificationReceivedListener(
+  //     (notification) => {
+  //       console.log("Notification received: ", notification);
+  //     }
+  //   );
 
-    return () => subscription.remove();
-  }, []);
+  //   return () => subscription.remove();
+  // }, []);
 
   return (
     <Provider store={store}>
