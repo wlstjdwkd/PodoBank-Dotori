@@ -115,7 +115,7 @@ public class PurposeServiceImpl implements PurposeService{
 
         for(PurposeData data : list){
             //Account account = accountRepository.findByAccountSeqAndDeleteAtIsNull(data.getAccountSeq());
-            bodyData.clear();
+            HashMap<String, Object> bodyData = new HashMap<>();
             bodyData.put("accountSeq", data.getAccountSeq());
 
             response = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/getTitle", HttpMethod.POST, bodyData);
