@@ -180,7 +180,7 @@ public class ChatGPTService {
 
     }
 
-    //@Scheduled(fixedRate = 30 * 60 * 1000) // 30분(밀리초 단위)
+    // @Scheduled(fixedRate = 30 * 60 * 1000) // 30분(밀리초 단위)
     public void getPayments() throws ParseException, IOException {
 
         List<Plan> activePlanList = planRepository.findAllByPlanStateAndTerminatedAtIsNull(State.ACTIVE);

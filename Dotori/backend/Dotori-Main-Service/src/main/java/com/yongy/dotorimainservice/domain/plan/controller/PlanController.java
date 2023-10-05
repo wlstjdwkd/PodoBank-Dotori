@@ -1,6 +1,7 @@
 package com.yongy.dotorimainservice.domain.plan.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.yongy.dotorimainservice.domain.chatGPT.service.ChatGPTService;
 import com.yongy.dotorimainservice.domain.plan.dto.ActivePlanDTO;
 import com.yongy.dotorimainservice.domain.plan.dto.PlanDTO;
 import com.yongy.dotorimainservice.domain.plan.dto.PlanStateDTO;
@@ -23,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -33,6 +35,7 @@ public class PlanController {
 
     private final PlanService planService;
     private final PlanServiceImpl planServicelmpl;
+    private final ChatGPTService chatGPTService;
 
     @ApiResponses(value={
             @ApiResponse(responseCode = "200", description = "계획 생성 성공")
@@ -99,8 +102,12 @@ public class PlanController {
             @ApiResponse(responseCode = "404", description = "명세서 api를 호출하세요.")
     })
     @GetMapping("/{accountSeq}")
-    public ResponseEntity<ActivePlanDTO> findAllPlan(@PathVariable Long accountSeq) throws JsonProcessingException, ParseException {
+    public ResponseEntity<ActivePlanDTO> findAllPlan(@PathVariable Long accountSeq) throws IOException, ParseException {
         ActivePlanDTO result = planService.findAllPlan(accountSeq);
+
+        // TODO : 포도은행에서 새로운 계좌내역 가져오기
+        chatGPTService.getPayments();
+
         return ResponseEntity.ok(result);
     }
 
