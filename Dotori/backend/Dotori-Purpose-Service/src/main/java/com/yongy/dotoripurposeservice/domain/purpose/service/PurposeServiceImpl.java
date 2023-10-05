@@ -230,7 +230,7 @@ public class PurposeServiceImpl implements PurposeService{
         // TODO : 1. 은행 정보 가져오기
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put("bankSeq", purposeFinisedDTO.getBankSeq());
-        ResponseEntity<String> bankResponse = callServer.getHttpWithParamsAndSend(MAIN_SERVICE_URL+"/bank/communication/bankInfo", HttpMethod.GET, parameters);
+        ResponseEntity<String> bankResponse = callServer.getHttpWithParamsAndSend(MAIN_SERVICE_URL+"/bank/communication/bankInfo", HttpMethod.POST, parameters);
 
         String responseCode = bankResponse.getStatusCode().toString().split(" ")[0];
         String responseContent = bankResponse.getBody();
@@ -244,7 +244,7 @@ public class PurposeServiceImpl implements PurposeService{
             // TODO : 2. 은행 정보와 계좌정보 바탕으로 account 정보 가져오기
             HashMap<String, Object> body = new HashMap<>();
             body.put("accountNumber", purposeFinisedDTO.getAccountNumber());
-            ResponseEntity<String> accountResponse = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/account", HttpMethod.GET, body);
+            ResponseEntity<String> accountResponse = callServer.postHttpBodyAndSend(MAIN_SERVICE_URL+"/account/communication/account", HttpMethod.POST, body);
 
             responseCode = accountResponse.getStatusCode().toString().split(" ")[0];
             responseContent = accountResponse.getBody();
