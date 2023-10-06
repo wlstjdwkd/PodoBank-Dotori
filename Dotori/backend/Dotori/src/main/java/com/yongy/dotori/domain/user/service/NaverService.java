@@ -38,11 +38,8 @@ public class NaverService {
     private final static String NAVER_AUTH_URI = "https://nid.naver.com";
     private final static String NAVER_API_URI = "https://openapi.naver.com";
 
-    @Autowired
-    private UserRepository userRepository;
     private String accessToken;
 
-    private String refreshToken;
 
     private final long exp = 1000L * 60 * 60;
 
@@ -84,22 +81,7 @@ public class NaverService {
             JSONObject jsonObj = (JSONObject) jsonParser.parse(response.getBody());
 
             accessToken = (String)jsonObj.get("access_token");
-//            refreshToken = (String)jsonObj.get("refresh_token");
-//
-//            log.info("access_token :  "+ accessToken);
-//            log.info("refresh_token : "+ refreshToken);
 
-//            User user = (User) getUserInfo(accessToken).getBody().getData();
-
-//            // RefreshToken이 없는 경우(시간이 만료되었거나, 처음 들어오는 사용자)
-//            if(redisUtil.getData(user.getId()) == null){
-//                // DB에 사용자의 정보가 없는 경우
-//                if(userRepository.findByIdAndExpiredAtIsNull(user.getId()) == null){
-//                    userRepository.save(user); // DB에 사용자 저장
-//                }
-//            }
-//
-//            redisUtil.setDataExpire(user.getId(), refreshToken, exp * 24);
             return accessToken;
         }catch(Exception e){
             return null;

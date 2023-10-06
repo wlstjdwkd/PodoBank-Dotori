@@ -5,6 +5,8 @@ import com.yongy.dotori.domain.account.dto.AccountDTO;
 import com.yongy.dotori.domain.account.service.AccountServiceImpl;
 import com.yongy.dotori.domain.payment.entity.Payment;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +21,14 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/account")
-public class AccountController {
+public class  AccountController {
 
     private final AccountServiceImpl accountService;
 
     @Operation(summary = "전체 계좌 조회")
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "전체 계좌 조회 성공")
+    })
     @GetMapping()
     public ResponseEntity<List<AccountDTO>> findAllAccount() throws JsonProcessingException {
         List<AccountDTO> result = accountService.findAllAccount();

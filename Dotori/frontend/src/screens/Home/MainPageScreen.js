@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,45 +10,61 @@ import {
 } from "react-native";
 
 import FooterScreen from "../Components/FooterScreen";
+import { useDispatch, useSelector } from "react-redux";
+import { accountWholeInquiry } from "../../apis/accountapi";
+import { userInfoInquiry } from "../../apis/userapi";
+import { useIsFocused } from "@react-navigation/native";
+import { Alert } from "react-native";
 
-const banks = [
-  {
-    id: "1",
-    name: "월급 통장",
-    balance: 10000,
-  },
-  {
-    id: "2",
-    name: "비상금 통장",
-    balance: 20000,
-  },
-  // {
-  //   id: "3",
-  //   name: "비상금 통장",
-  //   balance: "20,000원",
-  // },
-  // {
-  //   id: "4",
-  //   name: "비상금 통장",
-  //   balance: "20,000원",
-  // },
-  // {
-  //   id: "5",
-  //   name: "비상금 통장",
-  //   balance: "20,000원",
-  // },
-  // ... 다른 은행들의 데이터
-];
 const formatNumber = (num) => {
   return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 };
 
 export default function MainPageScreen({ navigation }) {
+  // 토큰
+  const grantType = useSelector((state) => state.user.grantType);
+  const accessToken = useSelector((state) => state.user.accessToken);
+  const refreshToken = useSelector((state) => state.user.refreshToken);
+  const dispatch = useDispatch();
+  // 그 외
+  const [accountList, setAccountList] = useState([]);
+  const [userInfo, setUserInfo] = useState(null);
+  const isFocused = useIsFocused();
+
+  const doAccountWholeInquiry = async () => {
+    try {
+      const response = await accountWholeInquiry(accessToken, grantType);
+      if (response.status === 200) {
+        setAccountList(response.data);
+      } else {
+      }
+    } catch (error) {
+    }
+  };
+  const doUserInfoInquiry = async () => {
+    try {
+      const response = await userInfoInquiry(accessToken, grantType);
+      if (response.status === 200) {
+        setUserInfo(response.data);
+      } else {
+      }
+    } catch (error) {
+    }
+  };
+
+  useEffect(() => {
+    if (isFocused) {
+      doAccountWholeInquiry();
+      doUserInfoInquiry();
+    }
+  }, [isFocused]);
+
   return (
     <View style={styles.container}>
       <View style={styles.innerContainer}>
         <FlatList
-          data={banks}
+          data={accountList}
+          showsVerticalScrollIndicator={false}
           ListHeaderComponent={
             <>
               <View style={styles.header}>
@@ -57,9 +73,7 @@ export default function MainPageScreen({ navigation }) {
                   style={styles.logo}
                   source={require("../../assets/images/dotori_logo.png")}
                 />
-                <TouchableOpacity style={styles.helpButton}>
-                  <Text style={styles.helpIcon}>?</Text>
-                </TouchableOpacity>
+                <View></View>
               </View>
 
               <Text style={styles.title}>당신의 소비를 계획 해보세요!</Text>
@@ -76,21 +90,26 @@ export default function MainPageScreen({ navigation }) {
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.bankContainer}
-              onPress={() => navigation.navigate("PlanMainScreen")}
+              onPress={() =>
+                navigation.navigate("PlanMainScreen", {
+                  accountSeq: item.accountSeq,
+                  accountTitle: item.accountTitle,
+                })
+              }
             >
               <View style={styles.imageText}>
                 <Image
                   style={styles.bankIcon}
                   source={require("../../assets/images/logo_podo.png")}
                 />
-                <Text style={styles.bankName}>{item.name}</Text>
+                <Text style={styles.bankName}>{item.accountTitle}</Text>
               </View>
 
               <View style={styles.bankTextContainer}>
                 <View style={styles.balanceRow}>
                   <Text style={styles.bankSubtitle}>잔액</Text>
                   <Text style={styles.bankBalance}>
-                    {formatNumber(item.balance)}원
+                    {formatNumber(item.currentBalance)}원
                   </Text>
                 </View>
               </View>
@@ -100,16 +119,21 @@ export default function MainPageScreen({ navigation }) {
             <>
               <TouchableOpacity
                 style={styles.addButton}
-                onPress={() => navigation.navigate("OneCent1Screen")}
+                onPress={() => {
+                  navigation.navigate("OneCent1Screen", {
+                    userName: userInfo.userName,
+                  });
+                }}
               >
                 <Text style={styles.addText}>+</Text>
               </TouchableOpacity>
               <View style={{ marginTop: 50 }}></View>
             </>
           }
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.accountSeq.toString()}
         />
       </View>
+
       <View style={styles.footer}>
         <FooterScreen navigation={navigation} />
       </View>
@@ -136,7 +160,6 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     resizeMode: "contain",
-    marginLeft: 30,
   },
   helpButton: {
     width: 30,
@@ -173,8 +196,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   bankContainer: {
-    // flexDirection: "row",
-    // alignItems: "center",
     borderWidth: 1,
     borderColor: "#FCAF17",
     borderRadius: 20,
@@ -199,8 +220,8 @@ const styles = StyleSheet.create({
     borderColor: "#FCAF17",
     borderRadius: 15,
     height: 50,
-    borderStyle: "dashed", // 점선 테두리 추가
-    marginVertical: 10, // 위아래로 여백 추가
+    borderStyle: "dashed",
+    marginVertical: 10,
   },
   addText: {
     color: "#FCAF17",
@@ -211,13 +232,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "center",
-    // marginTop: 220,
     marginBottom: -20,
   },
   bankTextContainer: {
     flex: 1,
     justifyContent: "space-between",
-    // marginTop: 20,
     paddingHorizontal: 10,
   },
 
@@ -229,7 +248,6 @@ const styles = StyleSheet.create({
   },
 
   bankBalance: {
-    // 기존 스타일에서 marginLeft: 'auto' 삭제
     fontSize: 16,
     fontWeight: "bold",
   },

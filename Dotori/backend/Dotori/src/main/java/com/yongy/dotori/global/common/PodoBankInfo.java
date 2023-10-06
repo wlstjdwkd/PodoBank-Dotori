@@ -39,13 +39,14 @@ public class PodoBankInfo {
     @Autowired
     private BankRepository bankRepository;
 
+    private static Bank bankInfo;
 
-    public void podoBankLogin(Bank bankInfo){
+
+    public void podoBankLogin(){
         try{
-
             HttpHeaders headers = new HttpHeaders();
             headers.add("Content-Type", "application/json;charset=utf-8");
-
+            log.info(bankInfo.getBankId()+"/"+bankInfo.getBankPwd());
             Map<String, String> bodyData = new HashMap<>();
             bodyData.put("email", bankInfo.getBankId());
             bodyData.put("password", bankInfo.getBankPwd());
@@ -59,7 +60,6 @@ public class PodoBankInfo {
                     HttpMethod.POST,
                     httpEntity,
                     String.class
-
             );
 
             JSONParser jsonParser = new JSONParser();
@@ -68,8 +68,11 @@ public class PodoBankInfo {
             String accessToken = (String) jsonObject.get("accessToken");
             String refreshToken = (String) jsonObject.get("refreshToken");
 
-            bankAccessTokenRepository.save(BankAccessToken.of("accessToken", accessToken));
-            bankRefreshTokenRepository.save(BankRefreshToken.of("refreshToken", refreshToken));
+            log.info("1- accessToken : "+ accessToken);
+            log.info("2- refreshToken : "+ refreshToken);
+
+            bankAccessTokenRepository.save(BankAccessToken.of(bankInfo.getBankName(), accessToken));
+            bankRefreshTokenRepository.save(BankRefreshToken.of(bankInfo.getBankName(), refreshToken));
         } catch (ParseException e) {
             throw new IllegalArgumentException("포도뱅크에 로그인할 수 없음");
         }
@@ -78,24 +81,37 @@ public class PodoBankInfo {
 
     // NOTE : accessToken이나 refreshToken을 세팅한다.(없으면 podoBankLogin을 호출해서 새로 발급해서 세팅함)
     public String getConnectionToken(Long bankSeq){
-        Optional<BankAccessToken> dotoriAccessToken = bankAccessTokenRepository.findById("accessToken");
-        Optional<BankRefreshToken> dotoriRefreshToken = bankRefreshTokenRepository.findById("refreshToken");
+        bankInfo = bankRepository.findByBankSeq(bankSeq);
+
+        log.info(bankInfo.getBankName()+"--1");
+
+        Optional<BankAccessToken> bankAccessToken = bankAccessTokenRepository.findById(bankInfo.getBankName());
+
+        Optional<BankRefreshToken> bankRefreshToken = bankRefreshTokenRepository.findById(bankInfo.getBankName());
+
+        log.info("1- accessToken : "+ bankAccessToken);
+        log.info("2- refreshToken : "+ bankRefreshToken);
+
 
         String useToken = null;
 
-        Bank bankInfo = null;
 
-        if(dotoriAccessToken.isEmpty()){
-            if(dotoriRefreshToken.isEmpty()){
-                bankInfo = bankRepository.findByBankSeq(bankSeq);
-                this.podoBankLogin(bankInfo); // accessToken, refreshToken 재발급
-                useToken = bankAccessTokenRepository.findById("accessToken").get().getToken();
+        // this.podoBankLogin(); // accessToken, refreshToken 재발급
+
+        if(bankAccessToken.isEmpty()){
+            if(bankRefreshToken.isEmpty()){
+                this.podoBankLogin(); // NOTE : accessToken, refreshToken 재발급
+                log.info("--1--");
+                useToken = bankAccessTokenRepository.findById(bankInfo.getBankName()).get().getToken();
             }else{
-                useToken = dotoriRefreshToken.get().getToken();
+                log.info("--2--");
+                useToken = bankRefreshToken.get().getToken();
             }
         }else{
-            useToken = dotoriAccessToken.get().getToken();
+            log.info("--3--");
+            useToken = bankAccessToken.get().getToken();
         }
+
         return useToken;
     }
 

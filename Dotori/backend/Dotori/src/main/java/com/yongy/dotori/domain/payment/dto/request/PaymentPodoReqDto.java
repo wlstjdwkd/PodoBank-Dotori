@@ -8,13 +8,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PaymentPodoReqDto {
-    private String startAt;
     private Long accountSeq;
     private Long planSeq;
 
     @Builder
-    public PaymentPodoReqDto(String startAt, Long accountSeq, Long planSeq) {
-        this.startAt = startAt;
+    public PaymentPodoReqDto(Long accountSeq, Long planSeq) {
         this.accountSeq = accountSeq;
         this.planSeq = planSeq;
     }

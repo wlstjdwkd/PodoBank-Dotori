@@ -40,4 +40,10 @@ public class CategoryData {
         this.dataName = dataName;
         this.count = count;
     }
+
+    public CategoryData updateCount(){
+        this.count = this.count+1;
+        return this;
+    }
+
 }
