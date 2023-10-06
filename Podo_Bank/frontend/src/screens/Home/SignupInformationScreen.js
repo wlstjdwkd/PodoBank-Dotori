@@ -35,7 +35,7 @@ export default function SignupInformationScreen({ navigation, route }) {
   const handlePasswordChange = (text) => {
     setPassword(text);
     if (validatePassword(text)) {
-      setPasswordMessage("완벽합니당");
+      setPasswordMessage("완벽합니다");
       setIsPasswordValid(true);
     } else {
       setPasswordMessage("양식을 맞춰주세요!");
@@ -46,7 +46,7 @@ export default function SignupInformationScreen({ navigation, route }) {
   const handleConfirmPasswordChange = (text) => {
     setConfirmPassword(text);
     if (text === password && isPasswordValid) {
-      setConfirmPasswordMessage("완벽합니당");
+      setConfirmPasswordMessage("완벽합니다");
       setIsConfirmPasswordValid(true);
       setUserInfo((prev) => ({ ...prev, password: text }));
     } else {
