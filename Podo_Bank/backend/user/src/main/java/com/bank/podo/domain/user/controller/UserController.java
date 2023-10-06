@@ -33,14 +33,9 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "토큰 없음")
     })
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestBody String email) {
-        boolean success = userService.logout(email);
-
-        if(success) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Void> logout() {
+        userService.logout();
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "회원 정보 조회", description = "USER")

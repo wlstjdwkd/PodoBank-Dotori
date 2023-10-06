@@ -2,7 +2,6 @@ package com.bank.podo.domain.user.service;
 
 import com.bank.podo.domain.user.dto.*;
 import com.bank.podo.domain.user.entity.User;
-import com.bank.podo.domain.user.exception.AlreadyUsedUsernameException;
 import com.bank.podo.domain.user.exception.FromatException;
 import com.bank.podo.domain.user.exception.PasswordNotMatchException;
 import com.bank.podo.domain.user.repository.UserRepository;
@@ -25,12 +24,13 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public boolean logout(String email) {
-        boolean isLogout = requestUtil.removeRefreshToken(email);
+    public void logout() {
+        User user = getLoginUser();
 
-        logLogout(email, isLogout);
+        requestUtil.removeRefreshToken(user.getEmail());
+        requestUtil.deleteFCMToken(user.getEmail());
 
-        return isLogout;
+        logLogout(user.getEmail());
     }
 
     @Transactional(readOnly = true)
@@ -59,7 +59,7 @@ public class UserService {
 
         logChangePassword(user);
 
-        logout(user.getEmail());
+        logout();
     }
 
     @Transactional
@@ -111,15 +111,6 @@ public class UserService {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-    public void checkEmailFormat(String email) {
-        String emailPattern =
-                "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-
-        if(!Pattern.compile(emailPattern).matcher(email).matches()) {
-            throw new FromatException("이메일 형식이 올바르지 않습니다.");
-        }
-    }
-
     private void checkPasswordFormat(String password) {
         String passwordPattern = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[@$!%*#?&])(?=\\S+$).{8,}$";
 
@@ -136,11 +127,10 @@ public class UserService {
                 .phoneNumber(user.getPhoneNumber())
                 .build();
     }
-    private void logLogout(String email, boolean result) {
+    private void logLogout(String email) {
         log.info("===== " + "\t" +
                 "로그아웃" + "\t" +
                 "이메일: " + email + "\t" +
-                "결과: " + result + "\t" +
                 "=====");
     }
 
