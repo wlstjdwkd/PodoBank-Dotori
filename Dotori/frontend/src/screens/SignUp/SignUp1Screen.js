@@ -1,23 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
 
 import HeaderComponent from "../Components/HeaderScreen";
+import {userIdDuplicatedCheck, userSendEmail} from "../../apis/userapi"
 
 export default function SignUp1Screen({ navigation }) {
+  const emailRef = useRef(null)
   const [userInfo, setUserInfo] = useState({
-    email: "",
+    id: "",
   });
 
   const [email, setEmail] = useState("");
-  const [isValidEmail, setIsValidEmail] = useState(""); // 양식에맞게 이메일 작성
-  const [isCorrectEmail, setIsCorrectEmail] = useState(""); // 사용가능한 이메일여부 확인
-  const [emailMessage, setEmailMessage] = useState(""); // E-mail 사용가능 여부를 나타내는 메시지
+  const [isValidEmail, setIsValidEmail] = useState(false)
+  const [emailMessage, setEmailMessage] = useState("")
+  const [isCanEmail, setisCanEmail] = useState(true)
+
   function validateEmail(email) {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     return emailRegex.test(email);
@@ -25,40 +29,63 @@ export default function SignUp1Screen({ navigation }) {
 
   const handleEmailChange = (text) => {
     setEmail(text);
+    setUserInfo((prev) => ({ ...prev, id: text }))
     if (validateEmail(text)) {
-      setEmailMessage("사용 가능한 이메일입니다.");
-      setIsValidEmail(true);
-      // setEmailDuplicatedCheck(null); // 초기화: 이메일 양식이 올바르므로 중복 확인을 다시 해야 함
-      // setIsCorrectEmail(null);
+      setEmailMessage("사용 가능한 이메일입니다.")
+      setIsValidEmail(true)
+      setisCanEmail(true)
     } else {
-      setEmailMessage("이메일 양식을 맞춰주세요!");
-      setIsValidEmail(false);
-      // setEmailDuplicatedCheck(null); // 초기화: 이메일 양식이 올바르지 않으므로 중복 확인을 다시 해야 함
-      // setIsCorrectEmail(null);
+      setEmailMessage("이메일 양식을 맞춰주세요!")
+      setIsValidEmail(false)
     }
   };
-  // const hanldeUserEmailDuplicationCheck = async (text) => {
-  //   if (validateEmail(text)) {
-  //     const response = await userEmailDuplicationCheck(text);
-  //     if (response.status === 200) {
-  //       setEmailMessage("사용 가능한 이메일입니다.");
-  //       // setEmailDuplicatedCheck(true);
-  //       setIsCorrectEmail(true);
-  //     } else if (response.status === 400) {
-  //       setEmailMessage("이미 사용 중인 이메일입니다.");
-  //       // setEmailDuplicatedCheck(false);
-  //       setIsCorrectEmail(false);
-  //     } else {
-  //       setEmailMessage("서버 오류로 중복 확인에 실패했습니다.");
-  //       // setEmailDuplicatedCheck(null);
-  //       setIsCorrectEmail(null);
-  //     }
-  //   } else {
-  //     setEmailMessage("이메일 양식을 맞춰주세요!");
-  //     // setEmailDuplicatedCheck(null);
-  //     setIsCorrectEmail(null);
-  //   }
-  // };
+  const handleSendEmail = () =>{
+    if(isValidEmail){
+      doSendEmail()
+    }else{
+      setEmailMessage("이메일 주소를 다시 확인해주세요")
+      setIsValidEmail(false)
+    }
+  }
+
+  const doSendEmail = async () => {
+    setEmailMessage("코드 전송 중.")
+    const intervalId = setInterval(() => {
+      setEmailMessage(prevMessage => {
+        if (prevMessage.length >= 10) {
+          return "코드 전송 중."
+        } else {
+          return prevMessage + "."
+        }
+      })
+    }, 500)
+    try{
+      const response = await userSendEmail(email)
+      if(response.status === 200){
+        setEmailMessage("사용 가능한 이메일입니다.")
+        setisCanEmail(true)
+        navigation.navigate("SignUp2Screen", { userInfo: userInfo })
+      }else if(response.status === 409){
+        setEmailMessage('이미 사용중인 이메일입니다.')
+        setisCanEmail(false)
+        console.log("사용중인 이메일입니다.")
+      }else{
+        console.log("오류 발생 : 이메일 전송 실패")
+        setEmailMessage("오류 발생 : 이메일 전송 실패")
+        setisCanEmail(false)
+      }
+    }catch(error){
+      setisCanEmail(false)
+      console.log("에러..",error)
+      setEmailMessage("오류 발생: 이메일 전송 실패")
+    }
+    clearInterval(intervalId)
+  }
+
+  useEffect(() =>{
+    emailRef.current.focus()
+  })
+
   return (
     <View style={styles.container}>
       <HeaderComponent
@@ -66,41 +93,45 @@ export default function SignUp1Screen({ navigation }) {
         cancelNavi="LoginScreen"
         navigation={navigation}
       ></HeaderComponent>
-      <View style={styles.header}>
-        <Text style={styles.title}>이메일 인증하기</Text>
-        <Text style={styles.subtitle}>사용 가능한 이메일을 입력해주세요</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="이메일 예) abc123@naver.com"
-          onChangeText={(text) => {
-            handleEmailChange(text);
-            // {hanldeUserEmailDuplicationCheck(text) && isValidEmail}
-            setUserInfo((prev) => ({ ...prev, email: text }));
-          }}
-          multiline={true}
-          keyboardType="email-address"
-        />
-        <Text
-          style={{
-            color: isCorrectEmail && isValidEmail ? "blue" : "red",
-            marginLeft: 30,
-            marginTop: 0,
-          }}
-        >
-          {emailMessage}
-        </Text>
-      </View>
+      <View style={styles.innerContainer}>
+        <View style={styles.header}>
+          <Text style={styles.title}>이메일 인증하기</Text>
+          <Text style={styles.subtitle}>사용 가능한 이메일을 입력해주세요</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="이메일 예) abc123@naver.com"
+            onChangeText={(text) => {
+              handleEmailChange(text);
+            }}
+            ref={emailRef}
+            returnKeyType="send"
+            keyboardType="email-address"
+            onSubmitEditing={()=>{
+              handleSendEmail()
+            }}
+          />
+          <Text
+            style={{
+              color: (isValidEmail&&isCanEmail) ? "blue" : "red",
+              marginTop: 0,
+            }}
+          >
+            {emailMessage}
+          </Text>
+        </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() =>
-          navigation.navigate("SignUp2Screen", { userInfo: userInfo })
-        }
-        //TODO: 풀기
-        // disabled={!isValidEmail}
-      >
-        <Text style={styles.buttonText}>메일 보내기</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button,
+            !(isValidEmail) && {backgroundColor: "grey",},
+          ]}
+          onPress={() => {
+              handleSendEmail()
+          }}
+          disabled={!isValidEmail}
+        >
+          <Text style={styles.buttonText}>인증메일 보내기</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -112,10 +143,13 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "white",
   },
+  innerContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+    marginTop: 20,
+  },
   header: {
     flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
     marginTop: 90,
   },
   title: {
@@ -135,14 +169,14 @@ const styles = StyleSheet.create({
     borderColor: "#BAC0CA",
     borderRadius: 10,
     padding: 10,
-    // textAlign: "center",
   },
   button: {
-    height: 50,
+    height: 40,
     backgroundColor: "#FF965C",
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 10,
   },
   buttonText: {
     color: "white",

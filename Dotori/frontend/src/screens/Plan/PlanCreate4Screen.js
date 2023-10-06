@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,51 +7,56 @@ import {
   StyleSheet,
   ScrollView,
   Image,
+  ActivityIndicator,
 } from "react-native";
-import DraggableFlatList from "volkeno-react-native-drag-drop";
 import HeaderComponent from "../Components/HeaderScreen";
+import { useDispatch, useSelector } from "react-redux";
+import { useIsFocused } from "@react-navigation/native";
+import { planClassifyChatGpt } from "../../apis/planapi";
 
 export default function PlanCreate4Screen({ navigation, route }) {
-  const [planInfo, setPlanInfo] = useState(route.params.planInfo);
+  // 토큰
+  const grantType = useSelector((state) => state.user.grantType);
+  const accessToken = useSelector((state) => state.user.accessToken);
+  const refreshToken = useSelector((state) => state.user.refreshToken);
+  const dispatch = useDispatch();
+  // 그 외
+  const { categorise, categoryGroups } = route.params.planInfo;
 
-  const [categoryData, setCategoryData] = useState([
-    {
-      categoryGroupName: "식비",
-      categories: [
-        { name: "점심", amount: 5000 },
-        { name: "저녁", amount: 6000 },
-        { name: "간식", amount: 3000 },
-      ],
-    },
-    {
-      categoryGroupName: "교통비",
-      categories: [
-        { name: "버스", amount: 1200 },
-        { name: "택시", amount: 10000 },
-      ],
-    },
-  ]);
-  //   const categoryData = [
-  //     {
-  //       categoryGroupName: "식비",
-  //       categories: [
-  //         { name: "점심", amount: 5000 },
-  //         { name: "저녁", amount: 6000 },
-  //         { name: "간식", amount: 3000 },
-  //       ],
-  //     },
-  //     {
-  //       categoryGroupName: "교통비",
-  //       categories: [
-  //         { name: "버스", amount: 1200 },
-  //         { name: "택시", amount: 10000 },
-  //       ],
-  //     },
-  //     // ... 기타 카테고리 그룹들
-  //   ];
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [planInfo, setPlanInfo] = useState(route.params.planInfo);
+  const isFocused = useIsFocused();
+
+  const [categoryData, setCategoryData] = useState(null);
   const [data, setData] = useState(categoryData);
 
-  //드래그앤 드롭.. 대실패 일단 보류
+  const doPlanClassifyChatGpt = async () => {
+    setIsLoading(true);
+    try {
+      const payload = {
+        categorise: categorise,
+        categoryGroups: categoryGroups,
+      };
+      const response = await planClassifyChatGpt(
+        payload,
+        accessToken,
+        grantType
+      );
+      if (response.status === 200) {
+        setCategoryData(response.data);
+      } else {
+      }
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (isFocused) {
+      doPlanClassifyChatGpt();
+    }
+  }, [isFocused]);
   const renderItem = ({ item, index, drag, isActive }) => {
     return (
       <TouchableOpacity
@@ -67,7 +72,8 @@ export default function PlanCreate4Screen({ navigation, route }) {
             item.categories.map((category, idx) => (
               <View key={idx} style={styles.categoryBox}>
                 <Text style={styles.categoryText}>
-                  {category.name} {formatNumber(category.amount)}원
+                  {category.categoryName} {formatNumber(category.targetAmount)}
+                  원
                 </Text>
               </View>
             ))}
@@ -76,29 +82,6 @@ export default function PlanCreate4Screen({ navigation, route }) {
     );
   };
 
-  //   const [data, setData] = useState(categoryData);
-  //   const renderItem = ({ item, index, drag, isActive }) => {
-  //     return (
-  //       <TouchableOpacity
-  //         style={{
-  //           ...styles.categoryGroup,
-  //           backgroundColor: isActive ? "#E0E0E0" : "transparent",
-  //         }}
-  //         onLongPress={drag}
-  //       >
-  //         <Text style={styles.inputText}>{item.categoryGroupName}</Text>
-  //         <View style={styles.categoriesContainer}>
-  //           {item.categories.map((category, idx) => (
-  //             <View key={idx} style={styles.categoryBox}>
-  //               <Text style={styles.categoryText}>
-  //                 {category.name} {formatNumber(category.amount)}원
-  //               </Text>
-  //             </View>
-  //           ))}
-  //         </View>
-  //       </TouchableOpacity>
-  //     );
-  //   };
   const formatNumber = (num) => {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
   };
@@ -111,60 +94,64 @@ export default function PlanCreate4Screen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <HeaderComponent
-        title="계획 생성(4/5)"
-        cancelNavi="PlanMainScreen"
-        navigation={navigation}
-      ></HeaderComponent>
-      <ScrollView style={styles.header}>
-        <Text style={styles.title}>카테고리 분류</Text>
-        <Text style={styles.subtitle}>
-          카테고리 그룹과 카테고리를 확인해주세요.
-        </Text>
-
-        <View style={styles.center}>
+      {isLoading ? (
+        <View style={styles.loaderContainer}>
           <Image
-            style={styles.centerImage}
-            source={require("../../assets/images/Hamster/PlanCreateHamster.png")}
-          />
-          <Text style={styles.questionText}>이 분류가 맞나요?</Text>
-          <Text style={styles.moveText}>카테고리를 눌러서 옮겨보세요!</Text>
+            style={styles.loadingImage}
+            source={require("../../assets/images/Hamster/LoadingHamster.png")}
+          ></Image>
+          <ActivityIndicator size="large" color="#FF965C" />
+          <Text style={styles.loadingText}>다람쥐가 열심히 분류 중입니다!</Text>
+          <Text style={styles.loadingText}>조금만 기다려 주세용</Text>
         </View>
+      ) : (
+        <View style={styles.innerContainer}>
+          <HeaderComponent
+            title="계획 생성(4/5)"
+            cancelNavi="MainPageScreen"
+            navigation={navigation}
+          ></HeaderComponent>
+          <ScrollView style={styles.header}>
+            <Text style={styles.title}>카테고리 분류</Text>
+            <Text style={styles.subtitle}>
+              카테고리 그룹과 카테고리를 확인해주세요.
+            </Text>
 
-        {categoryData.map((group, index) => (
-          <View key={index} style={styles.categoryGroup}>
-            <Text style={styles.inputText}>{group.categoryGroupName}</Text>
-            <View style={styles.categoriesContainer}>
-              {group.categories.map((category, idx) => (
-                <View key={idx} style={styles.categoryBox}>
-                  <Text style={styles.categoryText}>
-                    {category.name} {formatNumber(category.amount)}원
+            <View style={styles.center}>
+              <Image
+                style={styles.centerImage}
+                source={require("../../assets/images/Hamster/PlanCreateHamster.png")}
+              />
+              <Text style={styles.questionText}>이 분류가 맞나요?</Text>
+              <Text style={styles.moveText}>카테고리를 눌러서 옮겨보세요!</Text>
+            </View>
+
+            {categoryData &&
+              categoryData.map((group, index) => (
+                <View key={index} style={styles.categoryGroup}>
+                  <Text style={styles.inputText}>
+                    {group.categoryGroupName}
                   </Text>
+                  <View style={styles.categoriesContainer}>
+                    {group.categories.map((category, idx) => (
+                      <View key={idx} style={styles.categoryBox}>
+                        <Text style={styles.categoryText}>
+                          {category.categoryName}{" "}
+                          {formatNumber(category.targetAmount)}원
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
                 </View>
               ))}
-            </View>
-          </View>
-        ))}
-        {/* <DraggableFlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => `draggable-item-${index}`}
-          onDragEnd={({ data }) => setCategoryData(data)}
-        /> */}
 
-        {/* <Text style={styles.inputText}>등록된 카테고리 그룹</Text>
-        <View style={styles.categoriesContainer}>
-          {categoryGroups.map((categoryGroup, index) => (
-            <View key={index} style={styles.categoryBox}>
-              <Text style={styles.categoryText}>{categoryGroup.name} </Text>
-            </View>
-          ))}
-        </View> */}
-      </ScrollView>
+          </ScrollView>
 
-      <TouchableOpacity style={styles.button} onPress={handleNextButton}>
-        <Text style={styles.buttonText}>다음</Text>
-      </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleNextButton}>
+            <Text style={styles.buttonText}>다음</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }
@@ -176,10 +163,27 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "white",
   },
+  innerContainer: {
+    flex: 1,
+    justifyContent: "space-between",
+    backgroundColor: "white",
+  },
+  loadingImage: {
+    width: 200,
+    height: 200,
+    marginBottom: 30,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    fontSize: 20,
+    marginBottom: 20,
+  },
   header: {
     flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
     marginTop: 90,
   },
   title: {
@@ -204,7 +208,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
-    // textAlign: "center",
   },
   categoryText: {
     fontSize: 12,

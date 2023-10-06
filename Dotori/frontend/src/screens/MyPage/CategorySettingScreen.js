@@ -1,176 +1,335 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react-native';
-
-const categorys = [
-    {
-        categorySeq: '1',
-        categoryTitle: "옷(겨울)",
-        categoryList: ['마왕족발', '김치찜은 못참치', '최각루', '피자가좋다', '세찜', '치킨과피자가같이 이게', '내가닭이다'],
-        newCategoryList: ['신촌 등갈비찜']
-    },
-    {
-        categorySeq: '2',
-        categoryTitle: "요가학원",
-    },
-    {
-        categorySeq: '3',
-        categoryTitle: "가구구매",
-    },
-    {
-        categorySeq: '4',
-        categoryTitle: "식자재",
-    },
-    {
-        categorySeq: '5',
-        categoryTitle: "배달",
-    },
-];
+import React, { useEffect, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  FlatList,
+  Dimensions,
+  ScrollView,
+  PanResponder,
+  Alert,
+  Modal,
+  Button,
+  Animated,
+} from "react-native";
+import HeaderComponent from "../Components/HeaderScreen";
+import { useDispatch, useSelector } from "react-redux";
+import { planCategoryUsingSpot, planCategoryDeleteSpot } from "../../apis/planapi"
 
 export default function CategorySettingScreen({ navigation, route }) {
-    // route.params를 통해 이전 페이지에서 받은 categorySeq를 가져옵니다.
-    const { categorySeq } = route.params;
+  // 토큰
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
+  const dispatch = useDispatch()
+  // 그 외
+  const [categorySeq, setCategorySeq] = useState(route.params.categorySeq);
+  const [categoryTitle, setCategoryTitle] = useState(route.params.categoryTitle)
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [selectedSpot, setSelectedSpot] = useState(null)
 
-    // categorySeq와 일치하는 category 데이터를 찾습니다.
-    const category = categorys.find(item => item.categorySeq === categorySeq);
+  const [categorySpot, setCategorySpot] = useState(null)
 
-    return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                {/* 뒤로가기 버튼 */}
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Image
-                        style={styles.arrowIcon}
-                        source={require('../../assets/icon/back_arrow.png')} // 화살표 아이콘 이미지 경로
-                    />
-                </TouchableOpacity>
-                
-            </View>
+  const doPlanCategoryUsingSpot = async () => {
+    try{
+      const response = await planCategoryUsingSpot(categorySeq, accessToken, grantType)
+      if(response.status===200){
+        console.log("카테고리 사용처 목록 데이터:",response.data)
+        setCategorySpot(response.data)
+        console.log('카테고리 사용처 목록 가져오기 성공') 
+      }else{
+        console.log('카테고리 사용처 목록 가져오기 실패',response.status) 
+      } 
+    }catch(error){
+      console.log('카테고리 사용처 목록 가져오기 실패',error) 
+    }
+  }
 
-            <View style={styles.topContainer}>
-                {/* 페이지 상단 좌측에 categoryTitle 출력 */}
-                <View style={styles.categoryTitleContainer}>
-                    <Text style={styles.categoryTitle}>{category.categoryTitle}</Text>
-                    <Text style={styles.categoryTitleExplain}>자주 사용하는 사용처를 분류해주세요.</Text>
-                </View>
-                <Image
-                        style={styles.checkIcon}
-                        source={require('../../assets/images/Hamster/CheckHamster.png')}
-                    />
-            </View>    
+  const doPlanCategoryDeleteSpot = async (dataCode) => {
+    try{
+      const response = await planCategoryDeleteSpot(dataCode, accessToken, grantType)
+      if(response.status===200){
+        // setCategorySpot(response.data)
+      }else{
+      } 
+    }catch(error){
+    }
+  }
 
-            {/* 자주 사용하는 사용처 */}
-            <View style={styles.categoryGroup}>
-                <Text style={styles.categoryGroupText}>자주 사용하는 사용처</Text>
-            </View>
-            {/* 카테고리 목록 */}
-            <FlatList
-                data={category.categoryList}
-                renderItem={({ item }) => (
-                    <View style={styles.categoryItem}>
-                        <Text style={styles.categoryItemText}>{item}</Text>
-                    </View>
-                )}
-                keyExtractor={(item, index) => index.toString()}
-                contentContainerStyle={styles.categoryList}
-                numColumns={3} // 2개의 열로 배치
-            />
-            {/* 구분선 */}
-            <View style={styles.separator}></View>
-            {/* 신규 사용처 */}
-            <View style={styles.categoryGroup}>
-                <Text style={styles.categoryGroupText}>신규 사용처</Text>
-            </View>
-            {/* 신규 카테고리 목록 */}
-            <FlatList
-                data={category.newCategoryList}
-                renderItem={({ item }) => (
-                    <View style={styles.categoryItem}>
-                        <Text style={styles.categoryItemText}>{item}</Text>
-                    </View>
-                )}
-                keyExtractor={(item, index) => index.toString()}
-                contentContainerStyle={styles.categoryList}
-                numColumns={2} // 2개의 열로 배치
-            />
+
+  
+
+  useEffect(()=>{
+    doPlanCategoryUsingSpot()
+  },[])
+
+  return (
+    <View style={styles.container}>
+      <HeaderComponent title="카테고리 세부 내용" navigation={navigation} cancelNavi="MyPageScreen"></HeaderComponent>
+
+      <View style={styles.topContainer}>
+        <View style={styles.categoryTitleContainer}>
+          <Text style={styles.categoryTitle}>{categoryTitle}</Text>
+          <Text style={styles.categoryTitleExplain}>
+            자주 사용하는 사용처를 분류해주세요.
+          </Text>
         </View>
-    );
+        <Image
+          style={styles.checkIcon}
+          source={require("../../assets/images/Hamster/CheckHamster.png")}
+        />
+      </View>
+
+      <View style={styles.categoryGroup}>
+        <Text style={styles.categoryGroupText}>자주 사용하는 사용처</Text>
+      </View>
+      {categorySpot
+        ?(<View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+          {categorySpot.map((item, index) => {
+            if(item.count > 1){
+              return(
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.categoryItem,
+                  ]}
+                  onPress={()=>{
+                    setIsDeleteModalVisible(true)
+                    setSelectedSpot({dataCode:item.dataCode, dataName:item.dataName})
+                  }}
+                >
+                  <Text style={styles.categoryItemText}>{item.dataName}</Text>
+                </TouchableOpacity>
+              )
+            }else{
+              return null
+            }
+          })}
+        </View>)
+        : (<View style={{ flexDirection: 'row', flexWrap: 'wrap' }}></View>)
+      }
+      <View style={styles.separator}></View>
+      <View style={styles.categoryGroup}>
+        <Text style={styles.categoryGroupText}>신규 사용처</Text>
+      </View>
+      {categorySpot
+        ?(<View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+          {categorySpot.map((item, index) => {
+            if(item.count ==1){
+              return(
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.categoryItem,
+                  ]}
+                  onPress={()=>{
+                    setIsDeleteModalVisible(true)
+                    setSelectedSpot({dataCode:item.dataCode, dataName:item.dataName})
+                  }}
+                >
+                  <Text style={styles.categoryItemText}>{item.dataName}</Text>
+                </TouchableOpacity>
+              )
+            }else{
+              return null
+            }
+          })}
+        </View>)
+        : (<View style={{ flexDirection: 'row', flexWrap: 'wrap' }}></View>)
+      }
+
+      {isDeleteModalVisible
+        ?(<View style={styles.centeredView}>
+          <Modal
+            animationType="none"
+            transparent={true}
+            visible={isDeleteModalVisible}
+            onRequestClose={() => {
+              setIsDeleteModalVisible(false)
+              setSelectedSpot(null)
+            }}>
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalText}>{selectedSpot.dataName}를 {categoryTitle} 카테고리에서 삭제 하시겠습니까?</Text>
+                <View style={{flexDirection:'row', justifyContent:'space-around'}}>
+                  <TouchableOpacity
+                    style={[styles.button, styles.buttonClose]}
+                    onPress={() => {
+                      doPlanCategoryDeleteSpot(selectedSpot.dataCode)
+                      const newCategorySpot = categorySpot.filter(item => item.dataCode !== selectedSpot.dataCode);
+                      setCategorySpot(newCategorySpot)
+                      setIsDeleteModalVisible(false)
+                      setSelectedSpot(null)
+                    }}>
+                    <Text style={styles.textStyle}>예</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.button, styles.buttonClose]}
+                    onPress={() => {
+                      setIsDeleteModalVisible(false)
+                      setSelectedSpot(null)
+                    }}>
+                    <Text style={styles.textStyle}>아니오</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        </View>)
+        :null
+      }
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: 'white',
-        padding: 16,
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+    padding: 16,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+    marginTop: 15,
+  },
+  arrowIcon: {
+    width: 20,
+    height: 20,
+  },
+  topContainer: {
+    flexDirection: "row",
+    marginLeft: "5%",
+    marginTop: 20,
+    marginBottom: 50,
+  },
+  categoryTitleContainer: {
+    flexDirection: "column",
+  },
+  categoryTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+
+    flex: 1,
+    textAlign: "left",
+    marginLeft: 8,
+    marginTop: 70,
+    marginBottom: -10,
+  },
+  categoryTitleExplain: {
+    fontSize: 10,
+    flex: 1,
+    textAlign: "left",
+    marginLeft: 8,
+    color: "#7B7B7B",
+  },
+  categoryGroup: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  categoryGroupText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginLeft: "5%",
+    marginBottom: 10,
+  },
+  checkIcon: {
+    width: 150,
+    height: 150,
+    marginLeft: 10,
+  },
+  categoryList: {
+    flexDirection: "column",
+    alignSelf: "left",
+  },
+  categoryItem: {
+    alignItems: "center",
+    padding: 4,
+    marginBottom: 8,
+    marginHorizontal: 8,
+    borderWidth: 1,
+    borderColor: "#7B7B7B",
+    borderRadius: 20,
+  },
+  categoryItemText: {
+    fontSize: 16,
+    marginHorizontal: 5,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: "#BAC0CA",
+    marginVertical: 40,
+  },
+  circle: {
+    width: 60, 
+    height: 60, 
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: "#7B7B7B",
+    backgroundColor: "#7B7B7B",
+    padding: 0,
+    justifyContent: 'center', 
+    alignItems: 'center',
+    bottom: 50
+  },
+  circle2: {
+    width: 80, 
+    height: 80,
+    borderRadius: 50, 
+    borderWidth: 1,
+    borderColor: "black", 
+    backgroundColor: "black",
+    padding: 0, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    bottom: 40
+  },
+
+  // 모달 관련 스타일
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
     },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 16,
-        marginTop: 15,
-    },
-    arrowIcon: {
-        width: 20,
-        height: 20,
-    },
-    topContainer: {
-        flexDirection: 'row',
-        marginLeft: "5%",
-        marginTop: 20,
-        marginBottom: 50,
-    },
-    categoryTitleContainer: {
-        flexDirection: 'column',
-    },
-    categoryTitle: {
-        fontSize: 30,
-        flex: 1,
-        textAlign: 'left',
-        marginLeft: 16, // categoryTitle을 뒤에 추가
-        marginTop: 20,
-    },
-    categoryTitleExplain: {
-        fontSize: 10,
-        flex: 1,
-        textAlign: 'left',
-        marginLeft: 16, // categoryTitle을 뒤에 추가
-        color: "#7B7B7B"
-    },
-    categoryGroup: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    categoryGroupText: {
-        fontSize: 23,
-        fontWeight: 'bold',
-        marginLeft: '5%',
-        marginBottom: 10,
-    },
-    checkIcon: {
-        width: 150,
-        height: 150,
-        marginLeft: 10,
-    },
-    categoryList: {
-        flexDirection: 'column', // 세로로 배치
-        alignSelf: 'left'
-    },
-    categoryItem: {
-        alignItems: 'center',
-        padding: 2,
-        marginBottom: 8,
-        marginHorizontal: 8, // 좌우 여백 추가
-        borderWidth: 1, // 테두리 추가
-        borderColor: 'black', // 테두리 색상
-        borderRadius: 20, // 테두리 둥글게 설정
-    },
-    categoryItemText: {
-        fontSize: 16,
-        marginHorizontal: 5,
-    },
-    separator: {
-        height: 2,
-        backgroundColor: '#BAC0CA', // 구분선 색상 변경
-        marginVertical: 20,
-    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    flex:1,
+    borderRadius: 20,
+    padding: 10,
+    marginHorizontal: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#FF965C',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
 });

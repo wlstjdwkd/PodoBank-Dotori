@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
@@ -9,18 +9,73 @@ import {
 } from "react-native";
 
 import HeaderComponent from "../Components/HeaderScreen";
+import { useDispatch, useSelector } from "react-redux";
+import { purposeNewRegister } from "../../apis/purposeapi"
 
 export default function PurposeCreate3Screen({ navigation, route }) {
+  // 토큰
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
+  const dispatch = useDispatch()
+  // 그 외
+  
+  const goalAmountRef = useRef()
   const [purposeInfo, setPurposeInfo] = useState(route.params.purposeInfo);
   const [isValid, setIsValid] = useState(false);
+  const [goalAmountMessage, setgoalAmountMessage] = useState("숫자만 입력해주세요.")
+
+  const validategoalAmount = (text) => {
+    const regex = /^[0-9]{1,}$/
+    return regex.test(text)
+  }
+
   const handleMoneyChange = (text) => {
-    setPurposeInfo((prev) => ({ ...prev, purposeMoney: text }));
-    if (text.length > 0) {
-      setIsValid(true);
-    } else {
-      setIsValid(false);
+    if(validategoalAmount(text)) {
+      setPurposeInfo((prev) => ({ ...prev, goalAmount: text }))
+      setIsValid(true)
+      setgoalAmountMessage("목표 금액 설정 완료!")
+    }else if(text.length <= 0){
+      setPurposeInfo((prev) => ({ ...prev, goalAmount: "" }))
+      setIsValid(false)
+      setgoalAmountMessage("숫자만 입력해주세요.")
     }
-  };
+    else {
+      setIsValid(false)
+      setgoalAmountMessage("숫자만 입력해주세요.")
+    }
+  }
+
+  const handlePurposeNewRegister = () => {
+    if(isValid){
+      doPurposeNewRegister()
+    }else{
+      setIsValid(false)
+      setgoalAmountMessage("숫자만 입력해주세요.")
+    }
+  }
+
+  const doPurposeNewRegister = async () => {
+    data = {
+      "purposeTitle" : purposeInfo.purposeTitle,
+      "goalAmount" : parseInt(purposeInfo.goalAmount),
+      "startedAt" : purposeInfo.startedAt,
+      "endAt" : purposeInfo.endAt,
+    }
+    try{
+      const response = await purposeNewRegister(data, accessToken, grantType)
+      if(response.status===200){
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'PurposeCompleteScreen', params: {name : purposeInfo.purposeTitle}}],
+        })
+      }else if(response.status===400){
+      }else{
+      }
+    }catch(error){
+    }
+  }
+
   return (
     <View style={styles.container}>
       <HeaderComponent
@@ -39,21 +94,24 @@ export default function PurposeCreate3Screen({ navigation, route }) {
             multiline={true}
             placeholder="예시) 10000"
             keyboardType="numeric"
+            returnKeyType="done"
+            ref={goalAmountRef}
+            onSubmitEditing={()=>{
+              handlePurposeNewRegister()
+            }}
+            value={purposeInfo.goalAmount}
           />
           <View style={styles.textRight}>
-            <Text style={styles.instructionText}>숫자만 적어주세요.</Text>
+            <Text style={[styles.instructionText, {color:isValid?'blue':'#A9A9A9'}]}>{goalAmountMessage}</Text>
           </View>
         </View>
 
         <TouchableOpacity
-          style={styles.button}
-          onPress={() =>
-            navigation.navigate("PurposeCompleteScreen", {
-              name: purposeInfo.purposeName,
-            })
-          }
-          //TODO: 풀기
-          // disabled={!isValid}
+          style={[styles.button, {backgroundColor:isValid?"#FF965C":"gray"}]}
+          onPress={() => {
+            handlePurposeNewRegister()
+          }}
+          disabled={!isValid}
         >
           <Text style={styles.buttonText}>목표 생성하기</Text>
         </TouchableOpacity>
@@ -77,8 +135,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
     marginTop: 90,
   },
   title: {
@@ -92,7 +148,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "100%",
-    height: 50,
+    height: 40,
     backgroundColor: "#D9D9D920",
     borderWidth: 1,
     borderColor: "#BAC0CA",
@@ -100,10 +156,9 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     marginTop: 20,
-    // textAlign: "center",
   },
   button: {
-    height: 50,
+    height: 40,
     backgroundColor: "#FF965C",
     borderRadius: 8,
     justifyContent: "center",
@@ -120,8 +175,6 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   middleImage: {
-    // justifyContent: "center",
-    // alignItems: "center",
     width: 150,
     height: 150,
   },

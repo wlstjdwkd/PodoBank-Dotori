@@ -1,6 +1,6 @@
 // src/api/accountApi.js
 import axios from 'axios';
-const apiAddress ="http://j9d107.p.ssafy.io:9000"
+const apiAddress ="http://j9d107.p.ssafy.io:9600"
 
 // 계좌가 최근에 보낸 계좌 3개를 받음
 export const accountRecentTransfer = async (accountNumber, accessToken) => {

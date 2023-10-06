@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,12 +6,16 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  RefreshControl,
 } from "react-native";
 import FooterScreen from "../Components/FooterScreen";
+import { useDispatch, useSelector } from "react-redux";
+import { useIsFocused } from "@react-navigation/native";
+import { planInProgress } from "../../apis/planapi";
 
 function ProgressBar({ current, target }) {
-  const progress = (current / target) * 100;
-  const displayedProgress = Math.floor(progress); // Ensure it's from the unit's digit
+  const progress = 100 - (current / target) * 100;
+  const displayedProgress = Math.floor(progress);
   let progressBarColor;
   if (displayedProgress >= 50) {
     progressBarColor = "#5F9DF7";
@@ -20,7 +24,7 @@ function ProgressBar({ current, target }) {
   } else if (displayedProgress >= 0) {
     progressBarColor = "#FEDE16";
   } else {
-    progressBarColor = "#ED4343"; // minus percentage
+    progressBarColor = "#ED4343";
   }
   const absoluteProgress = Math.abs(displayedProgress);
 
@@ -40,61 +44,119 @@ function ProgressBar({ current, target }) {
   );
 }
 
-export default function PlanMainScreen({ navigation }) {
-  // TODO: 서버에서 데이터를 가져와 아래 변수들을 설정하세요
-  const accountName = "월급 통장";
-  const accountMoney = 0;
-  const plan = {
-    endDate: new Date("2023-12-31"),
-    notClassifyNum: 5,
-    categoryList: [
-      {
-        categoryName: "식비",
-        currentMoney: 150000, // bigdecimal 타입이 JavaScript에는 없기 때문에 일단 float로 표현합니다.
-        targetMoney: 300000,
-        categoryGroupName: "일상비용",
-      },
-      {
-        categoryName: "교통비",
-        currentMoney: 40000,
-        targetMoney: 100000,
-        categoryGroupName: "일상비용",
-      },
-      {
-        categoryName: "여행비",
-        currentMoney: 1000000,
-        targetMoney: 5000000,
-        categoryGroupName: "여가/오락비용",
-      },
-      {
-        categoryName: "여행비",
-        currentMoney: 800000,
-        targetMoney: 5000000,
-        categoryGroupName: "여가/오락비용",
-      },
-      {
-        categoryName: "진성비",
-        currentMoney: -200,
-        targetMoney: 500,
-        categoryGroupName: "여가/오락비용",
-      },
-    ],
-  }; // 예시: categoryList가 없는 경우는 빈 배열
+export default function PlanMainScreen({ navigation, route }) {
+  // 토큰
+  const grantType = useSelector((state) => state.user.grantType);
+  const accessToken = useSelector((state) => state.user.accessToken);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const refreshToken = useSelector((state) => state.user.refreshToken);
+  const dispatch = useDispatch();
+  // 그 외
+  const isFocused = useIsFocused();
+
+  const onRefresh = async () => {
+    setRefreshing(true)
+    await doPlanInquiry()
+
+    setRefreshing(false)
+  };
+
+  const accountName = route.params.accountTitle;
+  const accountSeq = route.params.accountSeq;
+
+  const [planInfo, setPlanInfo] = useState(null);
   const formatNumber = (num) => {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
   };
+
+  const doPlanInquiry = async () => {
+    try {
+      const response = await planInProgress(accountSeq, accessToken, grantType);
+      if (response.status === 200) {
+        setPlanInfo(response.data);
+      } else if (response.status === 404) {
+        navigation.navigate("SavingPlanCompleteRecipeScreen", {
+          accountName: accountName,
+          accountSeq: accountSeq,
+          planSeq: response.data,
+        });
+      } else {
+      }
+    } catch (error) {
+    }
+  };
+
+  const renderPlans = () => {
+    if (!planInfo) return <Text>Loading...</Text>;
+    if (planInfo.activePlanList === null) return renderNoPlan();
+    if (planInfo.activePlanList.length > 0) return renderActivePlans();
+    return null;
+  };
+
+  useEffect(() => {
+    if (isFocused) {
+      doPlanInquiry();
+    }
+  }, [isFocused]);
+
+  const currentDate = new Date();
+  const formatDate = (dateTimeStr) => {
+    if (!dateTimeStr) return ""; 
+
+    const [dateOnly] = dateTimeStr.split("T"); 
+
+    return dateOnly; 
+  };
+
   return (
     <View style={styles.container}>
+      {planInfo ? (
+        planInfo.planSeq ? (
+          <TouchableOpacity
+            style={{ alignSelf: "flex-end", margin: 20, marginBottom: -40 }}
+            onPress={() => {
+              navigation.navigate("PlanManageScreen", {
+                accountTitle: accountName,
+                accountSeq: accountSeq,
+                planSeq: planInfo.planSeq,
+                accountBalance: planInfo.accountBalance,
+                endAt: planInfo.endAt,
+                startedAt: planInfo.startedAt,
+              });
+            }}
+          >
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}>관리</Text>
+          </TouchableOpacity>
+        ) : null
+      ) : null}
       <Text style={styles.accountName}>{accountName}</Text>
-      <Text style={styles.accountMoney}>{formatNumber(accountMoney)}원</Text>
+      <Text style={styles.accountMoney}>
+        {planInfo ? formatNumber(planInfo.accountBalance) + "원" : "Loading..."}
+      </Text>
 
       <View style={styles.divider}></View>
       {/* <View style={styles.innerContainer}> */}
-      {plan.length === 0 ? (
+
+      {planInfo && planInfo.state === "READY" && (
+        <View style={styles.overlay}>
+          <Image
+            style={styles.overlayImage}
+            source={require("../../assets/images/Hamster/OverlayHamster.png")}
+          ></Image>
+          <Text style={styles.overlayText}>계획은</Text>
+
+          <Text style={styles.overlayText}>
+            {formatDate(planInfo.startedAt)} 에
+          </Text>
+          <Text style={styles.overlayText}>시작합니다요</Text>
+        </View>
+      )}
+      {/* 무계획 상태 */}
+      {planInfo && planInfo.activePlanList === null ? (
         <>
           <Text style={styles.boldMessage}>새로운 계획을 생성하세요.</Text>
           <Text style={styles.message}>당신의 새로운 계획은 무엇인가요?</Text>
-          {/* 이미지를 가져올 경로를 적용하세요 */}
           <Image
             style={styles.image}
             source={require("../../assets/images/Hamster/PlanMainHamster.png")}
@@ -102,36 +164,47 @@ export default function PlanMainScreen({ navigation }) {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              navigation.navigate("PlanCreate1Screen");
+              navigation.navigate("PlanCreate1Screen", {
+                accountSeq: accountSeq,
+              });
             }}
           >
             <Text style={styles.buttonText}>계획 생성하기</Text>
           </TouchableOpacity>
         </>
-      ) : (
+      ) : planInfo &&
+        planInfo.activePlanList &&
+        planInfo.activePlanList.length > 0 ? (
         <>
+          {/* status active 상태 */}
           <ScrollView
             showsVerticalScrollIndicator={false}
             style={styles.planContainer}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
           >
             <View style={styles.headerContainer}>
               <Text style={styles.endDate}>
-                {plan.endDate.toLocaleDateString()} 종료 예정
+                {formatDate(planInfo.endAt)} 종료 예정
               </Text>
               <TouchableOpacity
                 style={styles.mailIconWrapper}
                 onPress={() => {
-                  navigation.navigate("PlanNotClassifyScreen");
+                  navigation.navigate("PlanNotClassifyScreen", {
+                    accountName: accountName,
+                    planSeq: planInfo.planSeq,
+                  });
                 }}
               >
                 <Image
                   style={styles.mailImage}
                   source={require("../../assets/images/mail-icon.png")}
                 />
-                {plan.notClassifyNum > 0 && (
+                {planInfo.unclassified > 0 && (
                   <View style={styles.notificationBubble}>
                     <Text style={styles.notificationText}>
-                      {plan.notClassifyNum}
+                      {planInfo.unclassified}
                     </Text>
                   </View>
                 )}
@@ -140,9 +213,9 @@ export default function PlanMainScreen({ navigation }) {
                 <Text>카테고리 그룹</Text>
               </TouchableOpacity>
             </View>
-            {plan.categoryList.map((category, index) => {
+            {planInfo.activePlanList.map((category, index) => {
               const percentage = Math.floor(
-                (category.currentMoney / category.targetMoney) * 100
+                100 - (category.currentBalance / category.goalAmount) * 100
               );
               let textColor;
               if (percentage >= 50) {
@@ -152,7 +225,7 @@ export default function PlanMainScreen({ navigation }) {
               } else if (percentage >= 0) {
                 textColor = "#FEDE16";
               } else {
-                textColor = "#ED4343"; // minus percentage
+                textColor = "#ED4343";
               }
 
               return (
@@ -160,24 +233,27 @@ export default function PlanMainScreen({ navigation }) {
                   key={index}
                   style={styles.categoryBox}
                   onPress={() => {
-                    navigation.navigate("PlanCategoryScreen");
+                    navigation.navigate("PlanCategoryScreen", {
+                      planDetailSeq: category.planDetailSeq,
+                    });
                   }}
                 >
                   <View style={styles.categoryTop}>
-                    <Text style={styles.categoryName}>
-                      {category.categoryName}
-                    </Text>
+                    <Text style={styles.categoryName}>{category.title}</Text>
                     <Text style={styles.currentMoney}>
-                      {formatNumber(category.currentMoney)}원
+                      {formatNumber(
+                        category.goalAmount - category.currentBalance
+                      )}
+                      원
                     </Text>
                   </View>
                   <Text style={styles.categoryGroupName}>
-                    {category.categoryGroupName}
+                    {category.groupTitle}
                   </Text>
                   <View style={styles.rowContainer}>
                     <ProgressBar
-                      current={category.currentMoney}
-                      target={category.targetMoney}
+                      current={category.currentBalance}
+                      target={category.goalAmount}
                     />
                     <Text style={[styles.percentageText, { color: textColor }]}>
                       {percentage}%
@@ -188,7 +264,7 @@ export default function PlanMainScreen({ navigation }) {
             })}
           </ScrollView>
         </>
-      )}
+      ) : null}
 
       <View style={styles.footer}>
         <FooterScreen navigation={navigation} />
@@ -215,26 +291,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  //   innerContainer: {
-  //     flex: 1,
-  //     alignItems: "center",
-  //     justifyContent: "center",
-  //     backgroundColor: "white",
-  //     padding: 16,
-  //     width: "100%"
-  //   },
+
   divider: {
-    width: "100%", // 원하는 너비로 조정하세요
-    height: 1, // 원하는 높이로 조정하세요
-    backgroundColor: "#d1d1d1", // 원하는 색상으로 변경하세요
+    width: "100%",
+    height: 1,
+    backgroundColor: "#d1d1d1",
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
-    marginBottom: 30, // 원하는 여백으로 조정하세요
+    marginBottom: 30,
     marginTop: -30,
   },
   accountName: {
     fontSize: 18,
-    // fontWeight: "bold",
     marginBottom: 8,
     marginTop: 100,
   },
@@ -256,8 +324,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   image: {
-    width: 180, // 이미지 크기는 조정하세요
-    height: 200, // 이미지 크기는 조정하세요
+    width: 180,
+    height: 200,
     marginBottom: 40,
     marginTop: 40,
   },
@@ -276,14 +344,14 @@ const styles = StyleSheet.create({
     top: 0,
     backgroundColor: "red",
     borderRadius: 10,
-    width: 20, // 이 크기는 숫자의 크기에 따라 조정이 필요할 수 있습니다.
-    height: 20, // 이 크기는 숫자의 크기에 따라 조정이 필요할 수 있습니다.
+    width: 20,
+    height: 20,
     alignItems: "center",
     justifyContent: "center",
   },
   notificationText: {
     color: "white",
-    fontSize: 12, // 글자 크기는 필요에 따라 조정하세요.
+    fontSize: 12,
     fontWeight: "bold",
   },
   button: {
@@ -327,6 +395,10 @@ const styles = StyleSheet.create({
     padding: 16,
     width: "100%",
     marginBottom: 10,
+
+    elevation: 5,
+    backgroundColor: "white",
+    marginBottom: 20,
   },
   categoryTop: {
     flexDirection: "row",
@@ -344,6 +416,7 @@ const styles = StyleSheet.create({
   },
   categoryGroupName: {
     color: "#7B7B7B",
+    fontSize: 12,
   },
   progressBarContainer: {
     height: 17,
@@ -356,17 +429,32 @@ const styles = StyleSheet.create({
   progressBar: {
     height: 17,
     borderRadius: 8.5,
-    backgroundColor: "blue", // 원하는 색상으로 변경하세요
+    backgroundColor: "blue",
   },
   progressBarText: {
-    position: "absolute", // 진행 바 위에 텍스트를 배치
-    right: 5, // 오른쪽에서 약간의 공간을 줌
-    color: "white", // 원하는 색상으로 변경하세요
+    position: "absolute",
+    right: 5,
+    color: "white",
     fontWeight: "bold",
   },
   percentageText: {
     textAlign: "right",
     fontSize: 15,
     marginTop: 27,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(255,255,255,0.8)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+  },
+  overlayImage: {
+    height: 200,
+    width: 200,
+  },
+  overlayText: {
+    fontSize: 25,
+    marginTop: 10,
   },
 });
