@@ -7,37 +7,18 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import { Audio } from 'expo-av';
-import { useIsFocused } from "@react-navigation/native";
 
-export default function RandomBox3Screen({ navigation, route }) {
+export default function RandomBoxCompleteScreen({ navigation, route }) {
   const [prizeAmount, setPrizeAmount] = useState(route.params.prizeAmount)
-  const [openSound, setOpenSound] = useState();
+  const [selectedAccountName, setSelectedAccountName] = useState(route.params.selectedAccountName)
 
-  const isFocused = useIsFocused();
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
 
-  const playopenSound = async() => {
-    const { sound } = await Audio.Sound.createAsync( require('../../assets/bbak.mp3')
-    );
-    setOpenSound(sound);
-    await sound.playAsync();
-  }
-
-  useEffect(() => {
-    return openSound
-      ? () => {
-        openSound.unloadAsync();
-        }
-      : undefined;
-  }, [openSound]);
 
   useEffect(()=>{
-    if(isFocused){
-      playopenSound()
-    }
-  }, [isFocused])
+    
+  }, [])
   return (
     <View style={{flex:1, backgroundColor:'white'}}>
       <View style={{flex:0.15}}></View>
@@ -45,13 +26,14 @@ export default function RandomBox3Screen({ navigation, route }) {
       <View style={styles.container}>
         <View>
           <Image
-            source={require("../../assets/images/Hamster/giftHamster2.png")}
+            source={require("../../assets/images/Hamster/financeHamster.png")}
             style={{width:windowWidth*0.7, height:windowWidth*0.7}}
           />
         </View>
         <View>
-          <Text style={{fontSize:40, fontWeight:"bold"}}>{prizeAmount}원</Text>
-          <Text style={{textAlign:'center'}}>축하합니다!</Text>
+          <Text style={{fontSize:20, textAlign:'center'}}>{selectedAccountName} 당첨금</Text>
+          <Text style={{fontSize:40, fontWeight:"bold", textAlign:'center'}}>{prizeAmount}원</Text>
+          <Text style={{fontSize:20, textAlign:'center'}}>을 {selectedAccountName} 계좌로 이체했어요!</Text>
         </View>
       </View>
       <View style={{width: "80%", alignSelf: "center", alignItems:'center',}}>
@@ -60,10 +42,10 @@ export default function RandomBox3Screen({ navigation, route }) {
               styles.button,
             ]}
             onPress={() => {
-              navigation.navigate("RandomBox4Screen",{prizeAmount:prizeAmount})
+              navigation.navigate("MainPageScreen")
             }}
           >
-            <Text style={styles.buttonText}>저축하기</Text>
+            <Text style={styles.buttonText}>메인페이지로 가기</Text>
           </TouchableOpacity>
       </View>
         

@@ -23,7 +23,6 @@ export default function PlanCategoryScreen({ navigation, route }) {
   const [planDetailSeq, setPlanDetailSeq] = useState(
     route.params.planDetailSeq
   );
-  console.log("planDetailSeq: " + planDetailSeq);
   const [consumeList, setConsumeList] = useState(null);
   const [data, setData] = useState(null);
   const doPlanDetailConsumeList = async () => {
@@ -34,43 +33,14 @@ export default function PlanCategoryScreen({ navigation, route }) {
         grantType
       );
       if (response.status === 200) {
-        console.log("response.data", response.data);
         setConsumeList(response.data);
-        // console.log("consumeList", consumeList);
         setData(response.data);
-        // 종료된 계획이라면 바로 종료 명세서 보기 창으로 넘김, else는 만들 필요없음.
 
-        console.log("data", data);
       } else {
-        console.log("계획 정보 조회 실패", response.status);
       }
     } catch (error) {
-      console.error("오류 발생 : 계획 정보 조회 실패:", error);
     }
   };
-  // TODO: 서버에서 데이터를 가져와 아래 변수들을 설정하세요
-  // const sampleData = {
-  //   categoryName: "Travel",
-  //   targetMoney: 500000,
-  //   currentMoney: 250000,
-  //   consumeList: [
-  //     {
-  //       transaction_at: "2023-09-15 10:30:00",
-  //       transaction_details: "Flight ticket",
-  //       amount: 150000,
-  //     },
-  //     {
-  //       transaction_at: "2023-09-15 08:30:00",
-  //       transaction_details: "Flight ticket",
-  //       amount: 200000,
-  //     },
-  //     {
-  //       transaction_at: "2023-09-16 13:45:00",
-  //       transaction_details: "Hotel booking",
-  //       amount: 100000,
-  //     },
-  //   ],
-  // };
   useEffect(() => {
     if (isFocused) {
       doPlanDetailConsumeList();
@@ -83,7 +53,7 @@ export default function PlanCategoryScreen({ navigation, route }) {
   };
   const formatDate = (transaction_at) => {
     const dateObj = new Date(transaction_at);
-    const month = dateObj.getMonth() + 1; // 월은 0부터 시작하므로 +1 해주어야 합니다.
+    const month = dateObj.getMonth() + 1;
     const date = dateObj.getDate();
     return `${month}월 ${date}일`;
   };
@@ -194,11 +164,10 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 18,
     marginBottom: 20,
-    // marginLeft: 0,
   },
   transBox: {
     flexDirection: "column",
-    alignItems: "flex-start", // 왼쪽 정렬
+    alignItems: "flex-start",
     justifyContent: "space-between",
     padding: 10,
     marginBottom: 5,
@@ -219,7 +188,7 @@ const styles = StyleSheet.create({
   },
   transDetails: {
     fontSize: 16,
-    alignSelf: "flex-start", // 왼쪽 정렬
+    alignSelf: "flex-start",
   },
   transTime: {
     fontSize: 14,
@@ -228,7 +197,7 @@ const styles = StyleSheet.create({
   transAmount: {
     fontSize: 16,
     fontWeight: "bold",
-    textAlign: "right", // 오른쪽 정렬
+    textAlign: "right",
   },
   header: {
     flexDirection: "row",
@@ -250,8 +219,6 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingVertical: 10,
     paddingHorizontal: 30,
-    // marginLeft: -100,
-    // marginRight: -100,
     marginBottom: 20,
   },
   categoryName: {

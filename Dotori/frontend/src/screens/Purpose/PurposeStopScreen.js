@@ -24,21 +24,9 @@ export default function PurposeDetailScreen({ navigation, route }) {
   const [initialSpacingWidth, setInitialSpacingWidth] = useState(3)
 
 
-  // 현재 창의 너비를 가져오기
   const windowWidth = Dimensions.get('window').width;
-
-  // 화면의 전체 너비를 가져오기
   const screenWidth = Dimensions.get('screen').width;
 
-
-  // const sortedPurposeDataList = data.purposeDataList.sort((a, b) => {
-  //   const dateA = new Date(a.month);
-  //   const dateB = new Date(b.month);
-  //   return dateA - dateB;
-  // });
-  // const barData = generateBarData(sortedPurposeDataList);
-
-  
   const generateBarData = (data) => {
     const barData = [];
     const currentDate = new Date();
@@ -49,7 +37,7 @@ export default function PurposeDetailScreen({ navigation, route }) {
 
     data.forEach((item) => {
       const { month, dataAmount } = item;
-      const [ year, monthNumber ] = month.split('-'); // 월과 연도 추출
+      const [ year, monthNumber ] = month.split('-');
 
       let isCurrentYearMonth = false;
 
@@ -59,8 +47,7 @@ export default function PurposeDetailScreen({ navigation, route }) {
 
       barData.push({
         value: dataAmount,
-        label: (monthNumber != 1) ? parseInt(monthNumber) : `${year.slice(-2)}/${parseInt(monthNumber)}`, // 월 표시 형식 변경
-        // frontColor: isCurrentYearMonth ? '#31C68F' : '#F1F1F1',
+        label: (monthNumber != 1) ? parseInt(monthNumber) : `${year.slice(-2)}/${parseInt(monthNumber)}`,
         frontColor: isCurrentYearMonth ? '#31C68F' : (dataAmount === Math.max(...data.map(item => item.dataAmount)) ? '#ED4343' : '#F1F1F1'),
       });
     });
@@ -77,29 +64,22 @@ export default function PurposeDetailScreen({ navigation, route }) {
     try{
       const response = await purposeQuit(purposeSeq, accessToken, grantType)
       if(response.status === 200){
-        console.log('목표 중단 완료')
         navigation.reset({
           index: 0,
           routes: [{ name: 'PurposeScreen' }],
         });
       }else{
-        console.log('목표 중단 실패', response.status)
       }
-      // console.log("테스트")
     }catch(error){
-      console.log('오류 발생: 목표 중단 실패', error)
     }
   }
   
   const settingbarData = () =>{
-    // Get the start and end dates from the response
     const startDate = new Date(purposeDetailData.startedAt);
     const endDate = new Date(purposeDetailData.endAt);
   
-    // Create a map to group data by month
     const monthlyDataMap = {};
   
-    // Loop through the purposeDataList and group data by month
     purposeDetailData.purposeDataList.forEach(item => {
       const dataDate = new Date(item.dataCreatedAt);
       const monthYearKey = `${dataDate.getFullYear()}-${(dataDate.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -110,13 +90,9 @@ export default function PurposeDetailScreen({ navigation, route }) {
   
       monthlyDataMap[monthYearKey] += item.dataAmount;
     });
-    console.log(monthlyDataMap) //{"2023-09": 6, "2023-10": 15, "2023-11": 24, "2023-12": 165}
-    
-    // Create an array of purposeData objects
     const purposeDataList = [];
   
-    // Loop through the months in the date range and create purposeData objects
-    let currentDate = new Date(startDate); // startDate 변수를 복사하여 currentDate에 할당
+    let currentDate = new Date(startDate)
 
     while (currentDate <= endDate) {
       const monthYearKey = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -127,12 +103,9 @@ export default function PurposeDetailScreen({ navigation, route }) {
         dataAmount
       });
     
-      // Move to the next month by creating a new date object
-      currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1); // 다음 달의 1일로 설정
+      currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
     }
   
-    console.log(purposeDataList); //[{"dataAmount": 6, "month": "2023-09"}, {"dataAmount": 15, "month": "2023-10"}, {"dataAmount": 24, "month": "2023-11"}]
-    // const barData = generateBarData(purposeDataList);
     setbarData(generateBarData(purposeDataList))
   }
 
@@ -147,41 +120,34 @@ export default function PurposeDetailScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <View style={{ flex: 1 }} />
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Feather name="x" size={30} style={styles.closeIcon} />
+          <Feather name="x" size={30} />
         </TouchableOpacity>
       </View>
 
-      {/* 목표 이름 */}
       <View style={[styles.titleContainer, {}]}>
-        {/* <Text style={styles.purposeTitle}>{data.purposeTitle}</Text> */}
         <Text style={styles.purposeTitle}>{purposeDetailData.purposeTitle}</Text>
       </View>
 
       <View style={{flexDirection:'row', marginVertical:20}}>
-        {/* 금액 정보 */}
         <View style={[styles.balanceContainer, {marginVertical:20}]}>
           <View style={styles.balanceItem}>
             <Text style={styles.balanceLabel}>목표 금액</Text>
             <Text style={styles.balanceValue}>
-              {/* {data.goalAmount.toLocaleString()}원 */}
               {purposeDetailData.goalAmount.toLocaleString()}원
             </Text>
           </View>
           <View style={styles.balanceItem}>
             <Text style={styles.balanceLabel}>현재 금액</Text>
             <Text style={styles.balanceValue}>
-              {/* {data.currentBalance.toLocaleString()}원 */}
               {purposeDetailData.currentBalance.toLocaleString()}원
             </Text>
           </View>
           <View style={styles.balanceItem}>
             <Text style={styles.balanceLabel}>남은 금액</Text>
             <Text style={styles.balanceValue}>
-              {/* {(data.goalAmount - data.currentBalance).toLocaleString()}원 */}
               {purposeDetailData.goalAmount - purposeDetailData.currentBalance > 0
                 ?(purposeDetailData.goalAmount - purposeDetailData.currentBalance).toLocaleString()
                 : 0}원
@@ -190,7 +156,6 @@ export default function PurposeDetailScreen({ navigation, route }) {
         </View>
       </View>
 
-      {/* 차트 */}
       <View style={styles.chartContainer}>
         <View style={styles.chartInfoContainer}>
           <Text style={styles.chartInfoText}>현재 달성</Text>
@@ -206,7 +171,6 @@ export default function PurposeDetailScreen({ navigation, route }) {
               width={250}
               height={150}
               initialSpacing={initialSpacingWidth}
-              // spacing={barData.length <= 7 ? Math.floor(windowWidth * 0.5 / barData.length) : 20}
               spacing={spacingWidth}
               hideRules
               hideYAxisText
@@ -242,47 +206,13 @@ export default function PurposeDetailScreen({ navigation, route }) {
           <Text style={{fontSize: 13, color: "#939393",}}>목표 중단하기</Text>
         </TouchableOpacity>
       </View>
-
-      {/* 중단 확인 문구 */}
-      {/* <View style={styles.stopCheckContainer}>
-        <Text style={styles.stopCheckText}>목표를 중단하시겠습니까?</Text>
-      </View> */}
-
-      {/* 확인 버튼 */}
-      {/* <View style={styles.purposeStopContainer}>
-        <TouchableOpacity
-          style={styles.stopPurposeButtonYes}
-          onPress={() => {
-            // 중단 요청
-            setIsQuitModalVisible(true)
-          }}
-        >
-          <View style={styles.stopPurposeButtonInner}>
-            <Text style={styles.stopPurposeText}>네</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.stopPurposeButtonNo}
-          onPress={() => { navigation.goBack() }}
-        >
-          <View style={styles.stopPurposeButtonInner}>
-            <Text style={styles.stopPurposeText}>아니오</Text>
-          </View>
-        </TouchableOpacity>
-      </View> */}
-
       
-
-
-      {/* 목표 종료 모달 */}
-      {/* 회원탈퇴 모달창 */}
       <View style={styles.centeredView}>
         <Modal
           animationType="none"
           transparent={true}
           visible={isQuitModalVisible}
           onRequestClose={() => {
-            // Alert.alert('Modal has been closed.');
             setIsQuitModalVisible(false);
           }}>
           <View style={styles.centeredView}>
@@ -300,7 +230,6 @@ export default function PurposeDetailScreen({ navigation, route }) {
                   onPress={() => {
                     navigation.navigate("PurposeStop1Screen", {purposeSeq:purposeSeq, purposeDetailData:purposeDetailData})
                     setIsQuitModalVisible(false)
-                    // doPurposeQuit()
                   }}>
                   <Text style={styles.textStyle}>예</Text>
                 </TouchableOpacity>
@@ -308,7 +237,6 @@ export default function PurposeDetailScreen({ navigation, route }) {
                   style={[styles.button, styles.buttonClose]}
                   onPress={() => {
                     setIsQuitModalVisible(false)
-                    // cancelUserWithdrawDotori()
                   }}>
                   <Text style={styles.textStyle}>아니오</Text>
                 </TouchableOpacity>
@@ -421,20 +349,15 @@ const styles = StyleSheet.create({
   },
   stopPurposeButtonInner: {
     alignItems: "center",
-    justifyContent: "center", // 추가
+    justifyContent: "center",
   },
   stopPurposeText: {
     fontSize: 20,
     color: "white",
-    textAlignVertical: 'center', // 추가
+    textAlignVertical: 'center',
     marginVertical: 5
   },
-  closeIcon: {
-    // marginRight: 20,
-  },
 
-  // 목표 종료 모달 스타일
-  // 모달 관련 스타일
   centeredView: {
     flex: 1,
     justifyContent: 'center',
@@ -446,7 +369,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
-    // alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -467,7 +389,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F194FF',
   },
   buttonClose: {
-    // backgroundColor: '#2196F3',
     backgroundColor: '#FF965C',
   },
   textStyle: {

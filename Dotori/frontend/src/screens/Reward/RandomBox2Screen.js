@@ -9,26 +9,22 @@ import {
 } from "react-native";
 
 import { Audio } from 'expo-av';
+import { useIsFocused } from "@react-navigation/native";
 
 
 export default function RandomBox2Screen({ navigation, route }) {
-  // const coin = route.params.coin;
   const [prizeAmount, setPrizeAmount] = useState(route.params.prizeAmount)
   const [sound1, setSound1] = useState();
-  const [sound2, setSound2] = useState();
-
 
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
 
+  const isFocused = useIsFocused();
 
   const playSound1 = async() => {
     const { sound } = await Audio.Sound.createAsync( require('../../assets/dodoong.mp3')
-    // const { sound } = await Audio.Sound.createAsync( require('../../assets/doogoodoogoo.mp3')
     );
     setSound1(sound);
-
-    console.log('Playing Sound');
     await sound.playAsync();
   }
 
@@ -40,30 +36,13 @@ export default function RandomBox2Screen({ navigation, route }) {
       : undefined;
   }, [sound1]);
 
-  const playSound2 = async() => {
-    if(sound1){
-      await sound1.stopAsync()
-      await sound1.unloadAsync()
-    }
-    const { sound } = await Audio.Sound.createAsync( require('../../assets/bbak.mp3')
-    );
-    setSound2(sound);
-
-    console.log('Playing Sound');
-    await sound.playAsync();
-  }
-
-  useEffect(() => {
-    return sound2
-      ? () => {
-        sound2.unloadAsync();
-        }
-      : undefined;
-  }, [sound2]);
 
   useEffect(()=>{
-    playSound1()
-  }, [])
+    if(isFocused){
+      playSound1()
+    }
+  }, [isFocused])
+  
   return (
     <View style={{flex:1, backgroundColor:'white'}}>
       <View style={{flex:0.15}}></View>
@@ -74,8 +53,7 @@ export default function RandomBox2Screen({ navigation, route }) {
         </View>
         <TouchableOpacity
           onPress={()=>{
-            playSound2()
-            navigation.navigate("RandomBox3Screen", {prizeAmount:prizeAmount})
+            navigation.navigate("RandomBoxLoadingScreen", {prizeAmount:prizeAmount})
           }}
         >
           <Image
@@ -104,13 +82,10 @@ const styles = StyleSheet.create({
     flex: 0.6,
     alignSelf: "center",
     alignItems:'center',
-    // justifyContent: "center",
     justifyContent: "space-evenly",
     width: "80%"
   },
   questionMark:{
     position:'absolute',
-    // right: 50,
-    // top: 100
   }
 });

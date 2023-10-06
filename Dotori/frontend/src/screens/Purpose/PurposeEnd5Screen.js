@@ -17,7 +17,6 @@ export default function PurposeEnd5Screen({ navigation, route }) {
   const dispatch = useDispatch();
   // 그 외
 
-  // const name = route.params.name;
   const [name, setName] = useState(route.params.title);
   return (
     <View style={styles.container}>
@@ -26,7 +25,6 @@ export default function PurposeEnd5Screen({ navigation, route }) {
           style={styles.centerImage}
           source={require("../../assets/images/Hamster/EndCompleteHamster.png")}
         />
-        {/* <Text style={styles.boldText}>" {name} "</Text> */}
         <Text style={styles.boldText}>{name}</Text>
         <Text style={styles.regularText}>저축액을 지급받았습니다.</Text>
       </View>
@@ -54,8 +52,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   centerImage: {
-    width: 200, // 이미지의 너비
-    height: 200, // 이미지의 높이
+    width: 200,
+    height: 200,
     marginBottom: 40,
   },
   boldText: {

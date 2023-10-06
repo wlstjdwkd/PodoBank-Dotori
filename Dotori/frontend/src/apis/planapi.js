@@ -1,7 +1,6 @@
 // 계획 정보와 관련된 API들을 모아둠 plan, chatgpt, category, categoryGroup, categorydata
 
 import axios from "axios";
-// apiAddress는 수정 필요
 const apiAddress = "http://j9d107.p.ssafy.io:9200";
 
 // PLAN
@@ -36,7 +35,7 @@ export const planSaving = async (savingData, accessToken, grantType) => {
     console.log("계획 종료 후 저축하기 성공:", response.data);
     return response;
   } catch (error) {
-    console.error("계획 종료 후 저축하기 실패:", error);
+    console.log("계획 종료 후 저축하기 실패:", error);
     const response = error.response;
     return response;
   }
@@ -56,7 +55,7 @@ export const planNoSaving = async (planSeq, accessToken, grantType) => {
     console.log("계획 종료 후 저축안하고 끝내기 성공:", response.data);
     return response;
   } catch (error) {
-    console.error("계획 종료 후 저축안하고 끝내기 실패:", error);
+    console.log("계획 종료 후 저축안하고 끝내기 실패:", error);
     const response = error.response;
     return response;
   }
@@ -76,10 +75,9 @@ export const planStop = async (planSeq, accessToken, grantType) => {
     console.log("계획 중단하기 성공:", response.data);
     return response;
   } catch (error) {
-    console.error(
+    console.log(
       "계획 중단하기 실패:",
-      error.response.status,
-      error.response.data
+      error
     );
     const response = error.response;
     return response;
@@ -111,8 +109,6 @@ export const planNewRegister = async (
   grantType
 ) => {
   try {
-    console.log("accessToken: " + accessToken + " " + grantType);
-    console.log("newRegisterData: " + newRegisterData);
     const response = await axios.post(
       apiAddress + `/api/v1/plan`,
       newRegisterData,
@@ -125,10 +121,9 @@ export const planNewRegister = async (
     console.log("계획 신규 등록 성공:", response.data);
     return response;
   } catch (error) {
-    console.error(
+    console.log(
       "계획 신규 등록 실패:",
-      error.response.status,
-      error.response.data
+      error
     );
     const response = error.response;
     return response;
@@ -167,13 +162,11 @@ export const planClassifyChatGpt = async (
       }
     );
     console.log("계획 전체 카테고리 그룹 가져오기 성공:", response.data);
-    // console.log("123", response.data[0].categories);
     return response;
   } catch (error) {
-    console.error(
+    console.log(
       "계획 전체 카테고리 그룹 가져오기 실패:",
-      error.response.status,
-      error.response.data
+      error
     );
     const response = error.response;
     return response;
@@ -196,10 +189,9 @@ export const planCategoryGroupList = async (accessToken, grantType) => {
     console.log("계획 전체 카테고리 그룹 가져오기 성공:", response.data);
     return response;
   } catch (error) {
-    console.error(
+    console.log(
       "계획 전체 카테고리 그룹 가져오기 실패:",
-      error.response.status,
-      error.response.data
+      error
     );
     const response = error.response;
     return response;
@@ -232,10 +224,9 @@ export const planCategoryUsingSpot = async (
     console.log("계획 카테고리 사용처 목록 가져오기 성공:", response.data);
     return response;
   } catch (error) {
-    console.error(
+    console.log(
       "계획 카테고리 사용처 목록 가져오기 실패:",
-      error.response.status,
-      error.response.data
+      error
     );
     const response = error.response;
     return response;
@@ -259,10 +250,9 @@ export const planCategoryDeleteSpot = async (
     console.log("계획 카테고리 사용처 목록 제거하기 성공:", response.data);
     return response;
   } catch (error) {
-    console.error(
+    console.log(
       "계획 카테고리 사용처 목록 제거하기 실패:",
-      error.response.status,
-      error.response.data
+      error
     );
     const response = error.response;
     return response;
@@ -281,10 +271,9 @@ export const planCategoryList = async (accessToken, grantType) => {
     console.log("계획 전체 카테고리 목록 가져오기 성공:", response.data);
     return response;
   } catch (error) {
-    console.error(
+    console.log(
       "계획 전체 카테고리 목록 가져오기 실패:",
-      error.response.status,
-      error.response.data
+      error
     );
     const response = error.response;
     return response;
@@ -299,8 +288,6 @@ export const planInProgress = async (
   grantType
 ) => {
   try {
-    console.log(inProgressData);
-    console.log(accessToken + " " + grantType);
     const response = await axios.get(
       apiAddress + `/api/v1/plan/${inProgressData}`,
       {
@@ -325,8 +312,6 @@ export const unclassifiedList = async (
   grantType
 ) => {
   try {
-    console.log(inProgressData);
-    console.log(accessToken + " " + grantType);
     const response = await axios.get(
       apiAddress + `/api/v1/payment/${inProgressData}`,
       {
@@ -338,10 +323,9 @@ export const unclassifiedList = async (
     console.log("미분류 정보 조회 성공:", response.data);
     return response;
   } catch (error) {
-    console.error(
+    console.log(
       "미분류 정보 계획 조회 실패:",
-      error.response.status,
-      error.response.data
+      error
     );
     const response = error.response;
     return response;
@@ -356,7 +340,6 @@ export const unClassifiedUpdate = async (
   grantType
 ) => {
   try {
-    console.log("inProgressData", updateData);
     const response = await axios.patch(
       apiAddress + `/api/v1/payment/${planSeq}`,
       { updateData },
@@ -369,7 +352,7 @@ export const unClassifiedUpdate = async (
     console.log("미분류 항목 업데이트 성공:", response.data);
     return response;
   } catch (error) {
-    console.error("진행중인 계획 조회 실패:", error);
+    console.log("진행중인 계획 조회 실패:", error);
     const response = error.response;
     return response;
   }
@@ -389,7 +372,7 @@ export const planSpecificationList = async (accessToken, grantType) => {
     console.log("계획 명세서 전체 조회하기 성공:", response.data);
     return response;
   } catch (error) {
-    console.error("계획 명세서 전체 조회하기 실패:", error);
+    console.log("계획 명세서 전체 조회하기 실패:", error);
     const response = error.response;
     return response;
   }
@@ -413,10 +396,9 @@ export const planSpecificationDetail = async (
     console.log("계획 명세서 상세 조회하기 성공:", response.data);
     return response;
   } catch (error) {
-    console.error(
+    console.log(
       "계획 명세서 상세 조회하기 실패:",
-      error.response.status,
-      error.response.data
+      error
     );
     const response = error.response;
     return response;
@@ -430,7 +412,6 @@ export const planDetailConsumeList = async (
   grantType
 ) => {
   try {
-    console.log(planDetailSeq + "planDetailSeq");
     const response = await axios.get(
       apiAddress + `/api/v1/planDetail/${planDetailSeq}`,
       {
@@ -442,10 +423,9 @@ export const planDetailConsumeList = async (
     console.log("카테고리 소비 내역 조회 성공:", response.data);
     return response;
   } catch (error) {
-    console.error(
+    console.log(
       "카테고리 소비 내역 조회 실패:",
-      error.response.status,
-      error.response.data
+      error
     );
     const response = error.response;
     return response;

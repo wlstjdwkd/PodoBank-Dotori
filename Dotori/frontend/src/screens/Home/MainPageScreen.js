@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { accountWholeInquiry } from "../../apis/accountapi";
 import { userInfoInquiry } from "../../apis/userapi";
 import { useIsFocused } from "@react-navigation/native";
+import { Alert } from "react-native";
 
 const formatNumber = (num) => {
   return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
@@ -34,13 +35,10 @@ export default function MainPageScreen({ navigation }) {
     try {
       const response = await accountWholeInquiry(accessToken, grantType);
       if (response.status === 200) {
-        console.log("전체 계좌 리스트 불러오기 성공");
         setAccountList(response.data);
       } else {
-        console.log("전체 계좌 리스트 불러오기 실패");
       }
     } catch (error) {
-      console.log(error);
     }
   };
   const doUserInfoInquiry = async () => {
@@ -49,16 +47,13 @@ export default function MainPageScreen({ navigation }) {
       if (response.status === 200) {
         setUserInfo(response.data);
       } else {
-        console.log("사용자 정보 조회 실패", response.status);
       }
     } catch (error) {
-      console.error("오류 발생 : 사용자 정보 조회 실패:", error);
     }
   };
 
   useEffect(() => {
     if (isFocused) {
-      // do정보조회()
       doAccountWholeInquiry();
       doUserInfoInquiry();
     }
@@ -69,7 +64,7 @@ export default function MainPageScreen({ navigation }) {
       <View style={styles.innerContainer}>
         <FlatList
           data={accountList}
-          showsVerticalScrollIndicator={false} // 수직 스크롤바 숨김
+          showsVerticalScrollIndicator={false}
           ListHeaderComponent={
             <>
               <View style={styles.header}>
@@ -78,9 +73,7 @@ export default function MainPageScreen({ navigation }) {
                   style={styles.logo}
                   source={require("../../assets/images/dotori_logo.png")}
                 />
-                <TouchableOpacity style={styles.helpButton}>
-                  <Text style={styles.helpIcon}>?</Text>
-                </TouchableOpacity>
+                <View></View>
               </View>
 
               <Text style={styles.title}>당신의 소비를 계획 해보세요!</Text>
@@ -167,7 +160,6 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     resizeMode: "contain",
-    marginLeft: 30,
   },
   helpButton: {
     width: 30,
@@ -204,8 +196,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   bankContainer: {
-    // flexDirection: "row",
-    // alignItems: "center",
     borderWidth: 1,
     borderColor: "#FCAF17",
     borderRadius: 20,
@@ -230,8 +220,8 @@ const styles = StyleSheet.create({
     borderColor: "#FCAF17",
     borderRadius: 15,
     height: 50,
-    borderStyle: "dashed", // 점선 테두리 추가
-    marginVertical: 10, // 위아래로 여백 추가
+    borderStyle: "dashed",
+    marginVertical: 10,
   },
   addText: {
     color: "#FCAF17",
@@ -242,13 +232,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "center",
-    // marginTop: 220,
     marginBottom: -20,
   },
   bankTextContainer: {
     flex: 1,
     justifyContent: "space-between",
-    // marginTop: 20,
     paddingHorizontal: 10,
   },
 
@@ -260,7 +248,6 @@ const styles = StyleSheet.create({
   },
 
   bankBalance: {
-    // 기존 스타일에서 marginLeft: 'auto' 삭제
     fontSize: 16,
     fontWeight: "bold",
   },
