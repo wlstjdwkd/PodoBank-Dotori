@@ -73,7 +73,6 @@ export default function OneCent5Screen({ navigation, route }) {
           index: 0,
           routes: [{ name: 'MainPageScreen', params:{}}],
         });
-        // navigation.navigate("OneCent5Screen", { accountInfo: accountInfo, })
       }else{
         console.log('계좌 별칭 설정 실패', response.status)
         setErrorMessage("계좌 별칭을 다시 확인해주세요.")
@@ -93,17 +92,16 @@ export default function OneCent5Screen({ navigation, route }) {
       <View style={styles.innerContainer}>
         <Text style={styles.boldTextLeft}>계좌 별칭을 입력해주세요.</Text>
 
-        {/* 텍스트 입력 박스 */}
         <View style={styles.inputContainer}>
           <TextInput
             style={[styles.input, {fontSize:accountInfo.accountTitle?16:12}]}
             placeholder="10자 이내로 띄어쓰기 없이 음절로 작성해주세요."
             placeholderTextColor="#A9A9A9"
-            underlineColorAndroid="transparent" // 하단 선 숨기기
+            underlineColorAndroid="transparent"
             returnKeyType="done"
-            keyboardType="default" // 숫자 키패드 표시
+            keyboardType="default"
             maxLength={10}
-            textAlign="center" // 가운데 정렬
+            textAlign="center"
             value={accountInfo.accountTitle}
             ref={accountTitleRef}
             onChangeText={(text) => {
@@ -138,15 +136,11 @@ export default function OneCent5Screen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // alignItems: "flex-start",
-    // justifyContent: "center",
     backgroundColor: "white",
     padding: 16,
   },
   innerContainer: {
     flex: 1,
-    // alignItems: "flex-start",
-    // justifyContent: "center",
     backgroundColor: "white",
     padding: 16,
   },
@@ -159,8 +153,8 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: "100%",
-    borderBottomWidth: 1, // 하단 선 추가
-    borderColor: "#FF965C", // 선 색상 설정
+    borderBottomWidth: 1,
+    borderColor: "#FF965C",
     marginBottom: 10,
   },
   input: {
@@ -175,7 +169,6 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 10,
     alignItems: "center",
-    // marginTop: 35,
     marginTop: 15,
   },
   buttonText: {
@@ -185,11 +178,8 @@ const styles = StyleSheet.create({
   },
   errorMessage: {
     color: "red",
-    // fontSize: 16,
-    // fontSize: 15,
     fontSize: 12,
     textAlign: "center",
-    // marginTop: 8,
   },
   footer: {
     flex: 1,

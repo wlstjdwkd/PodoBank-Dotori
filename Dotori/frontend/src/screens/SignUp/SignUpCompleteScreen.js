@@ -8,9 +8,7 @@ import {
   Image,
 } from "react-native";
 
-import HeaderComponent from "../Components/HeaderScreen";
 import {userLogin} from "../../apis/userapi"
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch, useSelector } from "react-redux";
 import {inputgrantType, inputAccessToken, inputRefreshToken} from "../../redux/slices/auth/user"
 
@@ -22,7 +20,6 @@ export default function SignUpCompleteScreen({ navigation, route }) {
   const dispatch = useDispatch()
   // 그 외
   const [loginInfo] = useState(route.params.loginInfo)
-  // console.log(loginInfo) //loginInfo.id, loginInfo.userName, loginInfo.password
   const [userName] = useState(loginInfo.userName)
 
 
@@ -33,17 +30,6 @@ export default function SignUpCompleteScreen({ navigation, route }) {
       navigation.navigate("LoginScreen")
     }
   }
-
-  // const doLogin = async () => {
-  //   console.log("로그인완료")
-  //   dispatch(inputgrantType("123"))
-  //   dispatch(inputAccessToken("456"))
-  //   dispatch(inputRefreshToken("789"))
-  //   navigation.reset({
-  //     index: 0,
-  //     routes: [{ name: 'MainPageScreen' }],
-  //   });
-  // }
 
   const doLogin = async () => {
     const data = {id:loginInfo.id, password:loginInfo.password}
@@ -115,8 +101,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   centerImage: {
-    width: 200, // 이미지의 너비
-    height: 200, // 이미지의 높이
+    width: 200,
+    height: 200,
     marginBottom: 40,
   },
   boldText: {

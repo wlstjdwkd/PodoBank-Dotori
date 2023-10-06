@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import {
   View,
   Text,
@@ -10,28 +10,7 @@ import {
 import HeaderComponent from "../Components/HeaderScreen";
 import { AntDesign, Entypo, FontAwesome } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
-const categorys = [
-  {
-    categorySeq: "1",
-    categoryTitle: "옷(겨울)",
-  },
-  {
-    categorySeq: "2",
-    categoryTitle: "요가학원",
-  },
-  {
-    categorySeq: "3",
-    categoryTitle: "가구구매",
-  },
-  {
-    categorySeq: "4",
-    categoryTitle: "식자재",
-  },
-  {
-    categorySeq: "5",
-    categoryTitle: "배달",
-  },
-];
+import { planCategoryList } from "../../apis/planapi"
 
 const randomColors = [
   "#FFD700",
@@ -53,12 +32,25 @@ const randomColors = [
 
 export default function CategoryScreen({ navigation }) {
   // 토큰
-  const grantType =  useSelector((state)=>{state.user.grantType})
-  const accessToken =  useSelector((state)=>{state.user.accessToken})
-  const refreshToken =  useSelector((state)=>{state.user.refreshToken})
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
+
+  const [categoryList, setCategoryList] = useState([])
   
+  const doPlanCategoryList = async () => {
+    try{
+      const response = await planCategoryList(accessToken, grantType)
+      if(response.status === 200){
+        setCategoryList(response.data)
+      }else{
+      }
+    }catch(error){
+    }
+  }
+
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={[
@@ -71,6 +63,7 @@ export default function CategoryScreen({ navigation }) {
       onPress={() =>
         navigation.navigate("CategorySettingScreen", {
           categorySeq: item.categorySeq,
+          categoryTitle: item.categoryTitle,
         })
       }
     >
@@ -78,16 +71,19 @@ export default function CategoryScreen({ navigation }) {
       <Text style={styles.categoryGroup}>{item.categoryGroup}</Text>
       <Image
         style={styles.arrowIcon}
-        source={require("../../assets/icon/forward_arrow.png")} // 화살표 아이콘 이미지 경로
+        source={require("../../assets/icon/forward_arrow.png")}
       />
     </TouchableOpacity>
   );
 
+  useEffect(()=>{
+    doPlanCategoryList()
+  }, [])
+
   return (
     <View style={styles.container}>
-      <HeaderComponent title="카테고리 보기" />
+      <HeaderComponent title="카테고리 보기" navigation={navigation} cancelNavi="MyPageScreen"/>
 
-      {/* 상단 작은 사각형 4개 */}
       <View style={styles.titleContainer}>
         <View style={styles.rectangleContainer}>
           <View style={styles.smallRectangles}>
@@ -110,13 +106,25 @@ export default function CategoryScreen({ navigation }) {
         <Text style={styles.titleText}>카테고리 </Text>
       </View>
 
-      {/* 카테고리 목록 */}
-      <FlatList
-        data={categorys}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.categorySeq}
-        contentContainerStyle={styles.categoryList}
-      />
+      {categoryList.length
+        ?(<FlatList
+          data={categoryList}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.categorySeq}
+          contentContainerStyle={styles.categoryList}
+          />)
+        :(<View
+          style={[
+            styles.categoryItem,
+            {
+              backgroundColor:
+                randomColors[Math.floor(Math.random() * randomColors.length)],
+            },
+          ]}
+        >
+          <Text style={styles.categoryTitle}>현재 등록된 카테고리가 없습니다.</Text>
+        </View>)
+      }
     </View>
   );
 }
@@ -134,8 +142,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   arrowIcon: {
-    // width: 12,
-    // height: 12,
   },
   CategoryText: {
     fontSize: 24,
@@ -151,13 +157,13 @@ const styles = StyleSheet.create({
   },
   smallRectangles: {
     alignItems: "center",
-    justifyContent: "space-between", // 가로 간격을 균등하게 분배
+    justifyContent: "space-between",
     marginBottom: 10,
   },
   smallRectangle: {
     width: 12,
     height: 12,
-    backgroundColor: "red", // 임시 색상
+    backgroundColor: "red",
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
@@ -181,8 +187,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   categoryList: {
-    alignItems: "center", // 중앙 정렬
-    width: "80%", // 화면 가로폭의 80%
+    alignItems: "center",
+    width: "80%",
     marginLeft: "auto",
     marginRight: "auto",
   },
@@ -193,7 +199,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 28,
     height: 50,
-    width: "100%", // 카테고리 아이템 가로폭을 100%로 설정
+    width: "100%",
   },
   categoryTitle: {
     fontSize: 16,
