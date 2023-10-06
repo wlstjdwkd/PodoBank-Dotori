@@ -24,6 +24,7 @@ export default function RewardScreen({ navigation }) {
   const opacityAnim = useRef(new Animated.Value(1)).current;
 
   const [dotoriCount, setDotoriCount] = useState(null);
+
   const [coinCount, setCoinCount] = useState(null);
 
   const doUserDotoriValueCheck = async () => {
@@ -34,10 +35,8 @@ export default function RewardScreen({ navigation }) {
         setCoinCount(response.data.coin);
       } else {
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   };
-
 
   const currentDotoriEffect = (index) => {
     if (dotoriCount !== index) {
@@ -102,7 +101,7 @@ export default function RewardScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require("../../assets/images/rewardBackground.png")}
+        source={require("../../assets/RewardImage.jpg")}
         style={styles.imageBackground}
       >
         <View style={styles.borderBox}>
@@ -196,7 +195,8 @@ const styles = StyleSheet.create({
     width: "100%",
     marginBottom: -150,
     marginTop: -200,
-    height: Dimensions.get("window").height - 10,
+
+    height: Dimensions.get("window").height - 10, // FooterScreen의 높이만큼 감소. 50은 예시값이며, 실제 FooterScreen의 높이에 맞게 조정해야 합니다.
   },
   borderBox: {
     position: "absolute",
