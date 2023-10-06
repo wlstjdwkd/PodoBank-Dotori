@@ -3,20 +3,20 @@ server:
   # http://j9d107.p.ssafy.io:9900/
 spring:
   config:
-    import: "optional:configserver:http://j9d107.p.ssafy.io:9900/"
-  cloud:
-    config:
-      name: dotori
-      profile: user
+    import: "optional:configserver:"
+#  cloud:
+#    config:
+#      name: dotori
+#      profile: user
   application:
     name: dotori-user-service
 
-encrypt:
-  key: ${ENCRYPT_KEY}
+#encrypt:
+#  key: ${ENCRYPT_KEY}
 
 eureka:
   client:
     service-url:
-      defaultZone: http://j9d107.p.ssafy.io:8761/eureka
+      defaultZone: http://localhost:8761/eureka
   instance:
-    hostname: j9d107.p.ssafy.io
+    hostname: localhost
