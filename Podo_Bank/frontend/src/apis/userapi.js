@@ -1,5 +1,8 @@
 // src/api/userApi.js
 import axios from "axios";
+// import * as Notifications from "expo-notifications";
+import messaging from "@react-native-firebase/messaging";
+
 import * as Notifications from "expo-notifications";
 import messaging from '@react-native-firebase/messaging'
 // import { Constants } from "expo-constants";
@@ -115,6 +118,18 @@ export const userLogout = async (accessToken) => {
   }
 };
 // access token과 refresh token을 받음.
+
+async function getToken() {
+  const authorized = await messaging().hasPermission();
+  if (!authorized) {
+    await messaging().requestPermission();
+  }
+
+  const token = await messaging().getToken();
+  console.log("FCM Token: ", token);
+  return token;
+}
+
 export const userLogin = async (email, password) => {
   try {
     const { status } = await Notifications.requestPermissionsAsync();
@@ -269,6 +284,7 @@ export const userIDfind = async () => {
     // throw error;
   }
 };
+
 
 // 비밀번호 초기화
 export const userPasswordReset = async (userInfo) => {

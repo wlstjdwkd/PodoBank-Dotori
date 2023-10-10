@@ -6,13 +6,21 @@ import { Provider, useDispatch, useSelector } from "react-redux"; // react-redux
 import store from "./src/redux/store"; // Redux 스토어 가져오기
 import AccessTokenRefreshModalScreen from "./src/screens/Modal/AccessTokenRefreshModalScreen";
 // import { setAccessTokenExpiration } from '../../redux/slices/auth/user'
+
+import { StyleSheet, Text, View, Alert } from "react-native";
 import {
   setAccessTokenExpiration,
   setUserTokenRefreshModalVisible,
   setIsnotReissuanceToken,
 } from "./src/redux/slices/auth/user";
 
-// import * as Notifications from "expo-notifications";
+// import messaging from "@react-native-firebase/messaging";
+
+// messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+//   console.log("[Background Remote Message]", remoteMessage);
+// });
+
+// import { useNotifications } from "./src/hooks/useNotifications";
 
 function MainApp() {
   const accessTokenExpiration = useSelector(
@@ -46,16 +54,6 @@ function MainApp() {
 }
 
 export default function App() {
-  // useEffect(() => {
-  //   const subscription = Notifications.addNotificationReceivedListener(
-  //     (notification) => {
-  //       console.log("Notification received: ", notification);
-  //     }
-  //   );
-
-  //   return () => subscription.remove();
-  // }, []);
-
   return (
     <Provider store={store}>
       <MainApp />
