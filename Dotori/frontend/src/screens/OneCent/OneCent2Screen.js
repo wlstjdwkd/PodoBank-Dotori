@@ -26,7 +26,6 @@ export default function OneCent1Screen({ navigation, route }) {
     bankImage: route.params.bankImage,
     accountNumber: "",
   });
-  // const [accountNumber, setAccountNumber] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isValid, setIsValid] = useState(false);
 
@@ -35,7 +34,6 @@ export default function OneCent1Screen({ navigation, route }) {
   const handleAccountNumber = (text) =>{
     setAccountInfo({ ...accountInfo, accountNumber: text });
     
-    // setAccountNumber(text);
     const regex = /^[0-9]{13}$/;
     if (!regex.test(text)) {
       setIsValid(false)
@@ -48,17 +46,15 @@ export default function OneCent1Screen({ navigation, route }) {
 
   const handleConfirm = () => {
     const regex = /^[0-9]{13}$/;
-    // if (accountInfo.accountNumber.length !== 13) {
     if (!regex.test(accountInfo.accountNumber)) {
       setIsValid(false)
       setErrorMessage("계좌 번호를 13자리 숫자로 입력해주세요.");
     } else {
       setIsValid(true)
       setErrorMessage("");
-      // console.log(accountInfo);
       navigation.navigate("OneCent3Screen", {
         accountInfo: accountInfo,
-      }); // 계좌 번호를 다음 페이지로 전달
+      })
     }
   };
 
@@ -71,17 +67,16 @@ export default function OneCent1Screen({ navigation, route }) {
       <View style={styles.innerContainer}>
         <Text style={styles.boldTextLeft}>계좌 번호를 입력해주세요.</Text>
 
-        {/* 텍스트 입력 박스 */}
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
             placeholder="'-'를 제외한 계좌 번호를 입력하세요."
             placeholderTextColor="#A9A9A9"
-            underlineColorAndroid="transparent" // 하단 선 숨기기
+            underlineColorAndroid="transparent"
             returnKeyType="done"
-            keyboardType="numeric" // 숫자 키패드 표시
-            maxLength={13} // 최대 13자리로 제한
-            textAlign="center" // 가운데 정렬
+            keyboardType="numeric"
+            maxLength={13}
+            textAlign="center"
             value={accountInfo.accountNumber}
             ref={accountNumberRef}
             onChangeText={(text) => {
@@ -93,14 +88,8 @@ export default function OneCent1Screen({ navigation, route }) {
           />
         </View>
 
-        {/* 오류 메시지 */}
-        {/* {errorMessage !== "" && (
-          <Text style={styles.errorMessage}>{errorMessage}</Text>
-        )} */}
         <Text style={styles.errorMessage}>{(errorMessage !== "") &&errorMessage}</Text>
         
-
-        {/* 버튼 */}
         <TouchableOpacity style={[styles.button, {backgroundColor:isValid?"#FF965C":'gray'}]}
           onPress={() => {
             handleConfirm()
@@ -120,15 +109,11 @@ export default function OneCent1Screen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // alignItems: "flex-start",
-    // justifyContent: "center",
     backgroundColor: "white",
     padding: 16,
   },
   innerContainer: {
     flex: 1,
-    // alignItems: "flex-start",
-    // justifyContent: "center",
     backgroundColor: "white",
     padding: 16,
   },
@@ -141,8 +126,8 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: "100%",
-    borderBottomWidth: 1, // 하단 선 추가
-    borderColor: "#FF965C", // 선 색상 설정
+    borderBottomWidth: 1,
+    borderColor: "#FF965C",
     marginBottom: 10,
   },
   input: {
@@ -157,7 +142,6 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 10,
     alignItems: "center",
-    // marginTop: 35,
     marginTop: 15,
   },
   buttonText: {
@@ -167,10 +151,8 @@ const styles = StyleSheet.create({
   },
   errorMessage: {
     color: "red",
-    // fontSize: 16,
     fontSize: 15,
     textAlign: "center",
-    // marginTop: 8,
   },
   footer: {
     flex: 1,

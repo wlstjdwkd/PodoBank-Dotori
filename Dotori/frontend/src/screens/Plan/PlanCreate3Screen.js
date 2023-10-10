@@ -29,7 +29,6 @@ export default function PlanCreate3Screen({ navigation, route }) {
   const [categoryGroupName, setCategoryGroupName] = useState("");
   const [categoryGroups, setCategoryGroups] = useState([]);
 
-  console.log(planInfo);
   const handleAddCategoryGroup = () => {
     if (categoryGroupName) {
       setCategoryGroups([...categoryGroups, categoryGroupName]);
@@ -46,7 +45,7 @@ export default function PlanCreate3Screen({ navigation, route }) {
     <View style={styles.container}>
       <HeaderComponent
         title="계획 생성(3/5)"
-        cancelNavi="PlanMainScreen"
+        cancelNavi="MainPageScreen"
         navigation={navigation}
       ></HeaderComponent>
       <ScrollView style={styles.header}>
@@ -100,8 +99,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
     marginTop: 90,
   },
   title: {
@@ -126,7 +123,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
-    // textAlign: "center",
   },
   button: {
     height: 50,

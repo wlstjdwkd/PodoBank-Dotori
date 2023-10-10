@@ -24,21 +24,17 @@ export default function OneCent2Screen({ navigation, route }) {
   const inputRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
 
   const handleBoxPress = (index) => {
-    // 네모 박스를 누르면 해당 칸에 포커스를 줍니다.
     inputRefs[index].current.focus();
   };
 
   const handleInputChange = (text, index) => {
-    // 백스페이스시 앞으로 넘어감.
     if (text === "" && index > 0) {
       inputRefs[index - 1].current.focus();
     }
-    // 각 텍스트 입력 상자에 입력된 값을 상태에 업데이트합니다.
     const newNumbers = [...numbers];
     newNumbers[index] = text;
     setNumbers(newNumbers);
 
-    // 입력이 완료되면 다음 칸으로 포커스 이동합니다.
     if (index < 3 && text.length === 1) {
       inputRefs[index + 1].current.focus();
     }
@@ -53,18 +49,14 @@ export default function OneCent2Screen({ navigation, route }) {
     try{
       const response = await accountVerificationsOnecentCheck(data, accessToken, grantType)
       if(response.status === 200){
-        // navigation.navigate("OneCent5Screen", { accountInfo: accountInfo, })
         navigation.reset({
           index: 0,
           routes: [{ name: 'OneCent5Screen', params:{ accountInfo: accountInfo, }}],
         });
       }else if(response.status === 404){
-        console.log('1원 인증 코드 검증 실패',response.status)
       }else{
-        console.log('1원 인증 코드 검증 실패',response.status)
       }
     }catch(error){
-      console.log('오류 발생 : 1원 인증 코드 검증 실패', error)
     }
   }
 
@@ -173,7 +165,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF965C",
     borderRadius: 8,
     width: "90%",
-    // padding: 16,
     height: 40,
     marginTop: 300,
     marginBottom: -100,

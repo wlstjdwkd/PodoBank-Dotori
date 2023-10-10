@@ -2,7 +2,7 @@
   "expo": {
     "name": "PodoBank",
     "slug": "PodoBank",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "light",
@@ -11,34 +11,35 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "bundleIdentifier": "com.yongyong.podobank",
       "supportsTablet": true
     },
     "android": {
       "googleServicesFile": "./google-services.json",
+      "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-
-      "package": "com.yongyong.podobank",
-      "versionCode": 1,
-      "permissions": ["NOTIFICATIONS"],
-      "useNextNotificationsApi": true
+      "package": "com.hyunduk9775.podobank",
+      "versionCode": "2"
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "87dc9661-bf07-4673-b9e6-dc5bcda7ea11"
+        "projectId": "f3595617-0f64-40fc-bad1-ce0d6403e677"
       }
     },
-    "plugins": [
-      "@react-native-firebase/app"
-      // "@react-native-firebase/messaging"
-    ]
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/f3595617-0f64-40fc-bad1-ce0d6403e677"
+    }
   }
 }

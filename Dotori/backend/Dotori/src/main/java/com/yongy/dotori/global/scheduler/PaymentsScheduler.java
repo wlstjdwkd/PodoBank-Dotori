@@ -70,9 +70,6 @@ public class PaymentsScheduler {
             }
 
             List<PaymentPodoResDto> paymentResDto = paymentService.getPayments(plan.getUpdatedAt(),plan.getAccount().getAccountSeq());
-            log.info(paymentResDto.toString());
-
-            log.info(paymentResDto.size()+"");
             List<Payment> chatGPT = new ArrayList<>();
             List<Payment> existPayment = new ArrayList<>();
 
@@ -122,6 +119,7 @@ public class PaymentsScheduler {
 
             paymentRepository.saveAll(chatGPT); // chatGPT로 분류할 거 저장
             paymentRepository.saveAll(existPayment); // 이미 등록된 사업장인 payment 한 번에 저장
+            planRepository.save(plan.updateCount((long) chatGPT.size())); // 미분류 개수 저장
 
             // NOTE : chatGPT로 분류
             List<PlanDetail> planDetails = planDetailRepository.findAllByPlanPlanSeq(plan.getPlanSeq());
