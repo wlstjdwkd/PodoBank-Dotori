@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import AppNavigator from "./src/navigation/AppNavigator";
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, Text, View, Alert } from 'react-native';
+import React, { useEffect } from 'react'
+import messaging from '@react-native-firebase/messaging'
 import { Provider, useDispatch, useSelector } from "react-redux"; // react-redux에서 Provider 가져오기
 import store from "./src/redux/store"; // Redux 스토어 가져오기
 import AccessTokenRefreshModalScreen from "./src/screens/Modal/AccessTokenRefreshModalScreen";
@@ -62,22 +63,11 @@ export default function App() {
   );
 }
 
-// import React from "react"
-// import { NavigationContainer } from "@react-navigation/native"
-// import AppNavigator from "./src/navigation/AppNavigator"
-// import { Provider, useSelector } from "react-redux" // react-redux에서 Provider 가져오기
-// import store from "./src/redux/store" // Redux 스토어 가져오기
-// import AccessTokenRefreshModalScreen from "./src/screens/Modal/AccessTokenRefreshModalScreen"
-
-// export default function App() {
-//   const accessTokenExpiration = useSelector((state) => state.user.accessTokenExpiration)
-
-//   return (
-//     <Provider store={store}>
-//       <NavigationContainer>
-//         <AppNavigator />
-//         {accessTokenExpiration && <AccessTokenRefreshModalScreen />}
-//       </NavigationContainer>
-//     </Provider>
-//   );
-// }
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

@@ -66,7 +66,6 @@ export default function PurposeCreate1Screen({ navigation, route }) {
   const dispatch = useDispatch();
   // 그 외
 
-  // 달력
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const currentMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
@@ -78,19 +77,15 @@ export default function PurposeCreate1Screen({ navigation, route }) {
   const [startingDate, setStartingDate] = useState(null);
   const [endingDate, setEndingDate] = useState(null);
 
-  const [settingDateType, setSettingDateType] = useState(""); // "start" 또는 "end"
+  const [settingDateType, setSettingDateType] = useState("")
 
-  // 달력 외
-  // const [planInfo, setPlanInfo] = useState(route.params.planInfo);
   const [planInfo, setPlanInfo] = useState({
     startedAt: null,
     endAt: null,
     accountSeq: route.params.accountSeq,
-    // accountSeq: 1,
   });
   const [isValid, setIsValid] = useState(false);
 
-  // 달력 부분
   const periodSelect = () => {
     if (selectionCount <= 1) {
       setSelectionCount(selectionCount + 1);
@@ -104,7 +99,6 @@ export default function PurposeCreate1Screen({ navigation, route }) {
     } else if (selectionCount === 2) {
       setStartingDate(null);
     }
-    // periodSelect()
   };
   const handleEndingDate = (date) => {
     if (selectionCount === 1) {
@@ -121,7 +115,6 @@ export default function PurposeCreate1Screen({ navigation, route }) {
       periodSelect();
     }
   };
-  // 시작일과 종료일을 확인할 수 있게 해줌.
   const getDatesBetween = (startDate, endDate) => {
     let dates = [];
     let currentDate = new Date(startDate);
@@ -163,7 +156,6 @@ export default function PurposeCreate1Screen({ navigation, route }) {
       startedAt: startingDate,
       endAt: endingDate,
     });
-    console.log(planInfo);
     setCalendarVisible(false);
   };
 
@@ -171,7 +163,7 @@ export default function PurposeCreate1Screen({ navigation, route }) {
     <View style={styles.container}>
       <HeaderComponent
         title="계획 생성(1/5)"
-        cancelNavi="PlanMainScreen"
+        cancelNavi="MainPageScreen"
         navigation={navigation}
       ></HeaderComponent>
       <View style={styles.innerContainer}>
@@ -185,11 +177,6 @@ export default function PurposeCreate1Screen({ navigation, route }) {
           <TouchableOpacity
             activeOpacity={0.5}
             onPress={() => {
-              // setSettingDateType("start");
-              // setSelectedDates({
-              //   startedAt: null,
-              //   endAt: null,
-              // });
               setCalendarVisible(true);
             }}
           >
@@ -197,7 +184,6 @@ export default function PurposeCreate1Screen({ navigation, route }) {
               <TextInput
                 style={styles.input}
                 value={planInfo.startedAt}
-                // multiline={true}
                 editable={false}
               />
               <AntDesign name="calendar" size={24} color="black" />
@@ -218,7 +204,6 @@ export default function PurposeCreate1Screen({ navigation, route }) {
               <TextInput
                 style={[styles.input]}
                 value={planInfo.endAt}
-                // multiline={true}
                 editable={false}
               />
               <AntDesign
@@ -233,11 +218,9 @@ export default function PurposeCreate1Screen({ navigation, route }) {
             </View>
           </TouchableOpacity>
 
-          {/* 달력 모달 부분 */}
           {isCalendarVisible && (
             <View style={styles.centeredView}>
               <Modal
-                // animationType="slide"
                 animationType="none"
                 transparent={true}
                 visible={isCalendarVisible}
@@ -258,9 +241,6 @@ export default function PurposeCreate1Screen({ navigation, route }) {
                     theme={{
                       arrowColor: "#FF965C",
                       "stylesheet.day.basic": {
-                        // text: {
-                        //   color: 'red',
-                        // },
                       },
 
                       "stylesheet.calendar.header": {
@@ -291,11 +271,9 @@ export default function PurposeCreate1Screen({ navigation, route }) {
                     locale={"kr"}
                     current={todayDate}
                     onDayPress={(day) => {
-                      // handleDateChange(day)
                       handleStartingDate(day.dateString);
                       handleEndingDate(day.dateString);
                     }}
-                    // markedDates={markedDates}
                     markingType={"period"}
                     markedDates={
                       endingDate
@@ -347,8 +325,6 @@ export default function PurposeCreate1Screen({ navigation, route }) {
               planInfo: planInfo,
             });
           }}
-          //TODO: 풀기
-          // disabled={!isValid}
           disabled={!startingDate || !endingDate}
         >
           <Text style={styles.buttonText}>다음</Text>
@@ -373,8 +349,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
     marginTop: 90,
   },
   title: {
@@ -401,9 +375,8 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: 20,
-    padding: 0, // remove padding to avoid overlap
+    padding: 0,
     fontSize: 16,
-    // textAlign: "center",
     color: "black",
   },
   button: {

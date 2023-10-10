@@ -79,7 +79,6 @@ export default function PurposeCreate1Screen({ navigation }) {
             onChangeText={(text) => {
               handleNameChange(text)
             }}
-            // multiline={true}
             maxLength={10}
             value={purposeInfo.purposeTitle}
             ref={purposeTitleRef}
@@ -125,8 +124,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
     marginTop: 90,
   },
   title: {
@@ -146,7 +143,6 @@ const styles = StyleSheet.create({
     borderColor: "#BAC0CA",
     borderRadius: 10,
     padding: 10,
-    // textAlign: "center",
   },
   button: {
     height: 40,
@@ -166,8 +162,6 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   middleImage: {
-    // justifyContent: "center",
-    // alignItems: "center",
     width: 150,
     height: 150,
   },

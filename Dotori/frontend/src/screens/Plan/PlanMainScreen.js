@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  RefreshControl,
 } from "react-native";
 import FooterScreen from "../Components/FooterScreen";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,8 +14,8 @@ import { useIsFocused } from "@react-navigation/native";
 import { planInProgress } from "../../apis/planapi";
 
 function ProgressBar({ current, target }) {
-  const progress = (current / target) * 100;
-  const displayedProgress = Math.floor(progress); // Ensure it's from the unit's digit
+  const progress = 100 - (current / target) * 100;
+  const displayedProgress = Math.floor(progress);
   let progressBarColor;
   if (displayedProgress >= 50) {
     progressBarColor = "#5F9DF7";
@@ -23,7 +24,7 @@ function ProgressBar({ current, target }) {
   } else if (displayedProgress >= 0) {
     progressBarColor = "#FEDE16";
   } else {
-    progressBarColor = "#ED4343"; // minus percentage
+    progressBarColor = "#ED4343";
   }
   const absoluteProgress = Math.abs(displayedProgress);
 
@@ -47,55 +48,24 @@ export default function PlanMainScreen({ navigation, route }) {
   // 토큰
   const grantType = useSelector((state) => state.user.grantType);
   const accessToken = useSelector((state) => state.user.accessToken);
+  const [refreshing, setRefreshing] = useState(false);
 
   const refreshToken = useSelector((state) => state.user.refreshToken);
   const dispatch = useDispatch();
   // 그 외
   const isFocused = useIsFocused();
-  // const
 
-  // TODO: 서버에서 데이터를 가져와 아래 변수들을 설정하세요
+  const onRefresh = async () => {
+    setRefreshing(true)
+    await doPlanInquiry()
+
+    setRefreshing(false)
+  };
+
   const accountName = route.params.accountTitle;
   const accountSeq = route.params.accountSeq;
 
   const [planInfo, setPlanInfo] = useState(null);
-  // const accountMoney = 0;
-  // const plan = {
-  //   endDate: new Date("2023-12-31"),
-  //   notClassifyNum: 5,
-  //   categoryList: [
-  //     {
-  //       categoryName: "식비",
-  //       currentMoney: 150000, // bigdecimal 타입이 JavaScript에는 없기 때문에 일단 float로 표현합니다.
-  //       targetMoney: 300000,
-  //       categoryGroupName: "일상비용",
-  //     },
-  //     {
-  //       categoryName: "교통비",
-  //       currentMoney: 40000,
-  //       targetMoney: 100000,
-  //       categoryGroupName: "일상비용",
-  //     },
-  //     {
-  //       categoryName: "여행비",
-  //       currentMoney: 1000000,
-  //       targetMoney: 5000000,
-  //       categoryGroupName: "여가/오락비용",
-  //     },
-  //     {
-  //       categoryName: "여행비",
-  //       currentMoney: 800000,
-  //       targetMoney: 5000000,
-  //       categoryGroupName: "여가/오락비용",
-  //     },
-  //     {
-  //       categoryName: "진성비",
-  //       currentMoney: -200,
-  //       targetMoney: 500,
-  //       categoryGroupName: "여가/오락비용",
-  //     },
-  //   ],
-  // }; // 예시: categoryList가 없는 경우는 빈 배열
   const formatNumber = (num) => {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
   };
@@ -105,19 +75,15 @@ export default function PlanMainScreen({ navigation, route }) {
       const response = await planInProgress(accountSeq, accessToken, grantType);
       if (response.status === 200) {
         setPlanInfo(response.data);
-        // 종료된 계획이라면 바로 종료 명세서 보기 창으로 넘김, else는 만들 필요없음.
-        if (response.data.state === "ACTIVE" && response.data.terminatedAt) {
-          navigation.navigate("SavingPlanCompleteRecipeScreen", {
-            accountName: accountName,
-            accountSeq: accountSeq,
-            planSeq: response.data.planSeq,
-          });
-        }
+      } else if (response.status === 404) {
+        navigation.navigate("SavingPlanCompleteRecipeScreen", {
+          accountName: accountName,
+          accountSeq: accountSeq,
+          planSeq: response.data,
+        });
       } else {
-        console.log("계획 정보 조회 실패", response.status);
       }
     } catch (error) {
-      console.error("오류 발생 : 계획 정보 조회 실패:", error);
     }
   };
 
@@ -136,15 +102,34 @@ export default function PlanMainScreen({ navigation, route }) {
 
   const currentDate = new Date();
   const formatDate = (dateTimeStr) => {
-    if (!dateTimeStr) return ""; // 입력값이 없으면 빈 문자열 반환
+    if (!dateTimeStr) return ""; 
 
-    const [dateOnly] = dateTimeStr.split("T"); // "T"를 기준으로 문자열을 분리하고, 첫 번째 부분만 가져옵니다.
+    const [dateOnly] = dateTimeStr.split("T"); 
 
-    return dateOnly; // 날짜 부분만 반환합니다.
+    return dateOnly; 
   };
 
   return (
     <View style={styles.container}>
+      {planInfo ? (
+        planInfo.planSeq ? (
+          <TouchableOpacity
+            style={{ alignSelf: "flex-end", margin: 20, marginBottom: -40 }}
+            onPress={() => {
+              navigation.navigate("PlanManageScreen", {
+                accountTitle: accountName,
+                accountSeq: accountSeq,
+                planSeq: planInfo.planSeq,
+                accountBalance: planInfo.accountBalance,
+                endAt: planInfo.endAt,
+                startedAt: planInfo.startedAt,
+              });
+            }}
+          >
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}>관리</Text>
+          </TouchableOpacity>
+        ) : null
+      ) : null}
       <Text style={styles.accountName}>{accountName}</Text>
       <Text style={styles.accountMoney}>
         {planInfo ? formatNumber(planInfo.accountBalance) + "원" : "Loading..."}
@@ -195,6 +180,9 @@ export default function PlanMainScreen({ navigation, route }) {
           <ScrollView
             showsVerticalScrollIndicator={false}
             style={styles.planContainer}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
           >
             <View style={styles.headerContainer}>
               <Text style={styles.endDate}>
@@ -227,7 +215,7 @@ export default function PlanMainScreen({ navigation, route }) {
             </View>
             {planInfo.activePlanList.map((category, index) => {
               const percentage = Math.floor(
-                (category.currentBalance / category.goalAmount) * 100
+                100 - (category.currentBalance / category.goalAmount) * 100
               );
               let textColor;
               if (percentage >= 50) {
@@ -237,7 +225,7 @@ export default function PlanMainScreen({ navigation, route }) {
               } else if (percentage >= 0) {
                 textColor = "#FEDE16";
               } else {
-                textColor = "#ED4343"; // minus percentage
+                textColor = "#ED4343";
               }
 
               return (
@@ -245,13 +233,18 @@ export default function PlanMainScreen({ navigation, route }) {
                   key={index}
                   style={styles.categoryBox}
                   onPress={() => {
-                    navigation.navigate("PlanCategoryScreen");
+                    navigation.navigate("PlanCategoryScreen", {
+                      planDetailSeq: category.planDetailSeq,
+                    });
                   }}
                 >
                   <View style={styles.categoryTop}>
                     <Text style={styles.categoryName}>{category.title}</Text>
                     <Text style={styles.currentMoney}>
-                      {formatNumber(category.currentBalance)}원
+                      {formatNumber(
+                        category.goalAmount - category.currentBalance
+                      )}
+                      원
                     </Text>
                   </View>
                   <Text style={styles.categoryGroupName}>
@@ -298,26 +291,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  //   innerContainer: {
-  //     flex: 1,
-  //     alignItems: "center",
-  //     justifyContent: "center",
-  //     backgroundColor: "white",
-  //     padding: 16,
-  //     width: "100%"
-  //   },
+
   divider: {
-    width: "100%", // 원하는 너비로 조정하세요
-    height: 1, // 원하는 높이로 조정하세요
-    backgroundColor: "#d1d1d1", // 원하는 색상으로 변경하세요
+    width: "100%",
+    height: 1,
+    backgroundColor: "#d1d1d1",
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
-    marginBottom: 30, // 원하는 여백으로 조정하세요
+    marginBottom: 30,
     marginTop: -30,
   },
   accountName: {
     fontSize: 18,
-    // fontWeight: "bold",
     marginBottom: 8,
     marginTop: 100,
   },
@@ -339,8 +324,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   image: {
-    width: 180, // 이미지 크기는 조정하세요
-    height: 200, // 이미지 크기는 조정하세요
+    width: 180,
+    height: 200,
     marginBottom: 40,
     marginTop: 40,
   },
@@ -359,14 +344,14 @@ const styles = StyleSheet.create({
     top: 0,
     backgroundColor: "red",
     borderRadius: 10,
-    width: 20, // 이 크기는 숫자의 크기에 따라 조정이 필요할 수 있습니다.
-    height: 20, // 이 크기는 숫자의 크기에 따라 조정이 필요할 수 있습니다.
+    width: 20,
+    height: 20,
     alignItems: "center",
     justifyContent: "center",
   },
   notificationText: {
     color: "white",
-    fontSize: 12, // 글자 크기는 필요에 따라 조정하세요.
+    fontSize: 12,
     fontWeight: "bold",
   },
   button: {
@@ -444,12 +429,12 @@ const styles = StyleSheet.create({
   progressBar: {
     height: 17,
     borderRadius: 8.5,
-    backgroundColor: "blue", // 원하는 색상으로 변경하세요
+    backgroundColor: "blue",
   },
   progressBarText: {
-    position: "absolute", // 진행 바 위에 텍스트를 배치
-    right: 5, // 오른쪽에서 약간의 공간을 줌
-    color: "white", // 원하는 색상으로 변경하세요
+    position: "absolute",
+    right: 5,
+    color: "white",
     fontWeight: "bold",
   },
   percentageText: {
@@ -470,7 +455,6 @@ const styles = StyleSheet.create({
   },
   overlayText: {
     fontSize: 25,
-    // marginBottom: 5,
     marginTop: 10,
   },
 });

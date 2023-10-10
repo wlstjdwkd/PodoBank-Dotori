@@ -1,15 +1,12 @@
-import { useIsFocused } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
   TouchableOpacity,
   Text,
-  ScrollView,
   Image,
 } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
-import { useDispatch, useSelector } from "react-redux";
 
 export default function PurposeEnd1Screen({ navigation, route }) {
   const [purposeData, setPurposeData] = useState(route.params.purposeData);
@@ -21,7 +18,6 @@ export default function PurposeEnd1Screen({ navigation, route }) {
   });
   return (
     <View style={styles.container}>
-      {/* Close Button */}
       <TouchableOpacity
         style={styles.closeButton}
         onPress={() => navigation.goBack()}
@@ -29,40 +25,31 @@ export default function PurposeEnd1Screen({ navigation, route }) {
         <Feather name="x" size={24} />
       </TouchableOpacity>
 
-      {/* Title */}
       <Text style={styles.titleText}>{purposeData.title}</Text>
 
-      {/* Image Placeholder */}
       <Image
         style={styles.image}
         source={require("../../assets/images/Hamster/End1Hamster.png")}
       />
 
-      {/* Achieved Amount Text */}
       <Text style={styles.achievedText}>달성 금액</Text>
 
-      {/* Current Balance */}
       <Text style={styles.currentBalance}>
         {purposeData.currentBalance.toLocaleString()}원
       </Text>
 
-      {/* Goal Period Text */}
       <Text style={styles.goalPeriodText}>목표 기간</Text>
 
-      {/* Period Dates */}
       <Text style={styles.periodDates}>
-        {purposeData.startedAt} ~ {purposeData.terminatedAt}
+        {purposeData.startedAt} ~ {purposeData.terminatedAt.slice(0,10)}
       </Text>
 
-      {/* Goal Amount Text */}
       <Text style={styles.goalAmountText}>목표 금액</Text>
 
-      {/* Goal Amount */}
       <Text style={styles.goalAmount}>
         {purposeData.goalAmount.toLocaleString()}원
       </Text>
 
-      {/* Receive Button */}
       <TouchableOpacity
         style={styles.receiveButton}
         onPress={() =>
@@ -101,7 +88,6 @@ const styles = StyleSheet.create({
   },
   achievedText: {
     fontSize: 20,
-    // fontWeight: "bold",
     alignSelf: "center",
     marginBottom: 10,
   },

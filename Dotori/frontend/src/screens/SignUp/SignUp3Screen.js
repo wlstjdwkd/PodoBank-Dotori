@@ -40,7 +40,6 @@ export default function SignUp3Screen({ navigation, route }) {
 
   const handleConfirmPasswordChange = (text) => {
     setConfirmPassword(text);
-    // if ((text === password) && isPasswordValid) {
     if ((text === password) && validatePassword(text)) {
       setConfirmPasswordMessage("완벽합니다.");
       setIsConfirmPasswordValid(true);
@@ -70,7 +69,6 @@ export default function SignUp3Screen({ navigation, route }) {
         confirmPasswordInputRef.current.focus()
         break;
       default:
-        console.log(userInfo)
         navigation.navigate("SignUp4Screen", { userInfo: userInfo })
         break;
     }
@@ -103,21 +101,12 @@ export default function SignUp3Screen({ navigation, route }) {
             returnKeyType ="next"
             ref={passwordInputRef}
             onSubmitEditing={()=>{
-              // if(isPasswordValid){
-              //   confirmPasswordInputRef.current.focus()
-              // }
               confirmPasswordInputRef.current.focus()
             }}
           />
           <View style={styles.rowContainer}>
-            {/* <Text style={styles.inputBehindText}>
-              영문, 숫자, 특수문자 포함 8자 이상
-            </Text> */}
             <Text
               style={ isPasswordValid ? styles.validMessage1 : styles.validMessage2}
-              // style={{
-              //   color: isPasswordValid ? "blue" : "red",
-              // }}
             >
               {passwordMessage}
             </Text>
@@ -125,9 +114,7 @@ export default function SignUp3Screen({ navigation, route }) {
 
           <Text style={styles.subtitle}>비밀번호 확인</Text>
           <TextInput
-            // style={styles.input}
             style={confirmPassword ?styles.input:[styles.input,{fontSize:12}]}
-            // placeholder="영문, 숫자, 특수문자 포함 8자 이상 16자 이내"
             placeholder="비밀번호를 다시 입력해주세요."
             placeholderTextColor="#7B7B7B"
             onChangeText={handleConfirmPasswordChange}
@@ -137,23 +124,13 @@ export default function SignUp3Screen({ navigation, route }) {
             returnKeyType ="done"
             ref={confirmPasswordInputRef}
             onSubmitEditing={()=>{
-              // if(isConfirmPasswordValid){
-              //   gotoSignUp4Screen()
-              //   // navigation.navigate("SignUp4Screen", { userInfo: userInfo })
-              // }
               gotoSignUp4Screen()
             }}
 
           />
           <View style={styles.rowContainer}>
-            {/* <Text style={styles.inputBehindText}>
-              영문, 숫자, 특수문자 포함 8자 이상
-            </Text> */}
             <Text
               style={ isConfirmPasswordValid ? styles.validMessage1 : styles.validMessage2}
-              // style={{
-              //   color: isConfirmPasswordValid ? "blue" : "red",
-              // }}
             >
               {confirmPasswordMessage}
             </Text>
@@ -167,7 +144,6 @@ export default function SignUp3Screen({ navigation, route }) {
           ]}
           onPress={() =>{
             gotoSignUp4Screen()
-            // navigation.navigate("SignUp4Screen", { userInfo: userInfo })
           }}
           disabled={!isPasswordValid || !isConfirmPasswordValid}
         >
@@ -192,8 +168,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
     marginTop: 90,
   },
   title: {
@@ -213,7 +187,6 @@ const styles = StyleSheet.create({
     borderColor: "#BAC0CA",
     borderRadius: 10,
     padding: 10,
-    // textAlign: "center",
   },
   button: {
     height: 40,

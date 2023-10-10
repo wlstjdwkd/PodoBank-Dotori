@@ -30,6 +30,7 @@ import PlanCreate4Screen from "../screens/Plan/PlanCreate4Screen";
 import PlanCreate5Screen from "../screens/Plan/PlanCreate5Screen";
 import PlanCategoryScreen from "../screens/Plan/PlanCategoryScreen";
 import PlanNotClassifyScreen from "../screens/Plan/PlanNotClassifyScreen";
+import PlanManageScreen from "../screens/Plan/PlanManageScreen";
 
 import SavingPlanCompleteRecipeScreen from "../screens/Saving/SavingPlanCompleteRecipeScreen";
 import SavingMoneyScreen from "../screens/Saving/SavingMoneyScreen";
@@ -41,6 +42,12 @@ import OneCent3Screen from "../screens/OneCent/OneCent3Screen";
 import OneCent4Screen from "../screens/OneCent/OneCent4Screen";
 import OneCent5Screen from "../screens/OneCent/OneCent5Screen";
 import RewardScreen from "../screens/Reward/RewardScreen";
+import RandomBox1Screen from "../screens/Reward/RandomBox1Screen";
+import RandomBox2Screen from "../screens/Reward/RandomBox2Screen";
+import RandomBox3Screen from "../screens/Reward/RandomBox3Screen";
+import RandomBox4Screen from "../screens/Reward/RandomBox4Screen";
+import RandomBoxCompleteScreen from "../screens/Reward/RandomBoxCompleteScreen";
+import RandomBoxLoadingScreen from "../screens/Reward/RandomBoxLoadingScreen";
 
 import MyPageScreen from "../screens/MyPage/MyPageScreen";
 import PasswordChangeScreen from "../screens/MyPage/PasswordChangeScreen";
@@ -171,6 +178,10 @@ export default function AppNavigator() {
         component={PlanNotClassifyScreen}
       ></Stack.Screen>
       <Stack.Screen
+        name="PlanManageScreen"
+        component={PlanManageScreen}
+      ></Stack.Screen>
+      <Stack.Screen
         name="OneCent1Screen"
         component={OneCent1Screen}
       ></Stack.Screen>
@@ -191,6 +202,30 @@ export default function AppNavigator() {
         component={OneCent5Screen}
       ></Stack.Screen>
       <Stack.Screen name="RewardScreen" component={RewardScreen}></Stack.Screen>
+      <Stack.Screen
+        name="RandomBox1Screen"
+        component={RandomBox1Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="RandomBox2Screen"
+        component={RandomBox2Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="RandomBox3Screen"
+        component={RandomBox3Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="RandomBox4Screen"
+        component={RandomBox4Screen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="RandomBoxCompleteScreen"
+        component={RandomBoxCompleteScreen}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="RandomBoxLoadingScreen"
+        component={RandomBoxLoadingScreen}
+      ></Stack.Screen>
       <Stack.Screen name="MyPageScreen" component={MyPageScreen}></Stack.Screen>
       <Stack.Screen
         name="PasswordChangeScreen"

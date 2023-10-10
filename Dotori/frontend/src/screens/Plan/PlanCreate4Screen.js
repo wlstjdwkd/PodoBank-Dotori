@@ -9,7 +9,6 @@ import {
   Image,
   ActivityIndicator,
 } from "react-native";
-// import DraggableFlatList from "volkeno-react-native-drag-drop";
 import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { useIsFocused } from "@react-navigation/native";
@@ -27,45 +26,9 @@ export default function PlanCreate4Screen({ navigation, route }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const [planInfo, setPlanInfo] = useState(route.params.planInfo);
-  console.log(planInfo);
   const isFocused = useIsFocused();
 
   const [categoryData, setCategoryData] = useState(null);
-  //   [
-  //   {
-  //     categoryGroupName: "식비",
-  //     categories: [
-  //       { name: "점심", amount: 5000 },
-  //       { name: "저녁", amount: 6000 },
-  //       { name: "간식", amount: 3000 },
-  //     ],
-  //   },
-  //   {
-  //     categoryGroupName: "교통비",
-  //     categories: [
-  //       { name: "버스", amount: 1200 },
-  //       { name: "택시", amount: 10000 },
-  //     ],
-  //   },
-  // ]
-  //   const categoryData = [
-  //     {
-  //       categoryGroupName: "식비",
-  //       categories: [
-  //         { name: "점심", amount: 5000 },
-  //         { name: "저녁", amount: 6000 },
-  //         { name: "간식", amount: 3000 },
-  //       ],
-  //     },
-  //     {
-  //       categoryGroupName: "교통비",
-  //       categories: [
-  //         { name: "버스", amount: 1200 },
-  //         { name: "택시", amount: 10000 },
-  //       ],
-  //     },
-  //     // ... 기타 카테고리 그룹들
-  //   ];
   const [data, setData] = useState(categoryData);
 
   const doPlanClassifyChatGpt = async () => {
@@ -75,31 +38,25 @@ export default function PlanCreate4Screen({ navigation, route }) {
         categorise: categorise,
         categoryGroups: categoryGroups,
       };
-      console.log(payload);
       const response = await planClassifyChatGpt(
         payload,
         accessToken,
         grantType
       );
       if (response.status === 200) {
-        console.log("전체 계좌 리스트 불러오기 성공");
         setCategoryData(response.data);
       } else {
-        console.log("전체 계좌 리스트 불러오기 실패");
       }
     } catch (error) {
-      console.log(error);
     } finally {
       setIsLoading(false);
     }
   };
   useEffect(() => {
     if (isFocused) {
-      // do정보조회()
       doPlanClassifyChatGpt();
     }
   }, [isFocused]);
-  //드래그앤 드롭.. 대실패 일단 보류
   const renderItem = ({ item, index, drag, isActive }) => {
     return (
       <TouchableOpacity
@@ -125,29 +82,6 @@ export default function PlanCreate4Screen({ navigation, route }) {
     );
   };
 
-  //   const [data, setData] = useState(categoryData);
-  //   const renderItem = ({ item, index, drag, isActive }) => {
-  //     return (
-  //       <TouchableOpacity
-  //         style={{
-  //           ...styles.categoryGroup,
-  //           backgroundColor: isActive ? "#E0E0E0" : "transparent",
-  //         }}
-  //         onLongPress={drag}
-  //       >
-  //         <Text style={styles.inputText}>{item.categoryGroupName}</Text>
-  //         <View style={styles.categoriesContainer}>
-  //           {item.categories.map((category, idx) => (
-  //             <View key={idx} style={styles.categoryBox}>
-  //               <Text style={styles.categoryText}>
-  //                 {category.name} {formatNumber(category.amount)}원
-  //               </Text>
-  //             </View>
-  //           ))}
-  //         </View>
-  //       </TouchableOpacity>
-  //     );
-  //   };
   const formatNumber = (num) => {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
   };
@@ -159,7 +93,6 @@ export default function PlanCreate4Screen({ navigation, route }) {
   };
 
   return (
-    // {isLoading ? ():()}
     <View style={styles.container}>
       {isLoading ? (
         <View style={styles.loaderContainer}>
@@ -175,7 +108,7 @@ export default function PlanCreate4Screen({ navigation, route }) {
         <View style={styles.innerContainer}>
           <HeaderComponent
             title="계획 생성(4/5)"
-            cancelNavi="PlanMainScreen"
+            cancelNavi="MainPageScreen"
             navigation={navigation}
           ></HeaderComponent>
           <ScrollView style={styles.header}>
@@ -212,21 +145,6 @@ export default function PlanCreate4Screen({ navigation, route }) {
                 </View>
               ))}
 
-            {/* <DraggableFlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => `draggable-item-${index}`}
-          onDragEnd={({ data }) => setCategoryData(data)}
-        /> */}
-
-            {/* <Text style={styles.inputText}>등록된 카테고리 그룹</Text>
-        <View style={styles.categoriesContainer}>
-          {categoryGroups.map((categoryGroup, index) => (
-            <View key={index} style={styles.categoryBox}>
-              <Text style={styles.categoryText}>{categoryGroup.name} </Text>
-            </View>
-          ))}
-        </View> */}
           </ScrollView>
 
           <TouchableOpacity style={styles.button} onPress={handleNextButton}>
@@ -248,12 +166,12 @@ const styles = StyleSheet.create({
   innerContainer: {
     flex: 1,
     justifyContent: "space-between",
-    // padding: 20,
     backgroundColor: "white",
   },
   loadingImage: {
     width: 200,
     height: 200,
+    marginBottom: 30,
   },
   loaderContainer: {
     flex: 1,
@@ -266,8 +184,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
     marginTop: 90,
   },
   title: {
@@ -292,7 +208,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
-    // textAlign: "center",
   },
   categoryText: {
     fontSize: 12,
