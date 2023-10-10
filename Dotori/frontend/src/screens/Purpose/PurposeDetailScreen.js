@@ -5,7 +5,9 @@ import Feather from "react-native-vector-icons/Feather"; // Feather 아이콘을
 import { useDispatch, useSelector } from "react-redux";
 import { purposeDetail } from "../../apis/purposeapi"
 
-const tmpData = {"currentBalance": 230, "endAt": "2024-05-28", "goalAmount": 512000, "purposeDataList": [{"dataAmount": 1, "dataCreatedAt": "2023-09-27 23:02:51", "dataCurrentBalance": 1, "dataName": "진성갓2계좌"},
+const tmpData = {"currentBalance": 230, "endAt": "2024-02-28", "goalAmount": 512000, 
+"purposeDataList": [
+  {"dataAmount": 1, "dataCreatedAt": "2023-09-27 23:02:51", "dataCurrentBalance": 1, "dataName": "진성갓2계좌"},
 {"dataAmount": 2, "dataCreatedAt": "2023-09-27 23:03:00", "dataCurrentBalance": 2, "dataName": "진성갓2계좌"},
 {"dataAmount": 3, "dataCreatedAt": "2023-09-30 23:03:09", "dataCurrentBalance": 3, "dataName": "진성갓2계좌"},
 {"dataAmount": 4, "dataCreatedAt": "2023-10-01 23:03:18", "dataCurrentBalance": 4, "dataName": "진성갓2계좌"},
@@ -46,13 +48,9 @@ export default function PurposeDetailScreen({ navigation, route }) {
   // 그 외
 
   const isFocused = useIsFocused()
-  // const { itemId } = route.params;
   const [purposeSeq, setPurposeSeq] = useState(route.params.purposeSeq)
   const [purposeDetailData, setPurposeDetailData] = useState({})
-  // const [purposeDataList, setPurposeDataList] = useState([])
 
-
-  // 날짜 형식을 변환하는 함수
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const month = date.getMonth() + 1;
@@ -60,41 +58,30 @@ export default function PurposeDetailScreen({ navigation, route }) {
     return `${month}월 ${day}일`;
   };
 
-  // const formatTime = (dateString) => {
-  //   const date = new Date(dateString);
-  //   const hours = date.getHours();
-  //   const minutes = date.getMinutes();
-  //   return `${hours}:${minutes}`;
-  // }
   const formatTime = (dateString) => {
     const date = new Date(dateString);
     const hours = date.getHours();
     const minutes = date.getMinutes();
     
-    // 시간과 분을 두 자리 숫자로 표시하도록 수정
+
     const formattedHours = hours < 10 ? `0${hours}` : hours;
     const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
   
     return `${formattedHours}:${formattedMinutes}`;
   }
 
-  // 날짜를 그룹화할 객체 생성
-  // const dateGroups = {};
   const [dateGroups, setDateGroups] = useState({});
 
-  // 날짜별로 항목을 그룹화하는 함수
   const groupingDate = (data) => {
-    const newDateGroups = { ...dateGroups }; // 이전 상태를 복사합니다.
+    const newDateGroups = { ...dateGroups };
     data.purposeDataList.forEach((item) => {
       const dateKey = formatDate(item.dataCreatedAt);
-      // 새로운 상태를 업데이트할 때는 이전 상태를 변경하지 않고 복사본을 수정합니다.
       if (!newDateGroups[dateKey]) {
         newDateGroups[dateKey] = [];
       }
       newDateGroups[dateKey].push(item);
     });
 
-    // setDateGroups를 사용하여 새로운 상태로 업데이트합니다.
     setDateGroups(newDateGroups);
   };
 
@@ -111,9 +98,6 @@ export default function PurposeDetailScreen({ navigation, route }) {
       const response = await purposeDetail(purposeSeq, accessToken, grantType)
       if(response.status===200){
         console.log("목표 상세 조회 성공")
-        // setPurposeDetailData(response.data)
-        // // setPurposeDataList(response.data.purposeDataList)
-        // groupingDate()
         handleData(response.data)
       }else{
         console.log("목표 상세 조회 실패", response.status)
@@ -130,22 +114,16 @@ export default function PurposeDetailScreen({ navigation, route }) {
     }
   }, [isFocused])
 
-  // useEffect(() => {
-  //   groupingDate();
-  // }, [purposeDetailData]);
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={{ flex: 1, }} />
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Feather name="x" size={30} 
-            // style={styles.closeIcon} 
           />
         </TouchableOpacity>
       </View>
 
-      {/* Title Container */}
       <View style={styles.titleContainer}>
         <Text style={styles.purposeTitle}>{purposeDetailData.purposeTitle}</Text>
         <Text style={styles.titleRight}>{purposeDetailData.currentBalance ? purposeDetailData.currentBalance.toLocaleString() : purposeDetailData.currentBalance}원</Text>
@@ -153,10 +131,8 @@ export default function PurposeDetailScreen({ navigation, route }) {
       <Text style={styles.goalAmount}>{purposeDetailData.goalAmount ? purposeDetailData.goalAmount.toLocaleString() : purposeDetailData.goalAmount}원</Text>
       </View>
 
-      {/* 구분선 */}
       <View style={styles.divider} />
 
-      {/* Purpose Data 날짜별로 묶기 */}
       <ScrollView 
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}
@@ -184,8 +160,7 @@ export default function PurposeDetailScreen({ navigation, route }) {
           <TouchableOpacity
             style={styles.stopPurposeButton}
             onPress={() => {
-              // navigation.navigate("PurposeStopScreen", {purposeSeq:purposeSeq, purposeDetailData:purposeDetailData})
-              navigation.navigate("PurposeStopScreen", {purposeSeq:purposeSeq, purposeDetailData:tmpData})
+              navigation.navigate("PurposeStopScreen", {purposeSeq:purposeSeq, purposeDetailData:purposeDetailData})
             }}
             
           >

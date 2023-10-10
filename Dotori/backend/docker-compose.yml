@@ -3,7 +3,7 @@ services:
   dotori-user-service:
     image: bangjinseong/dotori-user-service:${BUILD_NUMBER}
     build:
-      context: ../Dotori/backend/Dotori-User-Service
+      context: ./Dotori-User-Service
       dockerfile: Dockerfile
       args:
         - BUILD_NUMBER
@@ -15,10 +15,22 @@ services:
       - TZ=Asia/Seoul
     depends_on:
       - redis
+  chatGPT-service:
+    image: bangjinseong/dotori-chatGPT-service:${BUILD_NUMBER}
+    build:
+      context: ./chatGPT-service
+      dockerfile: Dockerfile
+      args:
+        - BUILD_NUMBER
+    ports:
+      - "9120:9120"
+    environment:
+      - ENCRYPT_KEY=${ENCRYPT_KEY_VALUE}
+      - TZ=Asia/Seoul
   redis:
     image: redis
     ports:
-      - "9050:6379"
+      - "9150:6379"
     volumes:
       - /etc/redis/redis.conf:/usr/local/etc/redis/redis.conf
     command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]

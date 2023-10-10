@@ -12,21 +12,8 @@ import HeaderComponent from "../Components/HeaderScreen";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function PlanCreate2Screen({ navigation, route }) {
-  // 토큰
-  // const grantType = useSelector((state) => {
-  //   state.user.grantType;
-  // });
-  // const accessToken = useSelector((state) => {
-  //   state.user.accessToken;
-  // });
-  // const refreshToken = useSelector((state) => {
-  //   state.user.refreshToken;
-  // });
-  // const dispatch = useDispatch();
-  // 그 외
 
   const [planInfo, setPlanInfo] = useState(route.params.planInfo);
-  console.log(planInfo);
   const [categoryName, setCategoryName] = useState("");
   const [targetAmount, setTargetAmount] = useState();
   const [categorise, setCategorise] = useState([]);
@@ -53,7 +40,7 @@ export default function PlanCreate2Screen({ navigation, route }) {
     <View style={styles.container}>
       <HeaderComponent
         title="계획 생성(2/5)"
-        cancelNavi="PlanMainScreen"
+        cancelNavi="MainPageScreen"
         navigation={navigation}
       ></HeaderComponent>
       <ScrollView style={styles.header}>
@@ -122,8 +109,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
     marginTop: 90,
   },
   title: {
@@ -148,7 +133,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
-    // textAlign: "center",
   },
   button: {
     height: 50,

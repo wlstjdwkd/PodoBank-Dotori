@@ -13,7 +13,6 @@ export default function WithDraw1Screen({ navigation, route }) {
   const refreshToken =  useSelector((state)=>state.user.refreshToken)
   const dispatch = useDispatch()
   // 그 외
-  // const [userInfo, setUserInfo] = useState(route.params.userInfo)
   const [purposeQuitModalVisible, setPurposeQuitModalVisible] = useState(false);
   const [purposeSeq] = useState(route.params.purposeSeq)
   const [purposeDetailData] = useState(route.params.purposeDetailData)
@@ -27,17 +26,13 @@ export default function WithDraw1Screen({ navigation, route }) {
     try{
       const response = await purposeQuit(purposeSeq, accessToken, grantType)
       if(response.status === 200){
-        console.log('목표 중단 완료')
         navigation.reset({
           index: 0,
           routes: [{ name: 'PurposeScreen' }],
         });
       }else{
-        console.log('목표 중단 실패', response.status)
       }
-      // console.log("테스트")
     }catch(error){
-      console.log('오류 발생: 목표 중단 실패', error)
     }
   }
 
@@ -58,19 +53,13 @@ export default function WithDraw1Screen({ navigation, route }) {
       />
 
       <View style={styles.box}>
-        {/* <Image
-          style={styles.leftImage}
-          source={require("../../assets/images/logo_podo.png")}
-        /> */}
         <Text style={styles.text}>목표가 필요 없어진 거예요?</Text>
       </View>
 
-      {/* <Text style={styles.text}>{userInfo.userName}님</Text> */}
       <Text style={styles.text}>정말로{"\n"}목표 : "{purposeDetailData.purposeTitle}" 를</Text>
       <Text style={{ fontSize: 18 }}>
         <Text style={{ color: "#FF965C" }}>중단</Text>할까요?
       </Text>
-      {/* 위치 맞추기 위한 View */}
       <View style={{margin:25}}></View>
 
       <TouchableOpacity style={[styles.button1, {backgroundColor:'lightgray'}]}
@@ -89,14 +78,12 @@ export default function WithDraw1Screen({ navigation, route }) {
         <Text style={styles.buttonText}>아니요, 잘못 눌렀어요.</Text>
       </TouchableOpacity>
 
-      {/* 회원탈퇴 모달창 */}
       <View style={styles.centeredView}>
         <Modal
           animationType="none"
           transparent={true}
           visible={purposeQuitModalVisible}
           onRequestClose={() => {
-            // Alert.alert('Modal has been closed.');
             setPurposeQuitModalVisible(false);
           }}>
           <View style={styles.centeredView}>
@@ -139,7 +126,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "white",
-    paddingBottom: 20, // 추가됨
+    paddingBottom: 20,
   },
   image: {
     width: 150,
@@ -172,19 +159,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF965C",
     borderRadius: 8,
     width: "80%",
-    // padding: 16,
     height: 40,
-    // marginTop: 180,
-    // marginBottom: -100,
   },
   button2: {
     backgroundColor: "#FF965C",
     borderRadius: 8,
     width: "80%",
-    // padding: 16,
     height: 40,
-    // marginTop: 180,
-    // marginBottom: -100,
   },
   buttonText: {
     fontSize: 15,
@@ -199,7 +180,6 @@ const styles = StyleSheet.create({
     marginBottom: -20,
   },
 
-  // 모달 관련 스타일
   centeredView: {
     flex: 1,
     justifyContent: 'center',
@@ -211,7 +191,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
-    // alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -232,7 +211,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F194FF',
   },
   buttonClose: {
-    // backgroundColor: '#2196F3',
     backgroundColor: '#FF965C',
   },
   textStyle: {

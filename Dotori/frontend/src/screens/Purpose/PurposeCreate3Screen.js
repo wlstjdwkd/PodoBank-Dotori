@@ -61,24 +61,18 @@ export default function PurposeCreate3Screen({ navigation, route }) {
       "goalAmount" : parseInt(purposeInfo.goalAmount),
       "startedAt" : purposeInfo.startedAt,
       "endAt" : purposeInfo.endAt,
-      // "startedAt" : purposeInfo.startedAt + " 00:00:00",
-      // "endAt" : purposeInfo.endAt + " 23:59:59",
     }
     try{
       const response = await purposeNewRegister(data, accessToken, grantType)
       if(response.status===200){
-        console.log("목표 등록 성공")
         navigation.reset({
           index: 0,
           routes: [{ name: 'PurposeCompleteScreen', params: {name : purposeInfo.purposeTitle}}],
         })
       }else if(response.status===400){
-        console.log("목표 등록 실패", response.status)
       }else{
-        console.log("목표 등록 실패", response.status)
       }
     }catch(error){
-      console.log("오류발생: 목표 등록 실패")
     }
   }
 
@@ -141,8 +135,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
     marginTop: 90,
   },
   title: {
@@ -164,7 +156,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     marginTop: 20,
-    // textAlign: "center",
   },
   button: {
     height: 40,
@@ -184,8 +175,6 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   middleImage: {
-    // justifyContent: "center",
-    // alignItems: "center",
     width: 150,
     height: 150,
   },

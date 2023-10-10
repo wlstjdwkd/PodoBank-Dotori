@@ -6,24 +6,24 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-} from "react-native"
-import FooterScreen from "../Components/FooterScreen"
-import { useDispatch, useSelector } from "react-redux"
-import { purposeGetList } from "../../apis/purposeapi"
-import { useIsFocused } from "@react-navigation/native"
+} from "react-native";
+import FooterScreen from "../Components/FooterScreen";
+import { useDispatch, useSelector } from "react-redux";
+import { purposeGetList } from "../../apis/purposeapi";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function PurposeScreen({ navigation }) {
   // 토큰
-  const grantType =  useSelector((state)=>state.user.grantType)
-  const accessToken =  useSelector((state)=>state.user.accessToken)
-  const refreshToken =  useSelector((state)=>state.user.refreshToken)
-  const dispatch = useDispatch()
+  const grantType = useSelector((state) => state.user.grantType);
+  const accessToken = useSelector((state) => state.user.accessToken);
+  const refreshToken = useSelector((state) => state.user.refreshToken);
+  const dispatch = useDispatch();
   // 그 외
-  const isFocused = useIsFocused()
+  const isFocused = useIsFocused();
 
-  const [currentTotalSavings, setcurrentTotalSavings] = useState(0)
-  const [purposeList, setPurposeList] = useState([])
-  
+  const [currentTotalSavings, setcurrentTotalSavings] = useState(0);
+  const [purposeList, setPurposeList] = useState([]);
+
   const data = [
     {
       id: "1",
@@ -37,7 +37,6 @@ export default function PurposeScreen({ navigation }) {
       currentAmount: 2500,
       targetAmount: 10000,
     },
-    // 다른 목표들...
   ];
 
   const formatNumber = (num) => {
@@ -51,48 +50,40 @@ export default function PurposeScreen({ navigation }) {
   };
 
   const doPurposeGetList = async () => {
-    try{
-      const response = await purposeGetList(accessToken, grantType)
-      if(response.status === 200){
-        console.log("목표 리스트 조회 성공")
-        console.log(response.data)
-        setPurposeList(response.data.purposeList)
-        setcurrentTotalSavings(response.data.currentTotalSavings)
-      }else{
-        console.log("목표 리스트 조회 실패", response.status)
+    try {
+      const response = await purposeGetList(accessToken, grantType);
+      if (response.status === 200) {
+        setPurposeList(response.data.purposeList);
+        setcurrentTotalSavings(response.data.currentTotalSavings);
+      } else {
       }
-    }catch(error){
-      console.log('오류 발생: 목표 리스트 조회 실패',error)
+    } catch (error) {
     }
-
-  }
+  };
 
   useEffect(() => {
-    if(isFocused){
-      doPurposeGetList()
+    if (isFocused) {
+      doPurposeGetList();
     }
   }, [isFocused]);
 
   return (
     <View style={styles.container}>
-      {/* 상단 이미지 */}
       <Image
         style={styles.topImage}
         source={require("../../assets/images/dotori_logo.png")}
       />
 
-      {/* 최신순 & 저축액 */}
       <View style={styles.dateAmountContainer}>
         <TouchableOpacity>
           <Text style={styles.latest}>최신순</Text>
         </TouchableOpacity>
-        <View style={styles.colContainer}>
+        <View>
           <Text style={styles.amount}>{currentTotalSavings}원</Text>
           <Text style={styles.currentSavings}>현재 저축액</Text>
         </View>
       </View>
 
-      {/* 중간 이미지 */}
       <View style={styles.middleImageContainer}>
         <Image
           style={styles.middleImage}
@@ -102,16 +93,24 @@ export default function PurposeScreen({ navigation }) {
 
       <View style={styles.divider}></View>
 
-      {/* 목표 리스트 */}
       <FlatList
-        style={{marginBottom:80}}
+        style={{ marginBottom: 80 }}
         data={purposeList}
         renderItem={({ item }) => {
           const borderColor = getRandomBorderColor();
           return (
-            <TouchableOpacity style={[styles.targetContainer, { borderColor }]}
-              onPress={()=>{
-                navigation.navigate("PurposeDetailScreen", {purposeSeq:item.purposeSeq})
+            <TouchableOpacity
+              style={[styles.targetContainer, { borderColor }]}
+              onPress={() => {
+                if (item.terminatedAt !== null) {
+                  navigation.navigate("PurposeEnd1Screen", {
+                    purposeData: item,
+                  });
+                } else {
+                  navigation.navigate("PurposeDetailScreen", {
+                    purposeSeq: item.purposeSeq,
+                  });
+                }
               }}
             >
               <Text style={styles.targetName}>{item.title}</Text>
@@ -131,7 +130,6 @@ export default function PurposeScreen({ navigation }) {
             </TouchableOpacity>
           );
         }}
-        // keyExtractor={(item) => item.purposeSeq}
         keyExtractor={(item) => item.purposeSeq}
         ListFooterComponent={
           <TouchableOpacity
@@ -142,44 +140,7 @@ export default function PurposeScreen({ navigation }) {
           </TouchableOpacity>
         }
       />
-      {/* 목표 리스트 */}
-      {/* <FlatList
-        data={data}
-        renderItem={({ item }) => {
-          const borderColor = getRandomBorderColor();
-          return (
-            <TouchableOpacity style={[styles.targetContainer, { borderColor }]}
-              onPress={()=>{
-                navigation.navigate("PurposeDetailScreen", {itemId:item.id})
-              }}
-            >
-              <Text style={styles.targetName}>{item.name}</Text>
-              <View style={styles.rightAlignContainer}>
-                <Text style={styles.currentAmount}>
-                  {formatNumber(item.currentAmount)}원
-                </Text>
-              </View>
-              <View style={styles.targetAmounts}>
-                <Text style={styles.targetAmountText}>목표 금액</Text>
-                <View style={styles.rightAlignContainer}>
-                  <Text style={styles.targetAmount}>
-                    {formatNumber(item.targetAmount)}원
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          );
-        }}
-        keyExtractor={(item) => item.id}
-        ListFooterComponent={
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => navigation.navigate("PurposeCreate1Screen")}
-          >
-            <Text style={styles.addText}>+</Text>
-          </TouchableOpacity>
-        }
-      /> */}
+
       <View style={styles.footer}>
         <FooterScreen navigation={navigation} />
       </View>
@@ -206,14 +167,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   latest: {
-    // 여기에 텍스트 스타일 추가...
     backgroundColor: "#EFF3F6",
     borderRadius: 10,
     fontSize: 12,
     padding: 10,
   },
   amount: {
-    // 여기에 텍스트 스타일 추가...
     fontSize: 20,
   },
   currentSavings: {
@@ -221,21 +180,20 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   middleImageContainer: {
-    position: "absolute", // Set position to absolute
+    position: "absolute",
     alignSelf: "center",
-    zIndex: 1, // Make sure the image is on top of the divider
-    top: "20%", // Adjust this to position the image correctly over the divider
+    zIndex: 1,
+    top: "20%",
   },
   middleImage: {
-    // 여기에 이미지 스타일 추가...
     width: 100,
     height: 110,
   },
   divider: {
-    marginTop: 115, // Height of the middleImage divided by 2, adjust this value as needed
+    marginTop: 115,
     height: 10,
-    backgroundColor: "#FFF2DE", // or any color you'd like
-    marginBottom: 30, // space after the divider
+    backgroundColor: "#FFF2DE",
+    marginBottom: 30,
   },
   targetContainer: {
     borderRadius: 15,
@@ -291,7 +249,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
     height: 70,
     marginTop: 20,
-    borderStyle: "dashed", // 점선 테두리 추가
+    borderStyle: "dashed",
   },
   addText: {
     color: "#A6A6A6",
