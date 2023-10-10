@@ -9,40 +9,19 @@
 
 ### 2. 주요기능설명
 
-#### 회원가입
-![PodoBank_register](https://github.com/hd9775/hd9775/assets/12166357/76940038-39ef-47fb-8d89-f4e9b3f13e6f)
+| 회원가입 | 로그인 | 입출금 알림 |
+|-------|-------|-------|
+| ![PodoBank_register](https://github.com/hd9775/hd9775/assets/12166357/76940038-39ef-47fb-8d89-f4e9b3f13e6f) | ![PodoBank_login](https://github.com/hd9775/hd9775/assets/12166357/869e0a34-29ce-4c4e-a8e1-2c2a302b46aa) | ![PodoBank_alert](https://github.com/hd9775/hd9775/assets/12166357/637dc928-f21b-4821-bdbe-51a771268787) |
 <br>
 
-#### 로그인
-![PodoBank_login](https://github.com/hd9775/hd9775/assets/12166357/869e0a34-29ce-4c4e-a8e1-2c2a302b46aa)
+| 계좌 생성 | 계좌 이체 | 계좌 비밀번호 3회 오류 잠금 | 계좌 비밀번호 3회 오류 잠금 해제 |
+|-------|-------|-------|-------|
+| ![PodoBank_account_create](https://github.com/hd9775/hd9775/assets/12166357/617e3f06-19ed-4526-853d-2db1631fb93d) | ![PodoBank_account_transfer](https://github.com/hd9775/hd9775/assets/12166357/e250fc8c-fa4d-4a71-abd0-9303a73992fc) | ![PodoBank_account_lock](https://github.com/hd9775/hd9775/assets/12166357/22eacbc7-c915-47a6-9fb5-6048ec968d5e) | ![PodoBank_account_unlock](https://github.com/hd9775/hd9775/assets/12166357/fbbe1f89-026b-4652-b7cf-6ea7ea1aeea3) |
 <br>
 
-#### 계좌 생성
-![PodoBank_account_create](https://github.com/hd9775/hd9775/assets/12166357/617e3f06-19ed-4526-853d-2db1631fb93d)
-<br>
-
-#### 입출금 알림
-![PodoBank_alert](https://github.com/hd9775/hd9775/assets/12166357/637dc928-f21b-4821-bdbe-51a771268787)
-<br>
-
-#### 계좌 이체
-![PodoBank_account_transfer](https://github.com/hd9775/hd9775/assets/12166357/e250fc8c-fa4d-4a71-abd0-9303a73992fc)
-<br>
-
-#### 계좌 비밀번호 3회 오류 잠금
-![PodoBank_account_lock](https://github.com/hd9775/hd9775/assets/12166357/22eacbc7-c915-47a6-9fb5-6048ec968d5e)
-<br>
-
-#### 계좌 비밀번호 3회 오류 잠금 해제
-![PodoBank_account_unlock](https://github.com/hd9775/hd9775/assets/12166357/fbbe1f89-026b-4652-b7cf-6ea7ea1aeea3)
-<br>
-
-#### 회원 탈퇴(잔액 보유시 탈퇴 불가)
-![PodoBank_withdrawal_fail](https://github.com/hd9775/hd9775/assets/12166357/5eaa3534-cb37-48b9-8905-851d6fa15d3c)
-<br>
-
-#### 회원탈퇴
-![PodoBank_withdrawal_success](https://github.com/hd9775/hd9775/assets/12166357/fdaca628-3b49-43f3-ab4a-1b65d3258be9)
+| 회원 탈퇴(잔액 보유시 탈퇴 불가) | 회원탈퇴 |
+|-------|-------|
+| ![PodoBank_withdrawal_fail](https://github.com/hd9775/hd9775/assets/12166357/5eaa3534-cb37-48b9-8905-851d6fa15d3c) | ![PodoBank_withdrawal_success](https://github.com/hd9775/hd9775/assets/12166357/fdaca628-3b49-43f3-ab4a-1b65d3258be9) 
 <br>
 
 
