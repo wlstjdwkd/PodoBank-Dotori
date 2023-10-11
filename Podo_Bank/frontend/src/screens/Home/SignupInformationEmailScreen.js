@@ -27,7 +27,7 @@ export default function SignupInformationEmailScreen({ navigation, route }) {
   const [emailMessage, setEmailMessage] = useState("");     // E-mail 사용가능 여부를 나타내는 메시지
   // 이메일 인증 카운트 다운
   const [countdown, setCountdown] = useState(0); // 5분 = 300초\
-  const [startCougntdown, setStartCountdown] = useState(false);
+  const [startCountdown, setStartCountdown] = useState(false);
 
   // const [emailDuplicatedCheck, setEmailDuplicatedCheck] = useState(null)  // 이메일 중복확인 결과
   // const userTokenRefreshModalVisible = useSelector((state) => state.user.userTokenRefreshModalVisible)

@@ -2,7 +2,6 @@ package com.bank.podo.domain.user.service;
 
 import com.bank.podo.domain.user.dto.*;
 import com.bank.podo.domain.user.entity.User;
-import com.bank.podo.domain.user.exception.AlreadyUsedUsernameException;
 import com.bank.podo.domain.user.exception.FromatException;
 import com.bank.podo.domain.user.exception.PasswordNotMatchException;
 import com.bank.podo.domain.user.repository.UserRepository;
@@ -25,31 +24,24 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
-    public void checkUsername(String email) {
-        checkEmailFormat(email);
-        if(userRepository.existsByEmail(email)) {
-            throw new AlreadyUsedUsernameException("이미 사용중인 아이디입니다.");
-        }
-    }
+    public void logout() {
+        User user = getLoginUser();
 
-    public boolean logout(String email) {
-        boolean isLogout = requestUtil.removeRefreshToken(email);
+        requestUtil.removeRefreshToken(user.getEmail());
+        requestUtil.deleteFCMToken(user.getEmail());
 
-        logLogout(email, isLogout);
-
-        return isLogout;
+        logLogout(user.getEmail());
     }
 
     @Transactional(readOnly = true)
-    public UserInfoDTO getUserInfo(String email) {
-        User user = getLoginUser(email);
+    public UserInfoDTO getUserInfo() {
+        User user = getLoginUser();
         return toUserInfoDTO(user);
     }
 
     @Transactional
-    public void changePassword(String email, ChangePasswordDTO changePasswordDTO, PasswordEncoder passwordEncoder) {
-        User user = getLoginUser(email);
+    public void changePassword(ChangePasswordDTO changePasswordDTO, PasswordEncoder passwordEncoder) {
+        User user = getLoginUser();
 
         if(!passwordEncoder.matches(changePasswordDTO.getPassword(), user.getPassword())) {
             throw new PasswordNotMatchException("기존 비밀번호가 일치하지 않습니다.");
@@ -67,7 +59,7 @@ public class UserService {
 
         logChangePassword(user);
 
-        logout(email);
+        logout();
     }
 
     @Transactional
@@ -93,8 +85,8 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(String email, UserDeleteDTO userDeleteDTO, PasswordEncoder passwordEncoder) {
-        User user = getLoginUser(email);
+    public void deleteUser(UserDeleteDTO userDeleteDTO, PasswordEncoder passwordEncoder) {
+        User user = getLoginUser();
 
         if(!passwordEncoder.matches(userDeleteDTO.getPassword(), user.getPassword())) {
             throw new PasswordNotMatchException("비밀번호가 일치하지 않습니다.");
@@ -109,18 +101,14 @@ public class UserService {
         logDeleteUser(user);
     }
 
-    private User getLoginUser(String email) {
+    @Transactional(readOnly = true)
+    public User getUser(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
     }
 
-    public void checkEmailFormat(String email) {
-        String emailPattern =
-                "^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-
-        if(!Pattern.compile(emailPattern).matcher(email).matches()) {
-            throw new FromatException("이메일 형식이 올바르지 않습니다.");
-        }
+    private User getLoginUser() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     private void checkPasswordFormat(String password) {
@@ -139,11 +127,10 @@ public class UserService {
                 .phoneNumber(user.getPhoneNumber())
                 .build();
     }
-    private void logLogout(String email, boolean result) {
+    private void logLogout(String email) {
         log.info("===== " + "\t" +
                 "로그아웃" + "\t" +
                 "이메일: " + email + "\t" +
-                "결과: " + result + "\t" +
                 "=====");
     }
 

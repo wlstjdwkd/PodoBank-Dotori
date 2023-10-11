@@ -1,15 +1,19 @@
 package com.bank.podo.global.request;
 
 import com.bank.podo.domain.user.dto.CheckSuccessCodeDTO;
-import com.bank.podo.domain.user.dto.ResetPasswordDTO;
+import com.bank.podo.global.others.dto.DeleteFCMTokenDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class RequestUtil {
+
+    @Value("${http.request.firebase.url}")
+    private String firebaseUrl;
 
     @Value("${http.request.account.url}")
     private String accountUrl;
@@ -42,5 +46,19 @@ public class RequestUtil {
             return false;
         }
 
+    }
+
+    @Async
+    public void deleteFCMToken(String email) {
+        String url = firebaseUrl + "/api/v1/fcm/deleteToken";
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(DeleteFCMTokenDTO.builder()
+                    .email(email)
+                    .build());
+            requestApi.apiPost(url, json);
+        } catch (Exception e) {
+        }
     }
 }

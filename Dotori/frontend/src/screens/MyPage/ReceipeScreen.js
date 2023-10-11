@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,59 +9,77 @@ import {
 } from "react-native";
 
 import HeaderComponent from "../Components/HeaderScreen";
+import { useDispatch, useSelector } from "react-redux";
+import { planSpecificationDetail } from "../../apis/planapi"
+
 export default function ReceipeScreen({ route, navigation }) {
-  // route.params에서 선택한 계좌와 명세서 번호(receipeSeq)를 가져옴
-  const { selectedAccount, selectedReceipe } = route.params;
+  // 토큰
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
+  const dispatch = useDispatch()
+  // 그 외
+  
+  const [accountName, setAccountName] = useState(route.params.selectedAccount)
+  const [planSeq, setPlanSeq] = useState(route.params.selectedReceipe)
+  const [receipeItems, setReceipeItems] = useState([])
+  const [additionalSavings, setAdditionalSavings] = useState(null)
+  const funcTotalExpense = (counting) => {
+    return counting.reduce(
+      (acc, item) => acc + item.expense,
+      0
+    )
+  }
+  const funcTotalSavings = (counting) => {
+    return counting.reduce(
+      (acc, item) => acc + item.savings,
+      0
+    )
+  }
+  const [totalExpense, setTotalExpense] = useState(null)
+  const [totalSavings, setTotalSavings] = useState(null)
 
-  // 가상 데이터 - 명세서 항목들
-  const receipeItems = [
-    { category: "식비", expense: 50000, savings: 20000 },
-    { category: "주거", expense: 30000, savings: 10000 },
-    { category: "주거", expense: 30000, savings: 10000 },
-    { category: "주거", expense: 30000, savings: 10000 },
-    { category: "주거", expense: 30000, savings: 10000 },
-    { category: "주거", expense: 30000, savings: 10000 },
-    { category: "주거", expense: 30000, savings: 10000 },
-    { category: "주거", expense: 30000, savings: 10000 },
-    { category: "주거", expense: 30000, savings: 10000 },
+  const doPlanSpecificationDetail = async () =>{
+    try{
+      const response = await planSpecificationDetail(planSeq, accessToken, grantType)
+      if(response.status === 200){
+        setReceipeItems(response.data.planDetailList)
+        setAdditionalSavings(response.data.additionalSaving)
+        setTotalExpense(funcTotalExpense(response.data.planDetailList))
+        setTotalSavings(funcTotalSavings(response.data.planDetailList))
+      }else{
+      }
+    }catch(error){
+    }
+  }
 
-    // 다른 항목들 추가
-  ];
-
-  // 추가 저축 항목
-  const additionalSavings = { category: "추가 저축", savings: 15000 };
-
-  // 총계 계산
-  const totalExpense = receipeItems.reduce(
-    (acc, item) => acc + item.expense,
-    0
-  );
-  const totalSavings = receipeItems.reduce(
-    (acc, item) => acc + item.savings,
-    0
-  );
-  const totalAdditionalSavings = additionalSavings.savings;
+  useEffect(()=>{
+    doPlanSpecificationDetail()
+    setTotalExpense(funcTotalExpense(receipeItems))
+    setTotalSavings(funcTotalSavings(receipeItems))
+  },[])
 
   return (
     <View style={styles.container}>
       <HeaderComponent
         title="명세서 보기"
         navigation={navigation}
+        cancelNavi="MyPageScreen"
       ></HeaderComponent>
 
-      {/* 선택한 명세서를 화면에 표시 */}
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        {/* 명세서 표 */}
         <View style={styles.receipeTable}>
-          {/* 시민주의 통장 */}
           <View style={styles.topContainer}>
-            <Text style={styles.label}>{selectedAccount}</Text>
+            <Text style={styles.label}>{accountName}</Text>
             <Text style={styles.amount}>
-              {(totalSavings + additionalSavings.savings).toLocaleString()}원
+              {additionalSavings!=null
+                ? (totalSavings + additionalSavings)?(totalSavings + additionalSavings).toLocaleString():(totalSavings + additionalSavings)
+                : totalSavings?totalSavings.toLocaleString():totalSavings
+              }원
+              
             </Text>
           </View>
 
-          {/* 제목 행 */}
           <View style={styles.tableRow}>
             <Text style={styles.tableIndexCell}></Text>
             <Text style={styles.tableCell}>카테고리</Text>
@@ -69,14 +87,12 @@ export default function ReceipeScreen({ route, navigation }) {
             <Text style={styles.tableCell}>저축</Text>
           </View>
 
-          {/* 구분선 */}
           <View style={styles.tableLine} />
 
-          {/* 항목들 */}
           {receipeItems.map((item, index) => (
             <View style={styles.tableRow} key={index}>
               <Text style={styles.tableIndexCell}>{index + 1}</Text>
-              <Text style={styles.tableCell}>{item.category}</Text>
+              <Text style={styles.tableCell}>{item.categoryTitle}</Text>
               <Text style={styles.tableCell}>
                 {item.expense.toLocaleString()}
               </Text>
@@ -86,43 +102,49 @@ export default function ReceipeScreen({ route, navigation }) {
             </View>
           ))}
 
-          {/* 구분선 */}
           <View style={styles.tableLine} />
 
-          {/* 사용 합계 */}
           <View style={styles.tableRow}>
             <Text style={styles.tableIndexCell}></Text>
             <Text style={styles.tableCell}></Text>
             <Text style={styles.tableCell}>
-              {totalExpense.toLocaleString()}
+              {totalExpense ? totalExpense.toLocaleString() : totalExpense}
             </Text>
             <Text style={styles.tableCell}>
-              {totalSavings.toLocaleString()}
+              {totalSavings ? totalSavings.toLocaleString() : totalSavings}
             </Text>
           </View>
 
-          {/* 추가 저축 항목 */}
-          <View style={styles.tableRow}>
-            <Text style={styles.tableIndexCell}></Text>
-            <Text style={styles.tableCell}>{additionalSavings.category}</Text>
-            <Text style={styles.tableCell}></Text>
-            <Text style={styles.tableCell}>
-              {additionalSavings.savings.toLocaleString()}
-            </Text>
-          </View>
+          {additionalSavings!=null
+            ?
+            (<View style={styles.tableRow}>
+              <Text style={styles.tableIndexCell}></Text>
+              <Text style={styles.tableCell}>추가 저축</Text>
+              <Text style={styles.tableCell}></Text>
+              <Text style={styles.tableCell}>
+                {additionalSavings ? additionalSavings.toLocaleString() : additionalSavings}
+              </Text>
+            </View>)
+            : null
+          }
 
-          {/* 구분선 */}
-          <View style={styles.tableDotLine} />
+          {additionalSavings!=null
+            ?
+            <View style={styles.tableDotLine} />
+            :null
+          }
 
-          {/* 총계 행 */}
           <View style={styles.tableRow}>
             <Text style={styles.tableIndexCell}></Text>
             <Text style={styles.tableCell}>총계</Text>
             <Text style={styles.tableCell}>
-              {totalExpense.toLocaleString()}
+              {totalExpense?totalExpense.toLocaleString():totalExpense}
             </Text>
             <Text style={styles.tableCell}>
-              {(totalSavings + additionalSavings.savings).toLocaleString()}
+              {additionalSavings
+                ?(totalSavings + additionalSavings)?(totalSavings + additionalSavings).toLocaleString():(totalSavings + additionalSavings)
+                :totalSavings?totalSavings.toLocaleString():totalSavings
+              }
             </Text>
           </View>
           <View style={styles.tableLine} />
@@ -149,16 +171,15 @@ const styles = StyleSheet.create({
     height: 20,
   },
   contentContainer: {
-    flexGrow: 1, // 스크롤 가능하도록 설정
+    flexGrow: 1,
     alignItems: "center",
     paddingTop: 20,
-    paddingBottom: 150, // 하단 여백
+    paddingBottom: 150,
     marginTop: 40,
   },
   label: {
     fontSize: 24,
     textAlign: "left",
-    // fontWeight: "bold",
     marginBottom: 8,
     marginTop: 20,
     color: "#333",
@@ -174,12 +195,11 @@ const styles = StyleSheet.create({
     width: "90%",
     borderWidth: 1,
     borderColor: "#DDD",
-    shadowColor: "rgba(0, 0, 0, 0.5)", // 그림자 색상을 어둡게 조정
-    shadowOffset: { width: 0, height: 4 }, // 그림자 오프셋을 크게 조정
-    shadowOpacity: 1, // 그림자 투명도를 최대로 조정
-    shadowRadius: 8, // 그림자 반경을 크게 조정
+    shadowColor: "rgba(0, 0, 0, 0.5)",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
     backgroundColor: "white",
-    // borderTop: 20,
     paddingBottom: 40,
   },
   topContainer: {

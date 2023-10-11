@@ -1,6 +1,6 @@
 // src/api/accountApi.js
 import axios from 'axios';
-const apiAddress ="http://j9d107.p.ssafy.io:9000"
+const apiAddress ="http://j9d107.p.ssafy.io:9600"
 
 // 사용자 계좌 잔액 조회
 export const userBalanceInquiry = async (codeInfo, ManagerAccessToken) => {
