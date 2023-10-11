@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.global.email.service;
+package com.bank.podo.global.email.service;
 
 import com.bank.podo.global.email.dto.EmailVerificationSuccessDTO;
 import com.bank.podo.global.email.entity.VerificationCode;

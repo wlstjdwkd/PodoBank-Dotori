@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.global.email.exception;
+package com.bank.podo.global.email.exception;
 
 public class ResendTimeNotExpiredException extends RuntimeException {
     public ResendTimeNotExpiredException() {

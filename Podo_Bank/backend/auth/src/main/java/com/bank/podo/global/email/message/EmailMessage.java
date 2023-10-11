@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.global.email.message;
+package com.bank.podo.global.email.message;
 
 import org.springframework.context.annotation.Configuration;
 

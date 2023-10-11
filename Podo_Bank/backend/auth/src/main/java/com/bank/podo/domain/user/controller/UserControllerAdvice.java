@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.domain.user.controller;
+package com.bank.podo.domain.user.controller;
 
 import com.bank.podo.domain.user.exception.AlreadyUsedUsernameException;
 import com.bank.podo.domain.user.exception.FromatException;

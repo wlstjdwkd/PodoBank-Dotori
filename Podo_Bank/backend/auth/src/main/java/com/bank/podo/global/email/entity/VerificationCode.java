@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.global.email.entity;
+package com.bank.podo.global.email.entity;
 
 import com.bank.podo.global.email.enums.VerificationType;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.global.email.config;
+package com.bank.podo.global.email.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

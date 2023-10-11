@@ -1,4 +1,4 @@
-package auth.src.test.java.com.bank.podo;
+package com.bank.podo;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

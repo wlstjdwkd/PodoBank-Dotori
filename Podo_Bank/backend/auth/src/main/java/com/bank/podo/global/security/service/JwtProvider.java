@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.global.security.service;
+package com.bank.podo.global.security.service;
 
 import com.bank.podo.domain.user.entity.User;
 import com.bank.podo.domain.user.enums.Role;
