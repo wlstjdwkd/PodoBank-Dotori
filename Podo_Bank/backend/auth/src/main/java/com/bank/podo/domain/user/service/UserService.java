@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.domain.user.service;
+package com.bank.podo.domain.user.service;
 
 import com.bank.podo.domain.user.dto.*;
 import com.bank.podo.domain.user.entity.User;

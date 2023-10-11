@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo;
+package com.bank.podo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.global.others.dto;
+package com.bank.podo.global.others.dto;
 
 import lombok.Builder;
 import lombok.Data;

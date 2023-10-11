@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.domain.user.dto;
+package com.bank.podo.domain.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

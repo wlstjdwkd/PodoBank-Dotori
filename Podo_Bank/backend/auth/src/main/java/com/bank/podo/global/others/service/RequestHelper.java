@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.global.others.service;
+package com.bank.podo.global.others.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;

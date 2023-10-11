@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.global.security.repository;
+package com.bank.podo.global.security.repository;
 
 import com.bank.podo.global.security.entity.RefreshToken;
 import org.springframework.data.repository.CrudRepository;

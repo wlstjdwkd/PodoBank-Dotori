@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.domain.user.enums;
+package com.bank.podo.domain.user.enums;
 
 public enum Gender {
     MALE,

@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.global.security.config;
+package com.bank.podo.global.security.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
