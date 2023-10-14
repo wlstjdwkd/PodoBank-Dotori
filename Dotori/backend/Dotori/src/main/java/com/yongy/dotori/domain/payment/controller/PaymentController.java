@@ -2,6 +2,7 @@ package com.yongy.dotori.domain.payment.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.yongy.dotori.domain.payment.dto.PaymentDetailDTO;
+import com.yongy.dotori.domain.payment.dto.UpdateUnclassifiedDTO;
 import com.yongy.dotori.domain.payment.dto.request.PaymentPodoReqDto;
 import com.yongy.dotori.domain.payment.dto.response.PaymentPodoResDto;
 import com.yongy.dotori.domain.payment.repository.PaymentRepository;
@@ -10,6 +11,8 @@ import com.yongy.dotori.domain.plan.entity.Plan;
 import com.yongy.dotori.domain.plan.exception.PaymentUpdateBeforeException;
 import com.yongy.dotori.domain.plan.repository.PlanRepository;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
@@ -62,15 +65,21 @@ public class PaymentController {
     }
 
     @Operation(summary = "미분류 Payment 리스트 조회")
-    @GetMapping("/unclassified/{planSeq}")
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "미분류 내역 조회")
+    })
+    @GetMapping("/{planSeq}")
     public ResponseEntity<List<PaymentDetailDTO>> findAllUnclassified(@PathVariable Long planSeq){
         return ResponseEntity.ok().body(paymentService.findAllUnclassified(planSeq));
     }
 
     @Operation(summary = "미분류 Payment category 수정 확인")
-    @PatchMapping("/unclassified/{planSeq}")
-    public ResponseEntity<Void> updateUnclassified(@PathVariable Long planSeq){
-        paymentService.updateUnclassified(planSeq);
+    @ApiResponses(value={
+            @ApiResponse(responseCode = "200", description = "미분류 사용자 확인")
+    })
+    @PatchMapping("/{planSeq}")
+    public ResponseEntity<Void> updateUnclassified(@PathVariable Long planSeq, @RequestBody UpdateUnclassifiedDTO updateUnclassifiedDTO){
+        paymentService.updateUnclassified(planSeq, updateUnclassifiedDTO);
         return ResponseEntity.ok().build();
     }
 }

@@ -23,7 +23,6 @@ export default function WithDraw1Screen({ navigation, route }) {
     try{
       const response = await userWithdrawDotori(refreshToken, accessToken, grantType)
       if(response.status === 200){
-        console.log('회원탈퇴 성공')
         dispatch(inputgrantType(null))
         dispatch(inputAccessToken(null))
         dispatch(inputRefreshToken(null))
@@ -39,26 +38,10 @@ export default function WithDraw1Screen({ navigation, route }) {
           },
         ]);
       }else{
-        console.log("오류 발생: 회원탈퇴 실패", response.status)
       }
     }catch(error){
-      console.log("오류 발생: 회원탈퇴 실패", error)
     }
   }
-
-  // const doUserWithdrawDotori = async () => {
-  //   Alert.alert('', `${userInfo.userName}님 탈퇴가 완료되었습니다.`, [
-  //     {
-  //       text: '확인',
-  //       onPress: () => {
-  //         navigation.reset({
-  //           index: 0,
-  //           routes: [{ name: 'MainPageScreen' }],
-  //         });
-  //       },
-  //     },
-  //   ]);
-  // }
 
   const cancelUserWithdrawDotori = () => {
     navigation.navigate("MyPageScreen")
@@ -72,15 +55,11 @@ export default function WithDraw1Screen({ navigation, route }) {
     <View style={styles.container}>
       <Image
         style={[styles.image]}
-        source={require("../../assets/images/Hamster/LightHamster.png")}
+        source={require("../../assets/images/Hamster/WatchHamster.png")}
       />
 
       <View style={styles.box}>
-        {/* <Image
-          style={styles.leftImage}
-          source={require("../../assets/images/logo_podo.png")}
-        /> */}
-        <Text style={styles.text}>탈퇴하실 거에요?</Text>
+        <Text style={styles.text}>{userInfo.userName}님 가실거에요?</Text>
       </View>
 
       <Text style={styles.text}>{userInfo.userName}님</Text>
@@ -88,10 +67,9 @@ export default function WithDraw1Screen({ navigation, route }) {
       <Text style={{ fontSize: 18 }}>
         <Text style={{ color: "#FF965C" }}>탈퇴</Text>하실건가요?
       </Text>
-      {/* 위치 맞추기 위한 View */}
       <View style={{margin:25}}></View>
 
-      <TouchableOpacity style={styles.button1}
+      <TouchableOpacity style={[styles.button1, {backgroundColor:'lightgray'}]}
         onPress={() =>{
           handleUserWithdrawDotori()
         }}
@@ -107,14 +85,12 @@ export default function WithDraw1Screen({ navigation, route }) {
         <Text style={styles.buttonText}>아니요, 잘못 눌렀어요.</Text>
       </TouchableOpacity>
 
-      {/* 회원탈퇴 모달창 */}
       <View style={styles.centeredView}>
         <Modal
           animationType="none"
           transparent={true}
           visible={userWithdrawModalVisible}
           onRequestClose={() => {
-            // Alert.alert('Modal has been closed.');
             setUserWithdrawModalVisible(false);
           }}>
           <View style={styles.centeredView}>
@@ -157,7 +133,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "white",
-    paddingBottom: 20, // 추가됨
+    paddingBottom: 20,
   },
   image: {
     width: 150,
@@ -189,19 +165,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF965C",
     borderRadius: 8,
     width: "80%",
-    // padding: 16,
     height: 40,
-    // marginTop: 180,
-    // marginBottom: -100,
   },
   button2: {
     backgroundColor: "#FF965C",
     borderRadius: 8,
     width: "80%",
-    // padding: 16,
     height: 40,
-    // marginTop: 180,
-    // marginBottom: -100,
   },
   buttonText: {
     fontSize: 15,
@@ -216,7 +186,6 @@ const styles = StyleSheet.create({
     marginBottom: -20,
   },
 
-  // 모달 관련 스타일
   centeredView: {
     flex: 1,
     justifyContent: 'center',
@@ -228,7 +197,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
-    // alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -249,7 +217,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F194FF',
   },
   buttonClose: {
-    // backgroundColor: '#2196F3',
     backgroundColor: '#FF965C',
   },
   textStyle: {

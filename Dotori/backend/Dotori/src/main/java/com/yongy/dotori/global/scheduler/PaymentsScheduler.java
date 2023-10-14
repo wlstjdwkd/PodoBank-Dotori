@@ -70,9 +70,6 @@ public class PaymentsScheduler {
             }
 
             List<PaymentPodoResDto> paymentResDto = paymentService.getPayments(plan.getUpdatedAt(),plan.getAccount().getAccountSeq());
-            log.info(paymentResDto.toString());
-
-            log.info(paymentResDto.size()+"");
             List<Payment> chatGPT = new ArrayList<>();
             List<Payment> existPayment = new ArrayList<>();
 
@@ -87,11 +84,11 @@ public class PaymentsScheduler {
                             .paymentPrice(payment.getAmount())
                             .user(plan.getUser())
                             .checked(false)
+                            .businessCode(payment.getCode())
                             .paymentDate(payment.getTransactionAt())
                             .build());
                     continue;
                 }
-
 
                 // 카테고리 데이터가 이미 있어서 planDetail에 연결 돼있는지 확인 해야하면
                 // 카테고리데이터에 연결된 카테고리로 planDetail 찾기
@@ -106,20 +103,23 @@ public class PaymentsScheduler {
                                     .user(plan.getUser())
                                     .planDetail(planDetail)
                                     .checked(false)
+                                    .businessCode(payment.getCode())
                             .build());
                     continue;
                 }
 
                 chatGPT.add(Payment.builder()
-                        .paymentName(payment.getContent())
-                        .paymentPrice(payment.getAmount())
-                        .user(plan.getUser())
-                        .checked(false)
+                                .paymentName(payment.getContent())
+                                .paymentPrice(payment.getAmount())
+                                .user(plan.getUser())
+                                .checked(false)
+                                .businessCode(payment.getCode())
                         .build());
             }
 
             paymentRepository.saveAll(chatGPT); // chatGPT로 분류할 거 저장
             paymentRepository.saveAll(existPayment); // 이미 등록된 사업장인 payment 한 번에 저장
+            planRepository.save(plan.updateCount((long) chatGPT.size())); // 미분류 개수 저장
 
             // NOTE : chatGPT로 분류
             List<PlanDetail> planDetails = planDetailRepository.findAllByPlanPlanSeq(plan.getPlanSeq());
@@ -129,6 +129,4 @@ public class PaymentsScheduler {
                     .build());
         }
     }
-
-
 }

@@ -6,11 +6,17 @@ import com.yongy.dotori.domain.account.entity.Account;
 import com.yongy.dotori.domain.account.repository.AccountRepository;
 import com.yongy.dotori.domain.bank.entity.Bank;
 import com.yongy.dotori.domain.bank.repository.BankRepository;
+import com.yongy.dotori.domain.categoryData.entity.CategoryData;
+import com.yongy.dotori.domain.categoryData.repository.CategoryDataRepository;
 import com.yongy.dotori.domain.payment.dto.PaymentDetailDTO;
 import com.yongy.dotori.domain.payment.dto.TransactionHistoryDTO;
+import com.yongy.dotori.domain.payment.dto.UpdateDataDTO;
+import com.yongy.dotori.domain.payment.dto.UpdateUnclassifiedDTO;
 import com.yongy.dotori.domain.payment.dto.response.PaymentPodoResDto;
 import com.yongy.dotori.domain.payment.entity.Payment;
 import com.yongy.dotori.domain.payment.repository.PaymentRepository;
+import com.yongy.dotori.domain.plan.entity.Plan;
+import com.yongy.dotori.domain.plan.repository.PlanRepository;
 import com.yongy.dotori.domain.plan.service.PlanService;
 import com.yongy.dotori.domain.planDetail.entity.PlanDetail;
 import com.yongy.dotori.domain.planDetail.repository.PlanDetailRepository;
@@ -34,9 +40,7 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -57,6 +61,8 @@ public class PaymentServiceImpl implements PaymentService{
     @Autowired
     private PodoBankInfo podoBankInfo;
     private final PlanDetailRepository planDetailRepository;
+    private final CategoryDataRepository categoryDataRepository;
+    private final PlanRepository planRepository;
 
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -137,12 +143,38 @@ public class PaymentServiceImpl implements PaymentService{
                             .paymentDate(payment.getPaymentDate().format(formatter))
                     .build());
         }
-
         return result;
     }
 
     @Override
-    public void updateUnclassified(Long planSeq) {
-        // TODO : payment의 checked = true로 변경
+    public void updateUnclassified(Long planSeq, UpdateUnclassifiedDTO updateUnclassifiedDTO) {
+        Plan plan = planRepository.findByPlanSeq(planSeq);
+        List<UpdateDataDTO> payments = updateUnclassifiedDTO.getUpdateData();
+        List<Payment> result = new ArrayList<>();
+        Set<CategoryData> categoryDataSet = new HashSet<>(); // 저장할 CategoryData
+
+        for(UpdateDataDTO data : payments){
+            Payment payment = paymentRepository.findByPaymentSeq(data.getPaymentSeq());
+            result.add(payment.updateChecked()); // checked = true
+            CategoryData categoryData = categoryDataRepository.findByDataCode(payment.getBusinessCode());
+
+            if(categoryData == null){ // 이전에 저장된 데이터가 없으면
+                categoryDataSet.add(CategoryData.builder()
+                        .category(payment.getPlanDetail().getCategory())
+                        .dataName(payment.getPaymentName())
+                        .dataCode(payment.getBusinessCode())
+                        .count(1) // 한 번 결제된 사용처니까 1로 초기화
+                        .build());
+                continue;
+            }
+
+            // 이전에 저장된 데이터가 있음
+            // TODO : payment 저장할 때마다 categoryData count++
+            categoryDataSet.add(categoryData.updateCount());
+        }
+
+        planRepository.save(plan.updateCount((long) -(updateUnclassifiedDTO.getUpdateData().size())));
+        paymentRepository.saveAll(result);
+        categoryDataRepository.saveAll(categoryDataSet);
     }
 }

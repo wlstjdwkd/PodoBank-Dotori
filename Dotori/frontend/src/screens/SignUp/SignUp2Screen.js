@@ -8,7 +8,6 @@ import {
 } from "react-native";
 
 import HeaderComponent from "../Components/HeaderScreen";
-// userInfoInquiry 이거 아님 바꿔야함.
 import {userEmailCodeVerificate, userSendEmail} from "../../apis/userapi"
 
 export default function SignUp2Screen({ navigation, route }) {
@@ -16,13 +15,10 @@ export default function SignUp2Screen({ navigation, route }) {
   const [userInfo, setUserInfo] = useState(route.params.userInfo);
   const [emailVerificationCode, setEmailVerificationCode] = useState("")
   const [isValidEmailCode, setIsValidEmailCode] = useState(false);
-  // 이메일 인증 카운트 다운
-  const [countdown, setCountdown] = useState(180); // 3분 = 300초\
+  const [countdown, setCountdown] = useState(180);
   const [startCountdown, setStartCountdown] = useState(true);
   const [codeMessage, setCodeMessage] = useState("")
 
-
-  // 이메일 인증 코드 확인
   const handleEmailCodeVerificate = () =>{
     const isCodeRight = /^[0-9]{4}$/.test(emailVerificationCode);
     if(isCodeRight){
@@ -32,29 +28,17 @@ export default function SignUp2Screen({ navigation, route }) {
     }
   }
 
-  // const doEmailCodeVerificate = () =>{
-  //   setCodeMessage("인증 완료")
-  //   setIsValidEmailCode(true)
-  //   setStartCountdown(false)
-  // }
-
   const doEmailCodeVerificate = async () =>{
     try{
       const response = await userEmailCodeVerificate(userInfo.id, emailVerificationCode)
-      console.log(response.data)
-      console.log(response.status)   
-  
       if(response.status === 200){
-        console.log("이메일 인증 코드 확인 성공")
         setCodeMessage("인증 완료")
         setIsValidEmailCode(true)
         setStartCountdown(false)
       }else if(response.status === 404){
-        console.log("이메일 인증 코드가 올바르지 않습니다.")
         setCodeMessage("인증에 실패하셨습니다.")
         setIsValidEmailCode(false)
       }else if(response.status === 409){
-        console.log("인증번호가 만료되었습니다.")
         setCodeMessage("인증에 실패하셨습니다.")
         setIsValidEmailCode(false)
       }else{
@@ -67,18 +51,12 @@ export default function SignUp2Screen({ navigation, route }) {
     }
   }
 
-
   const handleSendEmail = async () => {
     if(!isValidEmailCode){
       doSendEmail()
     }
   }
-  // const doSendEmail = async () => {
-  //   setStartCountdown(false)
-  //   //인증되면 풀어두기
-  //   setCountdown(300)
-  //   setStartCountdown(true)
-  // }
+
   const doSendEmail = async () => {
     setStartCountdown(false)
     try{
@@ -88,14 +66,11 @@ export default function SignUp2Screen({ navigation, route }) {
         setStartCountdown(true)
       }else if(response.status === 409){
         setCodeMessage('이미 사용중인 이메일입니다.')
-        setCannotUseEmail((prev) => {[...prev, email]}) // 이메일이 중복되었으니 이것은 사용하지 못하도록 우선 넣어둠.
-        console.log("사용중인 이메일입니다.")
+        setCannotUseEmail((prev) => {[...prev, email]})
       }else{
-        console.log("오류 발생 : 이메일을 전송 실패")
         setCodeMessage("오류 발생 : 이메일을 전송 실패")
       }
     }catch(error){
-      console.log('오류발생',error)
       setCodeMessage("오류 발생 : 이메일을 전송 실패")
     }
   }
@@ -111,7 +86,7 @@ export default function SignUp2Screen({ navigation, route }) {
         clearInterval(intervalId)
         setCodeMessage('이메일 인증시간 만료')
     }
-    return () => clearInterval(intervalId); // 컴포넌트 unmount 시 타이머 해제
+    return () => clearInterval(intervalId)
   }, [startCountdown, countdown])
 
   useEffect(()=>{
@@ -140,7 +115,6 @@ export default function SignUp2Screen({ navigation, route }) {
                   setEmailVerificationCode(text)
                 }}
                 value={emailVerificationCode}
-                // maxLength={16}
                 keyboardType="number-pad"
                 returnKeyType ="done"
                 ref={emailCodeInputRef}
@@ -206,8 +180,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
     marginTop: 90,
   },
   grayText: {
@@ -230,7 +202,6 @@ const styles = StyleSheet.create({
     borderColor: "#BAC0CA",
     borderRadius: 10,
     padding: 10,
-    // textAlign: "center",
   },
   button: {
     height: 40,
@@ -267,8 +238,6 @@ const styles = StyleSheet.create({
   },
   resendButton: {
     alignItems: "flex-end",
-    // marginTop: 20,
-    // borderBottomWidth: 1,
   },
   resendButtonText: {
     color: "#5A5A5A",
