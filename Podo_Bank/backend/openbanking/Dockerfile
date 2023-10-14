@@ -7,7 +7,14 @@ ENV TZ=Asia/Seoul
 WORKDIR /app
 
 # JAR 파일을 컨테이너 안의 /app 디렉토리로 복사
+<<<<<<<< HEAD:Podo_Bank/backend/openbanking/Dockerfile
 COPY build/libs/PODO-BANK-OPENBANKING-0.0.1-SNAPSHOT.jar /app/PODO-BANK-OPENBANKING-0.0.1-SNAPSHOT.jar
 
 # 애플리케이션 실행 명령어 설정
 CMD ["java", "-jar", "/app/PODO-BANK-OPENBANKING-0.0.1-SNAPSHOT.jar"]
+========
+COPY build/libs/PODO-BANK-AUTH-0.0.1-SNAPSHOT.jar /app/PODO-BANK-AUTH-0.0.1-SNAPSHOT.jar
+
+# 애플리케이션 실행 명령어 설정
+CMD ["java", "-jar", "/app/PODO-BANK-AUTH-0.0.1-SNAPSHOT.jar"]
+>>>>>>>> a067427fbdad1a65480a43c1745833d02fc3f082:Podo_Bank/backend/auth/Dockerfile
