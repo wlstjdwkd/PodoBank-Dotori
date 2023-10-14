@@ -1,6 +1,5 @@
 server:
-  port: 9130
-
+  port: 9110
 # http://j9d107.p.ssafy.io:9900/
 spring:
   config:
@@ -8,9 +7,9 @@ spring:
 #  cloud:
 #    config:
 #      name: dotori
-#      profile: purpose
+#      profile: auth
   application:
-    name: dotori-purpose-service
+    name: dotori-auth-service
 
 #encrypt:
 #  key: ${ENCRYPT_KEY}
