@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState, } from "react";
 import {
   View,
   Text,
@@ -7,16 +7,26 @@ import {
   Image,
   StyleSheet,
   Alert,
+  Linking,
 } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import {inputgrantType, inputAccessToken, inputRefreshToken} from "../../redux/slices/auth/user"
+import {userLogin} from "../../apis/userapi"
+import { useDispatch, useSelector } from "react-redux" 
 
 export default function LoginScreen({ navigation }) {
+  // 토큰
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
+  const dispatch = useDispatch()
+  // 그 외
   const idRef = useRef(null)
   const passwordRef = useRef(null)
-  const [idSave, setIdSave] = useState(false) // 아이디 저장여부
+  const [idSave, setIdSave] = useState(false) 
   const [emailValue, setEmailValue] = useState("")
   const [passwordValue, setPasswordValue] = useState("")
   const [loginMessage, setLoginMessage] = useState("")
-
 
   const handleLogin = () => {
     console.log(emailValue+'and'+passwordValue)
@@ -31,32 +41,60 @@ export default function LoginScreen({ navigation }) {
       doLogin();
     }
   }
-  
 
-  const doLogin = () => {
-    console.log("로그인완료")
-    // navigation.navigate("MainPageScreen")
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'MainPageScreen' }],
-    });
-    // cosnt data = {email:emailValue, password:passwordValue}
-    // const response = await 어쩌고함수()
-    // if(response.status === 200){
-    //   console.log('로그인 성공')
-    //   navigation.navigate("MainPageScreen")
-      // navigation.reset({
-      //   index: 0,
-      //   routes: [{ name: 'MainPageScreen' }],
-      // });
-    // }else if(response.status === 400){
-    //   console.log('로그인 실패')
-    //   Alert.alert('로그인 실패', 아이디와 비밀번호를 확인해주세요.)
-    //   setLoginMessage("아이디와 비밀번호를 확인해주세요.")
-    // }else{
-    //   console.log('오류 발생: 로그인 실패')
-    // }
+  const doLogin = async () => {
+    const data = {id:emailValue, password:passwordValue}
+    try{
+      const response = await userLogin(data)
+      if(response.status === 200){
+        dispatch(inputgrantType(response.data.grantType))
+        dispatch(inputAccessToken(response.data.accessToken))
+        dispatch(inputRefreshToken(response.data.refreshToken))
+        try{
+          if(idSave){
+            await AsyncStorage.setItem("id", emailValue);
+          }else{
+            await AsyncStorage.removeItem('id')
+          }
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'MainPageScreen' }],
+          });
+        }catch(error){
+          setLoginMessage('오류 발생: 로그인 실패')
+        }
+      }else if(response.status === 404){
+        Alert.alert('로그인 실패', "아이디와 비밀번호를 확인해주세요.")
+        setLoginMessage("아이디와 비밀번호를 확인해주세요.")
+      }else{
+        setLoginMessage('오류 발생: 로그인 실패')
+      }
+    }catch(error){
+      setLoginMessage('오류 발생: 로그인 실패')
+    }
   }
+
+  useEffect(()=>{
+    dispatch(inputgrantType(null))
+    dispatch(inputAccessToken(null))
+    dispatch(inputRefreshToken(null))
+
+    const getExistingId = async () => {
+      try{
+        const existingId = await AsyncStorage.getItem("id");
+        if(existingId){
+          setEmailValue(existingId)
+          passwordRef.current.focus()
+          setIdSave(true)
+        }else {
+          idRef.current.focus()
+        }
+      }catch (error) {
+      }
+    }
+    getExistingId()
+  }, [])
+
   return (
     <View style={styles.container}>
       <Image
@@ -106,7 +144,6 @@ export default function LoginScreen({ navigation }) {
             ?(<Text style={{textAlign:'center'}}>✔️</Text>)
             :null}
           </View>
-          {/* <View style={[styles.checkbox, {backgroundColor:idSave?'black':'white'}]}></View> */}
           <Text style={{ color: "#878787" }}>아이디저장</Text>
         </View>
       </TouchableOpacity>
@@ -123,52 +160,14 @@ export default function LoginScreen({ navigation }) {
       </TouchableOpacity>
 
       <View style={styles.linksContainer}>
-        <TouchableOpacity
-          onPress={()=>{
-            Alert.alert('', '아이디 찾기 구현 필요')
-            navigation.navigate("LoginScreen")
-          }}
-        >
-          <Text style={styles.linkText}>아이디 찾기</Text>
-        </TouchableOpacity>
 
-        <Text style={styles.linkText}>|</Text>
-        <TouchableOpacity
-          onPress={()=>{
-            Alert.alert('', '비밀번호 찾기 구현 필요')
-            navigation.navigate("LoginScreen")
-          }}
-        >
-          <Text style={styles.linkText}>비밀번호 찾기</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.linkText}>|</Text>
         <TouchableOpacity onPress={() => {
           navigation.navigate("SignUp1Screen")
         }}>
-          <Text style={styles.linkText}>회원가입</Text>
+          <Text style={styles.linkText}>아직 회원이 아니신가요?</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.divider}>
-        <Text style={styles.dividerText}>SNS 계정으로 로그인</Text>
-      </View>
-
-      {/* 카카오, 네이버 로그인 버튼은 라이브러리나 직접 이미지로 구현해야 합니다. */}
-      <View style={styles.oauth}>
-        <TouchableOpacity>
-          <Image
-            style={styles.oauthImage}
-            source={require("../../assets/images/kakao.png")}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Image
-            style={styles.oauthImage}
-            source={require("../../assets/images/naver.png")}
-          />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
@@ -206,8 +205,7 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     flexDirection: "row",
     alignItems: "center",
-    alignSelf: "flex-start", // 추가: 왼쪽 정렬
-    // marginBottom: 30,
+    alignSelf: "flex-start",
   },
   checkbox: {
     width: 20,
@@ -237,7 +235,7 @@ const styles = StyleSheet.create({
   },
   linksContainer: {
     flexDirection: "row",
-    justifyContent: "space-between", // 수정: 양쪽 끝으로 확장
+    justifyContent:'center',
     width: "100%",
     marginBottom: 60,
     paddingHorizontal: 10,
@@ -249,12 +247,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     position: "relative",
-    marginBottom: 30, // 추가: 여백
+    marginBottom: 30,
   },
   dividerText: {
-    position: "absolute", // 중앙에 배치하기 위해
-    backgroundColor: "white", // 배경색으로 구분선 가리기
-    paddingHorizontal: 10, // 좌우 패딩
+    position: "absolute",
+    backgroundColor: "white",
+    paddingHorizontal: 10,
     color: "#858585",
   },
   linkText: {
@@ -262,7 +260,6 @@ const styles = StyleSheet.create({
   },
   idSave:{
     width:"100%", 
-    // marginBottom: 30,
   },
   referenceMessage:{
     marginVertical: 10,
