@@ -1,142 +1,165 @@
-import React from "react";
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import React, { useState } from "react";
+import { View, StyleSheet, TouchableOpacity, Text, Modal } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
 import { BarChart } from "react-native-gifted-charts";
+import { useDispatch, useSelector } from "react-redux";
+import { purposeQuit } from "../../apis/purposeapi"
+import { useEffect } from "react";
+import { Dimensions } from 'react-native';
 
-const data = {
-  id: "1",
-  purposeTitle: "로마여행",
-  currentBalance: 2000000,
-  goalAmount: 4000000,
-  purposeDataList: [
-    {
-      month: "2022-11",
-      dataAmount: 300000,
-    },
-    {
-      month: "2023-01",
-      dataAmount: 500000,
-    },
-    {
-      month: "2022-12",
-      dataAmount: 350000,
-    },
-    {
-      month: "2023-03",
-      dataAmount: 50000,
-    },
-    {
-      month: "2023-02",
-      dataAmount: 250000,
-    },
-    {
-      month: "2023-04",
-      dataAmount: 420000,
-    },
-    {
-      month: "2023-05",
-      dataAmount: 360000,
-    },
-    {
-      month: "2023-06",
-      dataAmount: 100000,
-    },
-    {
-      month: "2023-07",
-      dataAmount: 450000,
-    },
-    {
-      month: "2023-08",
-      dataAmount: 240000,
-    },
-    {
-      month: "2023-09",
-      dataAmount: 320000,
+
+export default function PurposeDetailScreen({ navigation, route }) {
+  // 토큰
+  const grantType =  useSelector((state)=>state.user.grantType)
+  const accessToken =  useSelector((state)=>state.user.accessToken)
+  const refreshToken =  useSelector((state)=>state.user.refreshToken)
+  const dispatch = useDispatch()
+  // 그 외
+
+  const [purposeSeq, setPurposeSeq] = useState(route.params.purposeSeq)
+  const [purposeDetailData, setPurposeDetailData] = useState(route.params.purposeDetailData)
+  const [isQuitModalVisible, setIsQuitModalVisible] = useState(false)
+  const [barData, setbarData] = useState();
+  const [spacingWidth, setSpacingWidth] = useState(20)
+  const [initialSpacingWidth, setInitialSpacingWidth] = useState(3)
+
+
+  const windowWidth = Dimensions.get('window').width;
+  const screenWidth = Dimensions.get('screen').width;
+
+  const generateBarData = (data) => {
+    const barData = [];
+    const currentDate = new Date();
+
+    if (data.length === 0) {
+      return barData;
     }
-  ]
-};
 
+    data.forEach((item) => {
+      const { month, dataAmount } = item;
+      const [ year, monthNumber ] = month.split('-');
 
+      let isCurrentYearMonth = false;
 
-const generateBarData = (data) => {
-  const barData = [];
-  const currentDate = new Date();
+      if(currentDate.getFullYear() == year && currentDate.getMonth() + 1 == monthNumber) {
+        isCurrentYearMonth = true;
+      }
 
-  if (data.length === 0) {
+      barData.push({
+        value: dataAmount,
+        label: (monthNumber != 1) ? parseInt(monthNumber) : `${year.slice(-2)}/${parseInt(monthNumber)}`,
+        frontColor: isCurrentYearMonth ? '#31C68F' : (dataAmount === Math.max(...data.map(item => item.dataAmount)) ? '#ED4343' : '#F1F1F1'),
+      });
+    });
+    if(barData.length <= 7){
+      setSpacingWidth(Math.floor(windowWidth * 0.45 / barData.length))
+      setInitialSpacingWidth(Math.floor(windowWidth * 0.45 / barData.length)/2)
+    }
+    if(barData.length <= 6){
+    }
     return barData;
+  };
+  
+  const doPurposeQuit = async () => {
+    try{
+      const response = await purposeQuit(purposeSeq, accessToken, grantType)
+      if(response.status === 200){
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'PurposeScreen' }],
+        });
+      }else{
+      }
+    }catch(error){
+    }
+  }
+  
+  const settingbarData = () =>{
+    const startDate = new Date(purposeDetailData.startedAt);
+    const endDate = new Date(purposeDetailData.endAt);
+  
+    const monthlyDataMap = {};
+  
+    purposeDetailData.purposeDataList.forEach(item => {
+      const dataDate = new Date(item.dataCreatedAt);
+      const monthYearKey = `${dataDate.getFullYear()}-${(dataDate.getMonth() + 1).toString().padStart(2, '0')}`;
+  
+      if (!monthlyDataMap[monthYearKey]) {
+        monthlyDataMap[monthYearKey] = 0;
+      }
+  
+      monthlyDataMap[monthYearKey] += item.dataAmount;
+    });
+    const purposeDataList = [];
+  
+    let currentDate = new Date(startDate)
+
+    while (currentDate <= endDate) {
+      const monthYearKey = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
+      const dataAmount = monthlyDataMap[monthYearKey] || 0;
+    
+      purposeDataList.push({
+        month: monthYearKey,
+        dataAmount
+      });
+    
+      currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+    }
+  
+    setbarData(generateBarData(purposeDataList))
   }
 
-  data.forEach((item) => {
-    const { month, dataAmount } = item;
-    const [year, monthNumber] = month.split('-'); // 월과 연도 추출
+  
 
-    let isCurrentYearMonth = false;
+  
 
-    if(currentDate.getFullYear() == year && currentDate.getMonth() + 1 == monthNumber) {
-      isCurrentYearMonth = true;
-    }
+  useEffect(()=>{
+    settingbarData()
+  }, [])
 
-    barData.push({
-      value: dataAmount,
-      label: (monthNumber != 1) ? parseInt(monthNumber) : `${year.slice(-2)}/${parseInt(monthNumber)}`, // 월 표시 형식 변경
-      frontColor: isCurrentYearMonth ? '#31C68F' : '#F1F1F1',
-    });
-  });
-
-  return barData;
-};
-
-export default function PurposeDetailScreen({ navigation }) {
-const sortedPurposeDataList = data.purposeDataList.sort((a, b) => {
-  const dateA = new Date(a.month);
-  const dateB = new Date(b.month);
-  return dateA - dateB;
-});
-
-  const barData = generateBarData(sortedPurposeDataList);
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <View style={{ flex: 1 }} />
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Feather name="x" size={30} style={styles.closeIcon} />
+          <Feather name="x" size={30} />
         </TouchableOpacity>
       </View>
 
-      {/* 목표 이름 */}
-      <View style={styles.titleContainer}>
-        <Text style={styles.purposeTitle}>{data.purposeTitle}</Text>
+      <View style={[styles.titleContainer, {}]}>
+        <Text style={styles.purposeTitle}>{purposeDetailData.purposeTitle}</Text>
       </View>
 
-      {/* 금액 정보 */}
-      <View style={styles.balanceContainer}>
-        <View style={styles.balanceItem}>
-          <Text style={styles.balanceLabel}>목표 금액</Text>
-          <Text style={styles.balanceValue}>
-            {data.goalAmount.toLocaleString()}원
-          </Text>
-        </View>
-        <View style={styles.balanceItem}>
-          <Text style={styles.balanceLabel}>현재 금액</Text>
-          <Text style={styles.balanceValue}>
-            {data.currentBalance.toLocaleString()}원
-          </Text>
-        </View>
-        <View style={styles.balanceItem}>
-          <Text style={styles.balanceLabel}>남은 금액</Text>
-          <Text style={styles.balanceValue}>
-            {(data.goalAmount - data.currentBalance).toLocaleString()}원
-          </Text>
+      <View style={{flexDirection:'row', marginVertical:20}}>
+        <View style={[styles.balanceContainer, {marginVertical:20}]}>
+          <View style={styles.balanceItem}>
+            <Text style={styles.balanceLabel}>목표 금액</Text>
+            <Text style={styles.balanceValue}>
+              {purposeDetailData.goalAmount.toLocaleString()}원
+            </Text>
+          </View>
+          <View style={styles.balanceItem}>
+            <Text style={styles.balanceLabel}>현재 금액</Text>
+            <Text style={styles.balanceValue}>
+              {purposeDetailData.currentBalance.toLocaleString()}원
+            </Text>
+          </View>
+          <View style={styles.balanceItem}>
+            <Text style={styles.balanceLabel}>남은 금액</Text>
+            <Text style={styles.balanceValue}>
+              {purposeDetailData.goalAmount - purposeDetailData.currentBalance > 0
+                ?(purposeDetailData.goalAmount - purposeDetailData.currentBalance).toLocaleString()
+                : 0}원
+            </Text>
+          </View>
         </View>
       </View>
 
-      {/* 차트 */}
       <View style={styles.chartContainer}>
         <View style={styles.chartInfoContainer}>
           <Text style={styles.chartInfoText}>현재 달성</Text>
-          <Text style={styles.chartInfoPercent}>{data.currentBalance / data.goalAmount * 100}%</Text>
+          <Text style={styles.chartInfoPercent}>{(purposeDetailData.currentBalance / purposeDetailData.goalAmount * 100).toFixed(2)}%</Text>
         </View>
 
         <View style={styles.chartDataContainer}>
@@ -147,7 +170,8 @@ const sortedPurposeDataList = data.purposeDataList.sort((a, b) => {
               barWidth={15}
               width={250}
               height={150}
-              initialSpacing={3}
+              initialSpacing={initialSpacingWidth}
+              spacing={spacingWidth}
               hideRules
               hideYAxisText
               barBorderRadius={4}
@@ -170,35 +194,56 @@ const sortedPurposeDataList = data.purposeDataList.sort((a, b) => {
                   </View>
                 );
               }}
-              />
+            />
         </View>
       </View>
-
-      {/* 중단 확인 문구 */}
-      <View style={styles.stopCheckContainer}>
-        <Text style={styles.stopCheckText}>목표를 중단하시겠습니까?</Text>
-      </View>
-
-      {/* 확인 버튼 */}
-      <View style={styles.purposeStopContainer}>
+      <View style={{ width: "90%", alignItems: "flex-end", justifyContent: "center", margin: 20, }}>
         <TouchableOpacity
-          style={styles.stopPurposeButtonYes}
-          onPress={() => {
-            // 중단 요청
+          onPress={()=>{
+            setIsQuitModalVisible(true)
           }}
         >
-          <View style={styles.stopPurposeButtonInner}>
-            <Text style={styles.stopPurposeText}>네</Text>
-          </View>
+          <Text style={{fontSize: 13, color: "#939393",}}>목표 중단하기</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.stopPurposeButtonNo}
-          onPress={() => { navigation.goBack() }}
-        >
-          <View style={styles.stopPurposeButtonInner}>
-            <Text style={styles.stopPurposeText}>아니오</Text>
+      </View>
+      
+      <View style={styles.centeredView}>
+        <Modal
+          animationType="none"
+          transparent={true}
+          visible={isQuitModalVisible}
+          onRequestClose={() => {
+            setIsQuitModalVisible(false);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>
+                목표까지 {"\n"}
+                {purposeDetailData.goalAmount - purposeDetailData.currentBalance > 0
+                ?(purposeDetailData.goalAmount - purposeDetailData.currentBalance).toLocaleString()
+                : 0}원 
+                남았습니다.{"\n"} 목표 진행을 중단 하시겠습니까?
+              </Text>
+              <View style={{flexDirection:'row', justifyContent:'space-around'}}>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => {
+                    navigation.navigate("PurposeStop1Screen", {purposeSeq:purposeSeq, purposeDetailData:purposeDetailData})
+                    setIsQuitModalVisible(false)
+                  }}>
+                  <Text style={styles.textStyle}>예</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonClose]}
+                  onPress={() => {
+                    setIsQuitModalVisible(false)
+                  }}>
+                  <Text style={styles.textStyle}>아니오</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
-        </TouchableOpacity>
+        </Modal>
       </View>
     </View>
   );
@@ -214,7 +259,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    width: "100%",
+    width: "90%",
     justifyContent: "flex-end",
     marginTop: 20,
     marginBottom: 20,
@@ -271,10 +316,6 @@ const styles = StyleSheet.create({
     color: "#ED4343",
   },
   chartDataContainer: {
-    
-
-
-
 
   },
   stopCheckContainer: {
@@ -308,15 +349,56 @@ const styles = StyleSheet.create({
   },
   stopPurposeButtonInner: {
     alignItems: "center",
-    justifyContent: "center", // 추가
+    justifyContent: "center",
   },
   stopPurposeText: {
     fontSize: 20,
     color: "white",
-    textAlignVertical: 'center', // 추가
+    textAlignVertical: 'center',
     marginVertical: 5
   },
-  closeIcon: {
-    marginRight: 20,
+
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    flex:1,
+    borderRadius: 20,
+    padding: 10,
+    marginHorizontal: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#FF965C',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+    lineHeight: 24,
   },
 });
