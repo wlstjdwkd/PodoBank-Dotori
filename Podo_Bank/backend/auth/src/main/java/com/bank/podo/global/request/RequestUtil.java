@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.global.request;
+package com.bank.podo.global.request;
 
 import com.bank.podo.global.others.dto.AddFCMTokenDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;

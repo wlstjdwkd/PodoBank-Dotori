@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.domain.user.repository;
+package com.bank.podo.domain.user.repository;
 
 import com.bank.podo.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;

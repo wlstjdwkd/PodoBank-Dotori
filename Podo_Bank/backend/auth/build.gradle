@@ -1,5 +1,3 @@
-package auth
-
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.0.2'

@@ -1,4 +1,4 @@
-package auth.src.main.java.com.bank.podo.global.security.entity;
+package com.bank.podo.global.security.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
