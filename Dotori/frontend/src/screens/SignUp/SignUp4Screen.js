@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -10,17 +10,17 @@ import {
 } from "react-native";
 
 import HeaderComponent from "../Components/HeaderScreen";
+import {userSignup} from "../../apis/userapi"
 
 export default function SignUp4Screen({ navigation, route }) {
-  const nameInputRef = useRef(null); // 이름 입력란 ref
-  const birthDateInputRef = useRef(null); // 생년월일 입력란 ref
-  const phoneNumberInputRef = useRef(null); // 휴대폰번호 입력란 ref
+  const nameInputRef = useRef(null)
+  const birthDateInputRef = useRef(null)
+  const phoneNumberInputRef = useRef(null)
 
   const [userInfo, setUserInfo] = useState(route.params.userInfo);
   const [nameMessage, setNameMessage] = useState("");
   const [birthDateMessage, setBirthDateMessage] = useState("");
   const [phoneNumberMessage, setPhoneNumberMessage] = useState("");
-  // textinput value들
   const [nameValue, setNameValue] = useState("")
   const [birthDateValue, setbBirthDateValue] = useState("")
   const [phoneNumberValue, setPhoneNumberValue] = useState("")
@@ -29,7 +29,7 @@ export default function SignUp4Screen({ navigation, route }) {
     isNameValid: false,
     isBirthdateValid: false,
     isPhoneNumberValid: false,
-  });
+  }); 
 
   const validateName = (text) => {
     const regex = /^[A-Za-z가-힣]{2,}$/;
@@ -48,11 +48,11 @@ export default function SignUp4Screen({ navigation, route }) {
     if (validateName(text)) {
       setNameMessage("이름 작성 완료");
       setIsValid((prev) => ({ ...prev, isNameValid: true }));
-      setUserInfo({ ...userInfo, name: text });
+      setUserInfo({ ...userInfo, userName: text });
     } else {
       setNameMessage("이름은 2글자 이상 음절로 이루어져야 합니다.");
       setIsValid((prev) => ({ ...prev, isNameValid: false }));
-      setUserInfo({ ...userInfo, name: "" });
+      setUserInfo({ ...userInfo, userName: "" });
     }
   };
   const handleBirthDateChange = (text) => {
@@ -70,7 +70,7 @@ export default function SignUp4Screen({ navigation, route }) {
   const handlePhoneNumberChange = (text) => {
     setPhoneNumberValue(text)
     if (validatePhoneNumber(text)) {
-      setPhoneNumberMessage("휴대폰번호 작성 완료");
+      setPhoneNumberMessage("핸드폰번호 작성 완료");
       setIsValid((prev) => ({ ...prev, isPhoneNumberValid: true }));
       setUserInfo({ ...userInfo, phoneNumber: text });
     } else {
@@ -83,27 +83,58 @@ export default function SignUp4Screen({ navigation, route }) {
   const gotoSignUpCompleteScreen = () =>{
     switch (true) {
       case !isValid.isNameValid:
-        // console.log(isValid)
         Alert.alert('','작성하신 이름을 다시 확인해주세요.')
         nameInputRef.current.focus()
         break;
       case !isValid.isBirthdateValid:
-        // console.log(isValid)
         Alert.alert('','작성하신 생년월일을 다시 확인해주세요.')
         birthDateInputRef.current.focus()
         break;
       case !isValid.isPhoneNumberValid:
-        // console.log(isValid)
-        Alert.alert('','작성하신 휴대폰번호를 다시 확인해주세요.')
+        Alert.alert('','작성하신 핸드폰번호를 다시 확인해주세요.')
         phoneNumberInputRef.current.focus()
         break;
       default:
-        console.log(userInfo)
-        navigation.navigate("SignUpCompleteScreen", { name: userInfo.name })
+        doSignup()
         break;
     }
   }
 
+  changeFormbirthDate = (birthDate) => {
+    if (birthDate.length === 8) {
+      const year = birthDate.slice(0, 4);
+      const month = birthDate.slice(4, 6);
+      const day = birthDate.slice(6, 8);
+      const formattedDate = `${year}-${month}-${day}`;
+      return formattedDate;
+    } else {
+      return '유효하지 않은 날짜';
+    }
+  }
+
+
+  const doSignup = async () =>{
+    const userInfoSending = {...userInfo, birthDate:changeFormbirthDate(userInfo.birthDate)}
+    try{
+      const response = await userSignup(userInfoSending)
+      if(response.status === 200){
+        const loginInfo = {
+          "userName": userInfo.userName, "id":userInfo.id, "password":userInfo.password
+        }
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'SignUpCompleteScreen', params:{loginInfo} }],
+        });
+      }else if(response.status === 400){
+      }else{
+      }
+    }catch(error){
+    }
+  }
+
+  useEffect(()=>{
+    nameInputRef.current.focus()
+  },[])
 
   return (
     <View style={styles.container}>
@@ -117,31 +148,19 @@ export default function SignUp4Screen({ navigation, route }) {
           <Text style={styles.title}>가입정보 입력하기</Text>
           <View style={styles.rowContainer}>
             <Text style={styles.subtitle}>이름</Text>
-            {/* <Text
-              style={{
-                color: isValid.isNameValid ? "blue" : "red",
-                fontSize : 12,
-              }}
-            >
-              {nameMessage}
-            </Text> */}
           </View>
 
           <TextInput
             style={nameValue ?styles.input:[styles.input,{fontSize:12}]}
-            placeholder="예) 박새로이" // 색깔 및 크기 조정
+            placeholder="예) 박새로이" 
             placeholderTextColor="#7B7B7B"
             onChangeText={handleNameChange}
-            // multiline={true}
             keyboardType="default"
             returnKeyType ="next"
             maxLength={8}
             value={nameValue}
             ref={nameInputRef}
             onSubmitEditing={()=>{
-              // if(isValid.isNameValid){
-              //   birthDateInputRef.current.focus()
-              // }
               birthDateInputRef.current.focus()
             }}
           />
@@ -153,23 +172,12 @@ export default function SignUp4Screen({ navigation, route }) {
 
           <View style={styles.rowContainer}>
             <Text style={styles.subtitle}>생년월일</Text>
-            {/* <Text
-              style={{
-                color: isValid.isBirthdateValid ? "blue" : "red",
-                fontSize : 12,
-                //   marginLeft: 150,'
-              }}
-            >
-              {birthDateMessage}
-            </Text> */}
           </View>
 
           <TextInput
             style={birthDateValue ?styles.input:[styles.input,{fontSize:12}]}
-            // style={styles.input}
             onChangeText={handleBirthDateChange}
-            // multiline={true}
-            placeholder="생년월일 8자리 예) 19991212" // 색깔 및 크기 조정
+            placeholder="생년월일 8자리 예) 19991212"
             placeholderTextColor="#7B7B7B"
             keyboardType="number-pad"
             maxLength={8}
@@ -177,9 +185,6 @@ export default function SignUp4Screen({ navigation, route }) {
             value = {birthDateValue}
             ref={birthDateInputRef}
             onSubmitEditing={()=>{
-              // if(isValid.isBirthdateValid){
-              //   phoneNumberInputRef.current.focus()
-              // }
               phoneNumberInputRef.current.focus()
             }}
           />
@@ -189,29 +194,14 @@ export default function SignUp4Screen({ navigation, route }) {
             {birthDateMessage}
           </Text>
 
-          {/* <Text style={styles.inputBehindText}>
-            생년월일 8자리 예) 19991212
-          </Text> */}
-
           <View style={styles.rowContainer}>
-            <Text style={styles.subtitle}>휴대폰번호</Text>
-            {/* <Text
-              style={{
-                color: isValid.isPhoneNumberValid ? "blue" : "red",
-                fontSize : 12,
-                //   marginLeft: 0,
-              }}
-            >
-              {phoneNumberMessage}
-            </Text> */}
+            <Text style={styles.subtitle}>핸드폰번호</Text>
           </View>
 
           <TextInput
             style={phoneNumberValue ?styles.input:[styles.input,{fontSize:12}]}
-            // style={styles.input}
             onChangeText={handlePhoneNumberChange}
-            // multiline={true}
-            placeholder="예) 01012345678" // 색깔 및 크기 조정
+            placeholder="예) 01012345678"
             placeholderTextColor="#7B7B7B"
             keyboardType="number-pad"
             maxLength={11}
@@ -235,10 +225,11 @@ export default function SignUp4Screen({ navigation, route }) {
         </ScrollView>
         
         <TouchableOpacity
-          style={styles.button}
+          style={[styles.button,{backgroundColor:(isValid.isNameValid && isValid.isBirthdateValid && isValid.isPhoneNumberValid)?"#FF965C":'grey'}]}
           onPress={() =>{
             gotoSignUpCompleteScreen()
           }}
+          disabled={!(isValid.isNameValid && isValid.isBirthdateValid && isValid.isPhoneNumberValid)}
         >
           <Text style={styles.buttonText}>회원가입</Text>
         </TouchableOpacity>
@@ -261,8 +252,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
     marginTop: 90,
   },
   title: {
@@ -282,8 +271,6 @@ const styles = StyleSheet.create({
     borderColor: "#BAC0CA",
     borderRadius: 10,
     padding: 10,
-    // marginBottom: 20,
-    // textAlign: "center",
   },
   button: {
     height: 40,

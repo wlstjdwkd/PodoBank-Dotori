@@ -5,6 +5,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const userSlice = createSlice({
   name: 'user',
   initialState: {
+    grantType:null,
     accessToken:null,
     refreshToken:null,
     userTokenRefreshModalVisible:false, // AccessToken 만료 시 띄우는 모달창
@@ -13,6 +14,9 @@ const userSlice = createSlice({
     userInfo: null,
   },
   reducers: {
+    inputgrantType(state, action){
+      state.grantType = action.payload
+    },
     inputAccessToken(state, action){
       state.accessToken = action.payload
     },
@@ -38,7 +42,7 @@ const userSlice = createSlice({
 });
 
 export const { 
-  inputAccessToken, inputRefreshToken, setUserTokenRefreshModalVisible,
+  inputgrantType, inputAccessToken, inputRefreshToken, setUserTokenRefreshModalVisible,
   setAccessTokenExpiration, setIsnotReissuanceToken, setUserInfo,
 } = userSlice.actions;
 
