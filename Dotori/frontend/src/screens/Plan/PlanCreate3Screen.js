@@ -9,22 +9,35 @@ import {
 } from "react-native";
 
 import HeaderComponent from "../Components/HeaderScreen";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function PlanCreate3Screen({ navigation, route }) {
+  // 토큰
+  const grantType = useSelector((state) => {
+    state.user.grantType;
+  });
+  const accessToken = useSelector((state) => {
+    state.user.accessToken;
+  });
+  const refreshToken = useSelector((state) => {
+    state.user.refreshToken;
+  });
+  const dispatch = useDispatch();
+  // 그 외
+
   const [planInfo, setPlanInfo] = useState(route.params.planInfo);
   const [categoryGroupName, setCategoryGroupName] = useState("");
   const [categoryGroups, setCategoryGroups] = useState([]);
 
   const handleAddCategoryGroup = () => {
     if (categoryGroupName) {
-      setCategoryGroups([...categoryGroups, { name: categoryGroupName }]);
+      setCategoryGroups([...categoryGroups, categoryGroupName]);
       setCategoryGroupName("");
     }
   };
   const handleNextButton = () => {
-    setPlanInfo({ ...planInfo, categoryGroups: categoryGroups });
     navigation.navigate("PlanCreate4Screen", {
-      planInfo: planInfo,
+      planInfo: { ...planInfo, categoryGroups: categoryGroups },
     });
   };
 
@@ -32,7 +45,7 @@ export default function PlanCreate3Screen({ navigation, route }) {
     <View style={styles.container}>
       <HeaderComponent
         title="계획 생성(3/5)"
-        cancelNavi="PlanMainScreen"
+        cancelNavi="MainPageScreen"
         navigation={navigation}
       ></HeaderComponent>
       <ScrollView style={styles.header}>
@@ -62,9 +75,9 @@ export default function PlanCreate3Screen({ navigation, route }) {
 
         <Text style={styles.inputText}>등록된 카테고리 그룹</Text>
         <View style={styles.categoriesContainer}>
-          {categoryGroups.map((categoryGroup, index) => (
+          {categoryGroups.map((categoryGroupName, index) => (
             <View key={index} style={styles.categoryBox}>
-              <Text style={styles.categoryText}>{categoryGroup.name} </Text>
+              <Text style={styles.categoryText}>{categoryGroupName} </Text>
             </View>
           ))}
         </View>
@@ -86,8 +99,6 @@ const styles = StyleSheet.create({
   },
   header: {
     flex: 1,
-    // justifyContent: "center",
-    // alignItems: "center",
     marginTop: 90,
   },
   title: {
@@ -112,7 +123,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
-    // textAlign: "center",
   },
   button: {
     height: 50,
