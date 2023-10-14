@@ -1,5 +1,6 @@
-package com.yongy.dotoriAuthService.global.common;
+package com.yongy.dotoripurposeservice.global.common;
 
+import com.yongy.dotoripurposeservice.domain.purpose.dto.communication.BankDTO;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -19,8 +20,9 @@ import java.util.Map;
 @AllArgsConstructor
 public class CallServer {
 
+
     // NOTE : requestBody로 데이터 보낼 때
-    public ResponseEntity<String> postHttpBodyAndSend(String url, HashMap<String, Object> bodyData){
+    public ResponseEntity<String> postHttpBodyAndSend(String url, HttpMethod method, HashMap<String, Object> bodyData){
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json;charset=utf-8");
 
@@ -30,7 +32,7 @@ public class CallServer {
         log.info("------START------");
         ResponseEntity<String> response = restTemplate.exchange(
                 url,
-                HttpMethod.POST,
+                method,
                 httpEntity,
                 String.class
         );
@@ -38,17 +40,6 @@ public class CallServer {
         return response;
     }
 
-    // NOTE : parameter로 데이터 보낼 때(POST)
-    public ResponseEntity<String> postHttpWithParamsAndSend(String url, MultiValueMap<String, String> parameters){
-
-        RestTemplate restTemplate = new RestTemplate();
-
-        ResponseEntity<String> response = restTemplate.postForEntity(url, parameters, String.class);
-
-        return response;
-    }
-
-    // NOTE : parameter로 데이터 보낼 때(GET)
     public ResponseEntity<String> getHttpWithParamsAndSend(String url, HttpMethod method, HashMap<String, Object> params){
         // URL 매개변수를 이용한 요청 URL 생성
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
@@ -63,6 +54,14 @@ public class CallServer {
                 null,
                 String.class
         );
+        return response;
+    }
+
+    public ResponseEntity<String> postHttpWithParamsAndSend(String url, MultiValueMap<String, String> parameters){
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.postForEntity(url, parameters, String.class);
+
         return response;
     }
 
