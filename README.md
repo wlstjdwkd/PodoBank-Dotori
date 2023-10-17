@@ -1,4 +1,6 @@
-# [포도은행&도토리]
+# 🔎 포도은행&도토리
+
+
 
 ### 🗓️ 개발기간&개발인원
 
@@ -8,9 +10,9 @@
 <hr>
 
 ### 📌 포도은행과 도토리의 URL
-🐿[도토리 보러가기](https://lab.ssafy.com/s09-fintech-finance-sub2/S09P22D107/-/tree/develop/Dotori?ref_type=heads)
+- [도토리 보러가기](https://lab.ssafy.com/s09-fintech-finance-sub2/S09P22D107/-/tree/develop/Dotori?ref_type=heads) 🐿
 
-🍇[포도은행 보러가기](https://lab.ssafy.com/s09-fintech-finance-sub2/S09P22D107/-/tree/develop/Podo_Bank?ref_type=heads)
+- [포도은행 보러가기](https://lab.ssafy.com/s09-fintech-finance-sub2/S09P22D107/-/tree/develop/Podo_Bank?ref_type=heads) 🍇
 
 <hr>
 
