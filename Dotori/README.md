@@ -18,6 +18,7 @@
 
 
 ### 3. ERD
+![image](https://github.com/Poposong/WebRTC/assets/81174840/16d7f723-002d-4cc7-977b-3c6cbff748a6)
 
 <hr>
 
