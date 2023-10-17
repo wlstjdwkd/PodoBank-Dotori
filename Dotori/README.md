@@ -9,9 +9,14 @@
 
 ### 2. 주요기능설명
 
-| 계좌등록 | 목표등록 | 계획종료&저축&리워드 | 명세서조회 |
+| 계좌등록 | 계획생성 1 | 계획생성 2 | 계획생성 3 |
 |-------|-------|-------|-------|
-|![Dotori_account_add](https://github.com/tlalswn23/Algorithm/assets/35682216/17b963c4-20c3-478b-9166-d843c728308f) | ![Dotori_purpose_add](https://github.com/tlalswn23/Algorithm/assets/35682216/be3cc203-07d7-458e-9c45-029c4434842b) | ![Dotori_plan_finish](https://github.com/tlalswn23/Algorithm/assets/35682216/614579df-1598-4286-8aba-f354da555cf6) | ![Dotori_specification](https://github.com/tlalswn23/Algorithm/assets/35682216/e7441ad2-7fe2-4371-989c-af2a7f227a5a) |
+|![Dotori_account_add](https://github.com/tlalswn23/Algorithm/assets/35682216/17b963c4-20c3-478b-9166-d843c728308f) | ![plan_create1](https://github.com/tlalswn23/Algorithm/assets/35682216/10b0508f-a506-467c-93f1-8d99f83fa9f8) | ![plan_create2](https://github.com/tlalswn23/Algorithm/assets/35682216/ad776d90-c92f-4c28-bcec-c62068201859) | ![plan_create3](https://github.com/tlalswn23/Algorithm/assets/35682216/5cf71fc0-feb1-4b24-bdb6-b5684331c875) |
+<br>
+
+| 목표등록 | 계획종료&저축&리워드 | 명세서조회 |
+|-------|-------|-------|
+|![Dotori_purpose_add](https://github.com/tlalswn23/Algorithm/assets/35682216/be3cc203-07d7-458e-9c45-029c4434842b) | ![Dotori_plan_finish](https://github.com/tlalswn23/Algorithm/assets/35682216/614579df-1598-4286-8aba-f354da555cf6) | ![Dotori_specification](https://github.com/tlalswn23/Algorithm/assets/35682216/e7441ad2-7fe2-4371-989c-af2a7f227a5a) |
 <br>
 
 - 1원 인증 : '도토리'에서 1원 인증을 위해 계좌를 입력하면, '포도은행'으로 송금자명이 4자리 숫자 명칭으로 송금되어, 이 4자리 숫자를 해당 계좌에서 확인하고 '도토리'에서 입력함으로 인증 절차 완료
