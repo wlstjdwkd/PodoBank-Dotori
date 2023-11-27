@@ -10,6 +10,7 @@
 <hr>
 
 ### 전체 서비스 흐름도
+![image](https://github.com/wlstjdwkd/PodoBank-Dotori/assets/74286424/34029675-a7cd-4001-bf03-119568ea67ad)
 
 <hr>
 
